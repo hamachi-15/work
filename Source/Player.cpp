@@ -1211,7 +1211,12 @@ Player::SubState Player::InputAttack()
 //-----------------------------------------
 bool Player::CommandCheck(GamePadButton command)
 {
+	// 履歴が無ければ判定しない
+	if (input_history.front() == command) return false;
+
+	// 最後に入力されたコマンドと同一ならtrue
 	if (input_history.front() == command) return true;
+
 	return false;
 }
 
@@ -1240,8 +1245,10 @@ void Player::CommandListClear(float elapsed_time)
 //-----------------------------------------
 void Player::AddCommandList(GamePadButton command)
 {
+	// コマンドの有効時間が0.0秒以下なら有効時間を設定
 	if (command_life_timer <= 0.0f) command_life_timer = 0.5f;
 
+	// コマンド履歴を追加
 	input_history.push_front(command);
 }
 
@@ -1309,7 +1316,7 @@ void Player::UpdateCameraState(float elapsed_time)
 		// ロックオンモード
 		if (Input::Instance().GetGamePad().GetButton() & GamePad::BTN_LEFT_TRIGGER)
 		{
-			DirectX::XMVECTOR p, t, v;
+			DirectX::XMVECTOR vec_position, vec_target, vec_vector;
 			switch (old_lockon_state)
 			{
 			case	LockonState::NotLocked:
@@ -1323,29 +1330,29 @@ void Player::UpdateCameraState(float elapsed_time)
 
 					if (lockon_state != LockonState::NotLocked)
 					{
-						p = DirectX::XMLoadFloat3(&position);
-						t = DirectX::XMLoadFloat3(&lockon_enemy->GetActor()->GetPosition());
-						v = DirectX::XMVectorSubtract(t, p);
-						DirectX::XMStoreFloat(&length2, DirectX::XMVector3LengthSq(v));
-						p = DirectX::XMLoadFloat3(&position);
-						t = DirectX::XMLoadFloat3(&character->GetActor()->GetPosition());
-						v = DirectX::XMVectorSubtract(t, p);
-						DirectX::XMStoreFloat(&length1, DirectX::XMVector3LengthSq(v));
+						vec_position = DirectX::XMLoadFloat3(&position);
+						vec_target = DirectX::XMLoadFloat3(&lockon_enemy->GetActor()->GetPosition());
+						vec_vector = DirectX::XMVectorSubtract(vec_target, vec_position);
+						DirectX::XMStoreFloat(&length2, DirectX::XMVector3LengthSq(vec_vector));
+						vec_position = DirectX::XMLoadFloat3(&position);
+						vec_target = DirectX::XMLoadFloat3(&character->GetActor()->GetPosition());
+						vec_vector = DirectX::XMVectorSubtract(vec_target, vec_position);
+						DirectX::XMStoreFloat(&length1, DirectX::XMVector3LengthSq(vec_vector));
 						if (length1 < length2)
 						{
 							lockon_enemy = character;
-							DirectX::XMStoreFloat3(&lock_direction, DirectX::XMVector3Normalize(v));
+							DirectX::XMStoreFloat3(&lock_direction, DirectX::XMVector3Normalize(vec_vector));
 						}
 					}
 					else
 					{
-						p = DirectX::XMLoadFloat3(&position);
-						t = DirectX::XMLoadFloat3(&character->GetActor()->GetPosition());
-						v = DirectX::XMVectorSubtract(t, p);
-						DirectX::XMStoreFloat(&length1, DirectX::XMVector3LengthSq(v));
+						vec_position = DirectX::XMLoadFloat3(&position);
+						vec_target = DirectX::XMLoadFloat3(&character->GetActor()->GetPosition());
+						vec_vector = DirectX::XMVectorSubtract(vec_target, vec_position);
+						DirectX::XMStoreFloat(&length1, DirectX::XMVector3LengthSq(vec_vector));
 
 						lockon_enemy = character;
-						DirectX::XMStoreFloat3(&lock_direction, DirectX::XMVector3Normalize(v));
+						DirectX::XMStoreFloat3(&lock_direction, DirectX::XMVector3Normalize(vec_vector));
 						lockon_state = LockonState::Locked;
 					}
 				}
@@ -1363,12 +1370,12 @@ void Player::UpdateCameraState(float elapsed_time)
 					{
 						lockon_enemy = character;
 						lockon_state = LockonState::Locked;
-						p = DirectX::XMLoadFloat3(&position);
-						t = DirectX::XMLoadFloat3(&character->GetActor()->GetPosition());
-						v = DirectX::XMVectorSubtract(t, p);
+						vec_position = DirectX::XMLoadFloat3(&position);
+						vec_target = DirectX::XMLoadFloat3(&character->GetActor()->GetPosition());
+						vec_vector = DirectX::XMVectorSubtract(vec_target, vec_position);
 
 						lockon_enemy = character;
-						DirectX::XMStoreFloat3(&lock_direction, DirectX::XMVector3Normalize(v));
+						DirectX::XMStoreFloat3(&lock_direction, DirectX::XMVector3Normalize(vec_vector));
 						break;
 					}
 				}
@@ -1425,13 +1432,13 @@ void Player::UpdateCameraState(float elapsed_time)
 			}
 			if (lockon_state == LockonState::Locked)
 			{
-				MessageData::CameraChangeLockonModeData	p = { position, lockon_enemy->GetActor()->GetPosition() };
+				MessageData::CameraChangeLockonModeData	lockoncamera_data = { position, lockon_enemy->GetActor()->GetPosition() };
 				Messenger::Instance().SendData(MessageData::CameraChangeLockonMode, &p);
 				break;
 			}
 		}
-		MessageData::CameraChangeFreeModeData	p = { position };
-		Messenger::Instance().SendData(MessageData::CameraChangeFreeMode, &p);
+		MessageData::CameraChangeFreeModeData	freecamera_data = { position };
+		Messenger::Instance().SendData(MessageData::CameraChangeFreeMode, &freecamera_data);
 		break;
 	}
 	case	State::Death:

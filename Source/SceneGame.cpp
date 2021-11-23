@@ -73,7 +73,7 @@ void SceneGame::Initialize()
 		actor->SetName("Stage");
 		actor->SetPosition(DirectX::XMFLOAT3(0, 0, 0));
 		actor->SetAngle(DirectX::XMFLOAT3( 0, DirectX::XMConvertToRadians(-90), 0));
-		actor->SetScale(DirectX::XMFLOAT3(0.2f, 0.2f, 0.2f));
+		actor->SetScale(DirectX::XMFLOAT3(0.1f, 0.1f, 0.1f));
 		//actor->SetScale(DirectX::XMFLOAT3(5.f, 5.f, 5.f));
 		actor->AddComponent<Stage>();
 		actor->AddShader<PhongVarianceShadowMap>(Graphics::Instance().GetDevice());
@@ -86,10 +86,10 @@ void SceneGame::Initialize()
 		actor->SetUpModel("Data/Model/RPG-Character/Swordman.mdl");
 		actor->SetName("Player");
 		actor->SetAnimationNodeName("Motion");
-		actor->SetPosition(DirectX::XMFLOAT3(-400, 16, -416));
+		actor->SetPosition(DirectX::XMFLOAT3(-200, 16, -216));
 		//actor->SetPosition(DirectX::XMFLOAT3(0, 0, 0));
 		actor->SetAngle(DirectX::XMFLOAT3(0, 0, 0));
-		actor->SetScale(DirectX::XMFLOAT3(0.07f, 0.07f, 0.07f));
+		actor->SetScale(DirectX::XMFLOAT3(0.04f, 0.04f, 0.04));
 		actor->AddComponent<Movement>();
 		actor->AddComponent<Charactor>();
 		actor->AddComponent<Player>();
