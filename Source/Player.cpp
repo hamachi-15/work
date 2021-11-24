@@ -1302,6 +1302,11 @@ void Player::UpdateCameraState(float elapsed_time)
 	DirectX::XMFLOAT3 angle = actor->GetAngle();
 	LockonState old_lockon_state = lockon_state;
 	std::shared_ptr<Enemy> old_lockon_enemy = lockon_enemy;
+	std::shared_ptr<Actor> old_lockon_enemy_actor;
+	if (old_lockon_enemy != nullptr)
+	{
+		old_lockon_enemy_actor = old_lockon_enemy->GetActor();
+	}
 	lockon_state = LockonState::NotLocked;
 	lockon_enemy = nullptr;
 	switch (state)
@@ -1326,7 +1331,8 @@ void Player::UpdateCameraState(float elapsed_time)
 				EnemyManager& manager = EnemyManager::Instance();
 				for (int ii = 0; ii < manager.GetEnemyCount(); ++ii)
 				{
-					std::shared_ptr<Enemy> character = manager.GetEnemy(ii);
+					std::shared_ptr<Enemy> enemy = manager.GetEnemy(ii);
+					std::shared_ptr<Actor> enemy_actor = enemy->GetActor();
 
 					if (lockon_state != LockonState::NotLocked)
 					{
@@ -1335,23 +1341,23 @@ void Player::UpdateCameraState(float elapsed_time)
 						vec_vector = DirectX::XMVectorSubtract(vec_target, vec_position);
 						DirectX::XMStoreFloat(&length2, DirectX::XMVector3LengthSq(vec_vector));
 						vec_position = DirectX::XMLoadFloat3(&position);
-						vec_target = DirectX::XMLoadFloat3(&character->GetActor()->GetPosition());
+						vec_target = DirectX::XMLoadFloat3(&enemy_actor->GetPosition());
 						vec_vector = DirectX::XMVectorSubtract(vec_target, vec_position);
 						DirectX::XMStoreFloat(&length1, DirectX::XMVector3LengthSq(vec_vector));
 						if (length1 < length2)
 						{
-							lockon_enemy = character;
+							lockon_enemy = enemy;
 							DirectX::XMStoreFloat3(&lock_direction, DirectX::XMVector3Normalize(vec_vector));
 						}
 					}
 					else
 					{
 						vec_position = DirectX::XMLoadFloat3(&position);
-						vec_target = DirectX::XMLoadFloat3(&character->GetActor()->GetPosition());
+						vec_target = DirectX::XMLoadFloat3(&enemy_actor->GetPosition());
 						vec_vector = DirectX::XMVectorSubtract(vec_target, vec_position);
 						DirectX::XMStoreFloat(&length1, DirectX::XMVector3LengthSq(vec_vector));
 
-						lockon_enemy = character;
+						lockon_enemy = enemy;
 						DirectX::XMStoreFloat3(&lock_direction, DirectX::XMVector3Normalize(vec_vector));
 						lockon_state = LockonState::Locked;
 					}
@@ -1365,16 +1371,18 @@ void Player::UpdateCameraState(float elapsed_time)
 				EnemyManager& manager = EnemyManager::Instance();
 				for (int ii = 0; ii < manager.GetEnemyCount(); ++ii)
 				{
-					std::shared_ptr<Enemy> character = manager.GetEnemy(ii);
-					if (character == old_lockon_enemy)
+					std::shared_ptr<Enemy> enemy = manager.GetEnemy(ii);
+					std::shared_ptr<Actor> enemy_actor = enemy->GetActor();
+
+					if (enemy == old_lockon_enemy)
 					{
-						lockon_enemy = character;
+						lockon_enemy = enemy;
 						lockon_state = LockonState::Locked;
 						vec_position = DirectX::XMLoadFloat3(&position);
-						vec_target = DirectX::XMLoadFloat3(&character->GetActor()->GetPosition());
+						vec_target = DirectX::XMLoadFloat3(&enemy_actor->GetPosition());
 						vec_vector = DirectX::XMVectorSubtract(vec_target, vec_position);
 
-						lockon_enemy = character;
+						lockon_enemy = enemy;
 						DirectX::XMStoreFloat3(&lock_direction, DirectX::XMVector3Normalize(vec_vector));
 						break;
 					}
@@ -1390,8 +1398,8 @@ void Player::UpdateCameraState(float elapsed_time)
 				{
 					lockon_target_change_time = lockon_target_change_time_max;
 					// ロックオン対象と自分自身の位置からベクトルを算出
-					float dx = old_lockon_enemy->GetActor()->GetPosition().x - position.x;
-					float dz = old_lockon_enemy->GetActor()->GetPosition().z - position.z;
+					float dx = old_lockon_enemy_actor->GetPosition().x - position.x;
+					float dz = old_lockon_enemy_actor->GetPosition().z - position.z;
 					float l = sqrtf(dx * dx + dz * dz);
 					dx /= l;
 					dz /= l;
@@ -1399,11 +1407,12 @@ void Player::UpdateCameraState(float elapsed_time)
 					float angleMax = FLT_MAX;
 					for (int ii = 0; ii < manager.GetEnemyCount(); ++ii)
 					{
-						std::shared_ptr<Enemy> character = manager.GetEnemy(ii);
-						if (character == old_lockon_enemy)
+						std::shared_ptr<Enemy> enemy = manager.GetEnemy(ii);
+						std::shared_ptr<Actor> enemy_actor = enemy->GetActor();
+						if (enemy == old_lockon_enemy)
 							continue;
-						float ddx = character->GetActor()->GetPosition().x - position.x;
-						float ddz = character->GetActor()->GetPosition().z - position.z;
+						float ddx = enemy_actor->GetPosition().x - position.x;
+						float ddz = enemy_actor->GetPosition().z - position.z;
 						float ll = sqrtf(ddx * ddx + ddz * ddz);
 						ddx /= ll;
 						ddz /= ll;
@@ -1414,7 +1423,7 @@ void Player::UpdateCameraState(float elapsed_time)
 							if (cross < angleMax)
 							{
 								angleMax = cross;
-								lockon_enemy = character;
+								lockon_enemy = enemy;
 							}
 						}
 						else if (ax < 0 && cross > 0)
@@ -1422,7 +1431,7 @@ void Player::UpdateCameraState(float elapsed_time)
 							if (cross < angleMax)
 							{
 								angleMax = cross;
-								lockon_enemy = character;
+								lockon_enemy = enemy;
 							}
 						}
 					}
@@ -1430,37 +1439,39 @@ void Player::UpdateCameraState(float elapsed_time)
 				break;
 			}
 			}
+			// ロックオン状態ならロックオンカメラに変更
 			if (lockon_state == LockonState::Locked)
 			{
 				MessageData::CameraChangeLockonModeData	lockoncamera_data = { position, lockon_enemy->GetActor()->GetPosition() };
-				Messenger::Instance().SendData(MessageData::CameraChangeLockonMode, &p);
+				Messenger::Instance().SendData(MessageData::CameraChangeLockonMode, &lockoncamera_data);
 				break;
 			}
 		}
+
 		MessageData::CameraChangeFreeModeData	freecamera_data = { position };
 		Messenger::Instance().SendData(MessageData::CameraChangeFreeMode, &freecamera_data);
 		break;
 	}
 	case	State::Death:
 	{
-		// 死亡時はそれっぽいカメラアングルで死亡
-		// 例えばコレを必殺技などで上手く利用できればかっこいいカメラ演出が作れますね
-		MessageData::CameraChangeMotionModeData	p;
+		// 死亡時用のカメラモーション
+		MessageData::CameraChangeMotionModeData	motioncamera_data;
 		float vx = sinf(angle.y) * 6;
 		float vz = cosf(angle.y) * 6;
-		p.data.push_back({ 0, {position.x + vx, position.y + 50, position.z + vz }, position });
-		p.data.push_back({ 90, {position.x + vx, position.y + 70, position.z + vz }, position });
-		Messenger::Instance().SendData(MessageData::CameraChangeMotionMode, &p);
+		motioncamera_data.data.push_back({ 0, {position.x + vx, position.y + 50, position.z + vz }, position });
+		motioncamera_data.data.push_back({ 90, {position.x + vx, position.y + 70, position.z + vz }, position });
+		Messenger::Instance().SendData(MessageData::CameraChangeMotionMode, &motioncamera_data);
 		break;
 	}
 	case	State::Revive:
 	{
-		MessageData::CameraChangeMotionModeData	p;
+		// 復活時用のカメラモーション
+		MessageData::CameraChangeMotionModeData	motioncamera_data;
 		float vx = sinf(angle.y + DirectX::XM_PIDIV2) * 40;
 		float vz = cosf(angle.y + DirectX::XM_PIDIV2) * 40;
-		p.data.push_back({ 0, {position.x + vx, position.y + 40, position.z + vz }, position });
-		p.data.push_back({ 30, {position.x + vx, position.y + 35, position.z + vz }, position });
-		Messenger::Instance().SendData(MessageData::CameraChangeMotionMode, &p);
+		motioncamera_data.data.push_back({ 0, {position.x + vx, position.y + 40, position.z + vz }, position });
+		motioncamera_data.data.push_back({ 30, {position.x + vx, position.y + 35, position.z + vz }, position });
+		Messenger::Instance().SendData(MessageData::CameraChangeMotionMode, &motioncamera_data);
 		break;
 	}
 	}
