@@ -2,6 +2,8 @@
 #include "Graphics.h"
 #include "ActorManager.h"
 #include "Charactor.h"
+#include "SceneManager.h"
+
 //-----------------------------------------
 // 更新処理
 //-----------------------------------------
@@ -131,6 +133,7 @@ void CollisionManager::Update()
     {
         remove_spheres.erase(iterate_sphere_remove);
     }
+    remove_spheres.clear();
 
     for (std::shared_ptr<CollisionCylinder> cylinder : remove_cylinderes)
     {
@@ -142,6 +145,7 @@ void CollisionManager::Update()
     {
         remove_cylinderes.erase(iterate_remove);
     }
+    remove_cylinderes.clear();
 
     ObjectCollisionResult result;
     // 球vs球の交差判定
@@ -244,6 +248,19 @@ void CollisionManager::Update()
                 if (IntersectCylinderVsCylinder(cylinderA, cylinderB, result))
                 {
                     PushOutCollision(cylinderA, cylinderB, result);
+                    // 現在のシーンがワールドマップならシーンへ敵とエンカウントをしたメッセージを送る
+                    const char* scene_name = SceneManager::Instance().GetCurrentScene()->GetName();
+                    if (strcmp(cylinderA->GetName(), "Player") == 0 && strcmp(scene_name, "SceneWorldMap") == 0 ||
+                        strcmp(cylinderB->GetName(), "Player") == 0 && strcmp(scene_name, "SceneWorldMap") == 0)
+                    {
+                        Message message;
+                        message.message = MessageType::Message_Hit_Boddy;
+                        MetaAI::Instance().SendMessaging(
+                            static_cast<int>(MetaAI::Identity::Collision),   // 送信元
+                            static_cast<int>(MetaAI::Identity::WorldMap),    // 受信先
+                            message);                                        // メッセージ
+                        return;
+                    }
                 }
             }
         }
@@ -272,6 +289,23 @@ void CollisionManager::Draw()
 bool CollisionManager::OnMessage(const Telegram& message)
 {
     return false;
+}
+
+//-----------------------------------------
+// コリジョンリストを全破棄
+//-----------------------------------------
+void CollisionManager::Destroy()
+{
+    std::vector<std::shared_ptr<CollisionSphere>>::iterator iterate_sphere = spheres.begin();
+    for (; iterate_sphere != spheres.end(); iterate_sphere = spheres.begin())
+    {
+        spheres.erase(iterate_sphere);
+    }
+    std::vector<std::shared_ptr<CollisionCylinder>>::iterator iterate_cylindere = cylinderes.begin();
+    for (; iterate_cylindere != cylinderes.end(); iterate_cylindere = cylinderes.begin())
+    {
+        cylinderes.erase(iterate_cylindere);
+    }
 }
 
 //-----------------------------------------

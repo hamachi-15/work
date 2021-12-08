@@ -1,7 +1,10 @@
+#include "Func.hlsli"
 // テクスチャ・サンプラー
 Texture2D diffuse_texture : register(t0);
 SamplerState decal_sampler : register(s0);
-Texture2D shadow_texture : register(t3);
+Texture2D shadow_texture1 : register(t3);
+Texture2D shadow_texture2 : register(t4);
+Texture2D shadow_texture3 : register(t5);
 SamplerState shadow_sampler : register(s3);
 
 static const float Bius = 0.0001f;
@@ -31,7 +34,7 @@ struct PSInput
 //定数バッファ
 cbuffer CBScene : register(b0)
 {
-	float4x4			light_view_projection;
+	row_major float4x4			light_view_projection[3];
 	row_major float4x4	view_projection;
 	float4				light_direction;
 	float4				eye_pos; //カメラ座標
@@ -49,4 +52,24 @@ cbuffer CBSubset : register(b2)
 	float4				material_color;
 };
 
-#include "Func.hlsli"
+//---------------------------------------------
+// カスケードシャドウ算出関数
+//---------------------------------------------
+float3 GetCascadeShadow(float3 world_position)
+{
+	Texture2D shadow_texture[] = { shadow_texture1, shadow_texture2, shadow_texture3 };
+
+	for (int i = 0; i < 3; ++i)
+	{
+		float3 vshadow = GetShadowTex(light_view_projection[i], world_position);
+		float3	shadow_texcoord = vshadow;
+		if (shadow_texcoord.z >= 0 && shadow_texcoord.z <= 1 &&
+			shadow_texcoord.x >= 0 && shadow_texcoord.x <= 1 &&
+			shadow_texcoord.y >= 0 && shadow_texcoord.y <= 1)
+		{
+			return GetShadow(shadow_texture[i], shadow_sampler,
+				vshadow, shadow_parameter);
+		}
+	}
+	return 1;
+}

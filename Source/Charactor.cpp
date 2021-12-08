@@ -47,6 +47,7 @@ void Charactor::Update(float elapsed_time)
 void Charactor::OnGUI()
 {
 	ImGui::InputInt("Health", &health);
+	ImGui::InputInt("ID", &id);
 }
 
 //-----------------------------------------

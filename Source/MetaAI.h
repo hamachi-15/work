@@ -7,6 +7,7 @@ class Actor;
 class Enemy;
 class Player;
 class Charactor;
+class Scene;
 
 class MetaAI
 {
@@ -14,9 +15,10 @@ public:
 	enum class Identity : int
 	{
 		Meta = 0,
-		Collision = 1,	// コリジョンのIDは1
-		Player = 2,		// プレイヤーIDは2~4
-		Enemy = 5		// エネミーIDは5以降を付与
+		WorldMap = 1,	// ワールドマップのID
+		Collision = 2,	// コリジョンのIDは1
+		Player = 3,		// プレイヤーIDは2~4
+		Enemy = 4		// エネミーIDは5以降を付与
 	};
 
 	// コンストラクタ・デストラクタ
@@ -41,6 +43,9 @@ public:
 
 	// MetaAI用のレシーブ処理を指定
 	void Discharge(const Telegram& telegram);
+
+	//
+	void Discharge(Scene* receiver, const Telegram& telegram);
 
 	// メッセージ受信したときの処理
 	bool OnMessages(const Telegram& message);

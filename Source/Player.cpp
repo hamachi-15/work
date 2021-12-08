@@ -9,6 +9,9 @@
 #include "AttackCollitionTime.h"
 #include "MessageData.h"
 #include "Messenger.h"
+#include "PlayerUIHealthFrame.h"
+#include "PlayerUIHealth.h"
+#include "PlayerUIRedHealth.h"
 // プレイヤーの攻撃が当たった時にヒットストップを掛けるo
 // TODO プレイヤーの攻撃時にすこし移動できるようにする？
 //-----------------------------------------
@@ -18,7 +21,6 @@ void Player::OnGUI()
 {
 	if (ImGui::CollapsingHeader("Stete", ImGuiTreeNodeFlags_DefaultOpen))
 	{
-
 		if (ImGui::Button("Death"))
 		{
 			TransitionDeathState();
@@ -33,14 +35,14 @@ void Player::OnGUI()
 		{
 			switch (state)
 			{
-			case	State::Idle:	ImGui::Text("Idle");	break;
-			case	State::Move:	ImGui::Text("Move");	break;
-			case	State::Land:	ImGui::Text("Land");	break;
-			case	State::Attack:	ImGui::Text("Attack");	break;
-			case	State::Avoid:	ImGui::Text("Avoid");	break;
-			case	State::Damage:	ImGui::Text("Damage");	break;
-			case	State::Death:	ImGui::Text("Death");	break;
-			case	State::Revive:	ImGui::Text("Revive");	break;
+			case State::Idle:	ImGui::Text("Idle");	break;
+			case State::Move:	ImGui::Text("Move");	break;
+			case State::Land:	ImGui::Text("Land");	break;
+			case State::Attack:	ImGui::Text("Attack");	break;
+			case State::Avoid:	ImGui::Text("Avoid");	break;
+			case State::Damage:	ImGui::Text("Damage");	break;
+			case State::Death:	ImGui::Text("Death");	break;
+			case State::Revive:	ImGui::Text("Revive");	break;
 			}
 			switch (sub_state)
 			{
@@ -74,7 +76,7 @@ void Player::Start()
 {
 	// アクターの取得
 	std::shared_ptr<Actor> actor = GetActor();
-	
+
 	// キャラクターの取得
 	charactor = actor->GetComponent<Charactor>();
 
@@ -86,6 +88,67 @@ void Player::Start()
 
 	// 走った時のスピード倍率設定
 	charactor->SetRunSpeedScale(1.5f);
+	UIParameter parameter;
+
+	parameter.filename = "Data/Sprite/UIAseet/KP_clusterUI_v100/hp_gauge/gauge_frame.png";
+	parameter.name = "HealthGaugeFrame";
+	parameter.position = {10, 5};
+	std::shared_ptr<PlayerUIHealthFrame> health_gage_freame = std::make_shared<PlayerUIHealthFrame>(parameter);
+	
+	//
+	parameter.filename = "Data/Sprite/UIAseet/KP_clusterUI_v100/hp_gauge/gauge_base.png";
+	parameter.name = "HealthGaugeBase";
+	parameter.position = {12, 1};
+	parameter.parent = health_gage_freame;
+	std::shared_ptr<PlayerUIHealthFrame> health_gage_base = std::make_shared<PlayerUIHealthFrame>(parameter);
+
+	// 
+	parameter.filename = "Data/Sprite/UIAseet/KP_clusterUI_v100/hp_gauge/gauge_bl.png";
+	parameter.name = "HealthGauge";
+	parameter.position = {1, 1};
+	parameter.parent = health_gage_base;
+	std::shared_ptr<PlayerHealth> health_gage = std::make_shared<PlayerHealth>(parameter);
+	health_gage->SetCharactor(charactor);
+	
+	// Hpゲージの減少幅を示すゲージ
+	parameter.filename = "Data/Sprite/UIAseet/KP_clusterUI_v100/hp_gauge/gauge_rd.png";
+	parameter.name = "HealthSubtructGauge";
+	parameter.position = { 0, 0 };
+	parameter.parent = health_gage;
+	std::shared_ptr<PlayerUIRedHealth> health_red_gage = std::make_shared<PlayerUIRedHealth>(parameter);
+	health_red_gage->SetCharactor(charactor);
+	
+	// UIマネージャーに登録
+	UIManager::Instance().RegisterUI(health_gage_base);
+	UIManager::Instance().RegisterUI(health_red_gage);
+	UIManager::Instance().RegisterUI(health_gage);
+	UIManager::Instance().RegisterUI(health_gage_freame);
+
+	// 特殊ゲージ設定
+	parameter.filename = "Data/Sprite/UIAseet/KP_clusterUI_v100/hp_gauge/gauge_frame.png";
+	parameter.name = "GaugeFrame";
+	parameter.position = { 10, 55 };
+	parameter.parent = nullptr;
+	std::shared_ptr<PlayerUIHealthFrame> gage_freame = std::make_shared<PlayerUIHealthFrame>(parameter);
+
+	//
+	parameter.filename = "Data/Sprite/UIAseet/KP_clusterUI_v100/hp_gauge/gauge_base.png";
+	parameter.name = "HealthGaugeBase";
+	parameter.position = { 12, 1 };
+	parameter.parent = gage_freame;
+	std::shared_ptr<PlayerUIHealthFrame> gage_base = std::make_shared<PlayerUIHealthFrame>(parameter);
+	
+	parameter.filename = "Data/Sprite/UIAseet/KP_clusterUI_v100/hp_gauge/gauge_yl.png";
+	parameter.name = "Gauge";
+	parameter.position = { 1, 1 };
+	parameter.parent = gage_base;
+	std::shared_ptr<PlayerHealth> gage = std::make_shared<PlayerHealth>(parameter);
+	gage->SetCharactor(charactor);
+
+	// UIマネージャーに登録
+	UIManager::Instance().RegisterUI(gage_base);
+	UIManager::Instance().RegisterUI(gage);
+	UIManager::Instance().RegisterUI(gage_freame);
 
 	// コリジョンの登録
 	{
@@ -96,9 +159,9 @@ void Player::Start()
 		parameter.name = "Player";
 		parameter.node_name = "";
 		parameter.position = {};
-		parameter.radius = 2.5f;
+		parameter.radius = 1.5f;
 		parameter.weight = 5.0f;
-		parameter.height = 15.0f;
+		parameter.height = 9.0f;
 		parameter.collision_flg = true;
 		parameter.actor_id = charactor->GetID();
 		parameter.element = CollisionElement::Body;
@@ -131,11 +194,10 @@ void Player::Start()
 		parameter.name = "PlayerLeftFoot";
 		parameter.node_name = "B_L_Foot";
 		parameter.position = foot_position;
-		parameter.radius = 1.5f;
-		parameter.weight = 1.0f;
-		parameter.height = 0.0f;
-		parameter.collision_flg = false;
-		parameter.actor_id = charactor->GetID();
+		//parameter.radius = 1.0f;
+		//parameter.weight = 1.0f;
+		//parameter.collision_flg = false;
+		//parameter.actor_id = charactor->GetID();
 		parameter.element = CollisionElement::Weppon;
 		parameter.mask = CollisionPositionMask::Collision_Mask_Member_Position;
 		charactor->SetCollision(actor, parameter, CollisionMeshType::Sphere);
@@ -145,11 +207,10 @@ void Player::Start()
 		parameter.name = "PlayerRightFoot";
 		parameter.node_name = "B_R_Foot";
 		parameter.position = foot_position;
-		parameter.radius = 1.5f;
-		parameter.weight = 1.0f;
-		parameter.height = 0.0f;
-		parameter.collision_flg = false;
-		parameter.actor_id = charactor->GetID();
+		//parameter.radius = 1.0f;
+		//parameter.weight = 1.0f;
+		//parameter.collision_flg = false;
+		//parameter.actor_id = charactor->GetID();
 		parameter.element = CollisionElement::Weppon;
 		parameter.mask = CollisionPositionMask::Collision_Mask_Member_Position;
 		charactor->SetCollision(actor, parameter, CollisionMeshType::Sphere);
@@ -164,30 +225,31 @@ void Player::Start()
 //-----------------------------------------
 void Player::Update(float elapsed_time)
 {
-	// カメラステートの更新
+	// カメラステートの更新処理
 	UpdateCameraState(elapsed_time);
 
 	// 状態ごとの更新処理
 	switch (state)
 	{
-	case	State::Idle:	UpdateIdleState(elapsed_time);	 break;
-	case	State::Move:	UpdateMoveState(elapsed_time);	 break;
-	case	State::Attack:	UpdateAttackState(elapsed_time); break;
-	case	State::Avoid:	UpdateAvoidState(elapsed_time);	 break;
-	case	State::Damage:	UpdateDamageState(elapsed_time); break;
-	case	State::Death:	UpdateDeathState(elapsed_time);	 break;
-	case	State::Revive:	UpdateReviveState(elapsed_time); break;
+	case State::Idle:	UpdateIdleState(elapsed_time);	 break;
+	case State::Move:	UpdateMoveState(elapsed_time);	 break;
+	case State::Attack:	UpdateAttackState(elapsed_time); break;
+	case State::Avoid:	UpdateAvoidState(elapsed_time);	 break;
+	case State::Damage:	UpdateDamageState(elapsed_time); break;
+	case State::Death:	UpdateDeathState(elapsed_time);	 break;
+	case State::Revive:	UpdateReviveState(elapsed_time); break;
 	}
 
 	// キャラクター操作処理
 	movement->UpdateVelocity(elapsed_time);
 
+	// コマンド履歴クリア処理
 	CommandListClear(elapsed_time);
 
 	// 無敵時間更新処理
 	charactor->UpdateInvincibleTimer(elapsed_time);
 
-	// ヒットストップの更新
+	// ヒットストップの更新処理
 	charactor->UpdateHitStop(elapsed_time);
 }
 
@@ -205,6 +267,7 @@ bool Player::OnMessages(const Telegram& message)
 
 		// 攻撃ヒットフラグを立てる
 		charactor->SetHitAttackFlag(true);
+		return true;
 		break;
 	// 敵の攻撃がプレイヤーに当たった
 	case MessageType::Message_GetHit_Attack:
@@ -224,6 +287,7 @@ bool Player::OnMessages(const Telegram& message)
 			// 死亡状態に遷移
 			TransitionDeathState();
 		}
+		return true;
 		break;
 	case MessageType::Message_Hit_Boddy:
 
@@ -1212,7 +1276,7 @@ Player::SubState Player::InputAttack()
 bool Player::CommandCheck(GamePadButton command)
 {
 	// 履歴が無ければ判定しない
-	if (input_history.front() == command) return false;
+	if (input_history.size() == 0) return false;
 
 	// 最後に入力されたコマンドと同一ならtrue
 	if (input_history.front() == command) return true;
@@ -1297,6 +1361,7 @@ void Player::OnDead()
 //-----------------------------------------
 void Player::UpdateCameraState(float elapsed_time)
 {
+
 	std::shared_ptr<Actor> actor = GetActor();
 	DirectX::XMFLOAT3 position = actor->GetPosition();
 	DirectX::XMFLOAT3 angle = actor->GetAngle();
@@ -1317,162 +1382,181 @@ void Player::UpdateCameraState(float elapsed_time)
 	case	State::Land:
 	case	State::Attack:
 	case	State::Damage:
-	{
-		// ロックオンモード
-		if (Input::Instance().GetGamePad().GetButton() & GamePad::BTN_LEFT_TRIGGER)
 		{
-			DirectX::XMVECTOR vec_position, vec_target, vec_vector;
-			switch (old_lockon_state)
+			// ロックオンモード
+			if (Input::Instance().GetGamePad().GetButton() & GamePad::BTN_LEFT_TRIGGER)
 			{
-			case	LockonState::NotLocked:
-			{
-				// 一番近い距離のキャラクターを検索
-				float	length1, length2;
-				EnemyManager& manager = EnemyManager::Instance();
-				for (int ii = 0; ii < manager.GetEnemyCount(); ++ii)
+				DirectX::XMVECTOR vec_position, vec_target, vec_vector;
+				switch (old_lockon_state)
 				{
-					std::shared_ptr<Enemy> enemy = manager.GetEnemy(ii);
-					std::shared_ptr<Actor> enemy_actor = enemy->GetActor();
-
-					if (lockon_state != LockonState::NotLocked)
-					{
-						vec_position = DirectX::XMLoadFloat3(&position);
-						vec_target = DirectX::XMLoadFloat3(&lockon_enemy->GetActor()->GetPosition());
-						vec_vector = DirectX::XMVectorSubtract(vec_target, vec_position);
-						DirectX::XMStoreFloat(&length2, DirectX::XMVector3LengthSq(vec_vector));
-						vec_position = DirectX::XMLoadFloat3(&position);
-						vec_target = DirectX::XMLoadFloat3(&enemy_actor->GetPosition());
-						vec_vector = DirectX::XMVectorSubtract(vec_target, vec_position);
-						DirectX::XMStoreFloat(&length1, DirectX::XMVector3LengthSq(vec_vector));
-						if (length1 < length2)
-						{
-							lockon_enemy = enemy;
-							DirectX::XMStoreFloat3(&lock_direction, DirectX::XMVector3Normalize(vec_vector));
-						}
-					}
-					else
-					{
-						vec_position = DirectX::XMLoadFloat3(&position);
-						vec_target = DirectX::XMLoadFloat3(&enemy_actor->GetPosition());
-						vec_vector = DirectX::XMVectorSubtract(vec_target, vec_position);
-						DirectX::XMStoreFloat(&length1, DirectX::XMVector3LengthSq(vec_vector));
-
-						lockon_enemy = enemy;
-						DirectX::XMStoreFloat3(&lock_direction, DirectX::XMVector3Normalize(vec_vector));
-						lockon_state = LockonState::Locked;
-					}
-				}
-				break;
-			}
-			case	LockonState::Locked:
-			{
-				// ロックオン対象が存在しているかチェックして
-				// 対象がいればロックオンを継続させる
-				EnemyManager& manager = EnemyManager::Instance();
-				for (int ii = 0; ii < manager.GetEnemyCount(); ++ii)
+				case	LockonState::NotLocked:
 				{
-					std::shared_ptr<Enemy> enemy = manager.GetEnemy(ii);
-					std::shared_ptr<Actor> enemy_actor = enemy->GetActor();
-
-					if (enemy == old_lockon_enemy)
-					{
-						lockon_enemy = enemy;
-						lockon_state = LockonState::Locked;
-						vec_position = DirectX::XMLoadFloat3(&position);
-						vec_target = DirectX::XMLoadFloat3(&enemy_actor->GetPosition());
-						vec_vector = DirectX::XMVectorSubtract(vec_target, vec_position);
-
-						lockon_enemy = enemy;
-						DirectX::XMStoreFloat3(&lock_direction, DirectX::XMVector3Normalize(vec_vector));
-						break;
-					}
-				}
-				// 右スティックでロックオン対象を変更する処理
-				GamePad& gamePad = Input::Instance().GetGamePad();
-				float ax = gamePad.GetAxisRX();	// 水平のみ
-				// 垂直方向は使わないでおく
-				lockon_target_change_time -= 60.0f * elapsed_time;
-				if (lockon_enemy &&
-					lockon_target_change_time <= 0 &&
-					ax * ax > 0.3f)
-				{
-					lockon_target_change_time = lockon_target_change_time_max;
-					// ロックオン対象と自分自身の位置からベクトルを算出
-					float dx = old_lockon_enemy_actor->GetPosition().x - position.x;
-					float dz = old_lockon_enemy_actor->GetPosition().z - position.z;
-					float l = sqrtf(dx * dx + dz * dz);
-					dx /= l;
-					dz /= l;
-					// 外積を用いて左右判定を行い、角度的に最も近い対象にロックオンを変える
-					float angleMax = FLT_MAX;
+					// 一番近い距離のキャラクターを検索
+					float	length1, length2;
+					EnemyManager& manager = EnemyManager::Instance();
 					for (int ii = 0; ii < manager.GetEnemyCount(); ++ii)
 					{
 						std::shared_ptr<Enemy> enemy = manager.GetEnemy(ii);
 						std::shared_ptr<Actor> enemy_actor = enemy->GetActor();
-						if (enemy == old_lockon_enemy)
-							continue;
-						float ddx = enemy_actor->GetPosition().x - position.x;
-						float ddz = enemy_actor->GetPosition().z - position.z;
-						float ll = sqrtf(ddx * ddx + ddz * ddz);
-						ddx /= ll;
-						ddz /= ll;
-						float cross = dx * ddz - dz * ddx;
-						if (ax > 0 && cross < 0)
+
+						if (lockon_state != LockonState::NotLocked)
 						{
-							cross = abs(cross);
-							if (cross < angleMax)
+							vec_position = DirectX::XMLoadFloat3(&position);
+							vec_target = DirectX::XMLoadFloat3(&lockon_enemy->GetActor()->GetPosition());
+							vec_vector = DirectX::XMVectorSubtract(vec_target, vec_position);
+							DirectX::XMStoreFloat(&length2, DirectX::XMVector3LengthSq(vec_vector));
+							vec_position = DirectX::XMLoadFloat3(&position);
+							vec_target = DirectX::XMLoadFloat3(&enemy_actor->GetPosition());
+							vec_vector = DirectX::XMVectorSubtract(vec_target, vec_position);
+							DirectX::XMStoreFloat(&length1, DirectX::XMVector3LengthSq(vec_vector));
+							if (length1 < length2)
 							{
-								angleMax = cross;
 								lockon_enemy = enemy;
+								DirectX::XMStoreFloat3(&lock_direction, DirectX::XMVector3Normalize(vec_vector));
 							}
 						}
-						else if (ax < 0 && cross > 0)
+						else
 						{
-							if (cross < angleMax)
+							vec_position = DirectX::XMLoadFloat3(&position);
+							vec_target = DirectX::XMLoadFloat3(&enemy_actor->GetPosition());
+							vec_vector = DirectX::XMVectorSubtract(vec_target, vec_position);
+							DirectX::XMStoreFloat(&length1, DirectX::XMVector3LengthSq(vec_vector));
+
+							lockon_enemy = enemy;
+							DirectX::XMStoreFloat3(&lock_direction, DirectX::XMVector3Normalize(vec_vector));
+							lockon_state = LockonState::Locked;
+						}
+					}
+					break;
+				}
+				case	LockonState::Locked:
+				{
+					// ロックオン対象が存在しているかチェックして
+					// 対象がいればロックオンを継続させる
+					EnemyManager& manager = EnemyManager::Instance();
+					for (int ii = 0; ii < manager.GetEnemyCount(); ++ii)
+					{
+						std::shared_ptr<Enemy> enemy = manager.GetEnemy(ii);
+						std::shared_ptr<Actor> enemy_actor = enemy->GetActor();
+
+						if (enemy == old_lockon_enemy)
+						{
+							lockon_enemy = enemy;
+							lockon_state = LockonState::Locked;
+							vec_position = DirectX::XMLoadFloat3(&position);
+							vec_target = DirectX::XMLoadFloat3(&enemy_actor->GetPosition());
+							vec_vector = DirectX::XMVectorSubtract(vec_target, vec_position);
+
+							lockon_enemy = enemy;
+							DirectX::XMStoreFloat3(&lock_direction, DirectX::XMVector3Normalize(vec_vector));
+							break;
+						}
+					}
+					// 右スティックでロックオン対象を変更する処理
+					GamePad& gamePad = Input::Instance().GetGamePad();
+					float ax = gamePad.GetAxisRX();	// 水平のみ
+					// 垂直方向は使わないでおく
+					lockon_target_change_time -= 60.0f * elapsed_time;
+					if (lockon_enemy &&
+						lockon_target_change_time <= 0 &&
+						ax * ax > 0.3f)
+					{
+						lockon_target_change_time = lockon_target_change_time_max;
+						// ロックオン対象と自分自身の位置からベクトルを算出
+						float dx = old_lockon_enemy_actor->GetPosition().x - position.x;
+						float dz = old_lockon_enemy_actor->GetPosition().z - position.z;
+						float l = sqrtf(dx * dx + dz * dz);
+						dx /= l;
+						dz /= l;
+						// 外積を用いて左右判定を行い、角度的に最も近い対象にロックオンを変える
+						float angleMax = FLT_MAX;
+						for (int ii = 0; ii < manager.GetEnemyCount(); ++ii)
+						{
+							std::shared_ptr<Enemy> enemy = manager.GetEnemy(ii);
+							std::shared_ptr<Actor> enemy_actor = enemy->GetActor();
+							if (enemy == old_lockon_enemy)
+								continue;
+							float ddx = enemy_actor->GetPosition().x - position.x;
+							float ddz = enemy_actor->GetPosition().z - position.z;
+							float ll = sqrtf(ddx * ddx + ddz * ddz);
+							ddx /= ll;
+							ddz /= ll;
+							float cross = dx * ddz - dz * ddx;
+							if (ax > 0 && cross < 0)
 							{
-								angleMax = cross;
-								lockon_enemy = enemy;
+								cross = abs(cross);
+								if (cross < angleMax)
+								{
+									angleMax = cross;
+									lockon_enemy = enemy;
+								}
+							}
+							else if (ax < 0 && cross > 0)
+							{
+								if (cross < angleMax)
+								{
+									angleMax = cross;
+									lockon_enemy = enemy;
+								}
 							}
 						}
 					}
+					break;
 				}
-				break;
+				}
+				// ロックオン状態ならロックオンカメラに変更
+				if (lockon_state == LockonState::Locked)
+				{
+					MessageData::CameraChangeLockonModeData	lockoncamera_data = { position, lockon_enemy->GetActor()->GetPosition() };
+					Messenger::Instance().SendData(MessageData::CameraChangeLockonMode, &lockoncamera_data);
+					break;
+				}
 			}
-			}
-			// ロックオン状態ならロックオンカメラに変更
-			if (lockon_state == LockonState::Locked)
-			{
-				MessageData::CameraChangeLockonModeData	lockoncamera_data = { position, lockon_enemy->GetActor()->GetPosition() };
-				Messenger::Instance().SendData(MessageData::CameraChangeLockonMode, &lockoncamera_data);
-				break;
-			}
-		}
 
-		MessageData::CameraChangeFreeModeData	freecamera_data = { position };
-		Messenger::Instance().SendData(MessageData::CameraChangeFreeMode, &freecamera_data);
-		break;
-	}
+			MessageData::CameraChangeFreeModeData	freecamera_data = { position };
+			Messenger::Instance().SendData(MessageData::CameraChangeFreeMode, &freecamera_data);
+			break;
+		}
 	case	State::Death:
-	{
-		// 死亡時用のカメラモーション
-		MessageData::CameraChangeMotionModeData	motioncamera_data;
-		float vx = sinf(angle.y) * 6;
-		float vz = cosf(angle.y) * 6;
-		motioncamera_data.data.push_back({ 0, {position.x + vx, position.y + 50, position.z + vz }, position });
-		motioncamera_data.data.push_back({ 90, {position.x + vx, position.y + 70, position.z + vz }, position });
-		Messenger::Instance().SendData(MessageData::CameraChangeMotionMode, &motioncamera_data);
-		break;
-	}
+		{
+			// 死亡時用のカメラモーション
+			MessageData::CameraChangeMotionModeData	motioncamera_data;
+			float vx = sinf(angle.y) * 6;
+			float vz = cosf(angle.y) * 6;
+			//motioncamera_data.data.push_back({ 0, {position.x + vx, position.y + 50, position.z + vz }, position });
+			//motioncamera_data.data.push_back({ 90, {position.x + vx, position.y, position.z + vz }, position });
+			Messenger::Instance().SendData(MessageData::CameraChangeMotionMode, &motioncamera_data);
+			break;
+		}
 	case	State::Revive:
-	{
-		// 復活時用のカメラモーション
-		MessageData::CameraChangeMotionModeData	motioncamera_data;
-		float vx = sinf(angle.y + DirectX::XM_PIDIV2) * 40;
-		float vz = cosf(angle.y + DirectX::XM_PIDIV2) * 40;
-		motioncamera_data.data.push_back({ 0, {position.x + vx, position.y + 40, position.z + vz }, position });
-		motioncamera_data.data.push_back({ 30, {position.x + vx, position.y + 35, position.z + vz }, position });
-		Messenger::Instance().SendData(MessageData::CameraChangeMotionMode, &motioncamera_data);
-		break;
-	}
+		{
+			// 復活時用のカメラモーション
+			MessageData::CameraChangeMotionModeData	motioncamera_data;
+			float vx = sinf(angle.y + DirectX::XM_PIDIV2) * 40;
+			float vz = cosf(angle.y + DirectX::XM_PIDIV2) * 40;
+			motioncamera_data.data.push_back({ 0, {position.x + vx, position.y + 40, position.z + vz }, position });
+			motioncamera_data.data.push_back({ 30, {position.x + vx, position.y + 35, position.z + vz }, position });
+			Messenger::Instance().SendData(MessageData::CameraChangeMotionMode, &motioncamera_data);
+			break;
+		}
+	case State::Encounter:
+		if (fase == 0) 
+		{
+			start_position = Camera::Instance().GetEye();
+			fase++;
+		}
+		{
+			// エンカウント時のカメラモーション
+			MessageData::CameraChangeMotionModeData motioncamera_data;
+			float vx = sinf(angle.y) * 4;
+			float vz = cosf(angle.y) * 4;
+			DirectX::XMVECTOR vector = DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&position), DirectX::XMLoadFloat3(&start_position));
+			vector = DirectX::XMVector3Normalize(vector);
+			DirectX::XMFLOAT3 float_vector;
+			DirectX::XMStoreFloat3(&float_vector, vector);
+			motioncamera_data.data.push_back({ 0, {start_position.x, start_position.y, start_position.z}, position });
+			motioncamera_data.data.push_back({ 50, {start_position.x + float_vector.x * 10, start_position.y - 0.5f, start_position.z + float_vector.z * 10 }, position });
+			Messenger::Instance().SendData(MessageData::CameraChangeMotionMode, &motioncamera_data);
+		}
 	}
 }

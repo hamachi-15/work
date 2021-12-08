@@ -22,7 +22,7 @@ PSInput main(VSInput input)
 	output.color.a = input.color.a * material_color.a;
 	output.texcoord = input.texcoord;
 
-	output.shadow = GetShadowTex(light_view_projection, wpos);
+	//output.shadow = GetShadowTex(light_view_projection, wpos);
 	return output;
 
 }

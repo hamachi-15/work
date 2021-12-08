@@ -155,16 +155,16 @@ void WanderAction::Start(std::string action_name)
 //-----------------------------------
 ActionBase::State WanderAction::Run(float elapsed_time)
 {
-	std::shared_ptr<Actor> actor = owner->GetActor();
+	std::shared_ptr<Actor> owner_actor = owner->GetActor();
 	// 目的地点までのXZ平面での距離判定
-	DirectX::XMFLOAT3 position =  actor->GetPosition();
+	DirectX::XMFLOAT3 position = owner_actor->GetPosition();
 	DirectX::XMFLOAT3 target_position = owner->GetTargetPosition();
 	float vx = target_position.x - position.x;
 	float vz = target_position.z - position.z;
 	float distSq = vx * vx + vz * vz;
 
 	// 目的地へ着いた
-	std::shared_ptr<CollisionCylinder> collision = CollisionManager::Instance().GetCollisionCylinderFromName(actor->GetName());
+	std::shared_ptr<CollisionCylinder> collision = CollisionManager::Instance().GetCollisionCylinderFromName(owner_actor->GetName());
 	float radius = collision->GetRadius();
 	if (distSq < radius * radius)
 	{
@@ -187,7 +187,7 @@ ActionBase::State WanderAction::Run(float elapsed_time)
 }
 void LeaveAction::Start(std::string action_name)
 {
-	std::string animation_name = owner->GetName();;
+	std::string animation_name = owner->GetName();
 	// アニメーションデータベースからアニメーションデータを取得
 	std::shared_ptr<AnimationData> animation = GameDataBase::Instance().GetAnimationData(animation_name + "Walk");
 	// アニメーションデータを取得出来たら再生
@@ -243,7 +243,7 @@ ActionBase::State LeaveAction::Run(float elapsed_time)
 	float distSq = vx * vx + vz * vz;
 
 	// 目的地へ着いた
-	std::shared_ptr<CollisionCylinder> collision = CollisionManager::Instance().GetCollisionCylinderFromName(owner->GetName());
+	std::shared_ptr<CollisionCylinder> collision = CollisionManager::Instance().GetCollisionCylinderFromName(owner_actor->GetName());
 	float radius = collision->GetRadius();
 	if (distSq < radius * radius)
 	{

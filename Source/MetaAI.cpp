@@ -4,6 +4,7 @@
 #include "EnemyManager.h"
 #include "Player.h"
 #include "Charactor.h"
+#include "SceneManager.h"
 
 //-----------------------------------
 // コンストラクタ
@@ -24,7 +25,7 @@ MetaAI::MetaAI()
 			AppearanceEnemy(0.0f);
 			count++;
 		}
-		else //if (count >= 1/*EnemyManager::EnemyCountLimit::Min_Limit*/)
+		else
 		{
 			break;
 		}
@@ -97,6 +98,15 @@ void MetaAI::Discharge(const Telegram& telegram)
 	}
 }
 
+void MetaAI::Discharge(Scene* receiver, const Telegram& telegram)
+{
+	if (!receiver->OnMessages(telegram))
+	{
+		//受信できなかったときの処理
+		_RPT0(_CRT_WARN, "\n error:Scene Receive Failed");
+	}
+}
+
 //-----------------------------------
 // メッセージ受信したときの処理
 //-----------------------------------
@@ -144,6 +154,12 @@ void MetaAI::SendMessaging(int sender, int receiver, Message message, int enemy_
 		//ディレイ無しメッセージ（即時配送メッセージ）
 		Discharge(telegram);
 	}
+	else if(receiver == static_cast<int>(MetaAI::Identity::WorldMap))
+	{// 
+		Telegram telegram(sender, receiver, message);
+		//ディレイ無しメッセージ（即時配送メッセージ）
+		Discharge(SceneManager::Instance().GetCurrentScene(), telegram);
+	}	
 	else if(receiver == static_cast<int>(MetaAI::Identity::Player))
 	{// プレイヤーが受信者
 		//メッセージデータを作成

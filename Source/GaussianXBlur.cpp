@@ -12,27 +12,21 @@ GaussianXBlur::GaussianXBlur(ID3D11Device* device, u_int buffer_width, u_int buf
 
 }
 
-void GaussianXBlur::Begin(ID3D11DeviceContext* context, BlurRenderContext& bulr_render_context)
+void GaussianXBlur::Begin(ID3D11DeviceContext* context)
 {
-	ID3D11RenderTargetView* rtv[1] = { xblur_texture->GetRenderTargetView() };
-	ID3D11DepthStencilView* dsv = depth_texture->GetDepthStencilView();
-	context->OMSetRenderTargets(1, rtv, dsv);
+	Graphics& graphics = Graphics::Instance();
+	// レンダーターゲット設定
+	ID3D11RenderTargetView* render_target_view[1] = { xblur_texture->GetRenderTargetView() };
+	ID3D11DepthStencilView* depth_stensil_view = depth_texture->GetDepthStencilView();
+	graphics.SetRenderTargetView(render_target_view, depth_stensil_view);
 
 	// 画面クリア
-	float clear_color[4] = { 1.0f,1.0f,1.0f,1.0f };
-	context->ClearRenderTargetView(rtv[0], clear_color);
-	context->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+	graphics.ScreenClear(render_target_view, depth_stensil_view);
 
 	// ビューポートの設定
-	D3D11_VIEWPORT vp;
-	vp.Width = (FLOAT)xblur_texture->GetWidth();
-	vp.Height = (FLOAT)xblur_texture->GetHeight();
-	vp.MinDepth = 0.0f;
-	vp.MaxDepth = 1.0f;
-	vp.TopLeftX = 0;
-	vp.TopLeftY = 0;
-	context->RSSetViewports(1, &vp);
+	graphics.SetViewport(static_cast<float>(xblur_texture->GetWidth()), static_cast<float>(xblur_texture->GetHeight()));
 
+	// シェーダーの設定
 	Activate(context);
 }
 
@@ -40,9 +34,10 @@ void GaussianXBlur::End(ID3D11DeviceContext* context)
 {
 	Graphics& graphics = Graphics::Instance();
 	
+	// シェーダーの設定
 	InActivate(context);
 
 	// レンダーターゲットの回復
 	ID3D11RenderTargetView* backbuffer = graphics.GetRenderTargetView();
-	context->OMSetRenderTargets(1, &backbuffer, graphics.GetDepthStencilView());
+	graphics.SetRenderTargetView(&backbuffer, graphics.GetDepthStencilView());
 }

@@ -1,9 +1,10 @@
 #include "Graphics.h"
 #include "Charactor.h"
 #include "Telegram.h"
+#include "ActorManager.h"
 #include "EnemySlime.h"
 #include "EnemyManager.h"
-#include "ActorManager.h"
+
 #include "NodeBase.h"
 #include "BehaviorTree.h"
 #include "BehaviorData.h"
@@ -31,23 +32,28 @@ EnemySlime::~EnemySlime()
 //-----------------------------------------
 void EnemySlime::OnGUI()
 {
-	std::string str = "";
-	if (active_node != nullptr)
-	{
-		str = active_node->GetName();
-	}
-	ImGui::Text(u8"Behavior　%s", str.c_str());
-
 	DirectX::XMFLOAT3 origin = GetTerritoryOrigin();
 	ImGui::InputFloat3("territory_origin", &origin.x);
-	int c = (int)GetActor().use_count();
-	ImGui::InputInt("actor_counter", &c);
-	int health = GetCharactor()->GetHealth();
-	ImGui::InputInt("Health", &health);
-	int id = GetCharactor()->GetID();
-	ImGui::InputInt("ID", &id);
 	bool attack_flag = GetAttackFlag();
 	ImGui::Checkbox("AttackFlag", &attack_flag);
+
+	// ビヘイビア関連情報
+	if (ImGui::CollapsingHeader("BehaviorTree"))
+	{
+		ImGui::TextColored(ImVec4(1, 0, 1, 1), u8"-------アクティブになっているノード------");
+		std::string child_str = "";
+		std::string parent_str = "";
+		if (active_node != nullptr)
+		{
+			parent_str = active_node->GetParent()->GetName();
+			child_str = active_node->GetName();
+		}
+		ImGui::Text(u8"ActiveParentNode　%s", parent_str.c_str());
+		ImGui::Text(u8"ActiveChildNode　%s", child_str.c_str());
+		
+		ImGui::TextColored(ImVec4(1, 0, 1, 1), u8"-------ノードツリー-------");
+		ai_tree->DrawNodeGUI();
+	}
 }
 
 //-----------------------------------------
@@ -99,8 +105,8 @@ void EnemySlime::Start()
 		parameter.node_name = "";
 		parameter.actor_id = charactor->GetID() + GetIdentity();
 		parameter.position = { 0, 0, 0 };
-		parameter.radius = 6.5f;
-		parameter.height = 10.0f;
+		parameter.radius = 3.5f;
+		parameter.height = 6.5f;
 		parameter.weight = 6.5f;
 		parameter.collision_flg = true;
 		parameter.actor_type = CollisionActorType::Enemy;
@@ -115,7 +121,7 @@ void EnemySlime::Start()
 		parameter.name = haed_collision_name.c_str();
 		parameter.node_name = "BottomEyeCover";
 		parameter.position = head_position;
-		parameter.radius = 5.0f;
+		parameter.radius = 4.0f;
 		parameter.weight = 1.0f;
 		parameter.height = 0.0f;
 		parameter.collision_flg = false;
@@ -208,7 +214,7 @@ void EnemySlime::Destroy()
 	{
 		CollisionManager::Instance().UnregisterSphere(sphere);
 	}
-	CollisionManager::Instance().UnregisterCylinder(CollisionManager::Instance().GetCollisionCylinderFromName(GetName()));
+	CollisionManager::Instance().UnregisterCylinder(CollisionManager::Instance().GetCollisionCylinderFromName(actor->GetName()));
 
 	// 敵マネージャーから削除
 	EnemyManager::Instance().EnemyRemove(GetActor()->GetComponent<EnemySlime>());

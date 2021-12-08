@@ -21,12 +21,16 @@ ActorManager::ActorManager()
 	bulr = std::make_unique<GaussianBlur>(device);
 	shader = std::make_unique<PhongVarianceShadowMap>(device);
 
-	shadow_texture = std::make_unique<Texture>();
-	shadow_texture->Create(BUFFER_WIDTH, BUFFER_HEIGHT, DXGI_FORMAT_R32G32_FLOAT);
-	shadow_vsm_texture = std::make_unique<Texture>();
-	shadow_vsm_texture->Create(BUFFER_WIDTH, BUFFER_HEIGHT, DXGI_FORMAT_R32G32_FLOAT);
+	// シャドウテクスチャ作成
+	for (int i = 0; i < 3; ++i)
+	{
+		shadow_texture[i] = std::make_unique<Texture>();
+		shadow_texture[i]->Create(static_cast<u_int>(shadow_size[i].x), static_cast<u_int>(shadow_size[i].y), DXGI_FORMAT_R32G32_FLOAT);
+		shadow_vsm_texture[i] = std::make_unique<Texture>();
+		shadow_vsm_texture[i]->Create(static_cast<u_int>(shadow_size[i].x), static_cast<u_int>(shadow_size[i].y), DXGI_FORMAT_R32G32_FLOAT);
+	}
 	depth_texture = std::make_unique<Texture>();
-	depth_texture->CreateDepthStencil(BUFFER_WIDTH, BUFFER_HEIGHT);
+	depth_texture->CreateDepthStencil(2048, 2048, DXGI_FORMAT_D24_UNORM_S8_UINT);
 
 }
 
@@ -157,55 +161,142 @@ void ActorManager::ShadowRender(RenderContext& render_context, BlurRenderContext
 	Graphics& graphics = Graphics::Instance();
 	ID3D11DeviceContext* context = graphics.GetDeviceContext();
 	std::shared_ptr<Actor> actor = GetActor("Player");
+	Camera& camera = Camera::Instance();
+
+	// カメラのパラメータ取得
+	DirectX::XMVECTOR view_front, view_right, view_up, view_pos;
 	{
-		ID3D11RenderTargetView* rtv[1] = { shadow_texture->GetRenderTargetView() };
+		DirectX::XMMATRIX matrix = DirectX::XMMatrixInverse(nullptr, DirectX::XMLoadFloat4x4(&camera.GetView()));
+		//view_front = DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&camera.GetFront()));
+		//view_right = DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&camera.GetRight()));
+		//view_up = DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&camera.GetUp()));
+		view_right = DirectX::XMVector3Normalize(matrix.r[0]);
+		view_up = DirectX::XMVector3Normalize(matrix.r[1]);
+		view_front = DirectX::XMVector3Normalize(matrix.r[2]);
+		view_pos = matrix.r[3];
+	}
+
+	// ライトビュープロジェクション行列を算出
+	DirectX::XMMATRIX	view_matrix, projection_matrix;
+	{
+		// ライト位置からのビュー設定
+		DirectX::XMFLOAT3 t = { 0, 0, 0 };
+		DirectX::XMFLOAT3 pos, target, up;
+		//target = actor->GetPosition();
+		pos.x = t.x - Light::LightDir.x * 1500.0f;
+		pos.y = t.y - Light::LightDir.y * 1500.0f;
+		pos.z = t.z - Light::LightDir.z * 1500.0f;
+		target = { 0, 0, 0 };
+		up = { 0, 1, 0 };
+		DirectX::XMVECTOR eye = DirectX::XMLoadFloat3(&pos);
+		DirectX::XMVECTOR vtarget = DirectX::XMLoadFloat3(&target);
+		DirectX::XMVECTOR vup = DirectX::XMLoadFloat3(&up);
+
+		view_matrix = DirectX::XMMatrixLookAtLH(eye, vtarget, vup);
+
+		projection_matrix = DirectX::XMMatrixOrthographicLH(10000.0f, 10000.0f, 0.01f, 2000.0f);
+
+	}
+
+	//	シャドウマップの分割エリア定義
+	float	split_area_table[] =
+	{
+		camera.GetNear(),	//	カメラのニアクリップ
+		shadow_area[0],
+		shadow_area[1],
+		shadow_area[2]
+	};
+	for (int i = 0; i < 3; ++i)
+	{
+		float near_depth = split_area_table[i + 0];
+		float far_depth = split_area_table[i + 1];
+
+		// レンダーターゲットとデプスステンシルの設定
+		ID3D11RenderTargetView* rtv[1] = { shadow_texture[i]->GetRenderTargetView() };
 		ID3D11DepthStencilView* dsv = depth_texture->GetDepthStencilView();
 		context->OMSetRenderTargets(1, rtv, dsv);
-	
+
 		// 画面クリア
 		float clear_color[4] = { 1.0f,1.0f,1.0f,1.0f };
 		context->ClearRenderTargetView(rtv[0], clear_color);
 		context->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 		// ビューポートの設定
-		D3D11_VIEWPORT vp;
-		vp.Width = (FLOAT)BUFFER_WIDTH;
-		vp.Height = (FLOAT)BUFFER_HEIGHT;
-		vp.MinDepth = 0.0f;
-		vp.MaxDepth = 1.0f;
-		vp.TopLeftX = 0;
-		vp.TopLeftY = 0;
-		context->RSSetViewports(1, &vp);
+		graphics.SetViewport(shadow_size[i].x, shadow_size[i].y);
 
-		// ライト位置からのビュー設定
-		DirectX::XMFLOAT3 t = { 0, 0, 0 };
-		DirectX::XMFLOAT3 pos, target, up;
-		DirectX::XMFLOAT4X4 view, projection;
-		target = actor->GetPosition();
-		pos.x = target.x - Light::LightDir.x * 30.0f;
-		pos.y = target.y - Light::LightDir.y * 30.0f;
-		pos.z = target.z - Light::LightDir.z * 30.0f;
-		//target = { 0, 0, 0 };
-		up = { 0, 1, 0 };
-		DirectX::XMVECTOR eye = DirectX::XMLoadFloat3(&pos);
-		DirectX::XMVECTOR vtarget = DirectX::XMLoadFloat3(&target);
-		DirectX::XMVECTOR vup = DirectX::XMLoadFloat3(&up);
+		// エリアを内包する8頂点を算出する
+		DirectX::XMVECTOR	vertex[8];
+		{
+			//	エリアの近平面の中心からの上面までの距離を求める
+			float	nearY = tanf(camera.GetFov() * 0.5f) * near_depth;
+			//	エリアの近平面の中心からの右面までの距離を求める
+			float	nearX = nearY * camera.GetAspect();
+			//	エリアの遠平面の中心からの上面までの距離を求める
+			float	farY = tanf(camera.GetFov() * 0.5f) * far_depth;
+			//	エリアの遠平面の中心からの右面までの距離を求める
+			float	farX = farY * camera.GetAspect();
 
-		DirectX::XMMATRIX matview = DirectX::XMMatrixLookAtLH(eye, vtarget, vup);
-		DirectX::XMStoreFloat4x4(&view, matview);
+			//	エリアの近平面の中心座標を求める
+			DirectX::XMVECTOR	near_position = DirectX::XMVectorAdd(view_pos, DirectX::XMVectorScale(view_front, near_depth));
+			//	エリアの遠平面の中心座標を求める
+			DirectX::XMVECTOR	far_position = DirectX::XMVectorAdd(view_pos, DirectX::XMVectorScale(view_front, far_depth));
 
-		DirectX::XMMATRIX pm = DirectX::XMMatrixIdentity();
-		pm = DirectX::XMMatrixOrthographicLH(50.0f, 50.0f, 1.0f, 1000.0f);
-		//pm = DirectX::XMMatrixOrthographicLH(10.0f, 10.0f, 0.1f, 200.0f);
-		//pm = DirectX::XMMatrixOrthographicLH(320, 180, 1.0f, 100.0f);
-		//pm = DirectX::XMMatrixOrthographicLH(20.0f, 20.0f, 0.1f, 200.0f);
-		DirectX::XMStoreFloat4x4(&projection, pm);
-		// TODO 変更したカメラのビューとプロジェクションの設定
-		DirectX::XMStoreFloat4x4(&render_context.light_view_projection, matview * pm);
-		
+			//	8頂点を求める
+			{
+				// 近平面の右上
+				vertex[0] = DirectX::XMVectorAdd(near_position, DirectX::XMVectorAdd(DirectX::XMVectorScale(view_up, nearY), DirectX::XMVectorScale(view_right, nearX)));
+				// 近平面の左上
+				vertex[1] = DirectX::XMVectorAdd(near_position, DirectX::XMVectorAdd(DirectX::XMVectorScale(view_up, nearY), DirectX::XMVectorScale(view_right, -nearX)));
+				// 近平面の右下
+				vertex[2] = DirectX::XMVectorAdd(near_position, DirectX::XMVectorAdd(DirectX::XMVectorScale(view_up, -nearY), DirectX::XMVectorScale(view_right, nearX)));
+				// 近平面の左下
+				vertex[3] = DirectX::XMVectorAdd(near_position, DirectX::XMVectorAdd(DirectX::XMVectorScale(view_up, -nearY), DirectX::XMVectorScale(view_right, -nearX)));
+				// 遠平面の右上
+				vertex[4] = DirectX::XMVectorAdd(far_position, DirectX::XMVectorAdd(DirectX::XMVectorScale(view_up, farY), DirectX::XMVectorScale(view_right, farX)));
+				// 遠平面の左上
+				vertex[5] = DirectX::XMVectorAdd(far_position, DirectX::XMVectorAdd(DirectX::XMVectorScale(view_up, farY), DirectX::XMVectorScale(view_right, -farX)));
+				// 遠平面の右下
+				vertex[6] = DirectX::XMVectorAdd(far_position, DirectX::XMVectorAdd(DirectX::XMVectorScale(view_up, -farY), DirectX::XMVectorScale(view_right, farX)));
+				// 遠平面の左下
+				vertex[7] = DirectX::XMVectorAdd(far_position, DirectX::XMVectorAdd(DirectX::XMVectorScale(view_up, -farY), DirectX::XMVectorScale(view_right, -farX)));
+			}
+		}
+		//	8頂点をライトビュープロジェクション空間に変換して、最大値、最小値を求める
+		DirectX::XMFLOAT3	vertex_min(FLT_MAX, FLT_MAX, FLT_MAX), vertex_max(-FLT_MAX, -FLT_MAX, -FLT_MAX);
+		for (auto& it : vertex)
+		{
+			DirectX::XMFLOAT3	p;
+			DirectX::XMStoreFloat3(&p, DirectX::XMVector3TransformCoord(it, view_matrix * projection_matrix));
+
+			vertex_min.x = min(p.x, vertex_min.x);
+			vertex_min.y = min(p.y, vertex_min.y);
+			vertex_max.x = max(p.x, vertex_max.x);
+			vertex_max.y = max(p.y, vertex_max.y);
+		}
+
+		// クロップ行列を求める
+		DirectX::XMMATRIX	clop_matrix = DirectX::XMMatrixIdentity();
+		{
+			float	xscale = 2.0f / (vertex_max.x - vertex_min.x);
+			float	yscale = 2.0f / (vertex_max.y - vertex_min.y);
+			float	xoffset = -0.5f * (vertex_max.x + vertex_min.x) * xscale;
+			float	yoffset = -0.5f * (vertex_max.y + vertex_min.y) * yscale;
+			DirectX::XMFLOAT4X4	float_clop_matrix;
+			DirectX::XMStoreFloat4x4(&float_clop_matrix, clop_matrix);
+			float_clop_matrix._11 = xscale;
+			float_clop_matrix._22 = yscale;
+			float_clop_matrix._41 = xoffset;
+			float_clop_matrix._42 = yoffset;
+			clop_matrix = DirectX::XMLoadFloat4x4(&float_clop_matrix);
+		}
+		//ライトビュープロジェクション行列を計算
+		DirectX::XMStoreFloat4x4(&render_context.light_view_projection[i], view_matrix * projection_matrix * clop_matrix);
+		DirectX::XMStoreFloat4x4(&render_context.slight_view_projection, view_matrix * projection_matrix * clop_matrix);
+
 		shadowmap->Begin(context, render_context);
 		for (std::shared_ptr<Actor>& actor : update_actors)
 		{
+			if (strcmp(actor->GetName(), "Stage") == 0) continue;
 			// モデルがあれば描画
 			Model* model = actor->GetModel();
 			if (model != nullptr)
@@ -214,6 +305,7 @@ void ActorManager::ShadowRender(RenderContext& render_context, BlurRenderContext
 			}
 		}
 		shadowmap->End(context);
+
 	}
 
 	// ブラーを掛ける
@@ -223,86 +315,88 @@ void ActorManager::ShadowRender(RenderContext& render_context, BlurRenderContext
 		float blury_texture_width = static_cast<float>(bulr->GetGaussianYBlurShader()->GetBlurYTexture()->GetWidth());
 		float blury_texture_height = static_cast<float>(bulr->GetGaussianYBlurShader()->GetBlurYTexture()->GetHeight());
 		Sprite sprite;
-		// X方向にブラーを掛ける
-		bulr->Begin(context, bulr_render_context, BlurType::XBlur);
-		sprite.Render(context, shadow_texture.get(),
-			0, 0,
-			blurx_texture_width, blurx_texture_height,
-			0, 0,
-			(float)shadow_texture->GetWidth(), (float)shadow_texture->GetHeight(),
-			0,
-			1, 1, 1, 1);
-		bulr->End(context, BlurType::XBlur);
+		//for (int i = 0; i < 3; ++i)
+		//{
+			// X方向にブラーを掛ける
+			bulr->Begin(context, BlurType::XBlur);
+			sprite.Render(context, shadow_texture[0].get(),
+				0, 0,
+				blurx_texture_width, blurx_texture_height,
+				0, 0,
+				(float)shadow_texture[0]->GetWidth(), (float)shadow_texture[0]->GetHeight(),
+				0,
+				1, 1, 1, 1);
+			bulr->End(context, BlurType::XBlur);
 
-		// Y方向にブラーを掛ける
-		bulr->Begin(context, bulr_render_context, BlurType::YBlur);
-		sprite.Render(context, bulr->GetGaussianXBlurShader()->GetBlurXTexture(),
-			0, 0,
-			(float)bulr->GetGaussianYBlurShader()->GetBlurYTexture()->GetWidth(), (float)bulr->GetGaussianYBlurShader()->GetBlurYTexture()->GetHeight(),
-			0, 0,
-			blurx_texture_width, blurx_texture_height,
-			0,
-			1, 1, 1, 1);
-		bulr->End(context, BlurType::YBlur);
-	
-		// 掛けたブラーをシャドウマップてテクスチャに描画
-		// レンダーターゲットをシャドウマップに設定
-		ID3D11RenderTargetView* rtv[1] = { shadow_vsm_texture->GetRenderTargetView() };
-		ID3D11DepthStencilView* dsv = depth_texture->GetDepthStencilView();
-		context->OMSetRenderTargets(1, rtv, dsv);
+			// Y方向にブラーを掛ける
+			bulr->Begin(context, BlurType::YBlur);
+			sprite.Render(context, bulr->GetGaussianXBlurShader()->GetBlurXTexture(),
+				0, 0,
+				blury_texture_width, blury_texture_height,
+				0, 0,
+				blurx_texture_width, blurx_texture_height,
+				0,
+				1, 1, 1, 1);
+			bulr->End(context, BlurType::YBlur);
 
-		// 画面クリア
-		float clear_color[4] = { 1.0f,1.0f,1.0f,1.0f };
-		context->ClearRenderTargetView(rtv[0], clear_color);
-		context->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+			// 掛けたブラーをシャドウマップテクスチャに描画
+			// レンダーターゲットをシャドウマップに設定
+			ID3D11RenderTargetView* rtv[1] = { shadow_vsm_texture[0]->GetRenderTargetView() };
+			ID3D11DepthStencilView* dsv = depth_texture->GetDepthStencilView();
+			context->OMSetRenderTargets(1, rtv, dsv);
 
-		// ビューポートの設定
-		D3D11_VIEWPORT vp;
-		vp.Width = (FLOAT)shadow_vsm_texture->GetWidth();
-		vp.Height = (FLOAT)shadow_vsm_texture->GetHeight();
-		vp.MinDepth = 0.0f;
-		vp.MaxDepth = 1.0f;
-		vp.TopLeftX = 0;
-		vp.TopLeftY = 0;
-		context->RSSetViewports(1, &vp);
-		float screen_height = graphics.GetScreenHeight();
+			// 画面クリア
+			float clear_color[4] = { 1.0f,1.0f,1.0f,1.0f };
+			context->ClearRenderTargetView(rtv[0], clear_color);
+			context->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-		graphics.GetSpriteShader()->Begin(context);
-		sprite.Render(context,
-			bulr->GetGaussianYBlurShader()->GetBlurYTexture(),
-			0, 0,
-			shadow_vsm_texture->GetWidth(), shadow_vsm_texture->GetHeight(),
-			0, 0,
-			blury_texture_width, blury_texture_height,
-			0,
-			1, 1, 1, 1);
-		graphics.GetSpriteShader()->End(context);
-		// レンダーターゲットの回復
-	ID3D11RenderTargetView* backbuffer = graphics.GetRenderTargetView();
-	context->OMSetRenderTargets(1, &backbuffer, graphics.GetDepthStencilView());
+			// ビューポートの設定
+			graphics.SetViewport(static_cast<float>(shadow_vsm_texture[0]->GetWidth()), static_cast<float>(shadow_vsm_texture[0]->GetHeight()));
+			float screen_height = graphics.GetScreenHeight();
 
-	// ビューポートを元に戻す
-	D3D11_VIEWPORT viewport;
-	viewport.TopLeftX = 0;
-	viewport.TopLeftY = 0;
-	viewport.Width = static_cast<float>(graphics.GetScreenWidth());
-	viewport.Height = static_cast<float>(graphics.GetScreenHeight());
-	viewport.MinDepth = 0.0f;
-	viewport.MaxDepth = 1.0f;
-	context->RSSetViewports(1, &viewport);
+			graphics.GetSpriteShader()->Begin(context);
+			sprite.Render(context,
+				bulr->GetGaussianYBlurShader()->GetBlurYTexture(),
+				0, 0,
+				static_cast<float>(shadow_vsm_texture[0]->GetWidth()), static_cast<float>(shadow_vsm_texture[0]->GetHeight()),
+				0, 0,
+				blury_texture_width, blury_texture_height,
+				0,
+				1, 1, 1, 1);
+			graphics.GetSpriteShader()->End(context);
 
-	graphics.GetSpriteShader()->Begin(context);
-	sprite.Render(context,
-		bulr->GetGaussianYBlurShader()->GetBlurYTexture(),
-		100, 0,
-		200, 200,
-		0, 0,
-		blury_texture_width, blury_texture_height,
-		0,
-		1, 1, 1, 1);
-	graphics.GetSpriteShader()->End(context);
+		//}
+		for (int i = 1; i < 3; ++i)
+		{ 
+			// 掛けたブラーをシャドウマップテクスチャに描画
+			// レンダーターゲットをシャドウマップに設定
+			ID3D11RenderTargetView* rtv[1] = { shadow_vsm_texture[i]->GetRenderTargetView() };
+			ID3D11DepthStencilView* dsv = depth_texture->GetDepthStencilView();
+			context->OMSetRenderTargets(1, rtv, dsv);
 
-}
+			// 画面クリア
+			float clear_color[4] = { 1.0f,1.0f,1.0f,1.0f };
+			context->ClearRenderTargetView(rtv[0], clear_color);
+			context->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+
+			// ビューポートの設定
+			graphics.SetViewport(static_cast<float>(shadow_vsm_texture[i]->GetWidth()), static_cast<float>(shadow_vsm_texture[i]->GetHeight()));
+
+			graphics.GetSpriteShader()->Begin(context);
+			sprite.Render(context,
+				bulr->GetGaussianYBlurShader()->GetBlurYTexture(),
+				0, 0,
+				static_cast<float>(shadow_vsm_texture[i]->GetWidth()), static_cast<float>(shadow_vsm_texture[i]->GetHeight()),
+				0, 0,
+				blury_texture_width, blury_texture_height,
+				0,
+				1, 1, 1, 1);
+			graphics.GetSpriteShader()->End(context);
+		}
+
+
+
+	}
 }
 
 //------------------------------

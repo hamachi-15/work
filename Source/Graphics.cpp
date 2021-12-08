@@ -146,6 +146,12 @@ Graphics::Graphics(HWND hwnd)
 		debug_renderer = std::make_unique<DebugRenderer>(device.Get());
 		imgui_renderer = std::make_unique<ImGuiRenderer>(hwnd, device.Get());
 	}
+
+	{
+		scene_texture = std::make_unique<Texture>();
+		scene_texture->Create(screen_width, screen_height, DXGI_FORMAT_R8G8B8A8_UNORM);
+
+	}
 	BGM = Audio::Instance().LoadAudioSource("Data\\Audio\\BGM\\BGM.wav", true);
 
 }
@@ -156,4 +162,39 @@ Graphics::Graphics(HWND hwnd)
 Graphics::~Graphics()
 {
 
+}
+
+//-----------------------------
+// ビューポート設定
+//-----------------------------
+void Graphics::SetViewport(float weidth, float height)
+{
+	D3D11_VIEWPORT viewport;
+	viewport.TopLeftX = 0;
+	viewport.TopLeftY = 0;
+	viewport.Width = weidth;
+	viewport.Height = height;
+	viewport.MinDepth = 0.0f;
+	viewport.MaxDepth = 1.0f;
+	context->RSSetViewports(1, &viewport);
+}
+
+//-----------------------------
+// レンダーターゲット設定
+//-----------------------------
+void Graphics::SetRenderTargetView(ID3D11RenderTargetView* render_target_view[], ID3D11DepthStencilView* depth_stensil_view)
+{
+	// レンダーターゲット設定
+	context->OMSetRenderTargets(1, render_target_view, depth_stensil_view);
+}
+
+//-----------------------------
+// 画面クリア
+//-----------------------------
+void Graphics::ScreenClear(ID3D11RenderTargetView* render_target_view[], ID3D11DepthStencilView* depth_stensil_view)
+{
+	// 画面クリア
+	float clear_color[4] = { 1.0f,1.0f,1.0f,1.0f };
+	context->ClearRenderTargetView(render_target_view[0], clear_color);
+	context->ClearDepthStencilView(depth_stensil_view, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 }

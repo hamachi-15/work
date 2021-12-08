@@ -26,10 +26,8 @@ public:
 	// ï`âÊäJénèàóù
 	virtual void Begin(ID3D11DeviceContext* context) {}
 	virtual void Begin(ID3D11DeviceContext* context, RenderContext& render_context) {}
-	virtual void Begin(ID3D11DeviceContext* context, BlurRenderContext& bulr_render_context) {}
-	virtual void Begin(ID3D11DeviceContext* context, BlurRenderContext& bulr_render_context, Texture* texture) {}
-	virtual void Begin(ID3D11DeviceContext* context, RenderContext& render_context, CubeMapRenderContext& cubemap_render_context){}
 	virtual void Begin(ID3D11DeviceContext* context, Texture* texture) {}
+	virtual void Begin(ID3D11DeviceContext* context, RenderContext& render_context, CubeMapRenderContext& cubemap_render_context){}
 	// ï`âÊèàóù
 	virtual void Draw(ID3D11DeviceContext* context, const Model* model) {};
 	

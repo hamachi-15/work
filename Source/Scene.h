@@ -1,4 +1,6 @@
 #pragma once
+#include "Telegram.h"
+#include <string>
 
 class Scene
 {
@@ -7,6 +9,12 @@ public:
 	Scene(){}
 	// デストラクタ
 	virtual ~Scene(){}
+
+	// シーン名設定
+	void SetName(const char* name) { this->name = name; }
+
+	// シーン名取得
+	const char* GetName() const { return name.c_str(); }
 
 	// 初期化処理
 	virtual void Initialize() = 0;
@@ -20,9 +28,12 @@ public:
 	// 描画処理
 	virtual void Render() = 0;
 
+	virtual bool OnMessages(const Telegram& telegram) { return true; }
+
 	// 初期化完了
-	bool IsReady() const { return ready; };
+	bool IsReady() const { return ready; }
 	void SetReady() { ready = true; }
 private:
 	bool ready = false;
+	std::string name; // シーンの名前
 };

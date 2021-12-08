@@ -71,7 +71,7 @@ mov r1.w, l(1.000000)  // r1.w <- output.position.w
 mov r2.xyzw, v2.xyxy  // r2.z <- tex.x; r2.w <- tex.y
 
 #line 15
-itof r3.x, l(512)  // r3.x <- height
+itof r3.x, l(360)  // r3.x <- height
 
 #line 18
 mov r3.x, r3.x  // r3.x <- tex_size.y

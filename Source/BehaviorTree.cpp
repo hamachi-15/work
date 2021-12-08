@@ -5,6 +5,7 @@
 #include "Charactor.h"
 #include "Enemy.h"
 #include "BehaviorData.h"
+#include "ImGuiRenderer.h"
 
 //-----------------------------------------
 // デストラクタ
@@ -12,6 +13,51 @@
 BehaviorTree::~BehaviorTree()
 {
 	NodeAllClear(root);
+}
+
+//-----------------------------------------
+// ノードのGUI描画
+//-----------------------------------------
+void BehaviorTree::DrawNodeGUI()
+{
+	DrawNodeGUI(root);
+}
+
+void BehaviorTree::DrawNodeGUI(NodeBase* node)
+{
+	// 矢印をクリック、またはノードをダブルクリックで階層を開く
+	ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
+	
+	// 選択フラグ
+	if (select_root == node)
+	{
+		nodeFlags |= ImGuiTreeNodeFlags_Selected;
+	}
+	// 子がいない場合は矢印をつけない
+	size_t child_count = node->children.size();
+	if (child_count <= 0)
+	{
+		nodeFlags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
+	}
+
+	// ツリーノードを表示
+	bool opened = ImGui::TreeNodeEx(node, nodeFlags, node->GetName().c_str());
+
+	// アクティブ化されたノードは選択する
+	if (ImGui::IsItemClicked())
+	{
+		select_root = node;
+	}
+
+	// 開かれている場合、子階層も同じ処理を行う
+	if (opened && child_count > 0)
+	{
+		for (NodeBase* child : node->children)
+		{
+			DrawNodeGUI(child);
+		}
+		ImGui::TreePop();
+	}
 }
 
 //-----------------------------------------

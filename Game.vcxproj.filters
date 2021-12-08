@@ -109,6 +109,12 @@
     <Filter Include="ソース ファイル\Effect">
       <UniqueIdentifier>{2f002e55-93f3-4a9c-b893-5fe1dc354fb5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\UI">
+      <UniqueIdentifier>{20866eb4-e324-45c2-bf86-08704faab0b3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\HLSL\Bloom">
+      <UniqueIdentifier>{ca86f48d-340b-45ba-8bc6-756e441d05d6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui\imgui.cpp">
@@ -368,6 +374,24 @@
     </ClCompile>
     <ClCompile Include="Source\SceneGameOver.cpp">
       <Filter>ソース ファイル\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI.cpp">
+      <Filter>ソース ファイル\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\PlayerUIHealth.cpp">
+      <Filter>ソース ファイル\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\PlayerUIHealthFrame.cpp">
+      <Filter>ソース ファイル\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\PlayerUIRedHealth.cpp">
+      <Filter>ソース ファイル\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\SceneBattle.cpp">
+      <Filter>ソース ファイル\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Script.cpp">
+      <Filter>ソース ファイル\System</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -674,6 +698,24 @@
     <ClInclude Include="Source\PLTJudgmentOwner.h">
       <Filter>ソース ファイル\AI</Filter>
     </ClInclude>
+    <ClInclude Include="Source\UI.h">
+      <Filter>ソース ファイル\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\PlayerUIHealth.h">
+      <Filter>ソース ファイル\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\PlayerUIHealthFrame.h">
+      <Filter>ソース ファイル\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\PlayerUIRedHealth.h">
+      <Filter>ソース ファイル\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\SceneBattle.h">
+      <Filter>ソース ファイル\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Script.h">
+      <Filter>ソース ファイル\System</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="HLSL\Sprite.hlsli">
@@ -720,6 +762,9 @@
     </None>
     <None Include="HLSL\3DObj.hlsli">
       <Filter>ソース ファイル\HLSL\3DObj</Filter>
+    </None>
+    <None Include="HLSL\Bright.hlsli">
+      <Filter>ソース ファイル\HLSL\Bloom</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -815,6 +860,12 @@
     </FxCompile>
     <FxCompile Include="HLSL\GaussianYBlur_vs.hlsl">
       <Filter>ソース ファイル\HLSL\GaussianBlur</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\Bright_vs.hlsl">
+      <Filter>ソース ファイル\HLSL\Bloom</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\Bright_ps.hlsl">
+      <Filter>ソース ファイル\HLSL\Bloom</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

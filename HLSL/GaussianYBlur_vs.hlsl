@@ -11,8 +11,8 @@ PSInput main(VSInput input)
 	// テクスチャサイズを取得
     float2 tex_size;
     float level;
-    //diffuse_texture.GetDimensions(tex_size.x, tex_size.y);
-    float height = 512;
+    diffuse_texture.GetDimensions(tex_size.x, tex_size.y);
+    float height = 360;
 
     tex_size.x = 0.0f;
     tex_size.y = height;

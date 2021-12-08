@@ -121,7 +121,9 @@ PhongVarianceShadowMap::PhongVarianceShadowMap(ID3D11Device* device)
 
 void PhongVarianceShadowMap::Begin(ID3D11DeviceContext* context, RenderContext& render_context)
 {
-	Texture* shadow_texture = ActorManager::Instance().GetShadowBulrTexture();
+	Texture* shadow_texture1 = ActorManager::Instance().GetShadowBulrTexture(0);
+	Texture* shadow_texture2 = ActorManager::Instance().GetShadowBulrTexture(1);
+	Texture* shadow_texture3 = ActorManager::Instance().GetShadowBulrTexture(2);
 
 	Activate(context);
 
@@ -141,7 +143,9 @@ void PhongVarianceShadowMap::Begin(ID3D11DeviceContext* context, RenderContext& 
 	//デプスステンシルステート設定
 	context->OMSetDepthStencilState(depth_stencil_state.Get(), 1);
 
-	shadow_texture->Set(3);
+	shadow_texture1->Set(3);
+	shadow_texture2->Set(4);
+	shadow_texture3->Set(5);
 
 	context->PSSetSamplers(3, 1, sampler_shadow.GetAddressOf());
 
@@ -155,7 +159,9 @@ void PhongVarianceShadowMap::Begin(ID3D11DeviceContext* context, RenderContext& 
 	DirectX::XMStoreFloat4(&v, V.r[3]);
 	cbscene.eye_position = v;
 
-	cbscene.light_view_projection = render_context.light_view_projection;
+	cbscene.light_view_projection[0] = render_context.light_view_projection[0];
+	cbscene.light_view_projection[1] = render_context.light_view_projection[1];
+	cbscene.light_view_projection[2] = render_context.light_view_projection[2];
 
 	cbscene.light_direction = render_context.light_direction;
 	cbscene.shadow_parameter = render_context.ShadowParameter;

@@ -83,14 +83,6 @@ float3 GetShadow(Texture2D st, SamplerState ss, float3 tex, float4 parameter)
 	s = saturate((s - light_bleeding_factor) / (1.0f - light_bleeding_factor));
 	return	lerp(1.0f, parameter.rgb + (1.0f - parameter.rgb) * s, tex.z - parameter.w >= d.x);
 }
-//float3 GetShadow(Texture2D st, SamplerState ss, float3 Tex, float3 Scolor,
-//	float Bias)
-//{ // シャドウマップから深度を取り出す
-//	float d = st.Sample(ss, Tex.xy).r;
-//	// シャドウマップの深度値と現実の深度の比較
-//	Scolor = (Tex.z - d > Bias) ? Scolor : float3(1, 1, 1);
-//	return Scolor;
-//}
 
 //--------------------------------------------
 // フォグ

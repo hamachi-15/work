@@ -25,3 +25,25 @@ std::shared_ptr<ModelResource> ResourceManager::LoadModelResource(const char* fi
 
 	return model;
 }
+
+//-------------------------------------
+// テクスチャ読み込み
+//-------------------------------------
+std::shared_ptr<Texture> ResourceManager::LoadTexture(const char* filename)
+{
+	TextureMap::iterator it = textures.find(filename);
+	if (it != textures.end())
+	{
+		if (!it->second.expired())
+		{
+			return it->second.lock();
+		}
+	}
+	std::shared_ptr<Texture> texture = std::make_shared<Texture>();
+	texture->Load(filename);
+
+	// マップに登録
+	textures[filename] = texture;
+
+	return texture;
+}

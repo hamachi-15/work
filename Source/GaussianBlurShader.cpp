@@ -3,11 +3,12 @@
 #include "GaussianXBlur.h"
 #include "GaussianYBlur.h"
 #include "Graphics.h"
+#include "Sprite.h"
 
 //------------------------------------
 // コンストラクタ
 //------------------------------------
-GaussianBlur::GaussianBlur(ID3D11Device* device)
+GaussianBlur::GaussianBlur(ID3D11Device* device, DXGI_FORMAT format)
 {
 	Graphics& graphics = Graphics::Instance();
 	HRESULT hr = S_OK;
@@ -16,8 +17,8 @@ GaussianBlur::GaussianBlur(ID3D11Device* device)
 	float screen_height = graphics.GetScreenHeight();
 
 	// 縦ブラーと横ブラー初期化
-	xblur = std::make_unique<GaussianXBlur>(device, static_cast<u_int>(1024 * 0.5f), static_cast<u_int>(1024));
-	yblur = std::make_unique<GaussianYBlur>(device, static_cast<u_int>(1024 * 0.5f), static_cast<u_int>(1024* 0.5f));
+	xblur = std::make_unique<GaussianXBlur>(device, static_cast<u_int>(1024 * 0.5f), static_cast<u_int>(1024), format);
+	yblur = std::make_unique<GaussianYBlur>(device, static_cast<u_int>(1024 * 0.5f), static_cast<u_int>(1024* 0.5f), format);
 
 	// 定数バッファ
 	{
@@ -90,11 +91,11 @@ GaussianBlur::~GaussianBlur()
 //------------------------------------
 // 描画開始処理
 //------------------------------------
-void GaussianBlur::Begin(ID3D11DeviceContext* context, BlurRenderContext& blur_render_context, BlurType type)
+void GaussianBlur::Begin(ID3D11DeviceContext* context,	BlurType type)
 {
 	if(BlurType::XBlur == type) 
 	{
-		xblur->Begin(context, blur_render_context);
+		xblur->Begin(context);
 		//	ブレンドステート設定
 		context->OMSetBlendState(blend_state.Get(), nullptr, 0xFFFFFFFF);
 
@@ -111,8 +112,48 @@ void GaussianBlur::Begin(ID3D11DeviceContext* context, BlurRenderContext& blur_r
 	}
 	else if (BlurType::YBlur == type)
 	{
-		yblur->Begin(context, blur_render_context, xblur->GetBlurXTexture());
+		yblur->Begin(context, xblur->GetBlurXTexture());
 	}
+}
+
+//------------------------------------
+// ブラー処理
+//------------------------------------
+Texture* GaussianBlur::Render(Texture* texture)
+{
+	Sprite sprite;
+	Graphics& graphics = Graphics::Instance();
+	ID3D11DeviceContext* context = graphics.GetDeviceContext();
+	Texture* width_blur_texture = GetGaussianXBlurShader()->GetBlurXTexture();
+	Texture* height_blur_texture = GetGaussianYBlurShader()->GetBlurYTexture();
+
+	float width_blur_texture_width = static_cast<float>(width_blur_texture->GetWidth());
+	float width_blur_texture_height = static_cast<float>(width_blur_texture->GetHeight());
+	float height_blur_texture_width = static_cast<float>(height_blur_texture->GetWidth());
+	float height_blur_texture_height = static_cast<float>(height_blur_texture->GetHeight());
+
+	// X方向にブラーを掛ける
+	Begin(context, BlurType::XBlur);
+	sprite.Render(context, texture,
+		0, 0,
+		width_blur_texture_width, width_blur_texture_height,
+		0, 0,
+		(float)texture->GetWidth(), (float)texture->GetHeight(),
+		0,
+		1, 1, 1, 1);
+	End(context, BlurType::XBlur);
+
+	// Y方向にブラーを掛ける
+	Begin(context, BlurType::YBlur);
+	sprite.Render(context, 
+		width_blur_texture,
+		0, 0,
+		height_blur_texture_width, height_blur_texture_height,
+		0, 0,
+		width_blur_texture_width, width_blur_texture_height);
+	End(context, BlurType::YBlur);
+
+	return height_blur_texture;
 }
 
 //------------------------------------

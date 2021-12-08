@@ -15,7 +15,7 @@ public:
 	const char* GetShaderName() const override { return "GaussianXBlur"; }
 
 	// •`‰æŠJnˆ—
-	void Begin(ID3D11DeviceContext* context, BlurRenderContext& bulr_render_context)override;
+	void Begin(ID3D11DeviceContext* context)override;
 
 	// •`‰æI—¹ˆ—
 	void End(ID3D11DeviceContext* context) override;

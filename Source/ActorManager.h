@@ -56,8 +56,8 @@ public:
 	void Render(RenderContext& render_context);
 
 	// シャドウマップ取得
-	Texture* GetShadowTexture() const { return shadow_texture.get(); }
-	Texture* GetShadowBulrTexture() const { return shadow_vsm_texture.get(); }
+	Texture* GetShadowTexture(int index) const { return shadow_texture[index].get(); }
+	Texture* GetShadowBulrTexture(int index) const { return shadow_vsm_texture[index].get(); }
 	Texture* GetDepthTexture() const { return depth_texture.get(); }
 	// キューブマップ取得
 	Texture* GetCubeMapTexture() const { return cubemap_texture.get(); }
@@ -80,6 +80,13 @@ private:
 		CUBE_MAP_WIDTH = 1024,
 		CUBE_MAP_HEIGHT = 1024,
 	};
+	//シャドーマップサイズ
+	const DirectX::XMFLOAT2 shadow_size[3]{ { 1024,1024 },{ 512,512 },{ 256,256 } };
+	//シャドークリップエリア
+	const float shadow_area[3] = { 20, 50, 100 };
+	//ライトビュープロジェクションクロップ行列の配列を定義する
+	DirectX::XMFLOAT4X4 lvpc_matrix[3];
+
 	std::vector<std::shared_ptr<Actor>>	 start_actors;
 	std::vector<std::shared_ptr<Actor>>	 update_actors;
 	std::vector<std::shared_ptr<Actor>>	 remove_actors;
@@ -93,8 +100,8 @@ private:
 	std::unique_ptr<VarianceShadowMap>   shadowmap;
 	std::unique_ptr<GaussianBlur>		 bulr;
 
-	std::unique_ptr<Texture>			 shadow_texture;
-	std::unique_ptr<Texture>			 shadow_vsm_texture;
+	std::unique_ptr<Texture>			 shadow_texture[3];
+	std::unique_ptr<Texture>			 shadow_vsm_texture[3];
 	std::unique_ptr<Texture>			 depth_texture;
 
 	std::unique_ptr<Texture>			 cubemap_texture;

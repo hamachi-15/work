@@ -264,6 +264,9 @@ public:
 	// メッセージを受信したときの処理
 	bool OnMessage(const Telegram& message);
 
+	// コリジョンリストを全破棄
+	void Destroy();
+
 	//　球コリジョンの登録
 	void ReregisterSphere(std::shared_ptr<CollisionSphere> collision);
 

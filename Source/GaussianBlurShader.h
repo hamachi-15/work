@@ -19,14 +19,17 @@ class GaussianBlur
 {
 public:
 	// コンストラクタ
-	GaussianBlur(ID3D11Device* device);
+	GaussianBlur(ID3D11Device* device, DXGI_FORMAT format = DXGI_FORMAT_R32G32_FLOAT);
 	~GaussianBlur();
 
 	// 名前取得
 	//const char* GetShaderName() const override { return "GaussianBlur"; }
 	
 	// 描画開始処理
-	void Begin(ID3D11DeviceContext* context, BlurRenderContext& bulr_render_context, BlurType type);
+	void Begin(ID3D11DeviceContext* context, BlurType type);
+
+	// ブラー処理
+	Texture* Render(Texture* texture);
 
 	// 描画終了処理
 	void End(ID3D11DeviceContext* context, BlurType type);
@@ -42,6 +45,10 @@ private:
 	struct CBForPerGaussainBlur
 	{
 		float	weight[NumWeights];
+		DirectX::XMFLOAT2 texture_size;
+		float dummy;
+		float dummy1;
+
 	};
 	CBForPerGaussainBlur constant_buffer;
 	Microsoft::WRL::ComPtr<ID3D11Buffer>			blur_constant_buffer;

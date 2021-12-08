@@ -40,6 +40,10 @@ void Camera::SetLookAt(const DirectX::XMFLOAT3& eye, const DirectX::XMFLOAT3& fo
 //------------------------------------
 void Camera::SetPerspectiveFov(float fovY, float aspect, float nearZ, float farZ)
 {
+	this->fov = fovY;
+	this->aspect = aspect;
+	this->nearz = nearZ;
+	this->farz = farZ;
 	// 画角、画面比率、クリップ距離からプロジェクション行列を作成
 	DirectX::XMMATRIX projection = DirectX::XMMatrixPerspectiveFovLH(fovY, aspect, nearZ, farZ);
 	DirectX::XMStoreFloat4x4(&this->projection, projection);

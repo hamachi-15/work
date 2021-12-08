@@ -39,11 +39,18 @@ public:
 
 	// 実行
 	NodeBase* Run(Enemy* enemy, NodeBase* action_node, BehaviorData* data, float elapsed_time);
+
+	// ノードのGUI描画
+	void DrawNodeGUI();
+
 private:
+	// ノードのGUI描画
+	void DrawNodeGUI(NodeBase* node);
 	// ノード全削除
 	void NodeAllClear(NodeBase* del_node);
 private:
 	// ルートノード
 	NodeBase* root = nullptr;
+	NodeBase* select_root = nullptr;
 };
 

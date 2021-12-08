@@ -55,9 +55,21 @@ public:
 	Shader* GetSkyBoxShader() const { return skybox_shader.get(); }
 
 	AudioSource* GetAudio() const { return BGM.get(); }
-	
+
+	Texture* GetTexture() const { return scene_texture.get(); }
+
 	// ミューテクス取得
 	std::mutex& GetMutex() { return mutex; }
+
+	// ビューポート設定
+	void SetViewport(float weidth, float height);
+
+	// レンダーターゲット設定
+	void SetRenderTargetView(ID3D11RenderTargetView* render_target_view[], ID3D11DepthStencilView* depth_stensil_view);
+
+	// 画面クリア
+	void ScreenClear(ID3D11RenderTargetView* render_target_view[], ID3D11DepthStencilView* depth_stensil_view);
+
 private:
 	static Graphics* instance;
 	Microsoft::WRL::ComPtr<ID3D11Device>			device;
@@ -74,6 +86,8 @@ private:
 	std::unique_ptr<AudioSource>					BGM;
 
 	std::unique_ptr<Shader>							skybox_shader;
+
+	std::unique_ptr<Texture>						scene_texture;
 	std::mutex										mutex;
 	float screen_width;
 	float screen_height;

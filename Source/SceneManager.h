@@ -25,6 +25,9 @@ public:
 
 	// シーンチェンジ処理
 	void ChangeScene(Scene* scene);
+
+	// 現在のシーン取得
+	Scene* GetCurrentScene() const { return current_scene.get(); }
 private:
 	std::unique_ptr<Scene> current_scene;
 };

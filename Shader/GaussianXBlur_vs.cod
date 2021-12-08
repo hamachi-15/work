@@ -72,7 +72,7 @@ mov r1.xyzw, v2.xyxy  // r1.z <- tex.x; r1.w <- tex.y
 mov r2.xyzw, v1.xyzw  // r2.x <- output.color.x; r2.y <- output.color.y; r2.z <- output.color.z; r2.w <- output.color.w
 
 #line 16
-itof r3.x, l(512)  // r3.x <- width
+itof r3.x, l(640)  // r3.x <- width
 
 #line 18
 mov r3.x, r3.x  // r3.x <- tex_size.x

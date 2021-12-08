@@ -30,23 +30,28 @@ EnemyPLT::~EnemyPLT()
 //-----------------------------------------
 void EnemyPLT::OnGUI()
 {
-	std::string str = "";
-	if (active_node != nullptr)
-	{
-		str = active_node->GetName();
-	}
-	ImGui::Text(u8"Behavior　%s", str.c_str());
-
 	DirectX::XMFLOAT3 origin = GetTerritoryOrigin();
 	ImGui::InputFloat3("territory_origin", &origin.x);
-	int c = (int)GetActor().use_count();
-	ImGui::InputInt("actor_counter", &c);
-	int health = GetCharactor()->GetHealth();
-	ImGui::InputInt("Health", &health);
-	int id = GetCharactor()->GetID();
-	ImGui::InputInt("ID", &id);
 	bool attack_flag = GetAttackFlag();
 	ImGui::Checkbox("AttackFlag", &attack_flag);
+
+	// ビヘイビア関連情報
+	if (ImGui::CollapsingHeader("BehaviorTree"))
+	{
+		ImGui::TextColored(ImVec4(1, 0, 1, 1), u8"-------アクティブになっているノード------");
+		std::string child_str = "";
+		std::string parent_str = "";
+		if (active_node != nullptr)
+		{
+			parent_str = active_node->GetParent()->GetName();
+			child_str = active_node->GetName();
+		}
+		ImGui::Text(u8"ActiveParentNode　%s", parent_str.c_str());
+		ImGui::Text(u8"ActiveChildNode　%s", child_str.c_str());
+
+		ImGui::TextColored(ImVec4(1, 0, 1, 1), u8"-------ノードツリー-------");
+		ai_tree->DrawNodeGUI();
+	}
 }
 
 //-----------------------------------------
@@ -112,7 +117,7 @@ void EnemyPLT::Start()
 		right_hand_collision_name += "RightHand";
 		parameter.name = right_hand_collision_name.c_str();
 		parameter.node_name = "PLT:MiddleFinger2_R_BK";
-		parameter.radius = 10.0f;
+		parameter.radius = 6.0f;
 		parameter.weight = 1.0f;
 		parameter.collision_flg = false;
 		parameter.element = CollisionElement::Weppon;

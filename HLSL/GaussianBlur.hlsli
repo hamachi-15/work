@@ -6,6 +6,7 @@ SamplerState decal_sampler : register(s0);
 cbuffer CBPerBuffer : register(b0)
 {
 	float4 weight[2];
+	float2 tex_se;
 };
 
 //--------------------------------------------

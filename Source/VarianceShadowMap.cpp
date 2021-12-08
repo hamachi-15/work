@@ -174,7 +174,7 @@ void VarianceShadowMap::Begin(ID3D11DeviceContext* context, RenderContext& rende
 	//DirectX::XMMATRIX V = DirectX::XMLoadFloat4x4(&render_context.view);
 	//DirectX::XMMATRIX P = DirectX::XMLoadFloat4x4(&render_context.projection);
 	//DirectX::XMStoreFloat4x4(&cbscene.view_projection, V * P);
-	cbscene.view_projection = render_context.light_view_projection;
+	cbscene.view_projection = render_context.slight_view_projection;
 	context->UpdateSubresource(scene_constant_buffer.Get(), 0, 0, &cbscene, 0, 0);
 }
 

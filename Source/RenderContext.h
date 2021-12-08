@@ -8,7 +8,8 @@ struct RenderContext
 {
 	DirectX::XMFLOAT4X4 view;
 	DirectX::XMFLOAT4X4 projection;
-	DirectX::XMFLOAT4X4 light_view_projection;
+	DirectX::XMFLOAT4X4 light_view_projection[3];
+	DirectX::XMFLOAT4X4 slight_view_projection;
 	DirectX::XMFLOAT4X4 view_projection;
 	DirectX::XMFLOAT4	ambient_color;
 	DirectX::XMFLOAT4	light_color;

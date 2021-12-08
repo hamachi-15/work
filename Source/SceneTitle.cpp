@@ -13,12 +13,16 @@
 #include "SceneLoading.h"
 #include "SceneGame.h"
 #include "Messenger.h"
+#include "SceneBattle.h"
 //----------------------------------
 // ‰Šú‰»ˆ—
 //----------------------------------
 void SceneTitle::Initialize()
 {
 	Graphics& graphics = Graphics::Instance();
+
+	// ƒV[ƒ“–¼İ’è
+	SetName("SceneTitle");
 
 	//GameDataBase::Instance();
 

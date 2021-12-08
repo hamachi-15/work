@@ -42,6 +42,17 @@ public:
 	// 右方向取得
 	const DirectX::XMFLOAT3& GetRight() const { return right; }
 
+	// 画角取得
+	const float& GetFov() const { return fov; }
+
+	// アスペクト取得
+	const float& GetAspect() const { return aspect; }
+
+	// ニアクリップ取得
+	const float& GetNear() const { return nearz; }
+
+	// ファークリップ取得
+	const float& GetFar() const { return farz; }
 private:
 	DirectX::XMFLOAT4X4 view;
 	DirectX::XMFLOAT4X4 projection;
@@ -52,4 +63,9 @@ private:
 	DirectX::XMFLOAT3 up;
 	DirectX::XMFLOAT3 right;
 	DirectX::XMFLOAT3 front;
+
+	float fov;
+	float aspect;
+	float nearz;
+	float farz;
 };

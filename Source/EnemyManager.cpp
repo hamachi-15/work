@@ -9,6 +9,7 @@
 #include "EnemyLAT.h"
 #include "Graphics.h"
 #include "PhongVarianceShadowMap.h"
+#include "LambertShader.h"
 
 //-----------------------------------------------
 // コンストラクタ
@@ -88,7 +89,7 @@ void EnemyManager::CreateEnemies(int i, std::string index_string)
 	actor->SetScale({ enemy_data->scale_x, enemy_data->scale_y, enemy_data->scale_z });
 	actor->SetAngle({ enemy_data->angle_x, enemy_data->angle_y, enemy_data->angle_z });
 	actor->SetAnimationNodeName(enemy_data->animation_node_name);
-	actor->AddShader<PhongVarianceShadowMap>(Graphics::Instance().GetDevice());
+	actor->AddShader<LambertShader>(Graphics::Instance().GetDevice());
 
 	switch (enemy_data->category)
 	{

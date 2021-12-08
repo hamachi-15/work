@@ -196,7 +196,8 @@ private:
 		Avoid,
 		Damage,
 		Death,
-		Revive
+		Revive,
+		Encounter
 	};
 	enum class SubState
 	{
@@ -234,6 +235,7 @@ private:
 		DirectX::XMFLOAT3 Weppon_Local_Position;
 		const char* collision_name;
 	};
+
 	// 武器のあたり判定のローカル座標を格納する用
 	static const int Weppon_Collision_Max = 4;
 	const WepponCollisionList Weppon_Collison_List[Weppon_Collision_Max] = {
@@ -259,4 +261,7 @@ private:
 	float						lockon_target_change_time_max = 8;
 	std::shared_ptr<Enemy>		lockon_enemy;
 	DirectX::XMFLOAT3			lock_direction;
+	// TODO
+	DirectX::XMFLOAT3 start_position;
+	int fase = 0;
 };

@@ -268,16 +268,21 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Source\Player.cpp" />
+    <ClCompile Include="Source\PlayerUIHealth.cpp" />
+    <ClCompile Include="Source\PlayerUIHealthFrame.cpp" />
+    <ClCompile Include="Source\PlayerUIRedHealth.cpp" />
     <ClCompile Include="Source\PLTActionOwner.cpp" />
     <ClCompile Include="Source\PLTJudgmentOwner.cpp" />
     <ClCompile Include="Source\ReflectSeaShader.cpp" />
     <ClCompile Include="Source\ResourceManager.cpp" />
+    <ClCompile Include="Source\SceneBattle.cpp" />
     <ClCompile Include="Source\SceneGame.cpp" />
     <ClCompile Include="Source\SceneGameOver.cpp" />
     <ClCompile Include="Source\SceneLoading.cpp" />
     <ClCompile Include="Source\SceneManager.cpp" />
     <ClCompile Include="Source\SceneTitle.cpp" />
     <ClCompile Include="Source\SceneTutorial.cpp" />
+    <ClCompile Include="Source\Script.cpp" />
     <ClCompile Include="Source\Shader.cpp" />
     <ClCompile Include="Source\SkyBoxShader.cpp" />
     <ClCompile Include="Source\SlimeActionOwner.cpp" />
@@ -293,6 +298,7 @@
     <ClCompile Include="Source\TopMenu.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="Source\UI.cpp" />
     <ClCompile Include="Source\UseCubeMapShader.cpp" />
     <ClCompile Include="Source\VarianceShadowMap.cpp" />
     <ClCompile Include="Source\WinMain.cpp" />
@@ -396,17 +402,22 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Source\Player.h" />
+    <ClInclude Include="Source\PlayerUIHealth.h" />
+    <ClInclude Include="Source\PlayerUIHealthFrame.h" />
+    <ClInclude Include="Source\PlayerUIRedHealth.h" />
     <ClInclude Include="Source\PLTActionOwner.h" />
     <ClInclude Include="Source\PLTJudgmentOwner.h" />
     <ClInclude Include="Source\ReflectSeaShader.h" />
     <ClInclude Include="Source\RenderContext.h" />
     <ClInclude Include="Source\ResourceManager.h" />
     <ClInclude Include="Source\Scene.h" />
+    <ClInclude Include="Source\SceneBattle.h" />
     <ClInclude Include="Source\SceneGame.h" />
     <ClInclude Include="Source\SceneLoading.h" />
     <ClInclude Include="Source\SceneManager.h" />
     <ClInclude Include="Source\SceneTitle.h" />
     <ClInclude Include="Source\SceneTutorial.h" />
+    <ClInclude Include="Source\Script.h" />
     <ClInclude Include="Source\Shader.h" />
     <ClInclude Include="Source\SkyBoxShader.h" />
     <ClInclude Include="Source\SlimeActionOwner.h" />
@@ -423,11 +434,15 @@
     <ClInclude Include="Source\TopMenu.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="Source\UI.h" />
     <ClInclude Include="Source\UseCubeMapShader.h" />
     <ClInclude Include="Source\VarianceShadowMap.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="HLSL\3DObj.hlsli" />
+    <None Include="HLSL\Bright.hlsli">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </None>
     <None Include="HLSL\CubeMap.hlsli" />
     <None Include="HLSL\Debug.hlsli" />
     <None Include="HLSL\Font.hlsli" />
@@ -469,6 +484,20 @@
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Shader\%(Filename).cso</ObjectFileOutput>
       <AssemblerOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AssemblyCode</AssemblerOutput>
       <AssemblerOutputFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Shader\%(Filename).cod</AssemblerOutputFile>
+    </FxCompile>
+    <FxCompile Include="HLSL\Bright_ps.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="HLSL\Bright_vs.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="HLSL\CubeMap_ps.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
