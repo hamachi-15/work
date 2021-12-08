@@ -200,6 +200,7 @@
     <ClCompile Include="Source\AudioSource.cpp" />
     <ClCompile Include="Source\BehaviorData.cpp" />
     <ClCompile Include="Source\BehaviorTree.cpp" />
+    <ClCompile Include="Source\BloomShader.cpp" />
     <ClCompile Include="Source\BossActionOwner.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
@@ -321,6 +322,7 @@
     <ClInclude Include="Source\AudioSource.h" />
     <ClInclude Include="Source\BehaviorData.h" />
     <ClInclude Include="Source\BehaviorTree.h" />
+    <ClInclude Include="Source\BloomShader.h" />
     <ClInclude Include="Source\BossActionOwner.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>

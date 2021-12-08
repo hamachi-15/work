@@ -393,6 +393,9 @@
     <ClCompile Include="Source\Script.cpp">
       <Filter>ソース ファイル\System</Filter>
     </ClCompile>
+    <ClCompile Include="Source\BloomShader.cpp">
+      <Filter>ソース ファイル\Graphics\Shader</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\imgui\imconfig.h">
@@ -715,6 +718,9 @@
     </ClInclude>
     <ClInclude Include="Source\Script.h">
       <Filter>ソース ファイル\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\BloomShader.h">
+      <Filter>ソース ファイル\Graphics\Shader</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
