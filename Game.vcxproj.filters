@@ -115,6 +115,12 @@
     <Filter Include="ソース ファイル\HLSL\Bloom">
       <UniqueIdentifier>{ca86f48d-340b-45ba-8bc6-756e441d05d6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\HLSL\MotionBlur">
+      <UniqueIdentifier>{3ef48d16-2271-4112-8eb8-85a9154ff9a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Phong">
+      <UniqueIdentifier>{d9c22e51-bc45-4644-a4a3-1121cf41e174}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui\imgui.cpp">
@@ -394,6 +400,9 @@
       <Filter>ソース ファイル\System</Filter>
     </ClCompile>
     <ClCompile Include="Source\BloomShader.cpp">
+      <Filter>ソース ファイル\Graphics\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\PhongShader.cpp">
       <Filter>ソース ファイル\Graphics\Shader</Filter>
     </ClCompile>
   </ItemGroup>
@@ -722,6 +731,9 @@
     <ClInclude Include="Source\BloomShader.h">
       <Filter>ソース ファイル\Graphics\Shader</Filter>
     </ClInclude>
+    <ClInclude Include="Source\PhongShader.h">
+      <Filter>ソース ファイル\Graphics\Shader</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="HLSL\Sprite.hlsli">
@@ -771,6 +783,15 @@
     </None>
     <None Include="HLSL\Bright.hlsli">
       <Filter>ソース ファイル\HLSL\Bloom</Filter>
+    </None>
+    <None Include="HLSL\MotionBlur.hlsli">
+      <Filter>ソース ファイル\HLSL\MotionBlur</Filter>
+    </None>
+    <None Include="HLSL\VelocityBuffer.hlsli">
+      <Filter>ソース ファイル\HLSL\MotionBlur</Filter>
+    </None>
+    <None Include="HLSL\Phong.hlsli">
+      <Filter>ソース ファイル\Phong</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -872,6 +893,27 @@
     </FxCompile>
     <FxCompile Include="HLSL\Bright_ps.hlsl">
       <Filter>ソース ファイル\HLSL\Bloom</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\MotionBlur_vs.hlsl">
+      <Filter>ソース ファイル\HLSL\MotionBlur</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\MotionBlur_ps.hlsl">
+      <Filter>ソース ファイル\HLSL\MotionBlur</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\VelocityBuffer_vs.hlsl">
+      <Filter>ソース ファイル\HLSL\MotionBlur</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\VelocityBuffer_ps.hlsl">
+      <Filter>ソース ファイル\HLSL\MotionBlur</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\VelocityBuffer_gs.hlsl">
+      <Filter>ソース ファイル\HLSL\MotionBlur</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\Phong_vs.hlsl">
+      <Filter>ソース ファイル\Phong</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\Phong_ps.hlsl">
+      <Filter>ソース ファイル\Phong</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

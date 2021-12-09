@@ -194,7 +194,7 @@ void Graphics::SetRenderTargetView(ID3D11RenderTargetView* render_target_view[],
 void Graphics::ScreenClear(ID3D11RenderTargetView* render_target_view[], ID3D11DepthStencilView* depth_stensil_view)
 {
 	// ‰æ–ÊƒNƒŠƒA
-	float clear_color[4] = { 1.0f,1.0f,1.0f,1.0f };
+	float clear_color[4] = { 0.0f,0.0f,0.0f,1.0f };
 	context->ClearRenderTargetView(render_target_view[0], clear_color);
 	context->ClearDepthStencilView(depth_stensil_view, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 }

@@ -55,6 +55,21 @@ Sprite::Sprite() : texture(nullptr)
 
 		HRESULT hr = device->CreateBlendState(&desc, blend_state.GetAddressOf());
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+
+		desc.IndependentBlendEnable = false;
+		desc.AlphaToCoverageEnable = false;
+		desc.RenderTarget[0].BlendEnable = true;
+		desc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+		desc.RenderTarget[0].DestBlend = D3D11_BLEND_ONE;
+		desc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+		desc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ZERO;
+		desc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
+		desc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+		desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+
+		hr = device->CreateBlendState(&desc, add_blend_state.GetAddressOf());
+		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+
 	}
 
 	// 深度ステンシルステート
@@ -721,6 +736,117 @@ void Sprite::Render(ID3D11DeviceContext* context,
 
 		const float blend_factor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 		context->OMSetBlendState(blend_state.Get(), blend_factor, 0xFFFFFFFF);
+		texture->Set(0);
+		//context->OMSetDepthStencilState(depth_stencil_state.Get(), 1);
+		context->PSSetSamplers(0, 1, sampler_state.GetAddressOf());
+
+		// 描画
+		context->Draw(4, 0);
+	}
+}
+
+void Sprite::AddRender(ID3D11DeviceContext* context, Texture* texture, float dx, float dy, float dw, float dh, float sx, float sy, float sw, float sh, float angle, float r, float g, float b, float a) const
+{
+	{
+#if 0
+		Graphics& graphics = Graphics::Instance();
+		float screen_width = graphics.GetScreenWidth();
+		float screen_height = graphics.GetScreenHeight();
+
+#endif
+		D3D11_VIEWPORT viewport;
+		UINT num_viewport = 1;
+		context->RSGetViewports(&num_viewport, &viewport);
+		float screen_width = viewport.Width;
+		float screen_height = viewport.Height;
+		//
+		DirectX::XMFLOAT2 positions[] = {
+			DirectX::XMFLOAT2(dx,		dy),
+			DirectX::XMFLOAT2(dx + dw,	dy),
+			DirectX::XMFLOAT2(dx,		dy + dh),
+			DirectX::XMFLOAT2(dx + dw,	dy + dh)
+		};
+
+		DirectX::XMFLOAT2 texcoords[] = {
+			DirectX::XMFLOAT2(sx,		sy),
+			DirectX::XMFLOAT2(sx + sw,	sy),
+			DirectX::XMFLOAT2(sx,		sy + sh),
+			DirectX::XMFLOAT2(sx + sw,	sy + sh)
+		};
+
+		// スプライトの中心で回転させるために４頂点の中心位置が
+		// 原点(0, 0)になるように一旦頂点を移動させる。
+		float mx = dx + dw * 0.5f;
+		float my = dy + dh * 0.5f;
+		for (auto& p : positions)
+		{
+			p.x -= mx;
+			p.y -= my;
+		}
+
+		// 頂点を回転
+		const float PI = 3.141592653589793f;
+		float theta = angle * (PI / 180.0f);
+		float c = cosf(theta);
+		float s = sinf(theta);
+		for (auto& p : positions)
+		{
+			DirectX::XMFLOAT2 r = p;
+			p.x = c * r.x + -s * r.y;
+			p.y = s * r.x + c * r.y;
+		}
+
+		// 回転の為に移動させた頂点を元の位置へ
+		for (auto& p : positions)
+		{
+			p.x += mx;
+			p.y += my;
+		}
+
+		// NDC座標系へ変換
+		for (auto& p : positions)
+		{
+			p.x = 2.0f * p.x / screen_width - 1.0f;
+			p.y = 1.0f - 2.0f * p.y / screen_height;
+		}
+
+		// 頂点バッファの内容の編集を開始する。
+		D3D11_MAPPED_SUBRESOURCE mappedBuffer;
+		HRESULT hr = context->Map(vertex_buffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedBuffer);
+		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+
+		// pDataを編集することで頂点データの内容を書き換えることができる。
+		Vertex* v = static_cast<Vertex*>(mappedBuffer.pData);
+		for (int i = 0; i < 4; ++i)
+		{
+			v[i].position.x = positions[i].x;
+			v[i].position.y = positions[i].y;
+			v[i].position.z = 0.0f;
+
+			v[i].color.x = r;
+			v[i].color.y = g;
+			v[i].color.z = b;
+			v[i].color.w = a;
+
+			v[i].texcoord.x = texcoords[i].x / texture->GetWidth();
+			v[i].texcoord.y = texcoords[i].y / texture->GetHeight();
+		}
+
+		// 頂点バッファの内容の編集を終了する。
+		context->Unmap(vertex_buffer.Get(), 0);
+	}
+
+	// パイプライン設定
+	{
+		UINT stride = sizeof(Vertex);
+		UINT offset = 0;
+		context->IASetVertexBuffers(0, 1, vertex_buffer.GetAddressOf(), &stride, &offset);
+		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+
+		context->RSSetState(rasterizer_state.Get());
+
+		const float blend_factor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+		context->OMSetBlendState(add_blend_state.Get(), blend_factor, 0xFFFFFFFF);
 		texture->Set(0);
 		//context->OMSetDepthStencilState(depth_stencil_state.Get(), 1);
 		context->PSSetSamplers(0, 1, sampler_state.GetAddressOf());

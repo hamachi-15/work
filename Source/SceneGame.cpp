@@ -21,6 +21,7 @@
 #include "ReflectSeaShader.h"
 #include "UseCubeMapShader.h"
 #include "LambertShader.h"
+#include "BloomShader.h"
 
 #include "EnemyManager.h"
 #include "Player.h"
@@ -77,6 +78,7 @@ void SceneGame::Initialize()
 
 	//
 	bulr = std::make_unique<GaussianBlur>(device, DXGI_FORMAT_R16G16B16A16_FLOAT);
+	bloom = std::make_unique<Bloom>(device);
 
 	bulr_texture = std::make_unique<Texture>();
 	bulr_texture->Create(graphics.GetScreenWidth(), graphics.GetScreenHeight(), DXGI_FORMAT_R16G16B16A16_FLOAT);
@@ -257,25 +259,23 @@ void SceneGame::Render()
 	// アクター描画
 	{
 		// シャドウマップ作成
-		ActorManager::Instance().ShadowRender(render_context, blur_render_context);
-
+	//	ActorManager::Instance().ShadowRender(render_context, blur_render_context);
 		// 描画
 		ActorManager::Instance().Render(render_context);
 	}
 
+	Texture* t = bloom->Render(context, render_context, graphics.GetTexture());
+
 	Texture* texture = bulr->Render(graphics.GetTexture());
 	{
-		// レンダーターゲットをシャドウマップに設定
 		ID3D11RenderTargetView* render_target_view[1] = { bulr_texture->GetRenderTargetView() };
 		ID3D11DepthStencilView* depth_stencil_view = depth_texture->GetDepthStencilView();
 		graphics.SetRenderTargetView(render_target_view, depth_stencil_view);
-
 		// 画面クリア
 		graphics.ScreenClear(render_target_view, depth_stencil_view);
 	}
 	// ビューポートの設定
 	graphics.SetViewport(graphics.GetScreenWidth(), graphics.GetScreenHeight());
-
 	graphics.GetSpriteShader()->Begin(context);
 	sprite->Render(context,
 		texture,
@@ -291,7 +291,6 @@ void SceneGame::Render()
 		
 		// レンダーターゲット設定
 		graphics.SetRenderTargetView(&render_target_view, depth_stencil_view);
-
 		// 画面クリア
 		graphics.ScreenClear(&render_target_view, depth_stencil_view);
 	}
@@ -301,12 +300,6 @@ void SceneGame::Render()
 
 	// バックバッファにスクリーンテクスチャに描画
 	graphics.GetSpriteShader()->Begin(context);
-	//sprite->Render(context,
-	//	bulr_texture.get(),
-	//	0, 0,
-	//	screen_width, screen_height,
-	//	0, 0,
-	//	bulr_texture->GetWidth(), bulr_texture->GetHeight());
 	sprite->Render(context, graphics.GetTexture(),
 		0, 0,
 		screen_width, screen_height,
@@ -314,6 +307,12 @@ void SceneGame::Render()
 		(float)graphics.GetTexture()->GetWidth(), (float)graphics.GetTexture()->GetHeight(),
 		0,
 		1, 1, 1, 1);
+	sprite->AddRender(context, 
+		t,
+		0, 0,
+		screen_width, screen_height,
+		0, 0,
+		(float)t->GetWidth(), (float)t->GetHeight());
 	graphics.GetSpriteShader()->End(context);
 
 	// メニュー描画

@@ -9,6 +9,7 @@
 class VarianceShadowMap;
 class PhongVarianceShadowMap;
 class GaussianBlur;
+class Phong;
 class Texture;
 class Sprite;
 class Actor;
@@ -54,6 +55,7 @@ public:
 	
 	// 描画処理
 	void Render(RenderContext& render_context);
+	void BrightRender(RenderContext& render_context);
 
 	// シャドウマップ取得
 	Texture* GetShadowTexture(int index) const { return shadow_texture[index].get(); }
@@ -95,10 +97,11 @@ private:
 	bool								 hidden_lister = false;
 	bool								 hidden_detail = false;
 	std::string							 shader_name;
-	//Shader*								 shader = nullptr;
-	std::unique_ptr<PhongVarianceShadowMap>				 shader;
-	std::unique_ptr<VarianceShadowMap>   shadowmap;
-	std::unique_ptr<GaussianBlur>		 bulr;
+
+	std::unique_ptr<PhongVarianceShadowMap>	shader;
+	std::unique_ptr<VarianceShadowMap>		shadowmap;
+	std::unique_ptr<GaussianBlur>			bulr;
+	std::unique_ptr<Phong>					phong;
 
 	std::unique_ptr<Texture>			 shadow_texture[3];
 	std::unique_ptr<Texture>			 shadow_vsm_texture[3];

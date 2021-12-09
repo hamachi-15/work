@@ -50,6 +50,7 @@ cbuffer CbScene : register(b0)
 {
 	row_major float4x4	viewProjection;
 	float4				lightDirection;
+	float4				light_color;
 };
 
 #define MAX_BONES 128

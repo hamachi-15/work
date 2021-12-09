@@ -9,6 +9,7 @@ class Texture;
 class Sprite;
 class CameraController;
 class GaussianBlur;
+class Bloom;
 
 class SceneGame : public Scene
 {
@@ -48,6 +49,7 @@ private:
 
 	DirectX::XMFLOAT3 shadow_color = { 0.5f, 0.5f, 0.5f };
 	std::unique_ptr<GaussianBlur>		 bulr;
+	std::unique_ptr<Bloom>		 bloom;
 	std::unique_ptr<Texture>			bulr_texture;
 	std::unique_ptr<Texture> depth_texture;
 	bool battle_flag = false;

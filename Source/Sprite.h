@@ -60,7 +60,14 @@ public:
 		float sw, float sh,
 		float angle = 0.0f,
 		float r = 1, float g = 1, float b = 1, float a = 1) const;
-
+	void AddRender(ID3D11DeviceContext* context,
+		Texture* texture,
+		float dx, float dy,
+		float dw, float dh,
+		float sx, float sy,
+		float sw, float sh,
+		float angle = 0.0f,
+		float r = 1, float g = 1, float b = 1, float a = 1) const;
 	// テクスチャ幅取得
 	int GetTextureWidth() const { return texture_width; }
 
@@ -71,6 +78,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11Buffer>		vertex_buffer;
 
 	Microsoft::WRL::ComPtr<ID3D11BlendState>	blend_state;
+	Microsoft::WRL::ComPtr<ID3D11BlendState>	add_blend_state;
 	Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterizer_state;
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depth_stencil_state;
 

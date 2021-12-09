@@ -2,14 +2,6 @@
 Texture2D diffuse_texture : register(t0);
 SamplerState decal_sampler : register(s0);
 
-// グローバル変数
-cbuffer CBPerBloom : register(b3)
-{
-	float threshold;
-	float dummy1;
-	float dummy2;
-	float dummy3;
-};
 
 // データフォーマット
 struct VSInput

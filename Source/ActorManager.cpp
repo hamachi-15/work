@@ -4,6 +4,8 @@
 #include "PhongVarianceShadowMap.h"
 #include "VarianceShadowMap.h"
 #include "GaussianBlurShader.h"
+#include "PhongShader.h"
+
 #include "Sprite.h"
 #include "Texture.h"
 #include "Camera.h"
@@ -11,6 +13,7 @@
 #include "Light.h"
 #include "GaussianXBlur.h"
 #include "GaussianYBlur.h"
+
 //------------------------------
 // コンストラクタ
 //------------------------------
@@ -20,6 +23,7 @@ ActorManager::ActorManager()
 	shadowmap = std::make_unique<VarianceShadowMap>(device);
 	bulr = std::make_unique<GaussianBlur>(device);
 	shader = std::make_unique<PhongVarianceShadowMap>(device);
+	phong = std::make_unique<Phong>(device);
 
 	// シャドウテクスチャ作成
 	for (int i = 0; i < 3; ++i)
@@ -30,7 +34,7 @@ ActorManager::ActorManager()
 		shadow_vsm_texture[i]->Create(static_cast<u_int>(shadow_size[i].x), static_cast<u_int>(shadow_size[i].y), DXGI_FORMAT_R32G32_FLOAT);
 	}
 	depth_texture = std::make_unique<Texture>();
-	depth_texture->CreateDepthStencil(2048, 2048, DXGI_FORMAT_D24_UNORM_S8_UINT);
+	depth_texture->CreateDepthStencil(2048, 2048);
 
 }
 
@@ -442,6 +446,38 @@ void ActorManager::Render(RenderContext& render_context)
 	DrawLister();
 	// 詳細描画
 	DrawDetail();
+}
+
+// 輝度を算出するモデルを描画する
+void ActorManager::BrightRender(RenderContext& render_context)
+{
+	Graphics& graphics = Graphics::Instance();
+	ID3D11DeviceContext* context = graphics.GetDeviceContext();
+	phong->Begin(context, render_context, DirectX::XMFLOAT4{5, 5, 5, 1});
+	for (std::shared_ptr<Actor>& actor : update_actors)
+	{
+		// 現在セットされているシェーダーとこれからの描画に使うシェーダーが同じか
+		//if(strcmp(shader_name.c_str(),actor->GetShader()->GetShaderName()) != 0)
+		//{	
+		//	// シェーダーの終了処理
+		//	if(shader != nullptr)
+		//		shader->End(context);
+		//	// 現在のシェーダーを入れ替えて
+		//	shader = actor->GetShader();
+		//	shader_name = shader->GetShaderName();
+		//}
+		// シェーダーにポインタが入っていなければアサート
+		//_ASSERT_EXPR_A(shader, "shader is nullptr");
+
+		if (strcmp(actor->GetName(), "Stage") == 0) continue;
+		// モデルがあれば描画
+		Model* model = actor->GetModel();
+		if (model != nullptr)
+		{
+			phong->Draw(context, model);
+		}
+	}
+	phong->End(context);
 }
 
 //------------------------------
