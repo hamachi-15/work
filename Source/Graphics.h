@@ -68,7 +68,7 @@ public:
 	void SetRenderTargetView(ID3D11RenderTargetView* render_target_view[], ID3D11DepthStencilView* depth_stensil_view);
 
 	// ‰æ–ÊƒNƒŠƒA
-	void ScreenClear(ID3D11RenderTargetView* render_target_view[], ID3D11DepthStencilView* depth_stensil_view);
+	void ScreenClear(ID3D11RenderTargetView* render_target_view[], ID3D11DepthStencilView* depth_stensil_view, DirectX::XMFLOAT4 clear_color = {0.0f, 0.0f, 0.0f, 1.0f});
 
 private:
 	static Graphics* instance;

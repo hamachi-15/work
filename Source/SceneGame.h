@@ -30,6 +30,10 @@ private:
 	// 描画処理
 	void Render() override;
 
+	// ポストエフェクトに使うテクスチャ描画
+	void PostRender();
+
+
 	bool OnMessages(const Telegram& telegram) override;
 
 	// ImGui描画

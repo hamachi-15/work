@@ -190,33 +190,22 @@ void SceneBattle::Render()
 	render_context.view = camera.GetView();
 	render_context.projection = camera.GetProjection();
 
-	{
-		ID3D11RenderTargetView* render_target_view = graphics.GetTexture()->GetRenderTargetView();
-		ID3D11DepthStencilView* depth_stencil_view = graphics.GetDepthStencilView();
-
-		// 画面クリア
-		FLOAT color[] = { 1.0f, 0.0f, 0.0f, 1.0f };
-		context->ClearRenderTargetView(render_target_view, color);
-		context->ClearDepthStencilView(depth_stencil_view, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-		//context->OMSetRenderTargets(1, &render_target_view, depth_stencil_view);
-	}
-
+	// 深度ステンシルバッファ設定
+	ID3D11DepthStencilView* depth_stencil_view = graphics.GetDepthStencilView();
+	// バックバッファのクリア処理
 	{
 		ID3D11RenderTargetView* render_target_view = graphics.GetRenderTargetView();
-		ID3D11DepthStencilView* depth_stencil_view = graphics.GetDepthStencilView();
-
 		// 画面クリア
-		FLOAT color[] = { 1.0f, 0.0f, 0.0f, 1.0f };
-		context->ClearRenderTargetView(render_target_view, color);
-		context->ClearDepthStencilView(depth_stencil_view, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+		graphics.ScreenClear(&render_target_view, depth_stencil_view);
 	}
 	float screen_width = graphics.GetScreenWidth();
 	float screen_height = graphics.GetScreenHeight();
-
-	// レンダーターゲットの回復
-	ID3D11RenderTargetView* backbuffer = graphics.GetTexture()->GetRenderTargetView();
-	context->OMSetRenderTargets(1, &backbuffer, graphics.GetDepthStencilView());
-
+	// スクリーンテクスチャをレンダーターゲットに設定して画面クリア
+	{
+		// レンダーターゲットの回復
+		ID3D11RenderTargetView* screen_texture = graphics.GetTexture()->GetRenderTargetView();
+		graphics.SetRenderTargetView(&screen_texture, depth_stencil_view);
+	}
 	// ビューポートを元に戻す
 	graphics.SetViewport(static_cast<float>(graphics.GetScreenWidth()), static_cast<float>(graphics.GetScreenHeight()));
 
@@ -228,20 +217,71 @@ void SceneBattle::Render()
 			0, 0,
 			screen_width, screen_height,
 			0, 0,
-			(float)sky->GetWidth(), (float)sky->GetHeight(),
+			static_cast<float>(sky->GetWidth()), static_cast<float>(sky->GetHeight()),
 			0,
 			1, 1, 1, 1);
 		graphics.GetSkyBoxShader()->End(context);
 	}
 
+	// デバッグプリミティブ描画
+	{
+		EnemyManager::Instance().DrawDebugPrimitive();
+		CollisionManager::Instance().Draw();
+		graphics.GetDebugRenderer()->Render(context, render_context.view, render_context.projection);
+	}
+
 	// アクター描画
 	{
 		// シャドウマップ作成
-		ActorManager::Instance().ShadowRender(render_context, blur_render_context);
-
+		//ActorManager::Instance().ShadowRender(render_context, blur_render_context);
 		// 描画
 		ActorManager::Instance().Render(render_context);
 	}
+
+	//Texture* t = bloom->Render(context, render_context, graphics.GetTexture());
+
+	//Texture* texture = bulr->Render(graphics.GetTexture());
+	//{
+	//	ID3D11RenderTargetView* render_target_view[1] = { bulr_texture->GetRenderTargetView() };
+	//	graphics.SetRenderTargetView(render_target_view, depth_stencil_view);
+
+	//}
+	//// ビューポートの設定
+	//graphics.SetViewport(graphics.GetScreenWidth(), graphics.GetScreenHeight());
+	//graphics.GetSpriteShader()->Begin(context);
+	//sprite->Render(context,
+	//	texture,
+	//	0, 0,
+	//	screen_width, screen_height,
+	//	0, 0,
+	//	texture->GetWidth(), texture->GetHeight());
+	//graphics.GetSpriteShader()->End(context);
+
+	{
+		ID3D11RenderTargetView* render_target_view = graphics.GetRenderTargetView();
+		// レンダーターゲット設定
+		graphics.SetRenderTargetView(&render_target_view, depth_stencil_view);
+	}
+
+	// ビューポート設定
+	graphics.SetViewport(screen_width, screen_height);
+
+	// バックバッファにスクリーンテクスチャに描画
+	graphics.GetSpriteShader()->Begin(context);
+	sprite->Render(context, graphics.GetTexture(),
+		0, 0,
+		screen_width, screen_height,
+		0, 0,
+		(float)graphics.GetTexture()->GetWidth(), (float)graphics.GetTexture()->GetHeight(),
+		0,
+		1, 1, 1, 1);
+	//sprite->AddRender(context,
+	//	t,
+	//	0, 0,
+	//	screen_width, screen_height,
+	//	0, 0,
+	//	(float)t->GetWidth(), (float)t->GetHeight());
+	graphics.GetSpriteShader()->End(context);
 
 	// メニュー描画
 	{
@@ -252,7 +292,6 @@ void SceneBattle::Render()
 			graphics.GetSpriteShader()->End(context);
 		}
 	}
-
 	// UI描画処理
 	UIManager::Instance().Draw(context);
 
@@ -268,31 +307,6 @@ void SceneBattle::Render()
 			0,
 			1, 1, 1, 1);
 	}
-	graphics.GetSpriteShader()->End(context);
-
-	// デバッグプリミティブ描画
-	{
-		EnemyManager::Instance().DrawDebugPrimitive();
-		CollisionManager::Instance().Draw();
-		graphics.GetDebugRenderer()->Render(context, render_context.view, render_context.projection);
-	}
-	// レンダーターゲットの回復
-	{
-		ID3D11RenderTargetView* backbuffer = graphics.GetRenderTargetView();
-		context->OMSetRenderTargets(1, &backbuffer, graphics.GetDepthStencilView());
-
-		// ビューポートを元に戻す
-		graphics.SetViewport(static_cast<float>(graphics.GetScreenWidth()), static_cast<float>(graphics.GetScreenHeight()));
-	}
-	graphics.GetSpriteShader()->Begin(context);
-	sprite->Render(context,
-		graphics.GetTexture(),
-		0, 0,
-		screen_width, screen_height,
-		0, 0,
-		(float)graphics.GetTexture()->GetWidth(), (float)graphics.GetTexture()->GetHeight(),
-		0,
-		1, 1, 1, 1);
 	graphics.GetSpriteShader()->End(context);
 
 	// GUI描画

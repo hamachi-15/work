@@ -314,6 +314,7 @@ void ActorManager::ShadowRender(RenderContext& render_context, BlurRenderContext
 
 	// ブラーを掛ける
 	{
+	bulr->Render(shadow_texture[0].get());
 		float blurx_texture_width = static_cast<float>(bulr->GetGaussianXBlurShader()->GetBlurXTexture()->GetWidth());
 		float blurx_texture_height = static_cast<float>(bulr->GetGaussianXBlurShader()->GetBlurXTexture()->GetHeight());
 		float blury_texture_width = static_cast<float>(bulr->GetGaussianYBlurShader()->GetBlurYTexture()->GetWidth());
@@ -321,78 +322,52 @@ void ActorManager::ShadowRender(RenderContext& render_context, BlurRenderContext
 		Sprite sprite;
 		//for (int i = 0; i < 3; ++i)
 		//{
-			// X方向にブラーを掛ける
-			bulr->Begin(context, BlurType::XBlur);
-			sprite.Render(context, shadow_texture[0].get(),
-				0, 0,
-				blurx_texture_width, blurx_texture_height,
-				0, 0,
-				(float)shadow_texture[0]->GetWidth(), (float)shadow_texture[0]->GetHeight(),
-				0,
-				1, 1, 1, 1);
-			bulr->End(context, BlurType::XBlur);
+		Texture* shadow_bulr_texture = bulr->Render(shadow_texture[0].get());
 
-			// Y方向にブラーを掛ける
-			bulr->Begin(context, BlurType::YBlur);
-			sprite.Render(context, bulr->GetGaussianXBlurShader()->GetBlurXTexture(),
-				0, 0,
-				blury_texture_width, blury_texture_height,
-				0, 0,
-				blurx_texture_width, blurx_texture_height,
-				0,
-				1, 1, 1, 1);
-			bulr->End(context, BlurType::YBlur);
+		// 掛けたブラーをシャドウマップテクスチャに描画
+		// レンダーターゲットをシャドウマップに設定
+		ID3D11RenderTargetView* render_target_view[1] = { shadow_vsm_texture[0]->GetRenderTargetView() };
+		ID3D11DepthStencilView* depth_stencil_view = depth_texture->GetDepthStencilView();
+		graphics.SetRenderTargetView(render_target_view, depth_stencil_view);
+		// 画面クリア
+		graphics.ScreenClear(render_target_view, depth_stencil_view);
 
-			// 掛けたブラーをシャドウマップテクスチャに描画
-			// レンダーターゲットをシャドウマップに設定
-			ID3D11RenderTargetView* rtv[1] = { shadow_vsm_texture[0]->GetRenderTargetView() };
-			ID3D11DepthStencilView* dsv = depth_texture->GetDepthStencilView();
-			context->OMSetRenderTargets(1, rtv, dsv);
+		// ビューポートの設定
+		graphics.SetViewport(static_cast<float>(shadow_vsm_texture[0]->GetWidth()), static_cast<float>(shadow_vsm_texture[0]->GetHeight()));
 
-			// 画面クリア
-			float clear_color[4] = { 1.0f,1.0f,1.0f,1.0f };
-			context->ClearRenderTargetView(rtv[0], clear_color);
-			context->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-
-			// ビューポートの設定
-			graphics.SetViewport(static_cast<float>(shadow_vsm_texture[0]->GetWidth()), static_cast<float>(shadow_vsm_texture[0]->GetHeight()));
-			float screen_height = graphics.GetScreenHeight();
-
-			graphics.GetSpriteShader()->Begin(context);
-			sprite.Render(context,
-				bulr->GetGaussianYBlurShader()->GetBlurYTexture(),
-				0, 0,
-				static_cast<float>(shadow_vsm_texture[0]->GetWidth()), static_cast<float>(shadow_vsm_texture[0]->GetHeight()),
-				0, 0,
-				blury_texture_width, blury_texture_height,
-				0,
-				1, 1, 1, 1);
-			graphics.GetSpriteShader()->End(context);
+		graphics.GetSpriteShader()->Begin(context);
+		sprite.Render(context,
+			shadow_bulr_texture,
+			0, 0,
+			static_cast<float>(shadow_vsm_texture[0]->GetWidth()), static_cast<float>(shadow_vsm_texture[0]->GetHeight()),
+			0, 0,
+			static_cast<float>(shadow_bulr_texture->GetWidth()), static_cast<float>(shadow_bulr_texture->GetHeight()),
+			0,
+			1, 1, 1, 1);
+		graphics.GetSpriteShader()->End(context);
 
 		//}
 		for (int i = 1; i < 3; ++i)
 		{ 
 			// 掛けたブラーをシャドウマップテクスチャに描画
 			// レンダーターゲットをシャドウマップに設定
-			ID3D11RenderTargetView* rtv[1] = { shadow_vsm_texture[i]->GetRenderTargetView() };
-			ID3D11DepthStencilView* dsv = depth_texture->GetDepthStencilView();
-			context->OMSetRenderTargets(1, rtv, dsv);
-
+			ID3D11RenderTargetView* render_target_view[1] = { shadow_vsm_texture[i]->GetRenderTargetView() };
+			ID3D11DepthStencilView* depth_stencil_view = depth_texture->GetDepthStencilView();
+			graphics.SetRenderTargetView(render_target_view, depth_stencil_view);
 			// 画面クリア
-			float clear_color[4] = { 1.0f,1.0f,1.0f,1.0f };
-			context->ClearRenderTargetView(rtv[0], clear_color);
-			context->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+			graphics.ScreenClear(render_target_view, depth_stencil_view);
 
 			// ビューポートの設定
 			graphics.SetViewport(static_cast<float>(shadow_vsm_texture[i]->GetWidth()), static_cast<float>(shadow_vsm_texture[i]->GetHeight()));
 
+			// 描画
 			graphics.GetSpriteShader()->Begin(context);
 			sprite.Render(context,
-				bulr->GetGaussianYBlurShader()->GetBlurYTexture(),
+				shadow_texture[i].get(),
+				0, 0,
+				static_cast<float>(shadow_texture[i]->GetWidth()), static_cast<float>(shadow_texture[i]->GetHeight()),
 				0, 0,
 				static_cast<float>(shadow_vsm_texture[i]->GetWidth()), static_cast<float>(shadow_vsm_texture[i]->GetHeight()),
-				0, 0,
-				blury_texture_width, blury_texture_height,
 				0,
 				1, 1, 1, 1);
 			graphics.GetSpriteShader()->End(context);

@@ -191,10 +191,10 @@ void Graphics::SetRenderTargetView(ID3D11RenderTargetView* render_target_view[],
 //-----------------------------
 // 画面クリア
 //-----------------------------
-void Graphics::ScreenClear(ID3D11RenderTargetView* render_target_view[], ID3D11DepthStencilView* depth_stensil_view)
+void Graphics::ScreenClear(ID3D11RenderTargetView* render_target_view[], ID3D11DepthStencilView* depth_stensil_view, DirectX::XMFLOAT4 clear_color)
 {
 	// 画面クリア
-	float clear_color[4] = { 0.0f,0.0f,0.0f,1.0f };
-	context->ClearRenderTargetView(render_target_view[0], clear_color);
+	float color[4] = { clear_color.x, clear_color.y, clear_color.z, clear_color.w };
+	context->ClearRenderTargetView(render_target_view[0], color);
 	context->ClearDepthStencilView(depth_stensil_view, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 }

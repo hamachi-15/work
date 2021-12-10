@@ -81,9 +81,9 @@ void SceneGame::Initialize()
 	bloom = std::make_unique<Bloom>(device);
 
 	bulr_texture = std::make_unique<Texture>();
-	bulr_texture->Create(graphics.GetScreenWidth(), graphics.GetScreenHeight(), DXGI_FORMAT_R16G16B16A16_FLOAT);
+	bulr_texture->Create((u_int)graphics.GetScreenWidth(), (u_int)graphics.GetScreenHeight(), DXGI_FORMAT_R16G16B16A16_FLOAT);
 	depth_texture = std::make_unique<Texture>();
-	depth_texture->CreateDepthStencil(graphics.GetScreenWidth(), graphics.GetScreenHeight());
+	depth_texture->CreateDepthStencil((u_int)graphics.GetScreenWidth(), (u_int)graphics.GetScreenHeight());
 
 	// テクスチャの読み込み
 	sprite = std::make_unique<Sprite>();
@@ -217,7 +217,6 @@ void SceneGame::Render()
 	// バックバッファのクリア処理
 	{
 		ID3D11RenderTargetView* render_target_view = graphics.GetRenderTargetView();
-
 		// 画面クリア
 		graphics.ScreenClear(&render_target_view, depth_stencil_view);
 	}
@@ -228,8 +227,6 @@ void SceneGame::Render()
 		// レンダーターゲットの回復
 		ID3D11RenderTargetView* screen_texture = graphics.GetTexture()->GetRenderTargetView();
 		graphics.SetRenderTargetView(&screen_texture, depth_stencil_view);
-
-		// 画面クリア
 		graphics.ScreenClear(&screen_texture, depth_stencil_view);
 	}
 	// ビューポートを元に戻す
@@ -259,7 +256,15 @@ void SceneGame::Render()
 	// アクター描画
 	{
 		// シャドウマップ作成
-	//	ActorManager::Instance().ShadowRender(render_context, blur_render_context);
+		ActorManager::Instance().ShadowRender(render_context, blur_render_context);
+		// スクリーンテクスチャをレンダーターゲットに設定して画面クリア
+		{
+			// レンダーターゲットの回復
+			ID3D11RenderTargetView* screen_texture = graphics.GetTexture()->GetRenderTargetView();
+			graphics.SetRenderTargetView(&screen_texture, depth_stencil_view);
+			// ビューポートの設定
+			graphics.SetViewport(graphics.GetScreenWidth(), graphics.GetScreenHeight());
+		}
 		// 描画
 		ActorManager::Instance().Render(render_context);
 	}
@@ -269,13 +274,12 @@ void SceneGame::Render()
 	Texture* texture = bulr->Render(graphics.GetTexture());
 	{
 		ID3D11RenderTargetView* render_target_view[1] = { bulr_texture->GetRenderTargetView() };
-		ID3D11DepthStencilView* depth_stencil_view = depth_texture->GetDepthStencilView();
 		graphics.SetRenderTargetView(render_target_view, depth_stencil_view);
-		// 画面クリア
-		graphics.ScreenClear(render_target_view, depth_stencil_view);
+
 	}
 	// ビューポートの設定
 	graphics.SetViewport(graphics.GetScreenWidth(), graphics.GetScreenHeight());
+
 	graphics.GetSpriteShader()->Begin(context);
 	sprite->Render(context,
 		texture,
@@ -287,12 +291,8 @@ void SceneGame::Render()
 
 	{
 		ID3D11RenderTargetView* render_target_view = graphics.GetRenderTargetView();
-		ID3D11DepthStencilView* depth_stencil_view = graphics.GetDepthStencilView();
-		
 		// レンダーターゲット設定
 		graphics.SetRenderTargetView(&render_target_view, depth_stencil_view);
-		// 画面クリア
-		graphics.ScreenClear(&render_target_view, depth_stencil_view);
 	}
 
 	// ビューポート設定
@@ -327,6 +327,12 @@ void SceneGame::Render()
 
 	// GUI描画
 	//OnGui();
+}
+
+// ポストエフェクトに使うテクスチャ描画
+void SceneGame::PostRender()
+{
+
 }
 
 bool SceneGame::OnMessages(const Telegram& telegram)
