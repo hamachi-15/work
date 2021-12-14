@@ -4,6 +4,9 @@
 #include "Shader.h"
 #include "DebugRenderer.h"
 
+//-------------------------------
+// コンストラクタ
+//-------------------------------
 DebugRenderer::DebugRenderer(ID3D11Device* device)
 {
 	HRESULT hr;
@@ -129,7 +132,9 @@ DebugRenderer::DebugRenderer(ID3D11Device* device)
 	CreateCylinderMesh(device, 1.0f, 1.0f, 0.0f, 1.0f, 16, 1);
 }
 
+//-------------------------------
 // 描画処理
+//-------------------------------
 void DebugRenderer::Render(ID3D11DeviceContext* context, const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection)
 {
 	// シェーダー設定
@@ -196,7 +201,10 @@ void DebugRenderer::Render(ID3D11DeviceContext* context, const DirectX::XMFLOAT4
 	}
 	cylinders.clear();
 }
+
+//-------------------------------
 // 球描画処理
+//-------------------------------
 void DebugRenderer::DrawSphere(const DirectX::XMFLOAT3& center, float radius, const DirectX::XMFLOAT4& color)
 {
 	Sphere sphere;
@@ -205,7 +213,10 @@ void DebugRenderer::DrawSphere(const DirectX::XMFLOAT3& center, float radius, co
 	sphere.color  = color;
 	spheres.emplace_back(sphere);
 }
+
+//-------------------------------
 // 円柱描画処理
+//-------------------------------
 void DebugRenderer::DrawCylinder(const DirectX::XMFLOAT3& position, float radius, float height, const DirectX::XMFLOAT4& color)
 {
 	Cylinder cylinder;
@@ -216,7 +227,9 @@ void DebugRenderer::DrawCylinder(const DirectX::XMFLOAT3& position, float radius
 	cylinders.emplace_back(cylinder);
 }
 
+//-------------------------------
 // 球メッシュ作成
+//-------------------------------
 void DebugRenderer::CreateSphereMesh(ID3D11Device* device, float radius, int slices, int stacks)
 {
 	sphere_vertex_count = stacks * slices * 2 + slices * stacks * 2;
@@ -290,7 +303,10 @@ void DebugRenderer::CreateSphereMesh(ID3D11Device* device, float radius, int sli
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 	}
 }
+
+//-------------------------------
 // 円柱メッシュ作成
+//-------------------------------
 void DebugRenderer::CreateCylinderMesh(ID3D11Device* device, float radius1, float radius2, float start, float height, int slices, int stacks)
 {
 	cylinder_vertex_count = 2 * slices * (stacks + 1) + 2 * slices;

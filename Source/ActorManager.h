@@ -61,6 +61,7 @@ public:
 	Texture* GetShadowTexture(int index) const { return shadow_texture[index].get(); }
 	Texture* GetShadowBulrTexture(int index) const { return shadow_vsm_texture[index].get(); }
 	Texture* GetDepthTexture() const { return depth_texture.get(); }
+
 	// キューブマップ取得
 	Texture* GetCubeMapTexture() const { return cubemap_texture.get(); }
 

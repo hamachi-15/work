@@ -56,6 +56,13 @@ public:
 
 	// 敵を生成
 	void CreateEnemies(int i, std::string index_string);
+	
+	void CreateEnemies(int id);
+	
+	// スクリプトから敵情報を取得して敵を生成する
+	void CreateEnemyScriptData();
+	
+	void SetEnemyStatus(std::shared_ptr<Actor> actor, std::shared_ptr<EnemyData> enemy_data, std::string index_string, DirectX::XMFLOAT3 appearance_position);
 
 	// ゲームデータから得た出現位置を原点に出現位置をランダム算出
 	void GetAppearancePosition(std::shared_ptr<Actor> actor, DirectX::XMFLOAT3 appearance_origin);
@@ -83,7 +90,7 @@ public:
 	// 一度に出現させる敵の上限と下限
 	enum EnemyCountLimit
 	{
-		Min_Limit = 2,
+		Min_Limit = 1,
 		Max_Limit = 10,
 	};
 private:

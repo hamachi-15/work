@@ -29,7 +29,7 @@ ActorManager::ActorManager()
 	for (int i = 0; i < 3; ++i)
 	{
 		shadow_texture[i] = std::make_unique<Texture>();
-		shadow_texture[i]->Create(static_cast<u_int>(shadow_size[i].x), static_cast<u_int>(shadow_size[i].y), DXGI_FORMAT_R32G32_FLOAT);
+		shadow_texture[i]->Create(static_cast<u_int>(shadow_size[i].x), static_cast<u_int>(shadow_size[i].y), DXGI_FORMAT_R32_FLOAT);
 		shadow_vsm_texture[i] = std::make_unique<Texture>();
 		shadow_vsm_texture[i]->Create(static_cast<u_int>(shadow_size[i].x), static_cast<u_int>(shadow_size[i].y), DXGI_FORMAT_R32G32_FLOAT);
 	}
@@ -314,64 +314,60 @@ void ActorManager::ShadowRender(RenderContext& render_context, BlurRenderContext
 
 	// ブラーを掛ける
 	{
-	bulr->Render(shadow_texture[0].get());
-		float blurx_texture_width = static_cast<float>(bulr->GetGaussianXBlurShader()->GetBlurXTexture()->GetWidth());
-		float blurx_texture_height = static_cast<float>(bulr->GetGaussianXBlurShader()->GetBlurXTexture()->GetHeight());
-		float blury_texture_width = static_cast<float>(bulr->GetGaussianYBlurShader()->GetBlurYTexture()->GetWidth());
-		float blury_texture_height = static_cast<float>(bulr->GetGaussianYBlurShader()->GetBlurYTexture()->GetHeight());
+	//	bulr->Render(shadow_texture[0].get());
 		Sprite sprite;
+	//	//for (int i = 0; i < 3; ++i)
+	//	//{
+	//	Texture* shadow_bulr_texture = bulr->Render(shadow_texture[0].get());
+
+	//	// 掛けたブラーをシャドウマップテクスチャに描画
+	//	// レンダーターゲットをシャドウマップに設定
+	//	ID3D11RenderTargetView* render_target_view[1] = { shadow_vsm_texture[0]->GetRenderTargetView() };
+	//	ID3D11DepthStencilView* depth_stencil_view = depth_texture->GetDepthStencilView();
+	//	graphics.SetRenderTargetView(render_target_view, depth_stencil_view);
+	//	// 画面クリア
+	//	graphics.ScreenClear(render_target_view, depth_stencil_view);
+
+	//	// ビューポートの設定
+	//	graphics.SetViewport(static_cast<float>(shadow_vsm_texture[0]->GetWidth()), static_cast<float>(shadow_vsm_texture[0]->GetHeight()));
+
+	//	graphics.GetSpriteShader()->Begin(context);
+	//	sprite.Render(context,
+	//		shadow_bulr_texture,
+	//		0, 0,
+	//		static_cast<float>(shadow_vsm_texture[0]->GetWidth()), static_cast<float>(shadow_vsm_texture[0]->GetHeight()),
+	//		0, 0,
+	//		static_cast<float>(shadow_bulr_texture->GetWidth()), static_cast<float>(shadow_bulr_texture->GetHeight()),
+	//		0,
+	//		1, 1, 1, 1);
+	//	graphics.GetSpriteShader()->End(context);
+
+	//	//}
 		//for (int i = 0; i < 3; ++i)
-		//{
-		Texture* shadow_bulr_texture = bulr->Render(shadow_texture[0].get());
+		//{ 
+		//	// 掛けたブラーをシャドウマップテクスチャに描画
+		//	// レンダーターゲットをシャドウマップに設定
+		//	ID3D11RenderTargetView* render_target_view[1] = { shadow_vsm_texture[i]->GetRenderTargetView() };
+		//	ID3D11DepthStencilView* depth_stencil_view = depth_texture->GetDepthStencilView();
+		//	graphics.SetRenderTargetView(render_target_view, depth_stencil_view);
+		//	// 画面クリア
+		//	graphics.ScreenClear(render_target_view, depth_stencil_view);
 
-		// 掛けたブラーをシャドウマップテクスチャに描画
-		// レンダーターゲットをシャドウマップに設定
-		ID3D11RenderTargetView* render_target_view[1] = { shadow_vsm_texture[0]->GetRenderTargetView() };
-		ID3D11DepthStencilView* depth_stencil_view = depth_texture->GetDepthStencilView();
-		graphics.SetRenderTargetView(render_target_view, depth_stencil_view);
-		// 画面クリア
-		graphics.ScreenClear(render_target_view, depth_stencil_view);
+		//	// ビューポートの設定
+		//	graphics.SetViewport(static_cast<float>(shadow_vsm_texture[i]->GetWidth()), static_cast<float>(shadow_vsm_texture[i]->GetHeight()));
 
-		// ビューポートの設定
-		graphics.SetViewport(static_cast<float>(shadow_vsm_texture[0]->GetWidth()), static_cast<float>(shadow_vsm_texture[0]->GetHeight()));
-
-		graphics.GetSpriteShader()->Begin(context);
-		sprite.Render(context,
-			shadow_bulr_texture,
-			0, 0,
-			static_cast<float>(shadow_vsm_texture[0]->GetWidth()), static_cast<float>(shadow_vsm_texture[0]->GetHeight()),
-			0, 0,
-			static_cast<float>(shadow_bulr_texture->GetWidth()), static_cast<float>(shadow_bulr_texture->GetHeight()),
-			0,
-			1, 1, 1, 1);
-		graphics.GetSpriteShader()->End(context);
-
+		//	// 描画
+		//	graphics.GetSpriteShader()->Begin(context);
+		//	sprite.Render(context,
+		//		shadow_texture[i].get(),
+		//		0, 0,
+		//		static_cast<float>(shadow_texture[i]->GetWidth()), static_cast<float>(shadow_texture[i]->GetHeight()),
+		//		0, 0,
+		//		static_cast<float>(shadow_vsm_texture[i]->GetWidth()), static_cast<float>(shadow_vsm_texture[i]->GetHeight()),
+		//		0,
+		//		1, 1, 1, 1);
+		//	graphics.GetSpriteShader()->End(context);
 		//}
-		for (int i = 1; i < 3; ++i)
-		{ 
-			// 掛けたブラーをシャドウマップテクスチャに描画
-			// レンダーターゲットをシャドウマップに設定
-			ID3D11RenderTargetView* render_target_view[1] = { shadow_vsm_texture[i]->GetRenderTargetView() };
-			ID3D11DepthStencilView* depth_stencil_view = depth_texture->GetDepthStencilView();
-			graphics.SetRenderTargetView(render_target_view, depth_stencil_view);
-			// 画面クリア
-			graphics.ScreenClear(render_target_view, depth_stencil_view);
-
-			// ビューポートの設定
-			graphics.SetViewport(static_cast<float>(shadow_vsm_texture[i]->GetWidth()), static_cast<float>(shadow_vsm_texture[i]->GetHeight()));
-
-			// 描画
-			graphics.GetSpriteShader()->Begin(context);
-			sprite.Render(context,
-				shadow_texture[i].get(),
-				0, 0,
-				static_cast<float>(shadow_texture[i]->GetWidth()), static_cast<float>(shadow_texture[i]->GetHeight()),
-				0, 0,
-				static_cast<float>(shadow_vsm_texture[i]->GetWidth()), static_cast<float>(shadow_vsm_texture[i]->GetHeight()),
-				0,
-				1, 1, 1, 1);
-			graphics.GetSpriteShader()->End(context);
-		}
 
 
 
@@ -423,27 +419,16 @@ void ActorManager::Render(RenderContext& render_context)
 	DrawDetail();
 }
 
+//------------------------------
 // 輝度を算出するモデルを描画する
+//------------------------------
 void ActorManager::BrightRender(RenderContext& render_context)
 {
 	Graphics& graphics = Graphics::Instance();
 	ID3D11DeviceContext* context = graphics.GetDeviceContext();
-	phong->Begin(context, render_context, DirectX::XMFLOAT4{5, 5, 5, 1});
+	phong->Begin(context, render_context, DirectX::XMFLOAT4{2, 2, 2, 0.7f});
 	for (std::shared_ptr<Actor>& actor : update_actors)
 	{
-		// 現在セットされているシェーダーとこれからの描画に使うシェーダーが同じか
-		//if(strcmp(shader_name.c_str(),actor->GetShader()->GetShaderName()) != 0)
-		//{	
-		//	// シェーダーの終了処理
-		//	if(shader != nullptr)
-		//		shader->End(context);
-		//	// 現在のシェーダーを入れ替えて
-		//	shader = actor->GetShader();
-		//	shader_name = shader->GetShaderName();
-		//}
-		// シェーダーにポインタが入っていなければアサート
-		//_ASSERT_EXPR_A(shader, "shader is nullptr");
-
 		if (strcmp(actor->GetName(), "Stage") == 0) continue;
 		// モデルがあれば描画
 		Model* model = actor->GetModel();

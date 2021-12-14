@@ -566,7 +566,7 @@ void Player::TransitionAvoidState()
 	DirectX::XMFLOAT3 angle = actor->GetAngle();
 	float frontX = sinf(angle.y);
 	float frontZ = cosf(angle.y);
-	movement->Move({ frontX, 0.0f, frontZ }, 80);
+	movement->Move({ frontX, 0.0f, frontZ }, 40);
 
 	// ダメージアニメーション再生
 	Model* model = GetActor()->GetModel();

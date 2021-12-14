@@ -40,6 +40,9 @@ bool Script::LoadScript(const char* filename)
 	fseek(fp, 0, SEEK_SET);
 	fread(text_buffer, text_buffer_size, 1, fp);
 
+	// ファイルを閉じる
+	//fclose(fp);
+
 	// テキスト位置を初期化する
 	text_ip = 0;
 
@@ -70,10 +73,10 @@ bool Script::SearchParamTop()
 //----------------------------------------
 void Script::GetParamString(LPSTR buf)
 {
-	char temp;
+	char temp, n;
 	SearchParamTop();
 
-	for (char n = 0; ; ++text_ip, ++n)
+	for (n = 0; ; ++text_ip, ++n)
 	{
 		temp = text_buffer[text_ip];
 		if(temp == ',') break;
@@ -95,9 +98,10 @@ void Script::GetParamString(LPSTR buf)
 			n++;
 			text_ip++;
 		}
-		text_ip++;
-		buf[n] = '\0';
 	}
+	text_ip++;
+	buf[n] = '\0';
+
 }
 
 //----------------------------------------
@@ -156,4 +160,40 @@ bool Script::SearchTop()
 	}
 
 	return false;
+}
+
+// コンストラクタ
+WriteScript::WriteScript()
+{
+}
+
+// デストラクタ
+WriteScript::~WriteScript()
+{
+}
+
+// battleシーンに送るスクリプト書き込み
+bool WriteScript::WriteSceneDataScript(const char* filename, const BattleSceneDataHeadder& data_headder)
+{
+	// シーンデータスクリプト書き込み処理
+	FILE* fp;
+	fopen_s(&fp, filename, "w");
+
+	//　ファイルオープンに失敗したらfalseを返す
+	if (!fp)	return false;
+
+	fprintf(fp, "// 敵データID\n");
+
+	int data_size = static_cast<int>(data_headder.search_enemy_id.size());
+	for (int i = 0; i < data_size; ++i)
+	{
+		fprintf(fp, "EnemyID %d\n", data_headder.search_enemy_id.at(i));
+	}
+
+	fprintf(fp, "END");
+
+	// ファイルを閉じる
+	fclose(fp);
+
+	return true;
 }

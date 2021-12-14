@@ -9,11 +9,14 @@
 #include "Movement.h"
 #include "Actor.h"
 #include "ActorManager.h"
+
 #include "PhongVarianceShadowMap.h"
 #include "GaussianBlurShader.h"
 #include "ReflectSeaShader.h"
 #include "UseCubeMapShader.h"
 #include "LambertShader.h"
+#include "BloomShader.h"
+
 #include "EnemyManager.h"
 #include "Player.h"
 #include "EnemySlime.h"
@@ -39,6 +42,7 @@ SceneBattle::~SceneBattle()
 void SceneBattle::Initialize()
 {
 	Graphics& graphics = Graphics::Instance();
+	ID3D11Device* device = graphics.GetDevice();
 
 	// シーン名設定
 	SetName("SceneBattle");
@@ -66,6 +70,9 @@ void SceneBattle::Initialize()
 	camera_controller = std::make_unique<CameraController>();
 	camera_controller->SetCameraAngle({ DirectX::XMConvertToRadians(25), 0.0f, 0.0f });
 	//camera_controller->SetTarget(DirectX::XMFLOAT3(0, , -416));
+
+	// シェーダー初期化
+	bloom = std::make_unique<Bloom>(device);
 
 	// テクスチャの読み込み
 	sprite = std::make_unique<Sprite>();
@@ -102,7 +109,8 @@ void SceneBattle::Initialize()
 	ActorManager::Instance().Update(0.01f);
 	ActorManager::Instance().UpdateTransform();
 
-	//MetaAI::Instance();
+	// スクリプトから敵の生成
+	EnemyManager::Instance().CreateEnemyScriptData();
 }
 
 void SceneBattle::Finalize()
@@ -181,6 +189,9 @@ void SceneBattle::Render()
 	Graphics& graphics = Graphics::Instance();
 	ID3D11DeviceContext* context = graphics.GetDeviceContext();
 
+	// スクリーンサイズ取得
+	DirectX::XMFLOAT2 screen_size = { graphics.GetScreenWidth(), graphics.GetScreenHeight() };
+
 	// 描画処理
 	render_context.light_direction = Light::LightDir;
 	render_context.ShadowParameter = { shadow_color.x, shadow_color.y, shadow_color.z, 0.000001f };
@@ -190,24 +201,44 @@ void SceneBattle::Render()
 	render_context.view = camera.GetView();
 	render_context.projection = camera.GetProjection();
 
-	// 深度ステンシルバッファ設定
-	ID3D11DepthStencilView* depth_stencil_view = graphics.GetDepthStencilView();
 	// バックバッファのクリア処理
 	{
 		ID3D11RenderTargetView* render_target_view = graphics.GetRenderTargetView();
+		ID3D11DepthStencilView* depth_stencil_view = graphics.GetDepthStencilView();
 		// 画面クリア
 		graphics.ScreenClear(&render_target_view, depth_stencil_view);
 	}
-	float screen_width = graphics.GetScreenWidth();
-	float screen_height = graphics.GetScreenHeight();
+
+	// スクリーンテクスチャに描画
+	ScreenRender(context, render_context, screen_size);
+
+	// ポストテクスチャ描画
+	PostRender(context, render_context, screen_size);
+
+	// バックバッファに描画
+	BuckBufferRender(context, render_context, screen_size);
+
+	// GUI描画
+	//OnGui();
+}
+
+
+//-------------------------------------
+// スクリーンテクスチャ描画
+//-------------------------------------
+void SceneBattle::ScreenRender(ID3D11DeviceContext* context, RenderContext& render_context, const DirectX::XMFLOAT2& screen_size)
+{
+	Graphics& graphics = Graphics::Instance();
+
 	// スクリーンテクスチャをレンダーターゲットに設定して画面クリア
+	ID3D11RenderTargetView* screen_texture = graphics.GetTexture()->GetRenderTargetView();
+	ID3D11DepthStencilView* depth_stencil_view = graphics.GetDepthStencilView();
 	{
-		// レンダーターゲットの回復
-		ID3D11RenderTargetView* screen_texture = graphics.GetTexture()->GetRenderTargetView();
 		graphics.SetRenderTargetView(&screen_texture, depth_stencil_view);
+		graphics.ScreenClear(&screen_texture, depth_stencil_view);
 	}
 	// ビューポートを元に戻す
-	graphics.SetViewport(static_cast<float>(graphics.GetScreenWidth()), static_cast<float>(graphics.GetScreenHeight()));
+	graphics.SetViewport(screen_size.x, screen_size.y);
 
 	// スカイボックス描画
 	{
@@ -215,7 +246,7 @@ void SceneBattle::Render()
 		sprite->Render(context,
 			sky.get(),
 			0, 0,
-			screen_width, screen_height,
+			screen_size.x, screen_size.y,
 			0, 0,
 			static_cast<float>(sky->GetWidth()), static_cast<float>(sky->GetHeight()),
 			0,
@@ -234,53 +265,75 @@ void SceneBattle::Render()
 	{
 		// シャドウマップ作成
 		//ActorManager::Instance().ShadowRender(render_context, blur_render_context);
+
+		// レンダーターゲットの回復
+		//graphics.SetRenderTargetView(&screen_texture, depth_stencil_view);
+
+		// ビューポートの設定
+		//graphics.SetViewport(graphics.GetScreenWidth(), graphics.GetScreenHeight());
+
 		// 描画
 		ActorManager::Instance().Render(render_context);
 	}
+}
 
-	//Texture* t = bloom->Render(context, render_context, graphics.GetTexture());
+//-------------------------------------
+// ポストテクスチャ描画
+//-------------------------------------
+void SceneBattle::PostRender(ID3D11DeviceContext* context, RenderContext& render_context, const DirectX::XMFLOAT2& screen_size)
+{
+	bloom_texture = bloom->Render(context, render_context);
 
 	//Texture* texture = bulr->Render(graphics.GetTexture());
 	//{
 	//	ID3D11RenderTargetView* render_target_view[1] = { bulr_texture->GetRenderTargetView() };
 	//	graphics.SetRenderTargetView(render_target_view, depth_stencil_view);
-
 	//}
 	//// ビューポートの設定
-	//graphics.SetViewport(graphics.GetScreenWidth(), graphics.GetScreenHeight());
+	//graphics.SetViewport(screen_width, screen_height);
 	//graphics.GetSpriteShader()->Begin(context);
 	//sprite->Render(context,
 	//	texture,
 	//	0, 0,
-	//	screen_width, screen_height,
+	//	screen_size.x, screen_size.y,
 	//	0, 0,
 	//	texture->GetWidth(), texture->GetHeight());
 	//graphics.GetSpriteShader()->End(context);
+}
 
+//-------------------------------------
+//バックバッファ描画
+//-------------------------------------
+void SceneBattle::BuckBufferRender(ID3D11DeviceContext* context, RenderContext& render_context, const DirectX::XMFLOAT2& screen_size)
+{
+	Graphics& graphics = Graphics::Instance();
+
+	// レンダーターゲット設定
 	{
 		ID3D11RenderTargetView* render_target_view = graphics.GetRenderTargetView();
-		// レンダーターゲット設定
+		ID3D11DepthStencilView* depth_stencil_view = graphics.GetDepthStencilView();
 		graphics.SetRenderTargetView(&render_target_view, depth_stencil_view);
 	}
-
 	// ビューポート設定
-	graphics.SetViewport(screen_width, screen_height);
+	graphics.SetViewport(screen_size.x, screen_size.y);
 
-	// バックバッファにスクリーンテクスチャに描画
+	// バックバッファにスクリーンテクスチャを描画
 	graphics.GetSpriteShader()->Begin(context);
+	// スクリーンテクスチャ
 	sprite->Render(context, graphics.GetTexture(),
 		0, 0,
-		screen_width, screen_height,
+		screen_size.x, screen_size.y,
 		0, 0,
 		(float)graphics.GetTexture()->GetWidth(), (float)graphics.GetTexture()->GetHeight(),
 		0,
 		1, 1, 1, 1);
-	//sprite->AddRender(context,
-	//	t,
-	//	0, 0,
-	//	screen_width, screen_height,
-	//	0, 0,
-	//	(float)t->GetWidth(), (float)t->GetHeight());
+	// 輝度抽出テクスチャを加算合成
+	sprite->AddRender(context,
+		bloom_texture,
+		0, 0,
+		screen_size.x, screen_size.y,
+		0, 0,
+		(float)bloom_texture->GetWidth(), (float)bloom_texture->GetHeight());
 	graphics.GetSpriteShader()->End(context);
 
 	// メニュー描画
@@ -292,25 +345,25 @@ void SceneBattle::Render()
 			graphics.GetSpriteShader()->End(context);
 		}
 	}
+
 	// UI描画処理
 	UIManager::Instance().Draw(context);
 
-	graphics.GetSpriteShader()->Begin(context);
-	for (int i = 0; i < 3; ++i)
-	{
-		sprite->Render(context,
-			ActorManager::Instance().GetShadowTexture(i),
-			0 + 200 * (i), 0,
-			200, 200,
-			0, 0,
-			(float)ActorManager::Instance().GetShadowTexture(i)->GetWidth(), (float)ActorManager::Instance().GetShadowTexture(i)->GetHeight(),
-			0,
-			1, 1, 1, 1);
-	}
-	graphics.GetSpriteShader()->End(context);
+	// シャドウマップ
+	//graphics.GetSpriteShader()->Begin(context);
+	//for (int i = 0; i < 3; ++i)
+	//{
+	//	sprite->Render(context,
+	//		ActorManager::Instance().GetShadowTexture(i),
+	//		0 + 200 * (i), 0,
+	//		200, 200,
+	//		0, 0,
+	//		(float)ActorManager::Instance().GetShadowTexture(i)->GetWidth(), (float)ActorManager::Instance().GetShadowTexture(i)->GetHeight(),
+	//		0,
+	//		1, 1, 1, 1);
+	//}
+	//graphics.GetSpriteShader()->End(context);
 
-	// GUI描画
-	//OnGui();
 }
 
 //-------------------------------------

@@ -734,6 +734,9 @@
     <ClInclude Include="Source\PhongShader.h">
       <Filter>ソース ファイル\Graphics\Shader</Filter>
     </ClInclude>
+    <ClInclude Include="Source\ScriptDataHeadder.h">
+      <Filter>ソース ファイル\System</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="HLSL\Sprite.hlsli">

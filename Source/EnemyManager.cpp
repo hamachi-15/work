@@ -10,6 +10,7 @@
 #include "Graphics.h"
 #include "PhongVarianceShadowMap.h"
 #include "LambertShader.h"
+#include "Script.h"
 
 //-----------------------------------------------
 // コンストラクタ
@@ -75,17 +76,83 @@ void EnemyManager::DrawDebugPrimitive()
 //-----------------------------------------------
 // 敵を生成
 //-----------------------------------------------
-void EnemyManager::CreateEnemies(int i, std::string index_string)
+// TODO リファクタリング
+void EnemyManager::CreateEnemies(int index, std::string index_string)
 {
 	std::vector<std::shared_ptr<EnemyOccurPosition>> enemy_appearance_data = GameDataBase::Instance().GetEnemyOccurData();
 	std::vector<std::shared_ptr<EnemyData>> data_list = GameDataBase::Instance().GetEnemyData();
-	std::shared_ptr<EnemyData> enemy_data = data_list.at(i);
-	std::shared_ptr<EnemyOccurPosition> appearance_data = enemy_appearance_data.at(i);
+	std::shared_ptr<EnemyData> enemy_data = data_list.at(index);
+
 	std::shared_ptr<Actor> actor = ActorManager::Instance().Create();
+
+	std::shared_ptr<EnemyOccurPosition> appearance_data = enemy_appearance_data.at(index);
+	DirectX::XMFLOAT3 appearance_position = { appearance_data->position_x,appearance_data->position_y, appearance_data->position_z };
+
+
+	SetEnemyStatus(actor, enemy_data, index_string, appearance_position);
+}
+
+//-----------------------------------------------
+// スクリプトから敵を生成
+//-----------------------------------------------
+void EnemyManager::CreateEnemies(int id)
+{
+	std::vector<std::shared_ptr<EnemyData>> data_list = GameDataBase::Instance().GetEnemyData();
+	int index = 0;
+	for (std::shared_ptr<EnemyData> data : data_list)
+	{
+		if (data->id == id)
+		{
+			std::shared_ptr<Actor> actor = ActorManager::Instance().Create();
+			std::vector<std::shared_ptr<EnemyData>> data_list = GameDataBase::Instance().GetEnemyData();
+			std::shared_ptr<EnemyData> enemy_data = data_list.at(index);
+			std::string index_string = std::to_string(index);
+			SetEnemyStatus(actor, enemy_data, index_string, DirectX::XMFLOAT3{100, 1, 0});
+		}
+		++index;
+	}
+}
+
+//-----------------------------------------
+// スクリプトから敵情報を取得して敵を生成する
+//-----------------------------------------
+void EnemyManager::CreateEnemyScriptData()
+{
+	Script script("./Data/Script/SendBattleSceneScript.txt");
+	char	strwork[256];
+
+	while (1)
+	{
+		if (!script.SearchTop())
+			break;
+
+		//	文字列をファイルから取り出す
+		script.GetParamString(strwork);
+
+		//	終了コマンド
+		if (lstrcmpA(strwork, "END") == 0)
+		{
+			break;
+		}
+
+		if (lstrcmpA(strwork, "EnemyID") == 0)
+		{
+			// スクリプトの敵IDから敵を生成
+			CreateEnemies(script.GetParamInt());
+		}
+	}
+}
+
+//-----------------------------------------
+// 敵のステータスを設定する処理
+//-----------------------------------------
+void EnemyManager::SetEnemyStatus(std::shared_ptr<Actor> actor, std::shared_ptr<EnemyData> enemy_data, std::string index_string, DirectX::XMFLOAT3 appearance_position)
+{
 	std::string name = std::string(enemy_data->name) + index_string;
 	actor->SetName(name.c_str());
+	actor->SetEnemyDataID(enemy_data->id);
 	actor->SetUpModel(enemy_data->model_path);
-	GetAppearancePosition(actor, { appearance_data->position_x, appearance_data->position_y, appearance_data->position_z });
+	GetAppearancePosition(actor, { appearance_position.x, appearance_position.y, appearance_position.z });
 	actor->SetScale({ enemy_data->scale_x, enemy_data->scale_y, enemy_data->scale_z });
 	actor->SetAngle({ enemy_data->angle_x, enemy_data->angle_y, enemy_data->angle_z });
 	actor->SetAnimationNodeName(enemy_data->animation_node_name);

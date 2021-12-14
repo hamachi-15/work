@@ -135,7 +135,6 @@ bool Charactor::SearchAnimationTime(std::shared_ptr<Actor> actor, float start_ti
 	// アニメーション時間が一定内か調べる
 	float animation_time = model->GetCurrentAnimationSeconds();
 	return animation_time >= start_time && animation_time <= end_time;
-	return false;
 }
 
 //-----------------------------------------

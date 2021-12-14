@@ -17,9 +17,9 @@ Bloom::Bloom(ID3D11Device* device)
 
 	// テクスチャ初期化
 	bright_texture = std::make_unique<Texture>();
-	bright_texture->Create(1280, 720, DXGI_FORMAT_R16G16B16A16_FLOAT);
+	bright_texture->Create(1280, 720, DXGI_FORMAT_R32G32B32A32_FLOAT);
 	bloom_texture = std::make_unique<Texture>();
-	bloom_texture->Create(1280, 720, DXGI_FORMAT_R16G16B16A16_FLOAT);
+	bloom_texture->Create(1280, 720, DXGI_FORMAT_R32G32B32A32_FLOAT);
 	depth_texture = std::make_unique<Texture>();
 	depth_texture->CreateDepthStencil(1280, 720);
 
@@ -106,7 +106,7 @@ void Bloom::Begin(ID3D11DeviceContext* context)
 //--------------------------------------
 // 輝度抽出処理
 //--------------------------------------
-Texture* Bloom::Render(ID3D11DeviceContext* context, RenderContext& render_context, Texture* screen_texture)
+Texture* Bloom::Render(ID3D11DeviceContext* context, RenderContext& render_context)
 {
 	Graphics& graphics = Graphics::Instance();
 	ID3D11RenderTargetView* render_terget_view = bright_texture->GetRenderTargetView();
@@ -135,7 +135,7 @@ Texture* Bloom::Render(ID3D11DeviceContext* context, RenderContext& render_conte
 
 	//bloom_texture.reset(bulr->Render(bright_texture.get()));
 
-	return bulr->Render(bright_texture.get());
+	return bulr->Render(bloom_texture.get());
 }
 
 //--------------------------------------

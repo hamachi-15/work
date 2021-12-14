@@ -422,6 +422,7 @@
     <ClInclude Include="Source\SceneTitle.h" />
     <ClInclude Include="Source\SceneTutorial.h" />
     <ClInclude Include="Source\Script.h" />
+    <ClInclude Include="Source\ScriptDataHeadder.h" />
     <ClInclude Include="Source\Shader.h" />
     <ClInclude Include="Source\SkyBoxShader.h" />
     <ClInclude Include="Source\SlimeActionOwner.h" />

@@ -11,5 +11,6 @@ float4 main(PSInput input) : SV_TARGET0
 	// なので、マイナスになるとピクセルカラーは出力されない
 	// 今回の実装はカラーの明るさが1以下ならピクセルキルする
 	clip(t - 1.0f);
+	
 	return color;
 }

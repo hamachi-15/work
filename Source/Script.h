@@ -1,5 +1,6 @@
 #pragma once
 #include <Windows.h>
+#include "ScriptDataHeadder.h"
 
 class Script
 {
@@ -29,6 +30,26 @@ public:
 	bool SearchTop();
 private:
 	char* text_buffer = nullptr;
-	int text_buffer_size;
-	int text_ip;
+	int text_buffer_size = 0;
+	int text_ip = 0;
+};
+
+class WriteScript
+{
+private:
+	// コンストラクタ
+	WriteScript();
+	// デストラクタ
+	~WriteScript();
+public:
+	// インスタンス取得
+	static WriteScript& Instance()
+	{
+		static WriteScript instance;
+		return instance;
+	}
+
+	// シーンデータスクリプト書き込み処理
+	bool WriteSceneDataScript(const char* filename, const BattleSceneDataHeadder& dataheadder);
+
 };

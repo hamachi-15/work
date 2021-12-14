@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include <d3d11.h>
 #include "Scene.h"
 #include "RenderContext.h"
 
@@ -7,6 +8,7 @@ class Texture;
 class Sprite;
 class CameraController;
 class GaussianBlur;
+class Bloom;
 class Shader;
 
 //-------------------------------------
@@ -34,13 +36,24 @@ public:
 
 	// 描画処理
 	void Render() override;
+
+	// スクリーンテクスチャ描画
+	void ScreenRender(ID3D11DeviceContext* context, RenderContext& render_context, const DirectX::XMFLOAT2& screen_size);
+
+	// ポストテクスチャ描画
+	void PostRender(ID3D11DeviceContext* context, RenderContext& render_context, const DirectX::XMFLOAT2& screen_size);
+
+	//バックバッファ描画
+	void BuckBufferRender(ID3D11DeviceContext* context, RenderContext& render_context, const DirectX::XMFLOAT2& screen_size);
 private:
 	RenderContext render_context;
 	BlurRenderContext blur_render_context;
 	std::unique_ptr<Shader> sprite_cube;
+	std::unique_ptr<Bloom> bloom;
 
-	std::unique_ptr<Sprite> sprite;
-	std::unique_ptr<Texture> sky;
+	std::unique_ptr<Sprite>		sprite;
+	std::unique_ptr<Texture>	sky;
+	Texture*					bloom_texture;
 
 
 	std::unique_ptr<CameraController>camera_controller;

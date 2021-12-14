@@ -1,0 +1,3 @@
+// “Gƒf[ƒ^ID
+EnemyID 1
+END
