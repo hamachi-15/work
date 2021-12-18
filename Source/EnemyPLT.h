@@ -16,6 +16,9 @@ public:
 	// 開始処理
 	void Start() override;
 	
+	// ビヘイビアのノード設定処理
+	void SetBehaviorNode() override;
+
 	// 破棄処理
 	void Destroy() override;
 

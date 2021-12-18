@@ -11,10 +11,10 @@ public:
 	virtual ~Scene(){}
 
 	// シーン名設定
-	void SetName(const char* name) { this->name = name; }
+	void SetName(const char* scene_name) { this->scene_name = scene_name; }
 
 	// シーン名取得
-	const char* GetName() const { return name.c_str(); }
+	const char* GetName() const { return scene_name.c_str(); }
 
 	// 初期化処理
 	virtual void Initialize() = 0;
@@ -35,5 +35,5 @@ public:
 	void SetReady() { ready = true; }
 private:
 	bool ready = false;
-	std::string name; // シーンの名前
+	std::string scene_name; // シーンの名前
 };

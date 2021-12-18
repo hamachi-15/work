@@ -11,6 +11,10 @@ public:
 	void OnGUI() override;
 	// 開始処理
 	void Start() override;
+	// ビヘイビアのノード設定処理
+	void SetBehaviorNode() override;
+	// 敵の破棄処理
+	void Destroy() override;
 	// 更新処理
 	void Update(float elapsed_time) override;
 	void PlayAnimation(std::shared_ptr<AnimationData> animation) override;

@@ -144,6 +144,16 @@ void EnemyPLT::Start()
 	ai_tree->AddNode("Scount", "Idle",		 2, BehaviorTree::SelectRule::Non,		NULL,					  new IdleAction(this));
 }
 
+//-----------------------------------------
+// ビヘイビアのノード設定処理
+//-----------------------------------------
+void EnemyPLT::SetBehaviorNode()
+{
+}
+
+//-----------------------------------------
+// 破棄処理
+//-----------------------------------------
 void EnemyPLT::Destroy()
 {
 	// アクターの取得

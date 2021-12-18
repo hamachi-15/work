@@ -390,7 +390,6 @@ void SceneGame::BuckBufferRender(ID3D11DeviceContext* context, RenderContext& re
 		1, 1, 1, 1);
 	graphics.GetSpriteShader()->End(context);
 
-	OnGui();
 }
 
 //-------------------------------------
@@ -542,8 +541,7 @@ void SceneGame::OnGui()
 		ImGui::Separator();
 		ImGui::TreePop();
 	}
-	ImGui::Image(bloom_texture, ImVec2(200, 200));
-	
+
 	ImGui::GetStyle().Colors[ImGuiCol_WindowBg] = ImVec4(1.0f, 1.0f, 1.0f, 0.4f);
 	ImGui::GetStyle().Colors[ImGuiCol_Border].x = 1.0f;
 	ImGui::GetStyle().Colors[ImGuiCol_TitleBg] = ImVec4(0.0f, 1.0f, 1.0f, 0.7f);

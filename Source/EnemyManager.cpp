@@ -108,7 +108,7 @@ void EnemyManager::CreateEnemies(int id)
 			std::vector<std::shared_ptr<EnemyData>> data_list = GameDataBase::Instance().GetEnemyData();
 			std::shared_ptr<EnemyData> enemy_data = data_list.at(index);
 			std::string index_string = std::to_string(index);
-			SetEnemyStatus(actor, enemy_data, index_string, DirectX::XMFLOAT3{100, 1, 0});
+			SetEnemyStatus(actor, enemy_data, index_string, DirectX::XMFLOAT3{-126, 7, 169});
 		}
 		++index;
 	}

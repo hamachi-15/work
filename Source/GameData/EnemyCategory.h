@@ -2,7 +2,7 @@
 	@file	EnemyCategory.h
 	@brief	ツールにて自動生成しています。絶対に書き換えないでください。
 	@autor	DataBase.xlsm
-	@data	2021/12/14
+	@data	2021/12/19
 **/
 #pragma	once
 

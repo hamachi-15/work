@@ -319,10 +319,9 @@ void ActorManager::RenderCubeMap(RenderContext& render_context)
 //------------------------------
 void ActorManager::Render(RenderContext& render_context)
 {
-
 	Graphics& graphics = Graphics::Instance();
 	ID3D11DeviceContext* context = graphics.GetDeviceContext();
-	//shader->Begin(context, render_context);
+
 	for (std::shared_ptr<Actor>& actor : update_actors)
 	{
 		// 現在セットされているシェーダーとこれからの描画に使うシェーダーが同じか

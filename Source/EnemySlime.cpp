@@ -61,7 +61,6 @@ void EnemySlime::OnGUI()
 //-----------------------------------------
 void EnemySlime::Start()
 {
-
 	// アクターの取得
 	std::shared_ptr<Actor> actor = GetActor();
 
@@ -129,6 +128,7 @@ void EnemySlime::Start()
 		parameter.mask = CollisionPositionMask::Collision_Mask_Member_Position;
 		charactor->SetCollision(actor, parameter, CollisionMeshType::Sphere);
 	}
+
 	// ビヘイビアツリー設定
 	behavior_data = new BehaviorData();
 	ai_tree = new BehaviorTree();
@@ -147,6 +147,13 @@ void EnemySlime::Start()
 	ai_tree->AddNode("Attack", "BodyAttack", 2, BehaviorTree::SelectRule::Non, NULL, new BodyAttackAction(this));
 	ai_tree->AddNode("Scount", "Wander", 1, BehaviorTree::SelectRule::Non, new WanderJudgment(this), new WanderAction(this));
 	ai_tree->AddNode("Scount", "Idle", 2, BehaviorTree::SelectRule::Non, NULL, new IdleAction(this));
+}
+
+//-----------------------------------------
+// ビヘイビアのノード設定処理
+//-----------------------------------------
+void EnemySlime::SetBehaviorNode()
+{
 }
 
 //-----------------------------------------

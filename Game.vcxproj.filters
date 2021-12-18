@@ -127,6 +127,21 @@
     <Filter Include="ソース ファイル\HLSL\ShadowMap\ToShadowMap">
       <UniqueIdentifier>{94c20f59-bc46-4705-958a-495cc995b214}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\AI\NightmareDragonAI">
+      <UniqueIdentifier>{6d44e4ac-0956-4829-bb3d-722f29238093}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\AI\SlimeAI">
+      <UniqueIdentifier>{eaa1d039-6703-4936-84f5-eebb62479f11}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\AI\PLTAI">
+      <UniqueIdentifier>{057527d2-322c-4e67-976a-339f0e854e8a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\AI\LATAI">
+      <UniqueIdentifier>{2ad7e630-7557-4f27-b67e-c2f2a8189a92}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\AI\BossAI">
+      <UniqueIdentifier>{a08e178c-6117-48b3-a432-cd0e4db69e59}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui\imgui.cpp">
@@ -160,12 +175,6 @@
       <Filter>ソース ファイル\AI</Filter>
     </ClCompile>
     <ClCompile Include="Source\BehaviorTree.cpp">
-      <Filter>ソース ファイル\AI</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\BossActionOwner.cpp">
-      <Filter>ソース ファイル\AI</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\BossJudgmenetOwner.cpp">
       <Filter>ソース ファイル\AI</Filter>
     </ClCompile>
     <ClCompile Include="Source\CameraController.cpp">
@@ -242,9 +251,6 @@
     </ClCompile>
     <ClCompile Include="Source\ImGuiRenderer.cpp">
       <Filter>ソース ファイル\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\SlimeActionOwner.cpp">
-      <Filter>ソース ファイル\AI</Filter>
     </ClCompile>
     <ClCompile Include="Source\JudgmentOwner.cpp">
       <Filter>ソース ファイル\AI</Filter>
@@ -366,23 +372,11 @@
     <ClCompile Include="Source\EnemyMutant.cpp">
       <Filter>ソース ファイル\Character</Filter>
     </ClCompile>
-    <ClCompile Include="Source\SlimeJudgmentOwner.cpp">
-      <Filter>ソース ファイル\AI</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Effect.cpp">
       <Filter>ソース ファイル\Effect</Filter>
     </ClCompile>
     <ClCompile Include="Source\EffectManager.cpp">
       <Filter>ソース ファイル\Effect</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\PLTActionOwner.cpp">
-      <Filter>ソース ファイル\AI</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\LATActionOwner.cpp">
-      <Filter>ソース ファイル\AI</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\PLTJudgmentOwner.cpp">
-      <Filter>ソース ファイル\AI</Filter>
     </ClCompile>
     <ClCompile Include="Source\SceneGameOver.cpp">
       <Filter>ソース ファイル\Scene</Filter>
@@ -416,6 +410,33 @@
     </ClCompile>
     <ClCompile Include="Source\CascadeShadowMapShader.cpp">
       <Filter>ソース ファイル\Graphics\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\NightmareDragonActionOwner.cpp">
+      <Filter>ソース ファイル\AI\NightmareDragonAI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\NightmareDragonJudgmentOwner.cpp">
+      <Filter>ソース ファイル\AI\NightmareDragonAI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\SlimeActionOwner.cpp">
+      <Filter>ソース ファイル\AI\SlimeAI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\SlimeJudgmentOwner.cpp">
+      <Filter>ソース ファイル\AI\SlimeAI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\PLTActionOwner.cpp">
+      <Filter>ソース ファイル\AI\PLTAI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\PLTJudgmentOwner.cpp">
+      <Filter>ソース ファイル\AI\PLTAI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\LATActionOwner.cpp">
+      <Filter>ソース ファイル\AI\LATAI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\BossActionOwner.cpp">
+      <Filter>ソース ファイル\AI\BossAI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\BossJudgmenetOwner.cpp">
+      <Filter>ソース ファイル\AI\BossAI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -468,15 +489,6 @@
       <Filter>ソース ファイル\AI</Filter>
     </ClInclude>
     <ClInclude Include="Source\BehaviorTree.h">
-      <Filter>ソース ファイル\AI</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\BossActionOwner.h">
-      <Filter>ソース ファイル\AI</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\BossJudgmenetOwner.h">
-      <Filter>ソース ファイル\AI</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\SlimeActionOwner.h">
       <Filter>ソース ファイル\AI</Filter>
     </ClInclude>
     <ClInclude Include="Source\JudgmentOwner.h">
@@ -701,9 +713,6 @@
     <ClInclude Include="Source\EnemyMutant.h">
       <Filter>ソース ファイル\Character</Filter>
     </ClInclude>
-    <ClInclude Include="Source\SlimeJudgmentOwner.h">
-      <Filter>ソース ファイル\AI</Filter>
-    </ClInclude>
     <ClInclude Include="Source\GameData\AnimationData.h">
       <Filter>ソース ファイル\GameData</Filter>
     </ClInclude>
@@ -712,15 +721,6 @@
     </ClInclude>
     <ClInclude Include="Source\EffectManager.h">
       <Filter>ソース ファイル\Effect</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\PLTActionOwner.h">
-      <Filter>ソース ファイル\AI</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\LATActionOwner.h">
-      <Filter>ソース ファイル\AI</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\PLTJudgmentOwner.h">
-      <Filter>ソース ファイル\AI</Filter>
     </ClInclude>
     <ClInclude Include="Source\UI.h">
       <Filter>ソース ファイル\Graphics</Filter>
@@ -754,6 +754,33 @@
     </ClInclude>
     <ClInclude Include="Source\CascadeShadowMapShader.h">
       <Filter>ソース ファイル\Graphics\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\NightmareDragonActionOwner.h">
+      <Filter>ソース ファイル\AI\NightmareDragonAI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\NightmareDragonJudgmentOwner.h">
+      <Filter>ソース ファイル\AI\NightmareDragonAI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\SlimeActionOwner.h">
+      <Filter>ソース ファイル\AI\SlimeAI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\SlimeJudgmentOwner.h">
+      <Filter>ソース ファイル\AI\SlimeAI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\PLTActionOwner.h">
+      <Filter>ソース ファイル\AI\PLTAI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\PLTJudgmentOwner.h">
+      <Filter>ソース ファイル\AI\PLTAI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\LATActionOwner.h">
+      <Filter>ソース ファイル\AI\LATAI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\BossActionOwner.h">
+      <Filter>ソース ファイル\AI\BossAI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\BossJudgmenetOwner.h">
+      <Filter>ソース ファイル\AI\BossAI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

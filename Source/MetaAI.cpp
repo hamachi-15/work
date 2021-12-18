@@ -16,6 +16,7 @@ MetaAI::MetaAI()
 	
 	// Å‰‚©‚ç“G‚ğoŒ»‚³‚¹‚é
 	int count = 1;
+	EnemyManager::Instance().CreateEnemies(5);
 	while (1)
 	{
 		// ¡¶‚«‚Ä‚¢‚é“G‚Ì‘”‚ğŒ©‚Äˆê’èˆÈ‰º‚É‚È‚ê‚ÎoŒ»‚³‚¹‚Ä‚¢‚­

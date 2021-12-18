@@ -14,6 +14,9 @@ public:
 	// 開始処理
 	void Start() override;
 
+	// ビヘイビアのノード設定処理
+	void SetBehaviorNode() override;
+	
 	// 更新処理
 	void Update(float elapsed_time) override;
 

@@ -9,6 +9,7 @@ class BehaviorData;
 class NodeBase;
 class Telegram;
 class Charactor;
+
 class Enemy : public Component
 {
 public:
@@ -41,9 +42,12 @@ public:
 	// 当たり範囲デバッグプリミティブ描画
 	virtual void DrawDebugPrimitive(){}
 	
-	// 敵の破棄
-	virtual void Destroy() {}
+	// 敵の破棄処理
+	virtual void Destroy() = 0;
 	
+	// ビヘイビアのノード設定処理
+	virtual void SetBehaviorNode() = 0;
+
 	// ムーブメントの設定
 	void SetMovement(std::shared_ptr<Movement> movement) { this->movement = movement; }
 	
@@ -136,8 +140,8 @@ protected:
 	NodeBase*			active_node = nullptr;
 	NodeBase*			old_active_node = nullptr;
 	float				run_timer = 0.0f;
-	float				territory_range = 10.0f;
-	float				search_range = 5.0f;
-	float				attack_range = 1.5f;
+	float				territory_range = 10.0f; // 縄張りの範囲
+	float				search_range = 5.0f; // 索敵範囲
+	float				attack_range = 1.5f; // 攻撃に移る範囲
 };
 

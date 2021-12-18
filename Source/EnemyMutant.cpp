@@ -38,6 +38,13 @@ void EnemyMutant::OnGUI()
 	ImGui::Text(u8"Behavior　%s", str.c_str());
 }
 
+//-----------------------------------------
+// 敵の破棄処理
+//-----------------------------------------
+void EnemyMutant::Destroy()
+{
+}
+
 //---------------------------------------
 // 開始処理
 //---------------------------------------
@@ -122,6 +129,13 @@ void EnemyMutant::Start()
 	//ai_tree->AddNode("Attack", "JumpAttack", 0, BehaviorTree::SelectRule::Non, new JumpAttackJudgmenet(this), new JumpAttackAction(this));
 	ai_tree->AddNode("Scount", "Wander", 1, BehaviorTree::SelectRule::Non, new WanderJudgment(this), new WanderAction(this));
 	ai_tree->AddNode("Scount", "Idle", 2, BehaviorTree::SelectRule::Non, NULL, new IdleAction(this));
+}
+
+//-----------------------------------------
+// ビヘイビアのノード設定処理
+//-----------------------------------------
+void EnemyMutant::SetBehaviorNode()
+{
 }
 
 //---------------------------------------

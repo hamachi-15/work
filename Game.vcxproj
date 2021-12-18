@@ -263,6 +263,8 @@
     <ClCompile Include="Source\ModelVarianceShadowMap.cpp" />
     <ClCompile Include="Source\Mouse.cpp" />
     <ClCompile Include="Source\Movement.cpp" />
+    <ClCompile Include="Source\NightmareDragonActionOwner.cpp" />
+    <ClCompile Include="Source\NightmareDragonJudgmentOwner.cpp" />
     <ClCompile Include="Source\NodeBase.cpp" />
     <ClCompile Include="Source\OperateDictionaryMenu.cpp" />
     <ClCompile Include="Source\PhongShader.cpp" />
@@ -401,6 +403,8 @@
     <ClInclude Include="Source\ModelVarianceShadowMap.h" />
     <ClInclude Include="Source\Mouse.h" />
     <ClInclude Include="Source\Movement.h" />
+    <ClInclude Include="Source\NightmareDragonActionOwner.h" />
+    <ClInclude Include="Source\NightmareDragonJudgmentOwner.h" />
     <ClInclude Include="Source\NodeBase.h" />
     <ClInclude Include="Source\OperateDictionaryMenu.h" />
     <ClInclude Include="Source\PhongShader.h" />
