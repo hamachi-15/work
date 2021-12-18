@@ -846,7 +846,7 @@ void Sprite::AddRender(ID3D11DeviceContext* context, Texture* texture, float dx,
 		context->RSSetState(rasterizer_state.Get());
 
 		const float blend_factor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-		context->OMSetBlendState(add_blend_state.Get(), blend_factor, 0xFFFFFFFF);
+		//context->OMSetBlendState(add_blend_state.Get(), blend_factor, 0xFFFFFFFF);
 		texture->Set(0);
 		//context->OMSetDepthStencilState(depth_stencil_state.Get(), 1);
 		context->PSSetSamplers(0, 1, sampler_state.GetAddressOf());

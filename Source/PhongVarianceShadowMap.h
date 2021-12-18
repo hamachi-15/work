@@ -21,7 +21,7 @@ public:
 private:
 	struct CBScene
 	{
-		DirectX::XMFLOAT4X4 light_view_projection[3];
+		DirectX::XMFLOAT4X4 light_view_projection;
 		DirectX::XMFLOAT4X4	view_projection;
 		DirectX::XMFLOAT4	light_direction;
 		DirectX::XMFLOAT4	eye_position;

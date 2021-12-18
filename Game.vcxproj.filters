@@ -121,6 +121,12 @@
     <Filter Include="ソース ファイル\Phong">
       <UniqueIdentifier>{d9c22e51-bc45-4644-a4a3-1121cf41e174}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\HLSL\ShadowMap\CascadeShadowShader">
+      <UniqueIdentifier>{3f822639-4e94-4d01-b0b0-969b6b6364b3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\HLSL\ShadowMap\ToShadowMap">
+      <UniqueIdentifier>{94c20f59-bc46-4705-958a-495cc995b214}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui\imgui.cpp">
@@ -403,6 +409,12 @@
       <Filter>ソース ファイル\Graphics\Shader</Filter>
     </ClCompile>
     <ClCompile Include="Source\PhongShader.cpp">
+      <Filter>ソース ファイル\Graphics\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\EnemyDragonNightmare.cpp">
+      <Filter>ソース ファイル\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\CascadeShadowMapShader.cpp">
       <Filter>ソース ファイル\Graphics\Shader</Filter>
     </ClCompile>
   </ItemGroup>
@@ -737,6 +749,12 @@
     <ClInclude Include="Source\ScriptDataHeadder.h">
       <Filter>ソース ファイル\System</Filter>
     </ClInclude>
+    <ClInclude Include="Source\EnemyDragonNightmare.h">
+      <Filter>ソース ファイル\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\CascadeShadowMapShader.h">
+      <Filter>ソース ファイル\Graphics\Shader</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="HLSL\Sprite.hlsli">
@@ -795,6 +813,12 @@
     </None>
     <None Include="HLSL\Phong.hlsli">
       <Filter>ソース ファイル\Phong</Filter>
+    </None>
+    <None Include="HLSL\CascadeShadowMap.hlsli">
+      <Filter>ソース ファイル\HLSL\ShadowMap\CascadeShadowShader</Filter>
+    </None>
+    <None Include="HLSL\ToShadowMap.hlsli">
+      <Filter>ソース ファイル\HLSL\ShadowMap\ToShadowMap</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -917,6 +941,18 @@
     </FxCompile>
     <FxCompile Include="HLSL\Phong_ps.hlsl">
       <Filter>ソース ファイル\Phong</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\CascadeShadowMap_ps.hlsl">
+      <Filter>ソース ファイル\HLSL\ShadowMap\CascadeShadowShader</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\CascadeShadowMap_vs.hlsl">
+      <Filter>ソース ファイル\HLSL\ShadowMap\CascadeShadowShader</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\ToShadowMap_vs.hlsl">
+      <Filter>ソース ファイル\HLSL\ShadowMap\ToShadowMap</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\ToShadowMap_ps.hlsl">
+      <Filter>ソース ファイル\HLSL\ShadowMap\ToShadowMap</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

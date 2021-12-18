@@ -6,7 +6,8 @@
 VarianceShadowMap::VarianceShadowMap(ID3D11Device* device)
 {
 	HRESULT hr = S_OK;
-	Create(device, "Shader\\VarianceShadowMap_vs.cso", "Shader\\VarianceShadowMap_ps.cso", false);
+	//Create(device, "Shader\\VarianceShadowMap_vs.cso", "Shader\\VarianceShadowMap_ps.cso", false);
+	Create(device, "Shader\\ToShadowMap_vs.cso", "Shader\\ToShadowMap_ps.cso", false);
 
 	// 定数バッファ
 	{
@@ -158,19 +159,21 @@ void VarianceShadowMap::Begin(ID3D11DeviceContext* context, RenderContext& rende
 	context->PSSetConstantBuffers(0, ARRAYSIZE(constantBuffers), constantBuffers);
 	
 	//ブレンドステート設定
-	//context->OMSetBlendState(blend_state.Get(), nullptr, 0xFFFFFFFF);
+	context->OMSetBlendState(blend_state.Get(), nullptr, 0xFFFFFFFF);
 	//デプスステンシルステート設定
 	context->OMSetDepthStencilState(depth_stencil_state.Get(), 1);
 	//ラスタライザ―設定
 	context->RSSetState(rasterizer_state.Get());
 
+	context->PSSetSamplers(0, 1, sampler_state.GetAddressOf());
+	
+	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	// シーン用定数バッファ更新
 	CBScene cbscene;
 	// TODO 変更したカメラのビューとプロジェクションの設定
 	//DirectX::XMStoreFloat4x4(&cbScene.view_projection, matview * pm);
 	//render_context.light_view_projection = cbScene.view_projection;
-
 	//DirectX::XMMATRIX V = DirectX::XMLoadFloat4x4(&render_context.view);
 	//DirectX::XMMATRIX P = DirectX::XMLoadFloat4x4(&render_context.projection);
 	//DirectX::XMStoreFloat4x4(&cbscene.view_projection, V * P);
@@ -209,17 +212,19 @@ void VarianceShadowMap::Draw(ID3D11DeviceContext* context, const Model* model)
 		UINT offset = 0;
 		context->IASetVertexBuffers(0, 1, mesh.vertexBuffer.GetAddressOf(), &stride, &offset);
 		context->IASetIndexBuffer(mesh.indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		
+		u_int count = 0;
+		u_int index = 0;
 		for (const ModelResource::Subset& subset : mesh.subsets)
 		{
 			CBSubset cbsubset;
 			cbsubset.materialColor = subset.material->color;
-			context->UpdateSubresource(subset_constant_buffer.Get(), 0, 0, &cbsubset, 0, 0);
+			//context->UpdateSubresource(subset_constant_buffer.Get(), 0, 0, &cbsubset, 0, 0);
 			context->PSSetShaderResources(0, 1, subset.material->shaderResourceView.GetAddressOf());
-			context->PSSetSamplers(0, 1, sampler_state.GetAddressOf());
-			context->DrawIndexed(subset.indexCount, subset.startIndex, 0);
+			count += subset.indexCount;
+			index += subset.startIndex;
 		}
+		context->DrawIndexed(count, index, 0);
 	}
 }
 

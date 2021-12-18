@@ -101,6 +101,13 @@ void Bloom::Begin(ID3D11DeviceContext* context)
 	//デプスステンシルステート設定
 	context->OMSetDepthStencilState(depth_stencil_state.Get(), 1);
 
+	ConstantBufferForBloom cbscene;
+	cbscene.threshold = 0;
+
+	context->VSSetConstantBuffers(0, 1, constant_buffer.GetAddressOf());
+	context->PSSetConstantBuffers(0, 1, constant_buffer.GetAddressOf());
+	context->UpdateSubresource(constant_buffer.Get(), 0, 0, &cbscene, 0, 0);
+
 }
 
 //--------------------------------------
@@ -109,11 +116,12 @@ void Bloom::Begin(ID3D11DeviceContext* context)
 Texture* Bloom::Render(ID3D11DeviceContext* context, RenderContext& render_context)
 {
 	Graphics& graphics = Graphics::Instance();
+	// 輝度抽出テクスチャにレンダーターゲットを設定
 	ID3D11RenderTargetView* render_terget_view = bright_texture->GetRenderTargetView();
 	ID3D11DepthStencilView* depth_stencil_view = depth_texture->GetDepthStencilView();
 	graphics.SetRenderTargetView(&render_terget_view, depth_stencil_view);
-	graphics.ScreenClear(&render_terget_view, depth_stencil_view);
-	//
+	graphics.ScreenClear(&render_terget_view, depth_stencil_view, {0, 0, 0, 1.0f});
+	// 輝度抽出
 	ActorManager::Instance().BrightRender(render_context);
 
 	Sprite sprite;
@@ -121,7 +129,7 @@ Texture* Bloom::Render(ID3D11DeviceContext* context, RenderContext& render_conte
 		ID3D11RenderTargetView* render_terget_view = bloom_texture->GetRenderTargetView();
 		ID3D11DepthStencilView* depth_stencil_view = depth_texture->GetDepthStencilView();
 		graphics.SetRenderTargetView(&render_terget_view, depth_stencil_view);
-		graphics.ScreenClear(&render_terget_view, depth_stencil_view);
+		graphics.ScreenClear(&render_terget_view, depth_stencil_view, { 0, 0, 0, 1.0f });
 	}
 
 	Begin(context);

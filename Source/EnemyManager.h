@@ -60,7 +60,7 @@ public:
 	void CreateEnemies(int id);
 	
 	// スクリプトから敵情報を取得して敵を生成する
-	void CreateEnemyScriptData();
+	bool CreateEnemyScriptData();
 	
 	void SetEnemyStatus(std::shared_ptr<Actor> actor, std::shared_ptr<EnemyData> enemy_data, std::string index_string, DirectX::XMFLOAT3 appearance_position);
 

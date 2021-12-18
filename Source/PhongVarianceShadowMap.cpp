@@ -159,9 +159,9 @@ void PhongVarianceShadowMap::Begin(ID3D11DeviceContext* context, RenderContext& 
 	DirectX::XMStoreFloat4(&v, V.r[3]);
 	cbscene.eye_position = v;
 
-	cbscene.light_view_projection[0] = render_context.light_view_projection[0];
-	cbscene.light_view_projection[1] = render_context.light_view_projection[1];
-	cbscene.light_view_projection[2] = render_context.light_view_projection[2];
+	cbscene.light_view_projection = render_context.light_view_projection[0];
+	cbscene.light_view_projection = render_context.light_view_projection[1];
+	cbscene.light_view_projection = render_context.light_view_projection[2];
 
 	cbscene.light_direction = render_context.light_direction;
 	cbscene.shadow_parameter = render_context.ShadowParameter;

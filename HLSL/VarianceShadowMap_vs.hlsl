@@ -1,4 +1,5 @@
 #include "VarianceShadowMap.hlsli"
+
 PSInputShadow main(VSInput input)
 {
 	float3 p = { 0, 0, 0 };

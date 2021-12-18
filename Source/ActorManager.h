@@ -7,7 +7,7 @@
 
 // 前方宣言
 class VarianceShadowMap;
-class PhongVarianceShadowMap;
+class CascadeShadowMap;
 class GaussianBlur;
 class Phong;
 class Texture;
@@ -60,7 +60,7 @@ public:
 	// シャドウマップ取得
 	Texture* GetShadowTexture(int index) const { return shadow_texture[index].get(); }
 	Texture* GetShadowBulrTexture(int index) const { return shadow_vsm_texture[index].get(); }
-	Texture* GetDepthTexture() const { return depth_texture.get(); }
+	Texture* GetDepthTexture(int index) const { return depth_texture[index].get(); }
 
 	// キューブマップ取得
 	Texture* GetCubeMapTexture() const { return cubemap_texture.get(); }
@@ -86,7 +86,7 @@ private:
 	//シャドーマップサイズ
 	const DirectX::XMFLOAT2 shadow_size[3]{ { 1024,1024 },{ 512,512 },{ 256,256 } };
 	//シャドークリップエリア
-	const float shadow_area[3] = { 20, 50, 100 };
+	const float shadow_area[3] = { 50, 150, 350 };
 	//ライトビュープロジェクションクロップ行列の配列を定義する
 	DirectX::XMFLOAT4X4 lvpc_matrix[3];
 
@@ -99,14 +99,15 @@ private:
 	bool								 hidden_detail = false;
 	std::string							 shader_name;
 
-	std::unique_ptr<PhongVarianceShadowMap>	shader;
+	//std::unique_ptr<CascadeShadowMap>	shader;
+	Shader* shader;
 	std::unique_ptr<VarianceShadowMap>		shadowmap;
 	std::unique_ptr<GaussianBlur>			bulr;
 	std::unique_ptr<Phong>					phong;
 
 	std::unique_ptr<Texture>			 shadow_texture[3];
 	std::unique_ptr<Texture>			 shadow_vsm_texture[3];
-	std::unique_ptr<Texture>			 depth_texture;
+	std::unique_ptr<Texture>			 depth_texture[3];
 
 	std::unique_ptr<Texture>			 cubemap_texture;
 	std::unique_ptr<Texture>			 depth_cubemap_texture;

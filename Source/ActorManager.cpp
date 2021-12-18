@@ -1,18 +1,20 @@
 #include <imgui.h>
+#include "Misc.h"
+#include "Light.h"
 #include "Graphics.h"
 #include "ActorManager.h"
+
 #include "PhongVarianceShadowMap.h"
 #include "VarianceShadowMap.h"
+#include "CascadeShadowMapShader.h"
 #include "GaussianBlurShader.h"
 #include "PhongShader.h"
+#include "GaussianXBlur.h"
+#include "GaussianYBlur.h"
 
 #include "Sprite.h"
 #include "Texture.h"
 #include "Camera.h"
-#include "Misc.h"
-#include "Light.h"
-#include "GaussianXBlur.h"
-#include "GaussianYBlur.h"
 
 //------------------------------
 // コンストラクタ
@@ -22,7 +24,7 @@ ActorManager::ActorManager()
 	ID3D11Device* device = Graphics::Instance().GetDevice();
 	shadowmap = std::make_unique<VarianceShadowMap>(device);
 	bulr = std::make_unique<GaussianBlur>(device);
-	shader = std::make_unique<PhongVarianceShadowMap>(device);
+	//shader = std::make_unique<CascadeShadowMap>(device);
 	phong = std::make_unique<Phong>(device);
 
 	// シャドウテクスチャ作成
@@ -30,11 +32,9 @@ ActorManager::ActorManager()
 	{
 		shadow_texture[i] = std::make_unique<Texture>();
 		shadow_texture[i]->Create(static_cast<u_int>(shadow_size[i].x), static_cast<u_int>(shadow_size[i].y), DXGI_FORMAT_R32_FLOAT);
-		shadow_vsm_texture[i] = std::make_unique<Texture>();
-		shadow_vsm_texture[i]->Create(static_cast<u_int>(shadow_size[i].x), static_cast<u_int>(shadow_size[i].y), DXGI_FORMAT_R32G32_FLOAT);
+		depth_texture[i] = std::make_unique<Texture>();
+		depth_texture[i]->CreateDepthStencil(static_cast<u_int>(shadow_size[i].x), static_cast<u_int>(shadow_size[i].y));
 	}
-	depth_texture = std::make_unique<Texture>();
-	depth_texture->CreateDepthStencil(2048, 2048);
 
 }
 
@@ -153,7 +153,7 @@ void ActorManager::UpdateTransform()
 {
 	for (std::shared_ptr<Actor>& actor : update_actors)
 	{
-		actor->UpdateTransform();
+		actor->UpdateTransform(); 
 	}
 }
 
@@ -170,37 +170,32 @@ void ActorManager::ShadowRender(RenderContext& render_context, BlurRenderContext
 	// カメラのパラメータ取得
 	DirectX::XMVECTOR view_front, view_right, view_up, view_pos;
 	{
-		DirectX::XMMATRIX matrix = DirectX::XMMatrixInverse(nullptr, DirectX::XMLoadFloat4x4(&camera.GetView()));
-		//view_front = DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&camera.GetFront()));
-		//view_right = DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&camera.GetRight()));
-		//view_up = DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&camera.GetUp()));
-		view_right = DirectX::XMVector3Normalize(matrix.r[0]);
-		view_up = DirectX::XMVector3Normalize(matrix.r[1]);
-		view_front = DirectX::XMVector3Normalize(matrix.r[2]);
-		view_pos = matrix.r[3];
+		view_front = DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&camera.GetFront()));
+		view_right = DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&camera.GetRight()));
+		view_up = DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&camera.GetUp()));
+		view_pos = DirectX::XMLoadFloat3(&camera.GetEye());
 	}
 
 	// ライトビュープロジェクション行列を算出
-	DirectX::XMMATRIX	view_matrix, projection_matrix;
-	{
-		// ライト位置からのビュー設定
-		DirectX::XMFLOAT3 t = { 0, 0, 0 };
-		DirectX::XMFLOAT3 pos, target, up;
-		//target = actor->GetPosition();
-		pos.x = t.x - Light::LightDir.x * 1500.0f;
-		pos.y = t.y - Light::LightDir.y * 1500.0f;
-		pos.z = t.z - Light::LightDir.z * 1500.0f;
-		target = { 0, 0, 0 };
-		up = { 0, 1, 0 };
-		DirectX::XMVECTOR eye = DirectX::XMLoadFloat3(&pos);
-		DirectX::XMVECTOR vtarget = DirectX::XMLoadFloat3(&target);
-		DirectX::XMVECTOR vup = DirectX::XMLoadFloat3(&up);
+	DirectX::XMMATRIX	view_matrix, projection_matrix, light_view_projection;
+	
+	// ライト位置からのビュー設定
+	DirectX::XMFLOAT3 t = { 0, 0, 0 };
+	DirectX::XMFLOAT3 pos, target, up;
+	pos.x = t.x - Light::LightDir.x * 100.0f;
+	pos.y = t.y - Light::LightDir.y * 100.0f;
+	pos.z = t.z - Light::LightDir.z * 100.0f;
+	target = { 0, 0, 0 };
+	up = { 0, 1, 0 };
+	DirectX::XMVECTOR eye = DirectX::XMLoadFloat3(&pos);
+	DirectX::XMVECTOR vtarget = DirectX::XMLoadFloat3(&target);
+	DirectX::XMVECTOR vup = DirectX::XMLoadFloat3(&up);
 
-		view_matrix = DirectX::XMMatrixLookAtLH(eye, vtarget, vup);
+	view_matrix = DirectX::XMMatrixLookAtLH(eye, vtarget, vup);
 
-		projection_matrix = DirectX::XMMatrixOrthographicLH(10000.0f, 10000.0f, 0.01f, 2000.0f);
-
-	}
+	projection_matrix = DirectX::XMMatrixOrthographicLH(10000.0f, 10000.0f, 0.01f, 2000.0f);
+	light_view_projection = view_matrix * projection_matrix;
+	
 
 	//	シャドウマップの分割エリア定義
 	float	split_area_table[] =
@@ -210,20 +205,18 @@ void ActorManager::ShadowRender(RenderContext& render_context, BlurRenderContext
 		shadow_area[1],
 		shadow_area[2]
 	};
-	for (int i = 0; i < 3; ++i)
+	for (int i = 0; i < 2; ++i)
 	{
 		float near_depth = split_area_table[i + 0];
 		float far_depth = split_area_table[i + 1];
 
 		// レンダーターゲットとデプスステンシルの設定
-		ID3D11RenderTargetView* rtv[1] = { shadow_texture[i]->GetRenderTargetView() };
-		ID3D11DepthStencilView* dsv = depth_texture->GetDepthStencilView();
-		context->OMSetRenderTargets(1, rtv, dsv);
+		ID3D11RenderTargetView* render_target_view[1] = { shadow_texture[i]->GetRenderTargetView() };
+		ID3D11DepthStencilView* depth_stencil_view = depth_texture[i]->GetDepthStencilView();
+		graphics.SetRenderTargetView(render_target_view, depth_stencil_view);
 
 		// 画面クリア
-		float clear_color[4] = { 1.0f,1.0f,1.0f,1.0f };
-		context->ClearRenderTargetView(rtv[0], clear_color);
-		context->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+		graphics.ScreenClear(render_target_view, depth_stencil_view);
 
 		// ビューポートの設定
 		graphics.SetViewport(shadow_size[i].x, shadow_size[i].y);
@@ -270,7 +263,7 @@ void ActorManager::ShadowRender(RenderContext& render_context, BlurRenderContext
 		for (auto& it : vertex)
 		{
 			DirectX::XMFLOAT3	p;
-			DirectX::XMStoreFloat3(&p, DirectX::XMVector3TransformCoord(it, view_matrix * projection_matrix));
+			DirectX::XMStoreFloat3(&p, DirectX::XMVector3TransformCoord(it, light_view_projection));
 
 			vertex_min.x = min(p.x, vertex_min.x);
 			vertex_min.y = min(p.y, vertex_min.y);
@@ -294,13 +287,13 @@ void ActorManager::ShadowRender(RenderContext& render_context, BlurRenderContext
 			clop_matrix = DirectX::XMLoadFloat4x4(&float_clop_matrix);
 		}
 		//ライトビュープロジェクション行列を計算
-		DirectX::XMStoreFloat4x4(&render_context.light_view_projection[i], view_matrix * projection_matrix * clop_matrix);
-		DirectX::XMStoreFloat4x4(&render_context.slight_view_projection, view_matrix * projection_matrix * clop_matrix);
+		DirectX::XMStoreFloat4x4(&render_context.light_view_projection[i], light_view_projection * clop_matrix);
+		render_context.slight_view_projection = render_context.light_view_projection[i];
 
 		shadowmap->Begin(context, render_context);
 		for (std::shared_ptr<Actor>& actor : update_actors)
 		{
-			if (strcmp(actor->GetName(), "Stage") == 0) continue;
+			//if (strcmp(actor->GetName(), "Stage") == 0) continue;
 			// モデルがあれば描画
 			Model* model = actor->GetModel();
 			if (model != nullptr)
@@ -312,66 +305,6 @@ void ActorManager::ShadowRender(RenderContext& render_context, BlurRenderContext
 
 	}
 
-	// ブラーを掛ける
-	{
-	//	bulr->Render(shadow_texture[0].get());
-		Sprite sprite;
-	//	//for (int i = 0; i < 3; ++i)
-	//	//{
-	//	Texture* shadow_bulr_texture = bulr->Render(shadow_texture[0].get());
-
-	//	// 掛けたブラーをシャドウマップテクスチャに描画
-	//	// レンダーターゲットをシャドウマップに設定
-	//	ID3D11RenderTargetView* render_target_view[1] = { shadow_vsm_texture[0]->GetRenderTargetView() };
-	//	ID3D11DepthStencilView* depth_stencil_view = depth_texture->GetDepthStencilView();
-	//	graphics.SetRenderTargetView(render_target_view, depth_stencil_view);
-	//	// 画面クリア
-	//	graphics.ScreenClear(render_target_view, depth_stencil_view);
-
-	//	// ビューポートの設定
-	//	graphics.SetViewport(static_cast<float>(shadow_vsm_texture[0]->GetWidth()), static_cast<float>(shadow_vsm_texture[0]->GetHeight()));
-
-	//	graphics.GetSpriteShader()->Begin(context);
-	//	sprite.Render(context,
-	//		shadow_bulr_texture,
-	//		0, 0,
-	//		static_cast<float>(shadow_vsm_texture[0]->GetWidth()), static_cast<float>(shadow_vsm_texture[0]->GetHeight()),
-	//		0, 0,
-	//		static_cast<float>(shadow_bulr_texture->GetWidth()), static_cast<float>(shadow_bulr_texture->GetHeight()),
-	//		0,
-	//		1, 1, 1, 1);
-	//	graphics.GetSpriteShader()->End(context);
-
-	//	//}
-		//for (int i = 0; i < 3; ++i)
-		//{ 
-		//	// 掛けたブラーをシャドウマップテクスチャに描画
-		//	// レンダーターゲットをシャドウマップに設定
-		//	ID3D11RenderTargetView* render_target_view[1] = { shadow_vsm_texture[i]->GetRenderTargetView() };
-		//	ID3D11DepthStencilView* depth_stencil_view = depth_texture->GetDepthStencilView();
-		//	graphics.SetRenderTargetView(render_target_view, depth_stencil_view);
-		//	// 画面クリア
-		//	graphics.ScreenClear(render_target_view, depth_stencil_view);
-
-		//	// ビューポートの設定
-		//	graphics.SetViewport(static_cast<float>(shadow_vsm_texture[i]->GetWidth()), static_cast<float>(shadow_vsm_texture[i]->GetHeight()));
-
-		//	// 描画
-		//	graphics.GetSpriteShader()->Begin(context);
-		//	sprite.Render(context,
-		//		shadow_texture[i].get(),
-		//		0, 0,
-		//		static_cast<float>(shadow_texture[i]->GetWidth()), static_cast<float>(shadow_texture[i]->GetHeight()),
-		//		0, 0,
-		//		static_cast<float>(shadow_vsm_texture[i]->GetWidth()), static_cast<float>(shadow_vsm_texture[i]->GetHeight()),
-		//		0,
-		//		1, 1, 1, 1);
-		//	graphics.GetSpriteShader()->End(context);
-		//}
-
-
-
-	}
 }
 
 //------------------------------
@@ -389,21 +322,22 @@ void ActorManager::Render(RenderContext& render_context)
 
 	Graphics& graphics = Graphics::Instance();
 	ID3D11DeviceContext* context = graphics.GetDeviceContext();
-	shader->Begin(context, render_context);
+	//shader->Begin(context, render_context);
 	for (std::shared_ptr<Actor>& actor : update_actors)
 	{
 		// 現在セットされているシェーダーとこれからの描画に使うシェーダーが同じか
-		//if(strcmp(shader_name.c_str(),actor->GetShader()->GetShaderName()) != 0)
-		//{	
-		//	// シェーダーの終了処理
-		//	if(shader != nullptr)
-		//		shader->End(context);
-		//	// 現在のシェーダーを入れ替えて
-		//	shader = actor->GetShader();
-		//	shader_name = shader->GetShaderName();
-		//}
+		if(strcmp(shader_name.c_str(),actor->GetShader()->GetShaderName()) != 0)
+		{	
+			// シェーダーの終了処理
+			if(shader != nullptr)
+				shader->End(context);
+			// 現在のシェーダーを入れ替えて
+			shader = actor->GetShader();
+			shader_name = shader->GetShaderName();
+			shader->Begin(context, render_context);
+		}
 		// シェーダーにポインタが入っていなければアサート
-		//_ASSERT_EXPR_A(shader, "shader is nullptr");
+		_ASSERT_EXPR_A(shader, "shader is nullptr");
 
 		// モデルがあれば描画
 		Model* model = actor->GetModel();

@@ -2,6 +2,13 @@
 Texture2D diffuse_texture : register(t0);
 SamplerState decal_sampler : register(s0);
 
+cbuffer CBScene : register(b0)
+{
+	float threshold;
+	float dummy1;
+	float dummy2;
+	float dummy3;
+}
 
 // データフォーマット
 struct VSInput

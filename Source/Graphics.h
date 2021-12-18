@@ -36,6 +36,15 @@ public:
 	// デプスステンシルビュー取得
 	ID3D11DepthStencilView* GetDepthStencilView() const { return depth_stencil_view.Get(); }
 
+	// デプスステンシルステート取得
+	ID3D11DepthStencilState* GetDepthStencilState(int state) { return depth_stencil_state[state].Get(); }
+
+	// ラステライザーステート取得
+	ID3D11RasterizerState* GetRasterizerState(int state) { return rasterizer_state[state].Get(); }
+
+	// ブレンドステート取得
+	ID3D11BlendState* GetBlendState(int state) { return blend_state[state].Get(); }
+
 	// スクリーン高さ取得
 	float GetScreenHeight() const { return screen_height; }
 
@@ -68,9 +77,42 @@ public:
 	void SetRenderTargetView(ID3D11RenderTargetView* render_target_view[], ID3D11DepthStencilView* depth_stensil_view);
 
 	// 画面クリア
-	void ScreenClear(ID3D11RenderTargetView* render_target_view[], ID3D11DepthStencilView* depth_stensil_view, DirectX::XMFLOAT4 clear_color = {0.0f, 0.0f, 0.0f, 1.0f});
+	void ScreenClear(ID3D11RenderTargetView* render_target_view[], ID3D11DepthStencilView* depth_stensil_view, DirectX::XMFLOAT4 clear_color = {1.0f, 1.0f, 1.0f, 1.0f});
 
+public:
+	enum class DepthStencilState
+	{
+		False,
+		True,
+		Write_False
+	};
+
+	enum class RasterizerState
+	{
+		Cull_Back,
+		Wire,
+		Cull_Front,
+		Cull_None
+	};
+	enum class BlendState
+	{
+		None,
+		Alpha,
+		Add,
+		Subtract,
+		Replace,
+		Multiply,
+		Lighten,
+		Darken,
+		Screen
+	};
 private:
+	enum
+	{
+		Depth_Stencil_Type = 3,
+		Rasterize_Type = 4,
+		Blend_Type = 9
+	};
 	static Graphics* instance;
 	Microsoft::WRL::ComPtr<ID3D11Device>			device;
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext>		context;
@@ -78,6 +120,18 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView>	render_target_view;
 	Microsoft::WRL::ComPtr<ID3D11Texture2D>			depth_stencil_buffer;
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilView>	depth_stencil_view;
+	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depth_stencil_state[Depth_Stencil_Type];
+	Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterizer_state[Rasterize_Type];
+	Microsoft::WRL::ComPtr<ID3D11BlendState> blend_state[Blend_Type];
+	
+	// 深度ステンシルステート作成
+	bool CreateDeptthStencilState();
+
+	// ラステライザーステート作成
+	bool CreateRasterizerState();
+
+	// ブレンドステート作成
+	bool CreateBlendState();
 
 	std::unique_ptr<DebugRenderer>					debug_renderer;
 	std::unique_ptr<ImGuiRenderer>					imgui_renderer;

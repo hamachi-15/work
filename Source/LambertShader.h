@@ -13,8 +13,10 @@ public:
 	// 名前取得
 	const char* GetShaderName() const override { return "Lambert"; }
 
+	// 描画開始処理
 	void Begin(ID3D11DeviceContext* dc, RenderContext& rc);
 	void Draw(ID3D11DeviceContext* dc, const Model* model);
+	// 描画終了処理
 	void End(ID3D11DeviceContext* dc) ;
 
 private:

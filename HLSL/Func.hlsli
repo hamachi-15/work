@@ -61,7 +61,7 @@ float3 PhongSpecular(float3 N, float3 L, float3 C, float3 E,
 float3 GetShadowTex(float4x4 view_projection, float3 wpos)
 {
 	float4 wvp_pos = float4(wpos, 1.0f);
-	wvp_pos = mul(view_projection, wvp_pos);
+	wvp_pos = mul( wvp_pos,view_projection);
 	wvp_pos /= wvp_pos.w;
 	// テクスチャ座標系
 	wvp_pos.y = -wvp_pos.y;
@@ -69,19 +69,36 @@ float3 GetShadowTex(float4x4 view_projection, float3 wpos)
 	return wvp_pos.xyz;
 }
 
+
 //--------------------------------------------
 // シャドウマップからライト空間座標系とZ値比較
 //--------------------------------------------
+//float3 GetShadow(Texture2D st, SamplerState ss, float3 tex, float4 parameter)
+//{
+//	float2	d = st.Sample(ss, tex.xy).rg;
+//
+//	float v = max(0.0f, d.y - d.x * d.x);
+//	float e = tex.z - d.x;
+//	static float light_bleeding_factor = 0.15f;
+//	float s = saturate(v / (v + e * e));
+//	s = saturate((s - light_bleeding_factor) / (1.0f - light_bleeding_factor));
+//	return	lerp(1.0f, parameter.rgb + (1.0f - parameter.rgb) * s, tex.z - parameter.w >= d.x);
+//}
 float3 GetShadow(Texture2D st, SamplerState ss, float3 tex, float4 parameter)
 {
-	float2	d = st.Sample(ss, tex.xy).rg;
+	float	d = st.Sample(ss, tex.xy).r;
+	float3 color;
+	// シャドウマップの深度値と現実の深度の比較
+	color.rgb = (tex.z - d > parameter.w) ? parameter.rgb : float3(1, 1, 1);
 
-	float v = max(0.0f, d.y - d.x * d.x);
-	float e = tex.z - d.x;
-	static float light_bleeding_factor = 0.15f;
-	float s = saturate(v / (v + e * e));
-	s = saturate((s - light_bleeding_factor) / (1.0f - light_bleeding_factor));
-	return	lerp(1.0f, parameter.rgb + (1.0f - parameter.rgb) * s, tex.z - parameter.w >= d.x);
+	return color;
+
+	//float v = max(0.0f, d.y - d.x * d.x);
+	//float e = tex.z - d.x;
+	//static float light_bleeding_factor = 0.15f;
+	//float s = saturate(v / (v + e * e));
+	//s = saturate((s - light_bleeding_factor) / (1.0f - light_bleeding_factor));
+	//return	lerp(1.0f, parameter.rgb + (1.0f - parameter.rgb) * s, tex.z - parameter.w >= d.x);
 }
 
 //--------------------------------------------

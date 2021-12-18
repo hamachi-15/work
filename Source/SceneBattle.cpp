@@ -194,7 +194,7 @@ void SceneBattle::Render()
 
 	// 描画処理
 	render_context.light_direction = Light::LightDir;
-	render_context.ShadowParameter = { shadow_color.x, shadow_color.y, shadow_color.z, 0.000001f };
+	render_context.ShadowParameter = { shadow_color.x, shadow_color.y, shadow_color.z, 0.001f };
 
 	// カメラパラメータ設定
 	Camera& camera = Camera::Instance();
@@ -264,13 +264,13 @@ void SceneBattle::ScreenRender(ID3D11DeviceContext* context, RenderContext& rend
 	// アクター描画
 	{
 		// シャドウマップ作成
-		//ActorManager::Instance().ShadowRender(render_context, blur_render_context);
+		ActorManager::Instance().ShadowRender(render_context, blur_render_context);
 
 		// レンダーターゲットの回復
-		//graphics.SetRenderTargetView(&screen_texture, depth_stencil_view);
+		graphics.SetRenderTargetView(&screen_texture, depth_stencil_view);
 
 		// ビューポートの設定
-		//graphics.SetViewport(graphics.GetScreenWidth(), graphics.GetScreenHeight());
+		graphics.SetViewport(graphics.GetScreenWidth(), graphics.GetScreenHeight());
 
 		// 描画
 		ActorManager::Instance().Render(render_context);
@@ -328,12 +328,12 @@ void SceneBattle::BuckBufferRender(ID3D11DeviceContext* context, RenderContext& 
 		0,
 		1, 1, 1, 1);
 	// 輝度抽出テクスチャを加算合成
-	sprite->AddRender(context,
-		bloom_texture,
-		0, 0,
-		screen_size.x, screen_size.y,
-		0, 0,
-		(float)bloom_texture->GetWidth(), (float)bloom_texture->GetHeight());
+	//sprite->AddRender(context,
+	//	bloom_texture,
+	//	0, 0,
+	//	screen_size.x, screen_size.y,
+	//	0, 0,
+	//	(float)bloom_texture->GetWidth(), (float)bloom_texture->GetHeight());
 	graphics.GetSpriteShader()->End(context);
 
 	// メニュー描画
@@ -350,19 +350,19 @@ void SceneBattle::BuckBufferRender(ID3D11DeviceContext* context, RenderContext& 
 	UIManager::Instance().Draw(context);
 
 	// シャドウマップ
-	//graphics.GetSpriteShader()->Begin(context);
-	//for (int i = 0; i < 3; ++i)
-	//{
-	//	sprite->Render(context,
-	//		ActorManager::Instance().GetShadowTexture(i),
-	//		0 + 200 * (i), 0,
-	//		200, 200,
-	//		0, 0,
-	//		(float)ActorManager::Instance().GetShadowTexture(i)->GetWidth(), (float)ActorManager::Instance().GetShadowTexture(i)->GetHeight(),
-	//		0,
-	//		1, 1, 1, 1);
-	//}
-	//graphics.GetSpriteShader()->End(context);
+	graphics.GetSpriteShader()->Begin(context);
+	for (int i = 0; i < 3; ++i)
+	{
+		sprite->Render(context,
+			ActorManager::Instance().GetShadowTexture(i),
+			0 + 200 * (i), 0,
+			200, 200,
+			0, 0,
+			(float)ActorManager::Instance().GetShadowTexture(i)->GetWidth(), (float)ActorManager::Instance().GetShadowTexture(i)->GetHeight(),
+			0,
+			1, 1, 1, 1);
+	}
+	graphics.GetSpriteShader()->End(context);
 
 }
 

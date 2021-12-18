@@ -8,4 +8,5 @@ float4 main(PSInputShadow input) : SV_TARGET0
 	color.b = 1.0f;
 	color.a = 1.0f;
 	return color;
+
 }

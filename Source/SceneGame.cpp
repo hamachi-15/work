@@ -16,15 +16,16 @@
 
 #include "ActorManager.h"
 #include "Actor.h"
-#include "Movement.h"
 #include "EnemyManager.h"
 #include "Player.h"
 #include "EnemySlime.h"
 #include "Stage.h"
+#include "Movement.h"
 #include "Collision.h"
 
 
 #include "PhongVarianceShadowMap.h"
+#include "CascadeShadowMapShader.h"
 #include "GaussianBlurShader.h"
 #include "GaussianXBlur.h"
 #include "GaussianYBlur.h"
@@ -32,7 +33,7 @@
 #include "UseCubeMapShader.h"
 #include "LambertShader.h"
 #include "BloomShader.h"
-
+#include "PhongShader.h"
 
 #include "MenuSystem.h"
 #include "Messenger.h"
@@ -107,7 +108,7 @@ void SceneGame::Initialize()
 		actor->SetScale(DirectX::XMFLOAT3(0.1f, 0.1f, 0.1f));
 		//actor->SetScale(DirectX::XMFLOAT3(5.f, 5.f, 5.f));
 		actor->AddComponent<Stage>();
-		actor->AddShader<PhongVarianceShadowMap>(device);
+		actor->AddShader<CascadeShadowMap>(device);
 	}
 
 	// プレイヤー読み込み
@@ -122,7 +123,7 @@ void SceneGame::Initialize()
 		actor->AddComponent<Movement>();
 		actor->AddComponent<Charactor>();
 		actor->AddComponent<Player>();
-		actor->AddShader<PhongVarianceShadowMap>(device);
+		actor->AddShader<LambertShader>(device);
 	}
 	ActorManager::Instance().Update(0.01f);
 	ActorManager::Instance().UpdateTransform();
@@ -140,8 +141,7 @@ void SceneGame::Finalize()
 	CollisionManager::Instance().Destroy();
 
 	// メッセンジャーのクリア
-	Messenger::Instance().Clear();
-	
+	Messenger::Instance().Clear();	
 }
 
 void SceneGame::Update(float elapsed_time)
@@ -210,7 +210,7 @@ void SceneGame::Render()
 
 	// 描画処理
 	render_context.light_direction = Light::LightDir;
-	render_context.ShadowParameter = { shadow_color.x, shadow_color.y, shadow_color.z, 0.000001f };
+	render_context.ShadowParameter = { shadow_color.x, shadow_color.y, shadow_color.z, 0.001f };
 
 	// カメラパラメータ設定
 	Camera& camera = Camera::Instance();
@@ -282,7 +282,7 @@ void SceneGame::ScreenRender(ID3D11DeviceContext* context, RenderContext& render
 	// アクター描画
 	{
 		// シャドウマップ作成
-		//ActorManager::Instance().ShadowRender(render_context, blur_render_context);
+		ActorManager::Instance().ShadowRender(render_context, blur_render_context);
 		
 		// レンダーターゲットの回復
 		graphics.SetRenderTargetView(&screen_texture, depth_stencil_view);
@@ -347,6 +347,7 @@ void SceneGame::BuckBufferRender(ID3D11DeviceContext* context, RenderContext& re
 		0,
 		1, 1, 1, 1);
 	// 輝度抽出テクスチャを加算合成
+	context->OMSetBlendState(graphics.GetBlendState((int)Graphics::BlendState::Add), nullptr, 0xFFFFFFFF);
 	sprite->AddRender(context,
 		bloom_texture,
 		0, 0,
@@ -355,6 +356,8 @@ void SceneGame::BuckBufferRender(ID3D11DeviceContext* context, RenderContext& re
 		(float)bloom_texture->GetWidth(), (float)bloom_texture->GetHeight());
 	graphics.GetSpriteShader()->End(context);
 
+	//context->OMSetBlendState(graphics.GetBlendState((int)Graphics::BlendState::Alpha), nullptr, 0xFFFFFFFF);
+	
 	// メニュー描画
 	{
 		if (MenuSystem::Instance().IsOpened())
@@ -364,8 +367,35 @@ void SceneGame::BuckBufferRender(ID3D11DeviceContext* context, RenderContext& re
 			graphics.GetSpriteShader()->End(context);
 		}
 	}
+	// シャドウマップ
+	graphics.GetSpriteShader()->Begin(context);
+	for (int i = 0; i < 3; ++i)
+	{
+		sprite->Render(context,
+			ActorManager::Instance().GetShadowTexture(i),
+			0 + 200 * (i), 0,
+			200, 200,
+			0, 0,
+			(float)ActorManager::Instance().GetShadowTexture(i)->GetWidth(), (float)ActorManager::Instance().GetShadowTexture(i)->GetHeight(),
+			0,
+			1, 1, 1, 1);
+	}
+	sprite->Render(context,
+		bloom_texture,
+		0, 200,
+		200, 200,
+		0, 0,
+		(float)bloom_texture->GetWidth(), (float)bloom_texture->GetHeight(),
+		0,
+		1, 1, 1, 1);
+	graphics.GetSpriteShader()->End(context);
+
+	OnGui();
 }
 
+//-------------------------------------
+// メッセージ受信処理
+//-------------------------------------
 bool SceneGame::OnMessages(const Telegram& telegram)
 {
 	switch (telegram.message_box.message)
@@ -380,6 +410,7 @@ bool SceneGame::OnMessages(const Telegram& telegram)
 		// スクリプトにデータを書き込む
 		WriteScript::Instance().WriteSceneDataScript("./Data/Script/SendBattleSceneScript.txt", headder);
 		
+		// バトルシーンに遷移
 		SceneManager::Instance().ChangeScene(new SceneBattle());
 		
 		return true;
@@ -511,7 +542,8 @@ void SceneGame::OnGui()
 		ImGui::Separator();
 		ImGui::TreePop();
 	}
-
+	ImGui::Image(bloom_texture, ImVec2(200, 200));
+	
 	ImGui::GetStyle().Colors[ImGuiCol_WindowBg] = ImVec4(1.0f, 1.0f, 1.0f, 0.4f);
 	ImGui::GetStyle().Colors[ImGuiCol_Border].x = 1.0f;
 	ImGui::GetStyle().Colors[ImGuiCol_TitleBg] = ImVec4(0.0f, 1.0f, 1.0f, 0.7f);

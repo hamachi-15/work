@@ -7,6 +7,7 @@
 #include "EnemyMutant.h"
 #include "EnemyPLT.h"
 #include "EnemyLAT.h"
+#include "EnemyDragonNightmare.h"
 #include "Graphics.h"
 #include "PhongVarianceShadowMap.h"
 #include "LambertShader.h"
@@ -116,18 +117,21 @@ void EnemyManager::CreateEnemies(int id)
 //-----------------------------------------
 // スクリプトから敵情報を取得して敵を生成する
 //-----------------------------------------
-void EnemyManager::CreateEnemyScriptData()
+bool EnemyManager::CreateEnemyScriptData()
 {
-	Script script("./Data/Script/SendBattleSceneScript.txt");
+	Script* script = new Script("./Data/Script/SendBattleSceneScript.txt");
 	char	strwork[256];
 
 	while (1)
 	{
-		if (!script.SearchTop())
+		if (!script->SearchTop())
 			break;
-
+		if (script == nullptr)
+		{
+			return false;
+		}
 		//	文字列をファイルから取り出す
-		script.GetParamString(strwork);
+		script->GetParamString(strwork);
 
 		//	終了コマンド
 		if (lstrcmpA(strwork, "END") == 0)
@@ -138,9 +142,11 @@ void EnemyManager::CreateEnemyScriptData()
 		if (lstrcmpA(strwork, "EnemyID") == 0)
 		{
 			// スクリプトの敵IDから敵を生成
-			CreateEnemies(script.GetParamInt());
+			CreateEnemies(script->GetParamInt());
 		}
 	}
+	delete script;
+	return true;
 }
 
 //-----------------------------------------
@@ -148,35 +154,46 @@ void EnemyManager::CreateEnemyScriptData()
 //-----------------------------------------
 void EnemyManager::SetEnemyStatus(std::shared_ptr<Actor> actor, std::shared_ptr<EnemyData> enemy_data, std::string index_string, DirectX::XMFLOAT3 appearance_position)
 {
+	// 名前の設定
 	std::string name = std::string(enemy_data->name) + index_string;
 	actor->SetName(name.c_str());
+	// 敵データIDの設定
 	actor->SetEnemyDataID(enemy_data->id);
+	// モデルのセットアップ
 	actor->SetUpModel(enemy_data->model_path);
+	// 出現位置の設定
 	GetAppearancePosition(actor, { appearance_position.x, appearance_position.y, appearance_position.z });
+	// スケールの設定
 	actor->SetScale({ enemy_data->scale_x, enemy_data->scale_y, enemy_data->scale_z });
+	// アングルの設定
 	actor->SetAngle({ enemy_data->angle_x, enemy_data->angle_y, enemy_data->angle_z });
+	// アニメーションノードの設定
 	actor->SetAnimationNodeName(enemy_data->animation_node_name);
+	// シェーダーの設定
 	actor->AddShader<LambertShader>(Graphics::Instance().GetDevice());
 
+	// 各敵のコンポーネント追加
+	AddComponent(actor, enemy_data);
 	switch (enemy_data->category)
 	{
 	case EnemyCategory::Slime:
-		AddComponent(actor, enemy_data);
 		actor->AddComponent<EnemySlime>();
 		break;
 	case EnemyCategory::LAT:
-		AddComponent(actor, enemy_data);
 		actor->AddComponent<EnemyLAT>();
 		break;
 	case EnemyCategory::PLT:
-		AddComponent(actor, enemy_data);
 		actor->AddComponent<EnemyPLT>();
 		break;
 	case EnemyCategory::Mutant:
-		AddComponent(actor, enemy_data);
 		actor->AddComponent<EnemyMutant>();
 		break;
-	case EnemyCategory::Robot:
+	case EnemyCategory::NightmareDragon:
+		actor->AddComponent<EnemyDragonNightmare>();
+		break;
+	case EnemyCategory::SoulEaterDragon:
+		break;
+	case EnemyCategory::DragonUsurper:
 		break;
 	}
 }
