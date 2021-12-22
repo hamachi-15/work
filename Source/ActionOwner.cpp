@@ -7,6 +7,11 @@
 #include "GameDatabase.h"
 #include "Charactor.h"
 
+//***********************************
+// 
+// 待機行動
+// 
+//***********************************
 //-----------------------------------
 // 待機行動前処理
 //-----------------------------------
@@ -22,9 +27,6 @@ void IdleAction::Start(std::string action_name)
 	}
 }
 
-//-----------------------------------
-// 待機行動
-//-----------------------------------
 ActionBase::State IdleAction::Run(float elapsed_time)
 {
 	float run_timer = owner->GetRunTimer();
@@ -53,6 +55,12 @@ ActionBase::State IdleAction::Run(float elapsed_time)
 	}
 	return ActionBase::State::Run;
 }
+
+//***********************************
+// 
+// ダメージ行動
+// 
+//***********************************
 void DamageAction::Start(std::string action_name)
 {
 	std::string animation_name = owner->GetName();
@@ -65,9 +73,6 @@ void DamageAction::Start(std::string action_name)
 	}
 }
 
-//-----------------------------------
-// ダメージ行動
-//-----------------------------------
 ActionBase::State DamageAction::Run(float elapsed_time)
 {
 	// ダメージを与え、死亡しなければ
@@ -111,9 +116,12 @@ ActionBase::State DamageAction::Run(float elapsed_time)
 
 	return ActionBase::State::Run;
 }
-//-----------------------------------
+
+//***********************************
+// 
 // 死亡行動
-//-----------------------------------
+// 
+//***********************************
 void DeathAction::Start(std::string action_name)
 {
 	// 死亡アニメーション再生
@@ -138,6 +146,11 @@ ActionBase::State DeathAction::Run(float elapsed_time)
 	return ActionBase::State::Run;
 }
 
+//***********************************
+// 
+// 徘徊行動
+// 
+//***********************************
 void WanderAction::Start(std::string action_name)
 {
 	std::string animation_name = owner->GetName();
@@ -150,9 +163,6 @@ void WanderAction::Start(std::string action_name)
 	}
 }
 
-//-----------------------------------
-// 徘徊行動
-//-----------------------------------
 ActionBase::State WanderAction::Run(float elapsed_time)
 {
 	std::shared_ptr<Actor> owner_actor = owner->GetActor();
@@ -185,6 +195,12 @@ ActionBase::State WanderAction::Run(float elapsed_time)
 	// 実行中
 	return ActionBase::State::Run;
 }
+
+//***********************************
+// 
+// 逃走行動
+// 
+//***********************************
 void LeaveAction::Start(std::string action_name)
 {
 	std::string animation_name = owner->GetName();
@@ -197,9 +213,6 @@ void LeaveAction::Start(std::string action_name)
 	}
 }
 
-//-----------------------------------
-// 逃走行動
-//-----------------------------------
 ActionBase::State LeaveAction::Run(float elapsed_time)
 {
 	DirectX::XMFLOAT3 target_position;
@@ -291,6 +304,12 @@ ActionBase::State RecoverAction::Run(float elapsed_time)
 
 	return ActionBase::State::Run;
 }
+
+//***********************************
+// 
+// 追跡行動
+// 
+//***********************************
 void PursuitAction::Start(std::string action_name)
 {
 	std::string animation_name = owner->GetName();;
@@ -303,9 +322,6 @@ void PursuitAction::Start(std::string action_name)
 	}
 }
 
-//-----------------------------------
-// 追跡行動
-//-----------------------------------
 ActionBase::State PursuitAction::Run(float elapsed_time)
 {
 	float run_timer = owner->GetRunTimer();

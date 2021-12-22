@@ -438,6 +438,12 @@
     <ClCompile Include="Source\BossJudgmenetOwner.cpp">
       <Filter>ソース ファイル\AI\BossAI</Filter>
     </ClCompile>
+    <ClCompile Include="Source\EnemyTerritory.cpp">
+      <Filter>ソース ファイル\System</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\EnemyTerritoryManager.cpp">
+      <Filter>ソース ファイル\System</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\imgui\imconfig.h">
@@ -683,9 +689,6 @@
     <ClInclude Include="Source\GameData\EnemyData.h">
       <Filter>ソース ファイル\GameData</Filter>
     </ClInclude>
-    <ClInclude Include="Source\GameData\EnemyOccurPosition.h">
-      <Filter>ソース ファイル\GameData</Filter>
-    </ClInclude>
     <ClInclude Include="Source\GameData\AttackCollitionTime.h">
       <Filter>ソース ファイル\GameData</Filter>
     </ClInclude>
@@ -781,6 +784,21 @@
     </ClInclude>
     <ClInclude Include="Source\BossJudgmenetOwner.h">
       <Filter>ソース ファイル\AI\BossAI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\EnemyTerritory.h">
+      <Filter>ソース ファイル\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\EnemyTerritoryManager.h">
+      <Filter>ソース ファイル\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GameData\EnemyTerritoryTag.h">
+      <Filter>ソース ファイル\GameData</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GameData\EnemyAppearancePosition.h">
+      <Filter>ソース ファイル\GameData</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GameData\WorldMapData.h">
+      <Filter>ソース ファイル\GameData</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

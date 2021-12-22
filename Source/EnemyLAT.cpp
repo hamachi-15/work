@@ -1,7 +1,10 @@
-#include "EnemyLAT.h"
 #include "Graphics.h"
+#include "SceneManager.h"
+
 #include "Charactor.h"
 #include "EnemyManager.h"
+#include "EnemyLAT.h"
+
 #include "BehaviorTree.h"
 #include "BehaviorData.h"
 #include "NodeBase.h"
@@ -82,7 +85,7 @@ void EnemyLAT::Start()
 
 	// テリトリー範囲の設定
 	DirectX::XMFLOAT3 position = actor->GetPosition();
-	SetTerritoryOrigin(position);
+	//SetTerritoryOrigin(position);
 
 
 	// 最初はターゲット座標を自身の座標に設定
@@ -128,20 +131,8 @@ void EnemyLAT::Start()
 	behavior_data = new BehaviorData();
 	ai_tree = new BehaviorTree();
 
-	ai_tree->AddNode("", "Root", 0, BehaviorTree::SelectRule::Priority, NULL, NULL);
-	ai_tree->AddNode("Root", "Death", 1, BehaviorTree::SelectRule::Non, new DeathJudgment(this), new DeathAction(this));
-	ai_tree->AddNode("Root", "Damage", 2, BehaviorTree::SelectRule::Non, new DamageJudgment(this), new DamageAction(this));
-	ai_tree->AddNode("Root", "Escape", 3, BehaviorTree::SelectRule::Sequence, new EscapeJudgment(this), NULL);
-	ai_tree->AddNode("Root", "Battle", 4, BehaviorTree::SelectRule::Priority, new BattleJudgment(this), NULL);
-	ai_tree->AddNode("Root", "Scount", 5, BehaviorTree::SelectRule::Priority, NULL, NULL);
-	ai_tree->AddNode("Escape", "Leave", 0, BehaviorTree::SelectRule::Non, NULL, new LeaveAction(this));
-	ai_tree->AddNode("Escape", "Recover", 0, BehaviorTree::SelectRule::Non, NULL, new RecoverAction(this));
-	ai_tree->AddNode("Battle", "Attack", 1, BehaviorTree::SelectRule::Random, new AttackJudgment(this), NULL);
-	ai_tree->AddNode("Battle", "Pursuit", 2, BehaviorTree::SelectRule::Non, NULL, new PursuitAction(this));
-	//ai_tree->AddNode("Attack", "TailAttack", 0, BehaviorTree::SelectRule::Non, new SkillShotJudgment(this), new SkillShotAction(this));
-	ai_tree->AddNode("Scount", "Wander", 1, BehaviorTree::SelectRule::Non, new WanderJudgment(this), new WanderAction(this));
-	ai_tree->AddNode("Scount", "Idle", 2, BehaviorTree::SelectRule::Non, NULL, new IdleAction(this));
-
+	// ノード設定
+	SetBehaviorNode();
 }
 
 //-----------------------------------------
@@ -149,6 +140,35 @@ void EnemyLAT::Start()
 //-----------------------------------------
 void EnemyLAT::SetBehaviorNode()
 {
+	// 現在のシーン名取得
+	const char* name = SceneManager::Instance().GetCurrentScene()->GetName();
+
+	// シーンがワールドマップ時のノード設定
+	if (strcmp(name, "SceneWorldMap") == 0)
+	{
+		ai_tree->AddNode("", "Root", 0, BehaviorTree::SelectRule::Priority, NULL, NULL);
+		ai_tree->AddNode("Root", "Battle", 4, BehaviorTree::SelectRule::Priority, new BattleJudgment(this), NULL);
+		ai_tree->AddNode("Root", "Scount", 5, BehaviorTree::SelectRule::Priority, NULL, NULL);
+		ai_tree->AddNode("Battle", "Pursuit", 2, BehaviorTree::SelectRule::Non, NULL, new PursuitAction(this));
+		ai_tree->AddNode("Scount", "Wander", 1, BehaviorTree::SelectRule::Non, new WanderJudgment(this), new WanderAction(this));
+		ai_tree->AddNode("Scount", "Idle", 2, BehaviorTree::SelectRule::Non, NULL, new IdleAction(this));
+	}
+	else
+	{
+		ai_tree->AddNode("", "Root", 0, BehaviorTree::SelectRule::Priority, NULL, NULL);
+		ai_tree->AddNode("Root", "Death", 1, BehaviorTree::SelectRule::Non, new DeathJudgment(this), new DeathAction(this));
+		ai_tree->AddNode("Root", "Damage", 2, BehaviorTree::SelectRule::Non, new DamageJudgment(this), new DamageAction(this));
+		ai_tree->AddNode("Root", "Escape", 3, BehaviorTree::SelectRule::Sequence, new EscapeJudgment(this), NULL);
+		ai_tree->AddNode("Root", "Battle", 4, BehaviorTree::SelectRule::Priority, new BattleJudgment(this), NULL);
+		ai_tree->AddNode("Root", "Scount", 5, BehaviorTree::SelectRule::Priority, NULL, NULL);
+		ai_tree->AddNode("Escape", "Leave", 0, BehaviorTree::SelectRule::Non, NULL, new LeaveAction(this));
+		ai_tree->AddNode("Escape", "Recover", 0, BehaviorTree::SelectRule::Non, NULL, new RecoverAction(this));
+		ai_tree->AddNode("Battle", "Attack", 1, BehaviorTree::SelectRule::Random, new AttackJudgment(this), NULL);
+		ai_tree->AddNode("Battle", "Pursuit", 2, BehaviorTree::SelectRule::Non, NULL, new PursuitAction(this));
+		//ai_tree->AddNode("Attack", "TailAttack", 0, BehaviorTree::SelectRule::Non, new SkillShotJudgment(this), new SkillShotAction(this));
+		ai_tree->AddNode("Scount", "Wander", 1, BehaviorTree::SelectRule::Non, new WanderJudgment(this), new WanderAction(this));
+		ai_tree->AddNode("Scount", "Idle", 2, BehaviorTree::SelectRule::Non, NULL, new IdleAction(this));
+	}
 }
 
 //-----------------------------------------

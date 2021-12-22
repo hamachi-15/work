@@ -168,7 +168,7 @@ void Movement::UpdateVerticalVelocity(float elapsed_frame)
 void Movement::UpdateVerticalMove(float elapsed_time)
 {
 	std::shared_ptr<Actor> actor = GetActor();
-	std::shared_ptr<Actor> actor_stage = ActorManager::Instance().GetActor("Stage");;
+	std::shared_ptr<Actor> actor_stage = ActorManager::Instance().GetActor("Filde");;
 	std::shared_ptr<Stage> stage = actor_stage->GetComponent<Stage>();
 	std::shared_ptr<Actor> actor_player = ActorManager::Instance().GetActor("Player");;
 	std::shared_ptr<Player> player = actor_player->GetComponent<Player>();
@@ -318,7 +318,7 @@ void Movement::UpdateHorizontalVelocity(float elapsed_frame)
 void Movement::UpdateHorizontalMove(float elapsed_time)
 {
 	std::shared_ptr<Actor> actor = GetActor();
-	std::shared_ptr<Actor> actor_stage = ActorManager::Instance().GetActor("Stage");;
+	std::shared_ptr<Actor> actor_stage = ActorManager::Instance().GetActor("Filde");;
 	std::shared_ptr<Stage> stage = actor_stage->GetComponent<Stage>();
 
 	DirectX::XMFLOAT3 position = actor->GetPosition();

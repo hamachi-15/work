@@ -28,8 +28,8 @@ bool Script::LoadScript(const char* filename)
 	//　ファイルを読み込む
 	FILE* fp = nullptr;
 	fopen_s(&fp, filename, "r");
-	if (!fp)
-		return false;
+
+	if (!fp) return false;
 
 	// ファイルサイズを取得
 	fseek(fp, 0, SEEK_END);
@@ -41,7 +41,7 @@ bool Script::LoadScript(const char* filename)
 	fread(text_buffer, text_buffer_size, 1, fp);
 
 	// ファイルを閉じる
-	fclose(fp);
+	//fclose(fp);
 
 	// テキスト位置を初期化する
 	text_ip = 0;
@@ -190,7 +190,7 @@ bool WriteScript::WriteSceneDataScript(const char* filename, const BattleSceneDa
 		fprintf(fp, "EnemyID %d\n", data_headder.search_enemy_id.at(i));
 	}
 
-	fprintf(fp, "END");
+	fprintf(fp, "END\n");
 
 	// ファイルを閉じる
 	fclose(fp);

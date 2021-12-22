@@ -5,7 +5,7 @@
 //-----------------------------------------
 // ”»’è
 //-----------------------------------------
-bool JumpAttackJudgment::Judgment()
+bool HeavyBodyAttackJudgment::Judgment()
 {
 	// hp‚ª”¼•ªˆÈ‰º‚ÌŽžskill”­“®‰Â”\
 	int health = owner->GetCharactor()->GetHealth();

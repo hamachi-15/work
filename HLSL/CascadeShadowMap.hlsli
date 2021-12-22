@@ -61,7 +61,7 @@ float3 GetCascadeShadow(float3 world_position)
 {
 	Texture2D shadow_texture[3] = { shadow_texture1, shadow_texture2, shadow_texture3 };
 
-	for (int i = 0; i < 2; ++i)
+	for (int i = 0; i < 3; ++i)
 	{
 		float3 vshadow = GetShadowTex(light_view_projection[i], world_position);
 		float3	shadow_texcoord = vshadow;

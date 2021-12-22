@@ -7,7 +7,7 @@
 //-------------------------------------
 // ジャンプ攻撃行動前処理
 //-------------------------------------
-void JumpAttackAction::Start(std::string action_name)
+void HeavyBodyAttackAction::Start(std::string action_name)
 {
 	std::shared_ptr<AnimationData> animation = GameDataBase::Instance().GetAnimationData("SlimeAttack2");
 	owner->PlayAnimation(animation);
@@ -16,7 +16,7 @@ void JumpAttackAction::Start(std::string action_name)
 //-------------------------------------
 // ジャンプ攻撃行動
 //-------------------------------------
-JumpAttackAction::State JumpAttackAction::Run(float elapsed_time)
+HeavyBodyAttackAction::State HeavyBodyAttackAction::Run(float elapsed_time)
 {
 	CollisionManager& collision_manager = CollisionManager::Instance();
 	std::shared_ptr<Actor> actor = owner->GetActor();

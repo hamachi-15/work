@@ -230,6 +230,8 @@
     <ClCompile Include="Source\EnemyMutant.cpp" />
     <ClCompile Include="Source\EnemyPLT.cpp" />
     <ClCompile Include="Source\EnemySlime.cpp" />
+    <ClCompile Include="Source\EnemyTerritory.cpp" />
+    <ClCompile Include="Source\EnemyTerritoryManager.cpp" />
     <ClCompile Include="Source\Font.cpp" />
     <ClCompile Include="Source\FontShader.cpp" />
     <ClCompile Include="Source\Framework.cpp" />
@@ -358,6 +360,8 @@
     <ClInclude Include="Source\EnemyMutant.h" />
     <ClInclude Include="Source\EnemyPLT.h" />
     <ClInclude Include="Source\EnemySlime.h" />
+    <ClInclude Include="Source\EnemyTerritory.h" />
+    <ClInclude Include="Source\EnemyTerritoryManager.h" />
     <ClInclude Include="Source\Font.h" />
     <ClInclude Include="Source\FontShader.h" />
     <ClInclude Include="Source\Framework.h" />
@@ -365,9 +369,11 @@
     <ClInclude Include="Source\GameData\AnimationData.h" />
     <ClInclude Include="Source\GameData\AttackCategory.h" />
     <ClInclude Include="Source\GameData\AttackCollitionTime.h" />
+    <ClInclude Include="Source\GameData\EnemyAppearancePosition.h" />
     <ClInclude Include="Source\GameData\EnemyCategory.h" />
     <ClInclude Include="Source\GameData\EnemyData.h" />
-    <ClInclude Include="Source\GameData\EnemyOccurPosition.h" />
+    <ClInclude Include="Source\GameData\EnemyTerritoryTag.h" />
+    <ClInclude Include="Source\GameData\WorldMapData.h" />
     <ClInclude Include="Source\GamePad.h" />
     <ClInclude Include="Source\GaussianBlurShader.h" />
     <ClInclude Include="Source\GaussianXBlur.h" />

@@ -250,11 +250,23 @@ void CollisionManager::Update()
                     PushOutCollision(cylinderA, cylinderB, result);
                     // 現在のシーンがワールドマップならシーンへ敵とエンカウントをしたメッセージを送る
                     const char* scene_name = SceneManager::Instance().GetCurrentScene()->GetName();
-                    if (strcmp(cylinderA->GetName(), "Player") == 0 && strcmp(scene_name, "SceneWorldMap") == 0 ||
-                        strcmp(cylinderB->GetName(), "Player") == 0 && strcmp(scene_name, "SceneWorldMap") == 0)
+                    int isplayercolA = strcmp(cylinderA->GetName(), "Player");
+                    int isplayercolB = strcmp(cylinderB->GetName(), "Player");
+                    int isworldmap = strcmp(scene_name, "SceneWorldMap");
+                    if (isplayercolA == 0 && isworldmap == 0 ||
+                        isplayercolB == 0 && isworldmap == 0)
                     {
                         Message message;
                         message.message = MessageType::Message_Hit_Boddy;
+                        // 衝突した敵の座標を設定
+                        if (isplayercolA == 0)
+                        {
+                            message.hit_position = cylinderA->GetActor()->GetPosition();
+                        }
+                        else
+                        {
+                            message.hit_position = cylinderB->GetActor()->GetPosition();
+                        }
                         MetaAI::Instance().SendMessaging(
                             static_cast<int>(MetaAI::Identity::Collision),   // 送信元
                             static_cast<int>(MetaAI::Identity::WorldMap),    // 受信先

@@ -1,3 +1,5 @@
+
+#include "Mathf.h"
 #include "MetaAI.h"
 #include "ActorManager.h"
 #include "Enemy.h"
@@ -16,21 +18,13 @@ MetaAI::MetaAI()
 	
 	// 最初から敵を出現させる
 	int count = 1;
-	EnemyManager::Instance().CreateEnemies(5);
-	while (1)
-	{
-		// 今生きている敵の総数を見て一定以下になれば出現させていく
-		int enemy_count = EnemyManager::Instance().GetEnemyCount();
-		if (count <= EnemyManager::EnemyCountLimit::Min_Limit)
-		{
-			AppearanceEnemy(0.0f);
-			count++;
-		}
-		else
-		{
-			break;
-		}
-	}
+
+	// 敵の縄張り設定
+	EnemyManager::Instance().CreateTerritory();
+
+	//EnemyManager::Instance().CreateEnemies(5);
+
+	AppearanceEnemy(0.0f);
 }
 
 //-----------------------------------
@@ -99,6 +93,9 @@ void MetaAI::Discharge(const Telegram& telegram)
 	}
 }
 
+//-----------------------------------
+// シーンへ送る用のレシーブ処理を指定
+//-----------------------------------
 void MetaAI::Discharge(Scene* receiver, const Telegram& telegram)
 {
 	if (!receiver->OnMessages(telegram))
@@ -185,13 +182,23 @@ void MetaAI::SendMessaging(int sender, int receiver, Message message, int enemy_
 //-----------------------------------
 void MetaAI::AppearanceEnemy(float elapsed_time)
 {
-	int enemy_data_index = rand() % 2;
-	// アクターの後ろにつけるインデックス番号をstring型に変換する
-	std::string index_string = std::to_string(index);
-	// 敵を生成
-	EnemyManager::Instance().CreateEnemies(enemy_data_index, index_string);
-	// インターバルの時間を設定
-	pop_interval = 5.0f;
-	// インデックス番号のインクリメント
-	index++;
+	// 敵の出現位置ごとに敵を出現させていく
+	int appearance_data_count = GameDataBase::Instance().GetEnemyOccurCount();
+	for (int appearance_position_index = 0; appearance_position_index < 4; ++appearance_position_index)
+	{
+		std::shared_ptr<EnemyAppearancePosition> appearance_data = GameDataBase::Instance().GetEnemyAppearanceData(appearance_position_index);
+		DirectX::XMFLOAT3 appearance_position = { appearance_data->position_x,appearance_data->position_y, appearance_data->position_z };
+		// 範囲内のランダム値の数だけ敵を出現させる
+		int enemy_count_max = Mathf::RandomRange(EnemyManager::EnemyCountLimit::Min_Limit, EnemyManager::EnemyCountLimit::Max_Limit);
+		for (int enemy_count = 0; enemy_count < enemy_count_max; ++enemy_count)
+		{
+			int enemy_data_index = rand() % 2;
+		}
+	}
+			// アクターの後ろにつけるインデックス番号をstring型に変換する
+			std::string index_string = std::to_string(index);
+			// 敵を生成
+			EnemyManager::Instance().CreateEnemies();
+			// インデックス番号のインクリメント
+			index++;
 }

@@ -5,6 +5,7 @@
 class BattleJudgment : public JudgmentBase
 {
 public:
+	// コンストラクタ
 	BattleJudgment(Enemy* enemy) :JudgmentBase(enemy) {};
 	// 判定
 	bool Judgment();
@@ -14,6 +15,7 @@ public:
 class AttackJudgment : public JudgmentBase
 {
 public:
+	// コンストラクタ
 	AttackJudgment(Enemy* enemy) :JudgmentBase(enemy) {};
 	// 判定
 	bool Judgment();
@@ -23,6 +25,7 @@ public:
 class WanderJudgment : public JudgmentBase
 {
 public:
+	// コンストラクタ
 	WanderJudgment(Enemy* enemy) :JudgmentBase(enemy) {};
 	// 判定
 	bool Judgment();
@@ -32,6 +35,7 @@ public:
 class DamageJudgment : public JudgmentBase
 {
 public:
+	// コンストラクタ
 	DamageJudgment(Enemy* enemy) :JudgmentBase(enemy) {};
 	// 判定
 	bool Judgment();
@@ -41,6 +45,7 @@ public:
 class DeathJudgment : public JudgmentBase
 {
 public:
+	// コンストラクタ
 	DeathJudgment(Enemy* enemy) :JudgmentBase(enemy) {};
 	// 判定
 	bool Judgment();
@@ -50,6 +55,7 @@ public:
 class EscapeJudgment : public JudgmentBase
 {
 public:
+	// コンストラクタ
 	EscapeJudgment(Enemy* enemy) :JudgmentBase(enemy) {};
 	// 判定
 	bool Judgment();

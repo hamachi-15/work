@@ -147,7 +147,11 @@ private:
 	float	run_speed_scale = 0.0f;
 	float	turn_speed = DirectX::XMConvertToRadians(360);
 	bool	damage_flag = false;		// ダメージを受けているかのフラグ
-	bool	death_flag = false;		// 死亡状態かのフラグ
+	bool	death_flag = false;			// 死亡状態かのフラグ
 	float	hitstop_timer = 0.0f;		// ヒットストップタイマー
 	bool	hitstop_flag = false;		// ヒットストップを行うかのフラグ
+
+	int level;							// レベル
+	int exp;							// 現在の経験値
+	int next_exp;						// 次のレベルまでの経験値
 };

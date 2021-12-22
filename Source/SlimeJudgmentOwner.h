@@ -11,10 +11,10 @@ public:
 };
 
 // JumpAttackNode‚É‘JˆÚo—ˆ‚é‚©
-class JumpAttackJudgment : public JudgmentBase
+class HeavyBodyAttackJudgment : public JudgmentBase
 {
 public:
-	JumpAttackJudgment(Enemy* enemy) : JudgmentBase(enemy) {}
+	HeavyBodyAttackJudgment(Enemy* enemy) : JudgmentBase(enemy) {}
 	// ”»’è
 	bool Judgment();
 };

@@ -1,10 +1,9 @@
-#include <imgui.h>
-#include "Misc.h"
-#include "Light.h"
 #include "Graphics.h"
+#include "Camera.h"
+#include "Light.h"
+
 #include "ActorManager.h"
 
-#include "PhongVarianceShadowMap.h"
 #include "VarianceShadowMap.h"
 #include "CascadeShadowMapShader.h"
 #include "GaussianBlurShader.h"
@@ -14,7 +13,6 @@
 
 #include "Sprite.h"
 #include "Texture.h"
-#include "Camera.h"
 
 //------------------------------
 // コンストラクタ
@@ -24,7 +22,6 @@ ActorManager::ActorManager()
 	ID3D11Device* device = Graphics::Instance().GetDevice();
 	shadowmap = std::make_unique<VarianceShadowMap>(device);
 	bulr = std::make_unique<GaussianBlur>(device);
-	//shader = std::make_unique<CascadeShadowMap>(device);
 	phong = std::make_unique<Phong>(device);
 
 	// シャドウテクスチャ作成
@@ -89,6 +86,7 @@ void ActorManager::Destroy(std::shared_ptr<Actor> actor)
 	{
 		selection_actors.erase(iterate_selection);
 	}
+
 }
 void ActorManager::AllDestroy()
 {
@@ -113,6 +111,8 @@ void ActorManager::AllDestroy()
 		remove_actors.erase(iterate_remove);
 	}
 	shader_name = "";
+	shader = nullptr;
+
 }
 
 
@@ -182,9 +182,9 @@ void ActorManager::ShadowRender(RenderContext& render_context, BlurRenderContext
 	// ライト位置からのビュー設定
 	DirectX::XMFLOAT3 t = { 0, 0, 0 };
 	DirectX::XMFLOAT3 pos, target, up;
-	pos.x = t.x - Light::LightDir.x * 100.0f;
-	pos.y = t.y - Light::LightDir.y * 100.0f;
-	pos.z = t.z - Light::LightDir.z * 100.0f;
+	pos.x = t.x - Light::LightDir.x * 1000.0f;
+	pos.y = t.y - Light::LightDir.y * 1000.0f;
+	pos.z = t.z - Light::LightDir.z * 1000.0f;
 	target = { 0, 0, 0 };
 	up = { 0, 1, 0 };
 	DirectX::XMVECTOR eye = DirectX::XMLoadFloat3(&pos);
@@ -205,7 +205,7 @@ void ActorManager::ShadowRender(RenderContext& render_context, BlurRenderContext
 		shadow_area[1],
 		shadow_area[2]
 	};
-	for (int i = 0; i < 2; ++i)
+	for (int i = 0; i < 3; ++i)
 	{
 		float near_depth = split_area_table[i + 0];
 		float far_depth = split_area_table[i + 1];
@@ -293,7 +293,7 @@ void ActorManager::ShadowRender(RenderContext& render_context, BlurRenderContext
 		shadowmap->Begin(context, render_context);
 		for (std::shared_ptr<Actor>& actor : update_actors)
 		{
-			//if (strcmp(actor->GetName(), "Stage") == 0) continue;
+			if (strcmp(actor->GetName(), "Filde") == 0) continue;
 			// モデルがあれば描画
 			Model* model = actor->GetModel();
 			if (model != nullptr)
@@ -359,10 +359,10 @@ void ActorManager::BrightRender(RenderContext& render_context)
 {
 	Graphics& graphics = Graphics::Instance();
 	ID3D11DeviceContext* context = graphics.GetDeviceContext();
-	phong->Begin(context, render_context, DirectX::XMFLOAT4{2, 2, 2, 0.7f});
+	phong->Begin(context, render_context, DirectX::XMFLOAT4{5, 5, 5, 1.0f});
 	for (std::shared_ptr<Actor>& actor : update_actors)
 	{
-		if (strcmp(actor->GetName(), "Stage") == 0) continue;
+		if (strcmp(actor->GetName(), "FildeObjects") != 0) continue;
 		// モデルがあれば描画
 		Model* model = actor->GetModel();
 		if (model != nullptr)

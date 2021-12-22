@@ -101,12 +101,12 @@ void Bloom::Begin(ID3D11DeviceContext* context)
 	//デプスステンシルステート設定
 	context->OMSetDepthStencilState(depth_stencil_state.Get(), 1);
 
-	ConstantBufferForBloom cbscene;
-	cbscene.threshold = 0;
+	//ConstantBufferForBloom cbscene;
+	//cbscene.threshold = 0.5f;
 
-	context->VSSetConstantBuffers(0, 1, constant_buffer.GetAddressOf());
-	context->PSSetConstantBuffers(0, 1, constant_buffer.GetAddressOf());
-	context->UpdateSubresource(constant_buffer.Get(), 0, 0, &cbscene, 0, 0);
+	//context->VSSetConstantBuffers(0, 1, constant_buffer.GetAddressOf());
+	//context->PSSetConstantBuffers(0, 1, constant_buffer.GetAddressOf());
+	//context->UpdateSubresource(constant_buffer.Get(), 0, 0, &cbscene, 0, 0);
 
 }
 

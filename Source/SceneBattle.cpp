@@ -1,4 +1,5 @@
 #include <imgui.h>
+#include <stdio.h>
 #include "SceneBattle.h"
 #include "Graphics.h"
 #include "Camera.h"
@@ -7,30 +8,32 @@
 #include "Light.h"
 #include "Input.h"
 #include "Movement.h"
-#include "Actor.h"
-#include "ActorManager.h"
 
-#include "PhongVarianceShadowMap.h"
+#include "CascadeShadowMapShader.h"
 #include "GaussianBlurShader.h"
 #include "ReflectSeaShader.h"
-#include "UseCubeMapShader.h"
 #include "LambertShader.h"
 #include "BloomShader.h"
 
+#include "Actor.h"
+#include "ActorManager.h"
 #include "EnemyManager.h"
-#include "Player.h"
 #include "EnemySlime.h"
+#include "Player.h"
 #include "Stage.h"
+
 #include "MenuSystem.h"
+#include "UI.h"
+
 #include "Messenger.h"
 #include "MessageData.h"
+#include "GameDataBase.h"
+
 #include "Collision.h"
 #include "Texture.h"
 #include "Sprite.h"
-#include "GameDataBase.h"
 #include "MetaAI.h"
 
-#include "UI.h"
 SceneBattle::SceneBattle()
 {
 }
@@ -82,13 +85,13 @@ void SceneBattle::Initialize()
 	// ステージ読み込み
 	{
 		std::shared_ptr<Actor> actor = ActorManager::Instance().Create();
-		actor->SetUpModel("Data/Model/Tile.mdl");
-		actor->SetName("Stage");
+		actor->SetUpModel("Data/Model/Filde/Filde.mdl");
+		actor->SetName("Filde");
 		actor->SetPosition(DirectX::XMFLOAT3(0, 0, 0));
 		actor->SetAngle(DirectX::XMFLOAT3(0, DirectX::XMConvertToRadians(-90), 0));
-		actor->SetScale(DirectX::XMFLOAT3(5.f, 1.f, 5.f));
+		actor->SetScale(DirectX::XMFLOAT3(0.1f, 0.1f, 0.1f));
 		actor->AddComponent<Stage>();
-		actor->AddShader<PhongVarianceShadowMap>(Graphics::Instance().GetDevice());
+		actor->AddShader<CascadeShadowMap>(Graphics::Instance().GetDevice());
 	}
 
 	// プレイヤー読み込み
@@ -97,14 +100,14 @@ void SceneBattle::Initialize()
 		actor->SetUpModel("Data/Model/RPG-Character/Swordman.mdl");
 		actor->SetName("Player");
 		actor->SetAnimationNodeName("Motion");
-		//actor->SetPosition(DirectX::XMFLOAT3(-100, 16, -116));
-		actor->SetPosition(DirectX::XMFLOAT3(0, 1, 0));
+		actor->SetPosition(DirectX::XMFLOAT3(-100, 16, -116));
+//		actor->SetPosition(DirectX::XMFLOAT3(0, 1, 0));
 		actor->SetAngle(DirectX::XMFLOAT3(0, 0, 0));
 		actor->SetScale(DirectX::XMFLOAT3(0.04f, 0.04f, 0.04f));
 		actor->AddComponent<Movement>();
 		actor->AddComponent<Charactor>();
 		actor->AddComponent<Player>();
-		actor->AddShader<PhongVarianceShadowMap>(Graphics::Instance().GetDevice());
+		actor->AddShader<LambertShader>(Graphics::Instance().GetDevice());
 	}
 	ActorManager::Instance().Update(0.01f);
 	ActorManager::Instance().UpdateTransform();
@@ -126,6 +129,8 @@ void SceneBattle::Finalize()
 
 	// メッセンジャーのクリア
 	Messenger::Instance().Clear();
+
+	DeleteFileA("./Data/Script/SendBattleSceneScript.txt");
 }
 
 void SceneBattle::Update(float elapsed_time)
