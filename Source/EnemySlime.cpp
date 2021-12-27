@@ -1,3 +1,5 @@
+#include "Model.h"
+
 #include "Graphics.h"
 #include "SceneManager.h"
 #include "Telegram.h"
@@ -84,12 +86,13 @@ void EnemySlime::Start()
 	// テリトリー範囲の設定
 	//SetTerritoryRange(50.0f);
 
-	// 索敵範囲の設定
-	SetSearchRange(20.0f);
 
 	// テリトリー原点の設定
-	DirectX::XMFLOAT3 position = actor->GetPosition();
+	//DirectX::XMFLOAT3 position = actor->GetPosition();
 	//SetTerritoryOrigin(position);
+	
+	// 索敵範囲の設定
+	SetSearchRange(20.0f);
 
 	// 攻撃範囲の設定
 	SetAttackRange(10.0f);

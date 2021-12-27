@@ -3,6 +3,9 @@ Texture2D diffuse_texture : register(t0);
 SamplerState decal_sampler : register(s0);
 
 
+//--------------------------------------------
+//	ƒOƒ[ƒoƒ‹•Ï”
+//--------------------------------------------
 cbuffer CBPerBuffer : register(b0)
 {
 	float4 weight[2];

@@ -2,7 +2,7 @@
 #include "GameDatabase.h"
 #include "Enemy.h"
 #include "Charactor.h"
-
+#include "Model.h"
 //---------------------------
 // パンチ攻撃アニメーション再生
 //---------------------------

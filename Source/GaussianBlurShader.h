@@ -21,9 +21,6 @@ public:
 	// コンストラクタ
 	GaussianBlur(ID3D11Device* device, DXGI_FORMAT format = DXGI_FORMAT_R32G32_FLOAT);
 	~GaussianBlur();
-
-	// 名前取得
-	//const char* GetShaderName() const override { return "GaussianBlur"; }
 	
 	// 描画開始処理
 	void Begin(ID3D11DeviceContext* context, BlurType type);

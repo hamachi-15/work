@@ -1,11 +1,11 @@
 // ìGÉfÅ[É^ID
-EnemyID 2
-EnemyID 2
-EnemyID 2
-EnemyID 3
-EnemyID 3
-EnemyID 3
-EnemyID 3
 EnemyID 1
+EnemyID 2
+EnemyID 2
+EnemyID 2
+EnemyID 3
+EnemyID 3
+EnemyID 3
+EnemyID 3
 EnemyID 1
 END

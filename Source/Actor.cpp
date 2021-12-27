@@ -4,6 +4,7 @@
 #include "Component.h"
 #include "Charactor.h"
 #include "Graphics.h"
+#include "Model.h"
 
 //------------------------------
 // ŠJnˆ—

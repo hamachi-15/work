@@ -483,8 +483,16 @@ void Sprite::Render(
 			v[i].color.z = b;
 			v[i].color.w = a;
 
-			v[i].texcoord.x = texcoords[i].x / texture_width;
-			v[i].texcoord.y = texcoords[i].y / texture_height;
+			if (texture)
+			{
+				v[i].texcoord.x = texcoords[i].x / texture_width;
+				v[i].texcoord.y = texcoords[i].y / texture_height;
+			}
+			else
+			{
+				v[i].texcoord.x = texcoords[i].x;
+				v[i].texcoord.y = texcoords[i].y;
+			}
 		}
 
 		// 頂点バッファの内容の編集を終了する。
@@ -500,21 +508,28 @@ void Sprite::Render(
 
 		context->RSSetState(rasterizer_state.Get());
 		const float blendFactor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-		context->OMSetBlendState(blend_state.Get(), blendFactor, 0xFFFFFFFF);
-		context->OMSetDepthStencilState(depth_stencil_state.Get(), 0);
+		//context->OMSetBlendState(blend_state.Get(), blendFactor, 0xFFFFFFFF);
+		//context->OMSetDepthStencilState(depth_stencil_state.Get(), 0);
 
 		// シェーダーリソースビューの設定
-		texture->Set(0);
+		if(texture) texture->Set(0);
 
 		//context->OMSetDepthStencilState(depth_stencil_state.Get(), 1); 
-		context->PSSetSamplers(0, 1, sampler_state.GetAddressOf());
+		//context->PSSetSamplers(0, 1, sampler_state.GetAddressOf());
 
 		// 描画
 		context->Draw(4, 0);
 	}
 }
 
-void Sprite::Render(ID3D11DeviceContext* context, float dx, float dy, float dw, float dh, float sx, float sy, float sw, float sh, float angle, Pivot pivot, float r, float g, float b, float a) const
+void Sprite::Render(ID3D11DeviceContext* context, 
+	float dx, float dy, 
+	float dw, float dh, 
+	float sx, float sy, 
+	float sw, float sh, 
+	float angle, 
+	Pivot pivot, 
+	float r, float g, float b, float a) const
 {
 	D3D11_VIEWPORT viewport;
 	UINT num_viewport = 1;

@@ -9,6 +9,8 @@
 #include "DebugRenderer.h"
 #include "AudioSource.h"
 
+class Texture;
+
 class Graphics
 {
 public:

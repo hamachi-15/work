@@ -1,3 +1,5 @@
+#include "Model.h"
+
 #include "EnemyMutant.h"
 #include "EnemyManager.h"
 #include "Graphics.h"

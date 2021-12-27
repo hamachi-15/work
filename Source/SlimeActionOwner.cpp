@@ -2,6 +2,7 @@
 #include "Enemy.h"
 #include "GameDatabase.h"
 #include "Charactor.h"
+#include "Model.h"
 
 
 //-------------------------------------

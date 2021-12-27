@@ -18,7 +18,7 @@ float4 main(PSInput input) : SV_TARGET
 
 	//‹¾–Ê”½ŽË
 	float3 Ks = float3(1, 1, 1);
-	float3 S = BlinnPhongSpecular(N, L, C, E, Ks, 20);
+	float3 S = BlinnPhongSpecular(N, L, C, E, Ks, 100);
 	color *= input.color * float4(A + D + S, 1.0);
 
 	return color;

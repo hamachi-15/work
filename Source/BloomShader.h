@@ -1,9 +1,9 @@
 #pragma once
 #include <memory>
 #include "Shader.h"
+#include "GaussianBlurShader.h"
 
 class Texture;
-class GaussianBlur;
 
 class Bloom : public Shader
 {

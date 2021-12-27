@@ -35,6 +35,4 @@ private:
 
 	Microsoft::WRL::ComPtr<ID3D11Buffer>		skybox_buffer;
 
-	Microsoft::WRL::ComPtr<ID3D11DepthStencilState>		depth_stencil_state;
-
 };

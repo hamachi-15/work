@@ -6,7 +6,7 @@
 #include "RenderContext.h"
 
 // 前方宣言
-class VarianceShadowMap;
+class CreateShadowMap;
 class CascadeShadowMap;
 class GaussianBlur;
 class Phong;
@@ -86,7 +86,7 @@ private:
 	//シャドーマップサイズ
 	const DirectX::XMFLOAT2 shadow_size[3]{ { 1024,1024 },{ 512,512 },{ 256,256 } };
 	//シャドークリップエリア
-	const float shadow_area[3] = { 100, 150, 350 };
+	const float shadow_area[3] = { 50, 150, 300 };
 	//ライトビュープロジェクションクロップ行列の配列を定義する
 	DirectX::XMFLOAT4X4 lvpc_matrix[3];
 
@@ -99,9 +99,8 @@ private:
 	bool								 hidden_detail = false;
 	std::string							 shader_name;
 
-	//std::unique_ptr<CascadeShadowMap>	shader;
 	Shader* shader;
-	std::unique_ptr<VarianceShadowMap>		shadowmap;
+	std::unique_ptr<CreateShadowMap>		shadowmap;
 	std::unique_ptr<GaussianBlur>			bulr;
 	std::unique_ptr<Phong>					phong;
 

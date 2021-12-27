@@ -118,9 +118,6 @@
     <Filter Include="ソース ファイル\HLSL\MotionBlur">
       <UniqueIdentifier>{3ef48d16-2271-4112-8eb8-85a9154ff9a8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ソース ファイル\Phong">
-      <UniqueIdentifier>{d9c22e51-bc45-4644-a4a3-1121cf41e174}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ソース ファイル\HLSL\ShadowMap\CascadeShadowShader">
       <UniqueIdentifier>{3f822639-4e94-4d01-b0b0-969b6b6364b3}</UniqueIdentifier>
     </Filter>
@@ -141,6 +138,12 @@
     </Filter>
     <Filter Include="ソース ファイル\AI\BossAI">
       <UniqueIdentifier>{a08e178c-6117-48b3-a432-cd0e4db69e59}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\HLSL\2DPrimitive">
+      <UniqueIdentifier>{f2243f7b-08de-412d-aee5-27a3d33d8c8a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\HLSL\Phong">
+      <UniqueIdentifier>{d9c22e51-bc45-4644-a4a3-1121cf41e174}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -443,6 +446,12 @@
     </ClCompile>
     <ClCompile Include="Source\EnemyTerritoryManager.cpp">
       <Filter>ソース ファイル\System</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\CreateShadowMapShader.cpp">
+      <Filter>ソース ファイル\Graphics\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\2DPrimitive.cpp">
+      <Filter>ソース ファイル\Graphics\Shader</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -800,6 +809,12 @@
     <ClInclude Include="Source\GameData\WorldMapData.h">
       <Filter>ソース ファイル\GameData</Filter>
     </ClInclude>
+    <ClInclude Include="Source\CreateShadowMapShader.h">
+      <Filter>ソース ファイル\Graphics\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\2DPrimitive.h">
+      <Filter>ソース ファイル\Graphics\Shader</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="HLSL\Sprite.hlsli">
@@ -857,13 +872,16 @@
       <Filter>ソース ファイル\HLSL\MotionBlur</Filter>
     </None>
     <None Include="HLSL\Phong.hlsli">
-      <Filter>ソース ファイル\Phong</Filter>
+      <Filter>ソース ファイル\HLSL\Phong</Filter>
     </None>
     <None Include="HLSL\CascadeShadowMap.hlsli">
       <Filter>ソース ファイル\HLSL\ShadowMap\CascadeShadowShader</Filter>
     </None>
     <None Include="HLSL\ToShadowMap.hlsli">
       <Filter>ソース ファイル\HLSL\ShadowMap\ToShadowMap</Filter>
+    </None>
+    <None Include="HLSL\2DPrimitive.hlsli">
+      <Filter>ソース ファイル\HLSL\2DPrimitive</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -982,10 +1000,10 @@
       <Filter>ソース ファイル\HLSL\MotionBlur</Filter>
     </FxCompile>
     <FxCompile Include="HLSL\Phong_vs.hlsl">
-      <Filter>ソース ファイル\Phong</Filter>
+      <Filter>ソース ファイル\HLSL\Phong</Filter>
     </FxCompile>
     <FxCompile Include="HLSL\Phong_ps.hlsl">
-      <Filter>ソース ファイル\Phong</Filter>
+      <Filter>ソース ファイル\HLSL\Phong</Filter>
     </FxCompile>
     <FxCompile Include="HLSL\CascadeShadowMap_ps.hlsl">
       <Filter>ソース ファイル\HLSL\ShadowMap\CascadeShadowShader</Filter>
@@ -998,6 +1016,12 @@
     </FxCompile>
     <FxCompile Include="HLSL\ToShadowMap_ps.hlsl">
       <Filter>ソース ファイル\HLSL\ShadowMap\ToShadowMap</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\2DPrimitive_vs.hlsl">
+      <Filter>ソース ファイル\HLSL\2DPrimitive</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\2DPrimitive_ps.hlsl">
+      <Filter>ソース ファイル\HLSL\2DPrimitive</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

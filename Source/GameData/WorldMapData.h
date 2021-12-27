@@ -2,7 +2,7 @@
 	@file	WorldMapData.h
 	@brief	ツールにて自動生成しています。絶対に書き換えないでください。
 	@autor	DataBase.xlsm
-	@data	2021/12/21
+	@data	2021/12/24
 **/
 #pragma	once
 

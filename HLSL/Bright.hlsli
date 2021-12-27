@@ -2,6 +2,9 @@
 Texture2D diffuse_texture : register(t0);
 SamplerState decal_sampler : register(s0);
 
+//--------------------------------------------
+//	ƒOƒ[ƒoƒ‹•Ï”
+//--------------------------------------------
 cbuffer CBScene : register(b0)
 {
 	float threshold;

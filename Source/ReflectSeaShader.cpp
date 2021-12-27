@@ -1,6 +1,8 @@
 #include "ReflectSeaShader.h"
 #include "ActorManager.h"
 #include "ModelResource.h"
+#include "Texture.h"
+#include "Model.h"
 
 ReflectSea::ReflectSea(ID3D11Device* device)
 {

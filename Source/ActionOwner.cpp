@@ -7,6 +7,8 @@
 #include "GameDatabase.h"
 #include "Charactor.h"
 
+#include "Model.h"
+
 //***********************************
 // 
 // ë“ã@çsìÆ

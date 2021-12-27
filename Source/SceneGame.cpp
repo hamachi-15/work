@@ -24,16 +24,12 @@
 #include "Collision.h"
 
 
-#include "PhongVarianceShadowMap.h"
 #include "CascadeShadowMapShader.h"
-#include "GaussianBlurShader.h"
-#include "GaussianXBlur.h"
-#include "GaussianYBlur.h"
-#include "ReflectSeaShader.h"
-#include "UseCubeMapShader.h"
 #include "LambertShader.h"
 #include "BloomShader.h"
 #include "PhongShader.h"
+#include "2DPrimitive.h"
+
 
 #include "MenuSystem.h"
 #include "Messenger.h"
@@ -58,6 +54,11 @@ void SceneGame::Initialize()
 {
 	Graphics& graphics = Graphics::Instance();
 	ID3D11Device* device = graphics.GetDevice();
+
+	// プリミティブのコンスタントバッファの初期設定
+	primitive_falg = true;
+	primitive_context.number = 2;
+	primitive_context.timer = 0.0f;
 
 	// シーン名設定
 	SetName("SceneWorldMap");
@@ -85,10 +86,11 @@ void SceneGame::Initialize()
 	camera_controller->SetCameraAngle({ DirectX::XMConvertToRadians(25), 0.0f, 0.0f });
 	camera_controller->SetTarget(DirectX::XMFLOAT3(-400, 16, -416));
 
-	//
-	bulr = std::make_unique<GaussianBlur>(device, DXGI_FORMAT_R16G16B16A16_FLOAT);
+	// シェーダー初期化
 	bloom = std::make_unique<Bloom>(device);
+	primitive = std::make_unique<Primitive>(device);
 
+	// テクスチャ作成
 	bulr_texture = std::make_unique<Texture>();
 	bulr_texture->Create((u_int)graphics.GetScreenWidth(), (u_int)graphics.GetScreenHeight(), DXGI_FORMAT_R16G16B16A16_FLOAT);
 	depth_texture = std::make_unique<Texture>();
@@ -102,7 +104,6 @@ void SceneGame::Initialize()
 	// ステージ読み込み
 	{
 		std::shared_ptr<Actor> actor = ActorManager::Instance().Create();
-		//actor->SetUpModel("Data/Model/Filde/Stage.mdl");
 		actor->SetUpModel("Data/Model/Filde/Filde.mdl");
 		actor->SetName("Filde");
 		actor->SetPosition(DirectX::XMFLOAT3(0, 0, 0));
@@ -114,13 +115,11 @@ void SceneGame::Initialize()
 	}
 	{
 		std::shared_ptr<Actor> actor = ActorManager::Instance().Create();
-		//actor->SetUpModel("Data/Model/Filde/Stage.mdl");
 		actor->SetUpModel("Data/Model/Filde/StageObjects.mdl");
 		actor->SetName("FildeObjects");
 		actor->SetPosition(DirectX::XMFLOAT3(0, 0, 0));
 		actor->SetAngle(DirectX::XMFLOAT3(0, DirectX::XMConvertToRadians(-90), 0));
 		actor->SetScale(DirectX::XMFLOAT3(0.1f, 0.1f, 0.1f));
-		//actor->SetScale(DirectX::XMFLOAT3(5.f, 5.f, 5.f));
 		actor->AddComponent<Stage>();
 		actor->AddShader<LambertShader>(device);
 	}
@@ -179,6 +178,18 @@ void SceneGame::Update(float elapsed_time)
 			Messenger::Instance().SendData(MessageData::MENUOPENEVENT, &data);
 		}
 	}
+	// バトルシーンへの遷移フラグが立っているかつタイマーが一定以上なら
+	if (battle_flag && primitive_context.timer >= 40)
+	{
+		// バトルシーンへ遷移
+		SceneManager::Instance().ChangeScene(new SceneBattle());
+	}
+	// プリミティブコンテキストのコンストラクタ更新
+	if (primitive_context.timer < 40)
+	{
+		primitive_context.timer++;
+	}
+	if (battle_flag) return;
 
 	//ライト
 	static float light_angle = DirectX::XM_PI;
@@ -311,6 +322,7 @@ void SceneGame::PostRender(ID3D11DeviceContext* context, RenderContext& render_c
 	Graphics& graphics = Graphics::Instance();
 	bloom_texture = bloom->Render(context, render_context);
 
+
 	//Texture* texture = bulr->Render(graphics.GetTexture());
 	//{
 	//	ID3D11RenderTargetView* render_target_view[1] = { bulr_texture->GetRenderTargetView() };
@@ -326,7 +338,6 @@ void SceneGame::PostRender(ID3D11DeviceContext* context, RenderContext& render_c
 	//	0, 0,
 	//	texture->GetWidth(), texture->GetHeight());
 	//graphics.GetSpriteShader()->End(context);
-
 }
 
 //-------------------------------------
@@ -378,28 +389,41 @@ void SceneGame::BuckBufferRender(ID3D11DeviceContext* context, RenderContext& re
 	graphics.GetSpriteShader()->End(context);
 
 	// シャドウマップ
-	//graphics.GetSpriteShader()->Begin(context);
-	//for (int i = 0; i < 3; ++i)
-	//{
-	//	sprite->Render(context,
-	//		ActorManager::Instance().GetShadowTexture(i),
-	//		0 + 200 * (i), 0,
-	//		200, 200,
-	//		0, 0,
-	//		(float)ActorManager::Instance().GetShadowTexture(i)->GetWidth(), (float)ActorManager::Instance().GetShadowTexture(i)->GetHeight(),
-	//		0,
-	//		1, 1, 1, 1);
-	//}
-	//sprite->Render(context,
-	//	bloom_texture,
-	//	0, 200,
-	//	200, 200,
-	//	0, 0,
-	//	(float)bloom_texture->GetWidth(), (float)bloom_texture->GetHeight(),
-	//	0,
-	//	1, 1, 1, 1);
-	//graphics.GetSpriteShader()->End(context);
+	graphics.GetSpriteShader()->Begin(context);
+	for (int i = 0; i < 3; ++i)
+	{
+		sprite->Render(context,
+			ActorManager::Instance().GetShadowTexture(i),
+			0 + 200 * (i), 0,
+			200, 200,
+			0, 0,
+			(float)ActorManager::Instance().GetShadowTexture(i)->GetWidth(), (float)ActorManager::Instance().GetShadowTexture(i)->GetHeight(),
+			0,
+			1, 1, 1, 1);
+	}
+	sprite->Render(context,
+		bloom_texture,
+		0, 200,
+		200, 200,
+		0, 0,
+		(float)bloom_texture->GetWidth(), (float)bloom_texture->GetHeight(),
+		0,
+		1, 1, 1, 1);
+	graphics.GetSpriteShader()->End(context);
 
+	// 2Dプリミティブ描画
+	{
+		if (primitive_falg)
+		{
+			primitive->Begin(context, primitive_context);
+			sprite->Render(context,
+				0, 0,
+				screen_size.x, screen_size.y,
+				0, 0,
+				1, 1);
+			primitive->End(context);
+		}
+	}
 }
 
 //-------------------------------------
@@ -411,17 +435,16 @@ bool SceneGame::OnMessages(const Telegram& telegram)
 	{
 	case MessageType::Message_Hit_Boddy:
 		battle_flag = true;
+		primitive_falg = true;
+		primitive_context.number = 3;
+		primitive_context.timer = 0.0f;
 
 		BattleSceneDataHeadder headder;
 		// ある地点と敵座標との距離を計算して一定範囲内の距離ならIDを追加
 		DistanceBetweenEnemyAndPoint(headder, DirectX::XMLoadFloat3(&telegram.message_box.hit_position), enemy_search_range);		
 		
 		// スクリプトにデータを書き込む
-		WriteScript::Instance().WriteSceneDataScript("./Data/Script/SendBattleSceneScript.txt", headder);
-		
-		// バトルシーンに遷移
-		SceneManager::Instance().ChangeScene(new SceneBattle());
-		
+		WriteScript::Instance().WriteSceneDataScript("./Data/Script/SendBattleSceneScript.txt", headder);		
 		return true;
 		break;
 	}
@@ -443,6 +466,11 @@ void SceneGame::OnGui()
 
 	ImGui::TextColored(ImVec4(1, 1, 0, 1), u8"-------シャドウマップ-------");
 	ImGui::ColorEdit3("ShadowColor", (float*)&shadow_color);
+
+	ImGui::TextColored(ImVec4(1, 1, 0, 1), u8"-------2Dプリミティブ-------");
+	ImGui::SliderInt("PrimitiveType", &primitive_context.number, 1, 10);
+	ImGui::InputFloat("Timer", &primitive_context.timer);
+	ImGui::Checkbox("PrimitiveFlag", &primitive_falg);
 	ImGui::End();
 }
 

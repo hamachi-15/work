@@ -3,6 +3,7 @@
 #include "SpriteShader.h"
 #include "SkyBoxShader.h"
 #include "Audio.h"
+#include "Texture.h"
 
 Graphics* Graphics::instance = nullptr;
 

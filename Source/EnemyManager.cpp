@@ -136,7 +136,6 @@ void EnemyManager::CreateEnemies(int id)
 		if (data->id == id)
 		{
 			std::shared_ptr<Actor> actor = ActorManager::Instance().Create();
-			std::string index_string = std::to_string(index);
 			DirectX::XMFLOAT3 pos = DirectX::XMFLOAT3{ -126, 7, 169 };
 			SetEnemyStatus(actor, data, index, pos);
 		}
@@ -193,7 +192,7 @@ void EnemyManager::SetEnemyStatus(std::shared_ptr<Actor> actor, std::shared_ptr<
 	actor->SetUpModel(enemy_data->model_path);
 	// 出現位置の設定
 	DirectX::XMFLOAT3 appearance_position = { appearance_data->position_x,appearance_data->position_y, appearance_data->position_z };
-	GetAppearancePosition(actor, { appearance_position.x, appearance_position.y, appearance_position.z });
+	GetAppearancePosition(actor, { appearance_position.x, appearance_position.y, appearance_position.z }, appearance_data->radius);
 	// スケールの設定
 	actor->SetScale({ enemy_data->scale_x, enemy_data->scale_y, enemy_data->scale_z });
 	// アングルの設定
@@ -214,18 +213,25 @@ void EnemyManager::SetEnemyStatus(std::shared_ptr<Actor> actor, std::shared_ptr<
 	// 名前の設定
 	std::string name = std::string(enemy_data->name) + std::to_string(string_id);
 	actor->SetName(name.c_str());
+
 	// 敵データIDの設定
 	actor->SetEnemyDataID(enemy_data->id);
+
 	// モデルのセットアップ
 	actor->SetUpModel(enemy_data->model_path);
+
 	// 出現位置の設定
-	GetAppearancePosition(actor, { appearance_position.x, appearance_position.y, appearance_position.z });
+	GetAppearancePosition(actor, { appearance_position.x, appearance_position.y, appearance_position.z }, 2);
+
 	// スケールの設定
 	actor->SetScale({ enemy_data->scale_x, enemy_data->scale_y, enemy_data->scale_z });
+
 	// アングルの設定
 	actor->SetAngle({ enemy_data->angle_x, enemy_data->angle_y, enemy_data->angle_z });
+
 	// アニメーションノードの設定
 	actor->SetAnimationNodeName(enemy_data->animation_node_name);
+
 	// シェーダーの設定
 	actor->AddShader<LambertShader>(Graphics::Instance().GetDevice());
 
@@ -233,7 +239,9 @@ void EnemyManager::SetEnemyStatus(std::shared_ptr<Actor> actor, std::shared_ptr<
 	std::shared_ptr<Enemy> enemy;
 	actor->AddComponent<Movement>();
 	std::shared_ptr<Charactor> charactor = actor->AddComponent<Charactor>();
+	// 最大HP設定
 	charactor->SetMaxHealth(enemy_data->hp);
+	// HP設定
 	charactor->SetHealth(enemy_data->hp);
 
 	// 敵の種類ごとのコンポーネントを追加
@@ -265,7 +273,7 @@ void EnemyManager::SetEnemyStatus(std::shared_ptr<Actor> actor, std::shared_ptr<
 //-----------------------------------------------
 // 出現位置を決める処理
 //-----------------------------------------------
-void EnemyManager::GetAppearancePosition(std::shared_ptr<Actor> actor, DirectX::XMFLOAT3 appearance_origin)
+void EnemyManager::GetAppearancePosition(std::shared_ptr<Actor> actor, DirectX::XMFLOAT3 appearance_origin, float appearance_range)
 {
 	float theta = Mathf::RandomRange(-DirectX::XM_PI, DirectX::XM_PI);
 	float range = Mathf::RandomRange(0.0f, appearance_range);

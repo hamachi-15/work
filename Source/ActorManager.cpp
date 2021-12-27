@@ -2,9 +2,12 @@
 #include "Camera.h"
 #include "Light.h"
 
+#include "Model.h"
+
+#include "Actor.h"
 #include "ActorManager.h"
 
-#include "VarianceShadowMap.h"
+#include "CreateShadowMapShader.h"
 #include "CascadeShadowMapShader.h"
 #include "GaussianBlurShader.h"
 #include "PhongShader.h"
@@ -20,7 +23,7 @@
 ActorManager::ActorManager()
 {
 	ID3D11Device* device = Graphics::Instance().GetDevice();
-	shadowmap = std::make_unique<VarianceShadowMap>(device);
+	shadowmap = std::make_unique<CreateShadowMap>(device);
 	bulr = std::make_unique<GaussianBlur>(device);
 	phong = std::make_unique<Phong>(device);
 
@@ -288,7 +291,7 @@ void ActorManager::ShadowRender(RenderContext& render_context, BlurRenderContext
 		}
 		//ライトビュープロジェクション行列を計算
 		DirectX::XMStoreFloat4x4(&render_context.light_view_projection[i], light_view_projection * clop_matrix);
-		render_context.slight_view_projection = render_context.light_view_projection[i];
+		render_context.single_light_view_projection = render_context.light_view_projection[i];
 
 		shadowmap->Begin(context, render_context);
 		for (std::shared_ptr<Actor>& actor : update_actors)
@@ -359,7 +362,7 @@ void ActorManager::BrightRender(RenderContext& render_context)
 {
 	Graphics& graphics = Graphics::Instance();
 	ID3D11DeviceContext* context = graphics.GetDeviceContext();
-	phong->Begin(context, render_context, DirectX::XMFLOAT4{5, 5, 5, 1.0f});
+	phong->Begin(context, render_context, DirectX::XMFLOAT4{1, 1, 1, 1.0f});
 	for (std::shared_ptr<Actor>& actor : update_actors)
 	{
 		if (strcmp(actor->GetName(), "FildeObjects") != 0) continue;

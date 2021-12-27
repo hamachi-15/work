@@ -5,10 +5,10 @@
 #include <string>
 #include <DirectXMath.h>
 #include "Shader.h"
+#include "Model.h"
 
 class Component;
-//class shader;
-class Model;
+//class Model;
 
 class Actor : public std::enable_shared_from_this<Actor>
 {

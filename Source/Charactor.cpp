@@ -1,6 +1,7 @@
 #include "Charactor.h"
 #include "Actor.h"
 #include "ImGuiRenderer.h"
+#include "Model.h"
 
 //-----------------------------------------
 // ƒ_ƒ[ƒW‚ğ—^‚¦‚é

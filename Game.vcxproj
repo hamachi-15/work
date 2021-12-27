@@ -191,6 +191,7 @@
     <ClCompile Include="External\imgui\imgui_demo.cpp" />
     <ClCompile Include="External\imgui\imgui_draw.cpp" />
     <ClCompile Include="External\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="Source\2DPrimitive.cpp" />
     <ClCompile Include="Source\3DObj.cpp" />
     <ClCompile Include="Source\ActionOwner.cpp" />
     <ClCompile Include="Source\Actor.cpp" />
@@ -214,6 +215,7 @@
     <ClCompile Include="Source\CascadeShadowMapShader.cpp" />
     <ClCompile Include="Source\Charactor.cpp" />
     <ClCompile Include="Source\Collision.cpp" />
+    <ClCompile Include="Source\CreateShadowMapShader.cpp" />
     <ClCompile Include="Source\DebugRenderer.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
@@ -319,6 +321,7 @@
     <ClInclude Include="External\imgui\imstb_rectpack.h" />
     <ClInclude Include="External\imgui\imstb_textedit.h" />
     <ClInclude Include="External\imgui\imstb_truetype.h" />
+    <ClInclude Include="Source\2DPrimitive.h" />
     <ClInclude Include="Source\3DObj.h" />
     <ClInclude Include="Source\ActionBase.h" />
     <ClInclude Include="Source\ActionOwner.h" />
@@ -344,6 +347,7 @@
     <ClInclude Include="Source\Charactor.h" />
     <ClInclude Include="Source\Collision.h" />
     <ClInclude Include="Source\Component.h" />
+    <ClInclude Include="Source\CreateShadowMapShader.h" />
     <ClInclude Include="Source\DebugRenderer.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClInclude>
@@ -458,6 +462,7 @@
     <ClInclude Include="Source\VarianceShadowMap.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="HLSL\2DPrimitive.hlsli" />
     <None Include="HLSL\3DObj.hlsli" />
     <None Include="HLSL\Bright.hlsli">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
@@ -483,6 +488,18 @@
     <None Include="HLSL\VelocityBuffer.hlsli" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="HLSL\2DPrimitive_ps.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="HLSL\2DPrimitive_vs.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
     <FxCompile Include="HLSL\3DObj_ps.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>

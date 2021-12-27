@@ -10,7 +10,6 @@ class Texture;
 class Sprite;
 class CameraController;
 class Bloom;
-class GaussianBlur;
 
 class SceneGame : public Scene
 {
@@ -51,11 +50,13 @@ private:
 private:
 	RenderContext						render_context;
 	BlurRenderContext					blur_render_context;
+	PrimitiveContext					primitive_context;
+
 	std::unique_ptr<CameraController>	camera_controller;
 
 	std::unique_ptr<Shader>				sprite_cube;
-	std::unique_ptr<GaussianBlur>		bulr;
 	std::unique_ptr<Bloom>				bloom;
+	std::unique_ptr<Shader>				primitive;
 
 	std::unique_ptr<Sprite>				sprite;
 	std::unique_ptr<Texture>			sky;
@@ -71,6 +72,6 @@ private:
 	DirectX::XMFLOAT3					LightDir = { 0,0,0 };
 	DirectX::XMFLOAT3					shadow_color = { 0.5f, 0.5f, 0.5f };
 	bool								battle_flag = false;
-
+	bool								primitive_falg = false;
 
 };

@@ -7,6 +7,7 @@
 #include "BehaviorData.h"
 #include "ImGuiRenderer.h"
 
+#include "Model.h"
 //-----------------------------------------
 // デストラクタ
 //-----------------------------------------

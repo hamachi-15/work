@@ -1,5 +1,7 @@
 #include "EnemyPLT.h"
 
+#include "Model.h"
+
 #include "Graphics.h"
 #include "SceneManager.h"
 

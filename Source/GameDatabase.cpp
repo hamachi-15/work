@@ -24,7 +24,7 @@ GameDataBase::GameDataBase()
 	// ÉtÉ@ÉCÉãì«Ç›çûÇ›
 	char* world_map_data_buffer = LoadBuffer("Data/GameData/WorldMapData.dat");
 	char* enemy_data_buffer = LoadBuffer("Data/GameData/EnemyData.dat");
-	char* enemy_appearance_data_buffer = LoadBuffer("Data/GameData/EnemyOccurPosition.dat");
+	char* enemy_appearance_data_buffer = LoadBuffer("Data/GameData/EnemyAppearancePosition.dat");
 	char* collision_time_buffer = LoadBuffer("Data/GameData/AttackCollitionTime.dat");
 	char* animation_data_buffer = LoadBuffer("Data/GameData/AnimationData.dat");
 

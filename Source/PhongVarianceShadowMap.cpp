@@ -1,6 +1,8 @@
 #include "PhongVarianceShadowMap.h"
 #include "ActorManager.h"
 #include "ModelResource.h"
+#include "Texture.h"
+
 PhongVarianceShadowMap::PhongVarianceShadowMap(ID3D11Device* device)
 {
 	HRESULT hr = S_OK;
@@ -18,15 +20,9 @@ PhongVarianceShadowMap::PhongVarianceShadowMap(ID3D11Device* device)
 		desc.StructureByteStride = 0;
 		hr = device->CreateBuffer(&desc, 0, scene_constant_buffer.GetAddressOf());
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
-
-		desc.ByteWidth = sizeof(CBMesh);
-		hr = device->CreateBuffer(&desc, 0, mesh_constant_buffer.GetAddressOf());
-		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
-
-		desc.ByteWidth = sizeof(CBSubset);
-		hr = device->CreateBuffer(&desc, 0, subset_constant_buffer.GetAddressOf());
-		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
-
+		
+		// メッシュ、サブセットバッファの生成
+		CreateBuffer(device);
 	}
 	// ブレンドステート
 	{
@@ -166,50 +162,6 @@ void PhongVarianceShadowMap::Begin(ID3D11DeviceContext* context, RenderContext& 
 	cbscene.light_direction = render_context.light_direction;
 	cbscene.shadow_parameter = render_context.ShadowParameter;
 	context->UpdateSubresource(scene_constant_buffer.Get(), 0, 0, &cbscene, 0, 0);
-}
-
-void PhongVarianceShadowMap::Draw(ID3D11DeviceContext* context, const Model* model)
-{
-	const ModelResource* resource = model->GetResource();
-	const std::vector<Model::Node>& nodes = model->GetNodes();
-
-	for (const ModelResource::Mesh& mesh : resource->GetMeshes())
-	{
-		// メッシュ用定数バッファ更新
-		CBMesh cbmesh;
-		::memset(&cbmesh, 0, sizeof(cbmesh));
-		if (mesh.nodeIndices.size() > 0)
-		{
-			for (size_t i = 0; i < mesh.nodeIndices.size(); ++i)
-			{
-				DirectX::XMMATRIX worldTransform = DirectX::XMLoadFloat4x4(&nodes.at(mesh.nodeIndices.at(i)).world_transform);
-				DirectX::XMMATRIX offsetTransform = DirectX::XMLoadFloat4x4(&mesh.offsetTransforms.at(i));
-				DirectX::XMMATRIX boneTransform = offsetTransform * worldTransform;
-				DirectX::XMStoreFloat4x4(&cbmesh.boneTransforms[i], boneTransform);
-			}
-		}
-		else
-		{
-			cbmesh.boneTransforms[0] = nodes.at(mesh.nodeIndex).world_transform;
-		}
-		context->UpdateSubresource(mesh_constant_buffer.Get(), 0, 0, &cbmesh, 0, 0);
-
-		UINT stride = sizeof(ModelResource::Vertex);
-		UINT offset = 0;
-		context->IASetVertexBuffers(0, 1, mesh.vertexBuffer.GetAddressOf(), &stride, &offset);
-		context->IASetIndexBuffer(mesh.indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-		for (const ModelResource::Subset& subset : mesh.subsets)
-		{
-			CBSubset cbsubset;
-			cbsubset.materialColor = subset.material->color;
-			context->UpdateSubresource(subset_constant_buffer.Get(), 0, 0, &cbsubset, 0, 0);
-			context->PSSetShaderResources(0, 1, subset.material->shaderResourceView.GetAddressOf());
-			context->PSSetSamplers(0, 1, sampler_state.GetAddressOf());
-			context->DrawIndexed(subset.indexCount, subset.startIndex, 0);
-		}
-	}
 }
 
 void PhongVarianceShadowMap::End(ID3D11DeviceContext* context)

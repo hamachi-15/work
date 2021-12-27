@@ -2,6 +2,7 @@
 #include "Graphics.h"
 #include "ModelResource.h"
 #include "ActorManager.h"
+#include "Texture.h"
 
 //--------------------------------
 // コンストラクタ
@@ -24,14 +25,8 @@ CascadeShadowMap::CascadeShadowMap(ID3D11Device* device)
 		hr = device->CreateBuffer(&desc, 0, scene_constant_buffer.GetAddressOf());
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 
-		desc.ByteWidth = sizeof(CBMesh);
-		hr = device->CreateBuffer(&desc, 0, mesh_constant_buffer.GetAddressOf());
-		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
-
-		desc.ByteWidth = sizeof(CBSubset);
-		hr = device->CreateBuffer(&desc, 0, subset_constant_buffer.GetAddressOf());
-		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
-
+		// メッシュ、サブセットバッファの生成
+		CreateBuffer(device);
 	}
 	{
 		D3D11_SAMPLER_DESC desc;
@@ -144,50 +139,50 @@ void CascadeShadowMap::Begin(ID3D11DeviceContext* context, RenderContext& render
 //--------------------------------
 // 描画処理
 //--------------------------------
-void CascadeShadowMap::Draw(ID3D11DeviceContext* context, const Model* model)
-{
-	const ModelResource* resource = model->GetResource();
-	const std::vector<Model::Node>& nodes = model->GetNodes();
-
-	for (const ModelResource::Mesh& mesh : resource->GetMeshes())
-	{
-		// メッシュ用定数バッファ更新
-		CBMesh cbmesh;
-		::memset(&cbmesh, 0, sizeof(cbmesh));
-		if (mesh.nodeIndices.size() > 0)
-		{
-			for (size_t i = 0; i < mesh.nodeIndices.size(); ++i)
-			{
-				DirectX::XMMATRIX worldTransform = DirectX::XMLoadFloat4x4(&nodes.at(mesh.nodeIndices.at(i)).world_transform);
-				DirectX::XMMATRIX offsetTransform = DirectX::XMLoadFloat4x4(&mesh.offsetTransforms.at(i));
-				DirectX::XMMATRIX boneTransform = offsetTransform * worldTransform;
-				DirectX::XMStoreFloat4x4(&cbmesh.boneTransforms[i], boneTransform);
-			}
-		}
-		else
-		{
-			cbmesh.boneTransforms[0] = nodes.at(mesh.nodeIndex).world_transform;
-		}
-		context->UpdateSubresource(mesh_constant_buffer.Get(), 0, 0, &cbmesh, 0, 0);
-
-		UINT stride = sizeof(ModelResource::Vertex);
-		UINT offset = 0;
-		context->IASetVertexBuffers(0, 1, mesh.vertexBuffer.GetAddressOf(), &stride, &offset);
-		context->IASetIndexBuffer(mesh.indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-		u_int count = 0;
-		u_int index = 0;
-		for (const ModelResource::Subset& subset : mesh.subsets)
-		{
-			CBSubset cbsubset;
-			cbsubset.materialColor = subset.material->color;
-			context->UpdateSubresource(subset_constant_buffer.Get(), 0, 0, &cbsubset, 0, 0);
-			context->PSSetShaderResources(0, 1, subset.material->shaderResourceView.GetAddressOf());
-			count += subset.indexCount;
-			index += subset.startIndex;
-		}
-		context->DrawIndexed(count, index, 0);
-	}
-}
+//void CascadeShadowMap::Draw(ID3D11DeviceContext* context, const Model* model)
+//{
+//	const ModelResource* resource = model->GetResource();
+//	const std::vector<Model::Node>& nodes = model->GetNodes();
+//
+//	for (const ModelResource::Mesh& mesh : resource->GetMeshes())
+//	{
+//		// メッシュ用定数バッファ更新
+//		CBMesh cbmesh;
+//		::memset(&cbmesh, 0, sizeof(cbmesh));
+//		if (mesh.nodeIndices.size() > 0)
+//		{
+//			for (size_t i = 0; i < mesh.nodeIndices.size(); ++i)
+//			{
+//				DirectX::XMMATRIX worldTransform = DirectX::XMLoadFloat4x4(&nodes.at(mesh.nodeIndices.at(i)).world_transform);
+//				DirectX::XMMATRIX offsetTransform = DirectX::XMLoadFloat4x4(&mesh.offsetTransforms.at(i));
+//				DirectX::XMMATRIX boneTransform = offsetTransform * worldTransform;
+//				DirectX::XMStoreFloat4x4(&cbmesh.boneTransforms[i], boneTransform);
+//			}
+//		}
+//		else
+//		{
+//			cbmesh.boneTransforms[0] = nodes.at(mesh.nodeIndex).world_transform;
+//		}
+//		context->UpdateSubresource(mesh_constant_buffer.Get(), 0, 0, &cbmesh, 0, 0);
+//
+//		UINT stride = sizeof(ModelResource::Vertex);
+//		UINT offset = 0;
+//		context->IASetVertexBuffers(0, 1, mesh.vertexBuffer.GetAddressOf(), &stride, &offset);
+//		context->IASetIndexBuffer(mesh.indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+//		u_int count = 0;
+//		u_int index = 0;
+//		for (const ModelResource::Subset& subset : mesh.subsets)
+//		{
+//			CBSubset cbsubset;
+//			cbsubset.materialColor = subset.material->color;
+//			context->UpdateSubresource(subset_constant_buffer.Get(), 0, 0, &cbsubset, 0, 0);
+//			context->PSSetShaderResources(0, 1, subset.material->shaderResourceView.GetAddressOf());
+//			count += subset.indexCount;
+//			index += subset.startIndex;
+//		}
+//		context->DrawIndexed(count, index, 0);
+//	}
+//}
 
 //--------------------------------
 // 描画終了処理

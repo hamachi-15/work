@@ -20,19 +20,6 @@ SkyBoxShader::SkyBoxShader(ID3D11Device* device)
 		HRESULT hr = device->CreateBuffer(&desc, NULL, skybox_buffer.GetAddressOf());
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 	}
-
-	// 深度ステンシルステート
-	{
-		D3D11_DEPTH_STENCIL_DESC desc;
-		::memset(&desc, 0, sizeof(desc));
-		desc.DepthEnable = true;
-		desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-		desc.DepthFunc = D3D11_COMPARISON_ALWAYS;
-
-		HRESULT hr = device->CreateDepthStencilState(&desc, depth_stencil_state.GetAddressOf());
-		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
-	}
-
 }
 
 //----------------------------------

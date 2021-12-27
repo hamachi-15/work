@@ -3,6 +3,7 @@
 #include "ActorManager.h"
 #include "Charactor.h"
 #include "SceneManager.h"
+#include "Model.h"
 
 //-----------------------------------------
 // XVˆ—

@@ -5,6 +5,8 @@
 // メッセージ関連インクルード
 #include "Telegram.h"
 
+#include "Model.h"
+
 // アクター関連インクルード
 #include "Charactor.h"
 #include "ActorManager.h"

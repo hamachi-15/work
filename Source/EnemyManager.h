@@ -43,7 +43,7 @@ public:
 	void SetEnemyStatus(std::shared_ptr<Actor> actor, std::shared_ptr<EnemyData> enemy_data, int& string_id, DirectX::XMFLOAT3& appearance_position);
 
 	// ゲームデータから得た出現位置を原点に出現位置をランダム算出
-	void GetAppearancePosition(std::shared_ptr<Actor> actor, DirectX::XMFLOAT3 appearance_origin);
+	void GetAppearancePosition(std::shared_ptr<Actor> actor, DirectX::XMFLOAT3 appearance_origin, float appearance_range);
 
 	// 全ての敵を破棄
 	void AllRemove();
@@ -74,5 +74,4 @@ public:
 private:
 	std::vector<std::shared_ptr<Enemy>> enemies;
 	int identity;
-	float appearance_range = 50.0f;
 };

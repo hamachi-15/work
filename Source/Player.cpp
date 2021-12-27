@@ -1,14 +1,19 @@
 #include "Player.h"
 #include "Graphics.h"
 #include "Camera.h"
+#include "Model.h"
+
 #include "DebugRenderer.h"
 #include "ActorManager.h"
 #include "EnemyManager.h"
+
 #include "GameDatabase.h"
 #include "AttackCategory.h"
 #include "AttackCollitionTime.h"
+
 #include "MessageData.h"
 #include "Messenger.h"
+
 #include "PlayerUIHealthFrame.h"
 #include "PlayerUIHealth.h"
 #include "PlayerUIRedHealth.h"

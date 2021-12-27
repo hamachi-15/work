@@ -1,5 +1,6 @@
 #include "PlayerUIHealth.h"
 #include "Texture.h"
+#include "Model.h"
 
 // デストラクタ
 PlayerHealth::~PlayerHealth()
