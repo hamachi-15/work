@@ -4,7 +4,7 @@
 //-------------------------------------
 // モデルリソース読み込み
 //-------------------------------------
-std::shared_ptr<ModelResource> ResourceManager::LoadModelResource(const char* filename)
+std::shared_ptr<ModelResource> ResourceManager::LoadModelResource(const char* filename, const char* ignore_root_motion_node_name)
 {
 	// モデル検索
 	ModelMap::iterator it = models.find(filename);
@@ -18,7 +18,7 @@ std::shared_ptr<ModelResource> ResourceManager::LoadModelResource(const char* fi
 	// 新規モデルリソース作成と読み込み
 	ID3D11Device* device = Graphics::Instance().GetDevice();
 	std::shared_ptr<ModelResource> model = std::make_shared<ModelResource>();
-	model->Load(device, filename);
+	model->Load(device, filename, ignore_root_motion_node_name);
 
 	// マップに登録
 	models[filename] = model;

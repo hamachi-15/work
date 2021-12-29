@@ -103,7 +103,7 @@ UseCubeMap::UseCubeMap(ID3D11Device* device)
 
 void UseCubeMap::Begin(ID3D11DeviceContext* context, RenderContext& render_context)
 {
-	Texture* cubemap_texture = ActorManager::Instance().GetCubeMapTexture();
+	//Texture* cubemap_texture = ActorManager::Instance().GetCubeMapTexture();
 	Activate(context);
 
 	ID3D11Buffer* constant_buffers[] =
@@ -139,7 +139,7 @@ void UseCubeMap::Begin(ID3D11DeviceContext* context, RenderContext& render_conte
 	cbscene.light_color = render_context.light_color;
 	context->UpdateSubresource(scene_constant_buffer.Get(), 0, 0, &cbscene, 0, 0);
 
-	cubemap_texture->Set(1);
+	//cubemap_texture->Set(1);
 }
 
 void UseCubeMap::Draw(ID3D11DeviceContext* context, const Model* model)

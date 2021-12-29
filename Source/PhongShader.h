@@ -10,7 +10,8 @@ public:
 	// –¼‘OŽæ“¾
 	const char* GetShaderName() const override { return "Phong"; }
 	
-	void Begin(ID3D11DeviceContext* context, RenderContext& render_context, DirectX::XMFLOAT4 light_color);
+	void Begin(ID3D11DeviceContext* context, RenderContext& render_context);
+	//void Begin(ID3D11DeviceContext* context, RenderContext& render_context, DirectX::XMFLOAT4 light_color);
 
 	void End(ID3D11DeviceContext* context)override;
 

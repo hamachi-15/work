@@ -69,4 +69,5 @@ private:
 	std::unique_ptr<GaussianBlur>		 bulr;
 
 	bool								primitive_falg = false;
+	bool								isshadowmap = false;
 };

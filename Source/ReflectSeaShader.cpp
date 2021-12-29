@@ -107,7 +107,7 @@ ReflectSea::ReflectSea(ID3D11Device* device)
 
 void ReflectSea::Begin(ID3D11DeviceContext* context, RenderContext& render_context)
 {
-	Texture* cubemap = ActorManager::Instance().GetCubeMapTexture();
+	//Texture* cubemap = ActorManager::Instance().GetCubeMapTexture();
 
 	Activate(context);
 
@@ -127,7 +127,7 @@ void ReflectSea::Begin(ID3D11DeviceContext* context, RenderContext& render_conte
 	//デプスステンシルステート設定
 	context->OMSetDepthStencilState(depth_stencil_state.Get(), 1);
 
-	cubemap->Set(1);
+	//cubemap->Set(1);
 	sea_normal_map->Set(2);
 	context->PSSetSamplers(2, 1, sampler_shadow.GetAddressOf());
 

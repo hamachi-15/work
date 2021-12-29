@@ -23,9 +23,7 @@
 ActorManager::ActorManager()
 {
 	ID3D11Device* device = Graphics::Instance().GetDevice();
-	shadowmap = std::make_unique<CreateShadowMap>(device);
 	bulr = std::make_unique<GaussianBlur>(device);
-	phong = std::make_unique<Phong>(device);
 
 	// シャドウテクスチャ作成
 	for (int i = 0; i < 3; ++i)
@@ -113,9 +111,6 @@ void ActorManager::AllDestroy()
 	{
 		remove_actors.erase(iterate_remove);
 	}
-	shader_name = "";
-	shader = nullptr;
-
 }
 
 
@@ -167,6 +162,8 @@ void ActorManager::ShadowRender(RenderContext& render_context, BlurRenderContext
 {
 	Graphics& graphics = Graphics::Instance();
 	ID3D11DeviceContext* context = graphics.GetDeviceContext();
+	// シャドウマップ生成シェーダー取得
+	std::shared_ptr<Shader> create_chadowmap = ShaderManager::Instance().GetShader(ShaderManager::ShaderType::CreateShadowMap);
 	std::shared_ptr<Actor> actor = GetActor("Player");
 	Camera& camera = Camera::Instance();
 
@@ -293,7 +290,7 @@ void ActorManager::ShadowRender(RenderContext& render_context, BlurRenderContext
 		DirectX::XMStoreFloat4x4(&render_context.light_view_projection[i], light_view_projection * clop_matrix);
 		render_context.single_light_view_projection = render_context.light_view_projection[i];
 
-		shadowmap->Begin(context, render_context);
+		create_chadowmap->Begin(context, render_context);
 		for (std::shared_ptr<Actor>& actor : update_actors)
 		{
 			if (strcmp(actor->GetName(), "Filde") == 0) continue;
@@ -301,20 +298,13 @@ void ActorManager::ShadowRender(RenderContext& render_context, BlurRenderContext
 			Model* model = actor->GetModel();
 			if (model != nullptr)
 			{
-				shadowmap->Draw(context, model);
+				create_chadowmap->Draw(context, model);
 			}
 		}
-		shadowmap->End(context);
+		create_chadowmap->End(context);
 
 	}
 
-}
-
-//------------------------------
-// キューブマップ描画
-//------------------------------
-void ActorManager::RenderCubeMap(RenderContext& render_context)
-{
 }
 
 //------------------------------
@@ -324,22 +314,19 @@ void ActorManager::Render(RenderContext& render_context)
 {
 	Graphics& graphics = Graphics::Instance();
 	ID3D11DeviceContext* context = graphics.GetDeviceContext();
+	std::shared_ptr<Shader> shader;
 
 	for (std::shared_ptr<Actor>& actor : update_actors)
 	{
 		// 現在セットされているシェーダーとこれからの描画に使うシェーダーが同じか
-		if(strcmp(shader_name.c_str(),actor->GetShader()->GetShaderName()) != 0)
-		{	
-			// シェーダーの終了処理
-			if(shader != nullptr)
+		if (actor->GetShaderType() != shader_type)
+		{
+			if(shader_type != static_cast<ShaderManager::ShaderType>(-1))
 				shader->End(context);
-			// 現在のシェーダーを入れ替えて
-			shader = actor->GetShader();
-			shader_name = shader->GetShaderName();
+			shader_type = actor->GetShaderType();
+			shader = ShaderManager::Instance().GetShader(shader_type);
 			shader->Begin(context, render_context);
 		}
-		// シェーダーにポインタが入っていなければアサート
-		_ASSERT_EXPR_A(shader, "shader is nullptr");
 
 		// モデルがあれば描画
 		Model* model = actor->GetModel();
@@ -349,6 +336,9 @@ void ActorManager::Render(RenderContext& render_context)
 		}
 	}
 	shader->End(context);
+	
+	shader_type = static_cast<ShaderManager::ShaderType>(-1);
+
 	// リスター描画
 	DrawLister();
 	// 詳細描画
@@ -362,7 +352,11 @@ void ActorManager::BrightRender(RenderContext& render_context)
 {
 	Graphics& graphics = Graphics::Instance();
 	ID3D11DeviceContext* context = graphics.GetDeviceContext();
-	phong->Begin(context, render_context, DirectX::XMFLOAT4{1, 1, 1, 1.0f});
+	// フォンシェーダー取得
+	std::shared_ptr<Shader> phong = ShaderManager::Instance().GetShader(ShaderManager::ShaderType::Phong);
+	
+	// 描画
+	phong->Begin(context, render_context);
 	for (std::shared_ptr<Actor>& actor : update_actors)
 	{
 		if (strcmp(actor->GetName(), "FildeObjects") != 0) continue;

@@ -31,6 +31,7 @@ public:
 	// •`‰æI—¹ˆ—
 	void End(ID3D11DeviceContext* context, BlurType type);
 
+	// d‚İ‚ğŒvZ‚·‚éˆ—
 	void CalcGaussianFilter(float* weight, float blur_power);
 
 	GaussianXBlur* GetGaussianXBlurShader()  { return xblur.get(); }

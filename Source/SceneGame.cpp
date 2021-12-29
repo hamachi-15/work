@@ -29,7 +29,7 @@
 #include "BloomShader.h"
 #include "PhongShader.h"
 #include "2DPrimitive.h"
-
+#include "ShaderManager.h"
 
 #include "MenuSystem.h"
 #include "Messenger.h"
@@ -40,9 +40,9 @@
 #include "Sprite.h"
 
 #include "EnemyTerritoryManager.h"
-
 SceneGame::SceneGame()
 {
+	
 }
 
 SceneGame::~SceneGame()
@@ -88,7 +88,6 @@ void SceneGame::Initialize()
 
 	// シェーダー初期化
 	bloom = std::make_unique<Bloom>(device);
-	primitive = std::make_unique<Primitive>(device);
 
 	// テクスチャ作成
 	bulr_texture = std::make_unique<Texture>();
@@ -104,38 +103,37 @@ void SceneGame::Initialize()
 	// ステージ読み込み
 	{
 		std::shared_ptr<Actor> actor = ActorManager::Instance().Create();
-		actor->SetUpModel("Data/Model/Filde/Filde.mdl");
+		actor->SetUpModel("Data/Model/Filde/Filde.mdl", nullptr);
 		actor->SetName("Filde");
 		actor->SetPosition(DirectX::XMFLOAT3(0, 0, 0));
 		actor->SetAngle(DirectX::XMFLOAT3( 0, DirectX::XMConvertToRadians(-90), 0));
 		actor->SetScale(DirectX::XMFLOAT3(0.1f, 0.1f, 0.1f));
 		//actor->SetScale(DirectX::XMFLOAT3(5.f, 5.f, 5.f));
 		actor->AddComponent<Stage>();
-		actor->AddShader<CascadeShadowMap>(device);
+		actor->SetShaderType(ShaderManager::ShaderType::CascadeShadowMap);
 	}
 	{
 		std::shared_ptr<Actor> actor = ActorManager::Instance().Create();
-		actor->SetUpModel("Data/Model/Filde/StageObjects.mdl");
+		actor->SetUpModel("Data/Model/Filde/StageObjects.mdl", nullptr);
 		actor->SetName("FildeObjects");
 		actor->SetPosition(DirectX::XMFLOAT3(0, 0, 0));
 		actor->SetAngle(DirectX::XMFLOAT3(0, DirectX::XMConvertToRadians(-90), 0));
 		actor->SetScale(DirectX::XMFLOAT3(0.1f, 0.1f, 0.1f));
 		actor->AddComponent<Stage>();
-		actor->AddShader<LambertShader>(device);
+		actor->SetShaderType(ShaderManager::ShaderType::Lambert);
 	}
 	// プレイヤー読み込み
 	{
 		std::shared_ptr<Actor> actor = ActorManager::Instance().Create();
-		actor->SetUpModel("Data/Model/RPG-Character/WorldMapPlayer.mdl");
+		actor->SetUpModel("Data/Model/RPG-Character/WorldMapPlayer.mdl", "Motion");
 		actor->SetName("Player");
-		actor->SetAnimationNodeName("Motion");
 		actor->SetPosition(DirectX::XMFLOAT3(-100, 6, -116));
 		actor->SetAngle(DirectX::XMFLOAT3(0, 0, 0));
 		actor->SetScale(DirectX::XMFLOAT3(0.04f, 0.04f, 0.04f));
 		actor->AddComponent<Movement>();
 		actor->AddComponent<Charactor>();
 		actor->AddComponent<Player>();
-		actor->AddShader<LambertShader>(device);
+		actor->SetShaderType(ShaderManager::ShaderType::Lambert);
 	}
 	ActorManager::Instance().Update(0.01f);
 	ActorManager::Instance().UpdateTransform();
@@ -188,6 +186,10 @@ void SceneGame::Update(float elapsed_time)
 	if (primitive_context.timer < 40)
 	{
 		primitive_context.timer++;
+	}
+	if (!battle_flag && primitive_context.timer >= 40)
+	{
+		primitive_falg = false;
 	}
 	if (battle_flag) return;
 
@@ -261,6 +263,7 @@ void SceneGame::Render()
 void SceneGame::ScreenRender(ID3D11DeviceContext* context, RenderContext& render_context, const DirectX::XMFLOAT2& screen_size)
 {
 	Graphics& graphics = Graphics::Instance();
+	ShaderManager& shader_manager = ShaderManager::Instance();
 
 	// スクリーンテクスチャをレンダーターゲットに設定して画面クリア
 	ID3D11RenderTargetView* screen_texture = graphics.GetTexture()->GetRenderTargetView();
@@ -274,7 +277,8 @@ void SceneGame::ScreenRender(ID3D11DeviceContext* context, RenderContext& render
 
 	// スカイボックス描画
 	{
-		graphics.GetSkyBoxShader()->Begin(context, render_context);
+		std::shared_ptr<Shader> skybox_shader = shader_manager.GetShader(ShaderManager::ShaderType::SkyBox);
+		skybox_shader->Begin(context, render_context);
 		sprite->Render(context,
 			sky.get(),
 			0, 0,
@@ -283,7 +287,7 @@ void SceneGame::ScreenRender(ID3D11DeviceContext* context, RenderContext& render
 			static_cast<float>(sky->GetWidth()), static_cast<float>(sky->GetHeight()),
 			0,
 			1, 1, 1, 1);
-		graphics.GetSkyBoxShader()->End(context);
+		skybox_shader->End(context);
 	}
 
 	// デバッグプリミティブ描画
@@ -320,7 +324,9 @@ void SceneGame::ScreenRender(ID3D11DeviceContext* context, RenderContext& render
 void SceneGame::PostRender(ID3D11DeviceContext* context, RenderContext& render_context, const DirectX::XMFLOAT2& screen_size)
 {
 	Graphics& graphics = Graphics::Instance();
-	bloom_texture = bloom->Render(context, render_context);
+	ShaderManager& shader_manager = ShaderManager::Instance();
+	std::shared_ptr<Shader> bloom_shader = shader_manager.GetShader(ShaderManager::ShaderType::Bloom);
+	bloom_texture = dynamic_cast<Bloom*>(bloom_shader.get())->Render(context, render_context);
 
 
 	//Texture* texture = bulr->Render(graphics.GetTexture());
@@ -346,6 +352,9 @@ void SceneGame::PostRender(ID3D11DeviceContext* context, RenderContext& render_c
 void SceneGame::BuckBufferRender(ID3D11DeviceContext* context, RenderContext& render_context, const DirectX::XMFLOAT2& screen_size)
 {
 	Graphics& graphics = Graphics::Instance();
+	ShaderManager& shader_manager = ShaderManager::Instance();
+	// スプライトシェーダー取得
+	std::shared_ptr<Shader> sprite_shader = shader_manager.GetShader(ShaderManager::ShaderType::Sprite);
 
 	// レンダーターゲット設定
 	{
@@ -358,7 +367,7 @@ void SceneGame::BuckBufferRender(ID3D11DeviceContext* context, RenderContext& re
 	graphics.SetViewport(screen_size.x, screen_size.y);
 
 	// バックバッファにスクリーンテクスチャを描画
-	graphics.GetSpriteShader()->Begin(context);
+	sprite_shader->Begin(context);
 	// スクリーンテクスチャ
 	sprite->Render(context, graphics.GetTexture(),
 		0, 0,
@@ -386,20 +395,21 @@ void SceneGame::BuckBufferRender(ID3D11DeviceContext* context, RenderContext& re
 			MenuSystem::Instance().Render(context);
 		}
 	}
-	graphics.GetSpriteShader()->End(context);
 
 	// シャドウマップ
-	graphics.GetSpriteShader()->Begin(context);
-	for (int i = 0; i < 3; ++i)
+	if (isshadowmap)
 	{
-		sprite->Render(context,
-			ActorManager::Instance().GetShadowTexture(i),
-			0 + 200 * (i), 0,
-			200, 200,
-			0, 0,
-			(float)ActorManager::Instance().GetShadowTexture(i)->GetWidth(), (float)ActorManager::Instance().GetShadowTexture(i)->GetHeight(),
-			0,
-			1, 1, 1, 1);
+		for (int i = 0; i < 3; ++i)
+		{
+			sprite->Render(context,
+				ActorManager::Instance().GetShadowTexture(i),
+				0 + 200 * (i), 0,
+				200, 200,
+				0, 0,
+				(float)ActorManager::Instance().GetShadowTexture(i)->GetWidth(), (float)ActorManager::Instance().GetShadowTexture(i)->GetHeight(),
+				0,
+				1, 1, 1, 1);
+		}
 	}
 	sprite->Render(context,
 		bloom_texture,
@@ -409,12 +419,13 @@ void SceneGame::BuckBufferRender(ID3D11DeviceContext* context, RenderContext& re
 		(float)bloom_texture->GetWidth(), (float)bloom_texture->GetHeight(),
 		0,
 		1, 1, 1, 1);
-	graphics.GetSpriteShader()->End(context);
+	sprite_shader->End(context);
 
 	// 2Dプリミティブ描画
 	{
 		if (primitive_falg)
 		{
+			std::shared_ptr<Shader> primitive = shader_manager.GetShader(ShaderManager::ShaderType::Primitive);
 			primitive->Begin(context, primitive_context);
 			sprite->Render(context,
 				0, 0,
@@ -461,11 +472,8 @@ void SceneGame::OnGui()
 	ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
 
 	ImGui::Begin("Shader", nullptr, ImGuiWindowFlags_None);
-	ImGui::TextColored(ImVec4(1, 1, 0, 1), u8"-------シャドウマップ用ブラー-------");
-	ImGui::SliderInt("KarnelSize", &blur_render_context.karnel_size, 1, 15);
-
-	ImGui::TextColored(ImVec4(1, 1, 0, 1), u8"-------シャドウマップ-------");
-	ImGui::ColorEdit3("ShadowColor", (float*)&shadow_color);
+	ImGui::TextColored(ImVec4(1, 1, 0, 1), u8"-------シャドウマップ表示フラグ-------");
+	ImGui::Checkbox("ShadowmapDrawFlag", &isshadowmap);
 
 	ImGui::TextColored(ImVec4(1, 1, 0, 1), u8"-------2Dプリミティブ-------");
 	ImGui::SliderInt("PrimitiveType", &primitive_context.number, 1, 10);

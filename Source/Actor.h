@@ -6,6 +6,7 @@
 #include <DirectXMath.h>
 #include "Shader.h"
 #include "Model.h"
+#include "ShaderManager.h"
 
 class Component;
 //class Model;
@@ -23,9 +24,6 @@ public:
 	// 更新処理
 	virtual void Update(float elapsed_time);
 
-	// 描画処理
-	virtual void Draw(ID3D11DeviceContext* context);
-
 	// 行列更新
 	virtual void UpdateTransform();
 
@@ -33,19 +31,17 @@ public:
 	virtual void OnGUI();
 
 	// モデルのセットアップ
-	void SetUpModel(const char* filename);
+	void SetUpModel(const char* filename, const char* ignore_root_motion_node_name);
 
 	// モデルの取得
 	Model* GetModel() const { return model.get(); }
 
-	// アニメーション時の原点ノード名を設定
-	void SetAnimationNodeName(const char* node_name) { animation_node_origin = node_name; }
-
 	// シェーダーの設定
-	void SetShader(std::shared_ptr<Shader> shader) { this->shader = shader; }
+	void SetShaderType(ShaderManager::ShaderType shader_type) { this->shader_type = shader_type; }
 
 	// シェーダーの取得
-	Shader* GetShader() const { return shader.get(); }
+	//Shader* GetShader() const { return shader.get(); }
+	ShaderManager::ShaderType GetShaderType() { return shader_type; }
 
 	// エネミーデータID設定
 	void SetEnemyDataID(int id) { this->id = id; }
@@ -95,16 +91,10 @@ public:
 
 	// アニメーションフラグ設定
 	void SetAnimationFlag(bool animation_flag) { this->animation_flag = animation_flag; }
+	
 	// アニメーションフラグ取得
 	bool SetAnimationFlag() { return animation_flag; }
-	// コンポーネント設定
-	template<class T, class...Args>
-	std::shared_ptr<T> AddShader(Args... args)
-	{
-		std::shared_ptr<T> shader = std::make_shared<T>(args...);
-		this->shader = shader;
-		return shader;
-	}
+
 
 	// コンポーネント設定
 	template<class T, class...Args>
@@ -143,8 +133,7 @@ private:
 	};
 
 	std::unique_ptr<Model>  model;
-	std::string				animation_node_origin;
 	bool					animation_flag = true; // アニメーション更新を行うかのフラグ
-	std::shared_ptr<Shader> shader;
+	ShaderManager::ShaderType		shader_type;
 	std::vector<std::shared_ptr<Component>>	components;
 };

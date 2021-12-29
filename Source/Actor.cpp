@@ -32,21 +32,13 @@ void Actor::Update(float elapsed_time)
 		{
 			hitstop_flag = charactor->GetHitStopFlag();
 		}
-		model->UpdateAnimation(elapsed_time, animation_node_origin.c_str(), hitstop_flag);
+		model->UpdateAnimation(elapsed_time, hitstop_flag);
 	}
 	// 更新処理
 	for (std::shared_ptr<Component>& component : components)
 	{
 		component->Update(elapsed_time);
 	}
-}
-
-//------------------------------
-// 描画処理
-//------------------------------
-void Actor::Draw(ID3D11DeviceContext* context)
-{
-	shader->Draw(context, model.get());
 }
 
 //------------------------------
@@ -114,9 +106,9 @@ void Actor::OnGUI()
 //------------------------------
 // モデルのセットアップ
 //------------------------------
-void Actor::SetUpModel(const char* filename)
+void Actor::SetUpModel(const char* filename, const char* ignore_root_motion_node_name)
 {
-	model = std::make_unique<Model>(filename);
+	model = std::make_unique<Model>(filename, ignore_root_motion_node_name);
 }
 
 //------------------------------

@@ -2,6 +2,7 @@
 #include "Graphics.h"
 #include "SceneLoading.h"
 #include "SceneManager.h"
+#include "ShaderManager.h"
 
 //----------------------------------
 // コンストラクタ
@@ -53,6 +54,9 @@ void SceneLoading::Render()
 {
 	Graphics& graphics = Graphics::Instance();
 	ID3D11DeviceContext* context = graphics.GetDeviceContext();
+	ShaderManager& shader_manager = ShaderManager::Instance();
+	std::shared_ptr<Shader> sprite_shader = shader_manager.GetShader(ShaderManager::ShaderType::Sprite);
+
 	ID3D11RenderTargetView* render_target_view = graphics.GetRenderTargetView();
 	ID3D11DepthStencilView* depth_stencil_view = graphics.GetDepthStencilView();
 
@@ -70,12 +74,12 @@ void SceneLoading::Render()
 	float positionY = screen_height - texture_height;
 	// TODO 深度テストが失敗する
 	{
-		graphics.GetSpriteShader()->Begin(context);
+		sprite_shader->Begin(context);
 		sprite->Render(context,
 			positionX, positionY, texture_width, texture_height,
 			0, 0, texture_width, texture_height,
 			angle, Sprite::Pivot::CenterCenter);
-		graphics.GetSpriteShader()->End(context);
+		sprite_shader->End(context);
 	}
 }
 

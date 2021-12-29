@@ -8,7 +8,7 @@ class ModelResource;
 class Model
 {
 public:
-	Model(const char* filename);
+	Model(const char* filename, const char* ignore_root_motion_node_name);
 	~Model(){}
 
 	struct Node
@@ -35,7 +35,7 @@ public:
 	Node* FindNode(const char* name);
 	
 	// アニメーション更新処理
-	void UpdateAnimation(float elapsed_time, const char* node_name, bool hitstop_flag = false);
+	void UpdateAnimation(float elapsed_time, bool hitstop_flag = false);
 	
 	// アニメーション再生
 	void PlayAnimation(int index, bool loop, float blend_seconds = 0.2f);

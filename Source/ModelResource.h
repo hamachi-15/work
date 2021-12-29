@@ -121,11 +121,14 @@ public:
 	const std::vector<Material>& GetMaterials() const { return materials; }
 
 	// 読み込み
-	void Load(ID3D11Device* device, const char* filename);
+	void Load(ID3D11Device* device, const char* filename, const char* ignore_root_motion_node_name);
 
 protected:
 	// モデルセットアップ
-	void BuildModel(ID3D11Device* device, const char* dirname);
+	void BuildModel(ID3D11Device* device, const char* dirname, const char* ignore_root_motion_node_name);
+
+	// ルートノードのキャンセル処理
+	void ModelAnimationCancel();
 
 	// シリアライズ
 	void Serialize(const char* filename);
@@ -141,4 +144,5 @@ protected:
 	std::vector<Material>	materials;
 	std::vector<Mesh>		meshes;
 	std::vector<Animation>	animations;
+	int						root_motion_node_index = -1;
 };

@@ -6,10 +6,10 @@
 //-------------------------------------
 // コンストラクタ
 //-------------------------------------
-Model::Model(const char* filename)
+Model::Model(const char* filename, const char* ignore_root_motion_node_name)
 {
 	// リソース読み込み
-	resource = ResourceManager::Instance().LoadModelResource(filename);
+	resource = ResourceManager::Instance().LoadModelResource(filename, ignore_root_motion_node_name);
 
 	// ノード
 	const std::vector<ModelResource::Node>& res_nodes = resource->GetNodes();
@@ -89,7 +89,7 @@ Model::Node* Model::FindNode(const char* name)
 //-------------------------------------
 // アニメーション更新処理
 //-------------------------------------
-void Model::UpdateAnimation(float elapsed_time, const char* node_name, bool hitstop_flag)
+void Model::UpdateAnimation(float elapsed_time, bool hitstop_flag)
 {
 	// 再生中なら更新しない
 	if (!IsPlayAnimation() || animation_stop_flag) return;
@@ -149,11 +149,7 @@ void Model::UpdateAnimation(float elapsed_time, const char* node_name, bool hits
 
 					DirectX::XMStoreFloat3(&node.scale, s);
 					DirectX::XMStoreFloat4(&node.rotate, r);
-					DirectX::XMFLOAT3 p = { 0, 0, 0 };
-					DirectX::XMStoreFloat3(&p, t);
-					if (strcmp(node.name, node_name) != 0) {
-						DirectX::XMStoreFloat3(&node.translate, t);
-					}
+					DirectX::XMStoreFloat3(&node.translate, t);
 				}
 				// 通常の計算
 				else
@@ -173,9 +169,7 @@ void Model::UpdateAnimation(float elapsed_time, const char* node_name, bool hits
 					DirectX::XMFLOAT3 p; DirectX::XMStoreFloat3(&p, t);
 					DirectX::XMStoreFloat3(&node.scale, s);
 					DirectX::XMStoreFloat4(&node.rotate, r);
-					if (strcmp(node.name, node_name) != 0) {
-						DirectX::XMStoreFloat3(&node.translate, t);
-					}
+					DirectX::XMStoreFloat3(&node.translate, t);
 				}
 			}
 			break;

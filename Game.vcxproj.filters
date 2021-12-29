@@ -453,6 +453,9 @@
     <ClCompile Include="Source\2DPrimitive.cpp">
       <Filter>ソース ファイル\Graphics\Shader</Filter>
     </ClCompile>
+    <ClCompile Include="Source\ShaderManager.cpp">
+      <Filter>ソース ファイル\Graphics\Shader</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\imgui\imconfig.h">
@@ -813,6 +816,9 @@
       <Filter>ソース ファイル\Graphics\Shader</Filter>
     </ClInclude>
     <ClInclude Include="Source\2DPrimitive.h">
+      <Filter>ソース ファイル\Graphics\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ShaderManager.h">
       <Filter>ソース ファイル\Graphics\Shader</Filter>
     </ClInclude>
   </ItemGroup>

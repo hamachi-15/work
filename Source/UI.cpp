@@ -3,6 +3,7 @@
 #include "Sprite.h"
 #include "Texture.h"
 #include "ResourceManager.h"
+#include "ShaderManager.h"
 
 //-----------------------------------------------
 // コンストラクタ
@@ -136,7 +137,10 @@ void UIManager::Update(float elapsed_time)
 //------------------------------
 void UIManager::Draw(ID3D11DeviceContext* context)
 {
-	Graphics::Instance().GetSpriteShader()->Begin(context);
+	ShaderManager& shader_manager = ShaderManager::Instance();
+	std::shared_ptr<Shader> sprite_shader = shader_manager.GetShader(ShaderManager::ShaderType::Sprite);
+	
+	sprite_shader->Begin(context);
 	Sprite sprite;
 	for (std::shared_ptr<UI> ui : ui_list)
 	{
@@ -149,7 +153,7 @@ void UIManager::Draw(ID3D11DeviceContext* context)
 			0, 0,
 			size.x, size.y);
 	}
-	Graphics::Instance().GetSpriteShader()->End(context);
+	sprite_shader->End(context);
 }
 
 //------------------------------

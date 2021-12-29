@@ -35,16 +35,16 @@ public:
 	// 更新処理
 	void Update(float elapsed_time);
 	
-	// このメソッドはtelegramクラスを作成して
-	// Enemyを継承するクラスのメッセージレシーバーの処理を呼び出す。
-	//void Discharge(Enemy* receiver, const Telegram& telegram);
-	void Discharge(std::shared_ptr<Player> receiver, const Telegram& telegram);
+	// Enemy用のレシーブ処理を指定
 	void Discharge(std::shared_ptr<Enemy> receiver, const Telegram& telegram);
+
+	// Player用のレシーブ処理を指定
+	void Discharge(std::shared_ptr<Player> receiver, const Telegram& telegram);
 
 	// MetaAI用のレシーブ処理を指定
 	void Discharge(const Telegram& telegram);
 
-	//
+	//シーン用のレシーブ処理を指定
 	void Discharge(Scene* receiver, const Telegram& telegram);
 
 	// メッセージ受信したときの処理
@@ -54,11 +54,7 @@ public:
 	void SendMessaging(int sender, int receiver, Message message, int enemy_identity = 0);
 
 	// 敵の出現処理
-	void AppearanceEnemy(float elapsed_time);
+	void AppearanceEnemy();
 private:
 	std::set<Telegram>			priority;
-	std::shared_ptr<Player>		player;
-
-	float						pop_interval;
-	int index;
 };

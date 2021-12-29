@@ -1,10 +1,17 @@
 #include "Misc.h"
 #include "Graphics.h"
-#include "SpriteShader.h"
-#include "SkyBoxShader.h"
 #include "Audio.h"
 #include "Texture.h"
 
+#include "ShaderManager.h"
+#include "SpriteShader.h"
+#include "SkyBoxShader.h"
+#include "2DPrimitive.h"
+#include "BloomShader.h"
+#include "CreateShadowMapShader.h"
+#include "CascadeShadowMapShader.h"
+#include "PhongShader.h"
+#include "LambertShader.h"
 Graphics* Graphics::instance = nullptr;
 
 
@@ -150,9 +157,16 @@ Graphics::Graphics(HWND hwnd)
 
 	// シェーダー
 	{
+		ShaderManager& shader_manager = ShaderManager::Instance();
 		// スプライトシェーダー
-		sprite_shader = std::make_unique<SpriteShader>(device.Get());
-		skybox_shader = std::make_unique<SkyBoxShader>(device.Get());
+		shader_manager.RegisterShader<SpriteShader>(device.Get());
+		shader_manager.RegisterShader<Primitive>(device.Get());
+		shader_manager.RegisterShader<SkyBoxShader>(device.Get());
+		shader_manager.RegisterShader<Bloom>(device.Get());
+		shader_manager.RegisterShader<Phong>(device.Get());
+		shader_manager.RegisterShader<LambertShader>(device.Get());
+		shader_manager.RegisterShader<CreateShadowMap>(device.Get());
+		shader_manager.RegisterShader<CascadeShadowMap>(device.Get());
 	}
 	// レンダラ
 	{

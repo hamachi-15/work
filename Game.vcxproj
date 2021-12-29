@@ -294,6 +294,7 @@
     <ClCompile Include="Source\SceneTutorial.cpp" />
     <ClCompile Include="Source\Script.cpp" />
     <ClCompile Include="Source\Shader.cpp" />
+    <ClCompile Include="Source\ShaderManager.cpp" />
     <ClCompile Include="Source\SkyBoxShader.cpp" />
     <ClCompile Include="Source\SlimeActionOwner.cpp" />
     <ClCompile Include="Source\SlimeJudgmentOwner.cpp" />
@@ -442,6 +443,7 @@
     <ClInclude Include="Source\Script.h" />
     <ClInclude Include="Source\ScriptDataHeadder.h" />
     <ClInclude Include="Source\Shader.h" />
+    <ClInclude Include="Source\ShaderManager.h" />
     <ClInclude Include="Source\SkyBoxShader.h" />
     <ClInclude Include="Source\SlimeActionOwner.h" />
     <ClInclude Include="Source\SlimeJudgmentOwner.h" />

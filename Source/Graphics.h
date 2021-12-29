@@ -59,14 +59,9 @@ public:
 	// デバックレンダラー取得
 	DebugRenderer* GetDebugRenderer() const { return debug_renderer.get(); }
 
-	// スプライトシェーダー取得
-	SpriteShader* GetSpriteShader() const { return sprite_shader.get(); }
-
-	// スカイボックスシェーダー取得
-	Shader* GetSkyBoxShader() const { return skybox_shader.get(); }
-
 	AudioSource* GetAudio() const { return BGM.get(); }
 
+	// シーンテクスチャ取得
 	Texture* GetTexture() const { return scene_texture.get(); }
 
 	// ミューテクス取得
@@ -88,7 +83,6 @@ public:
 		True,
 		Write_False
 	};
-
 	enum class RasterizerState
 	{
 		Cull_Back,
@@ -138,10 +132,7 @@ private:
 	std::unique_ptr<DebugRenderer>					debug_renderer;
 	std::unique_ptr<ImGuiRenderer>					imgui_renderer;
 
-	std::unique_ptr<SpriteShader>					sprite_shader;
 	std::unique_ptr<AudioSource>					BGM;
-
-	std::unique_ptr<Shader>							skybox_shader;
 
 	std::unique_ptr<Texture>						scene_texture;
 	std::mutex										mutex;

@@ -1,10 +1,12 @@
 // “Gƒf[ƒ^ID
+EnemyID 5
+EnemyID 1
+EnemyID 1
 EnemyID 1
 EnemyID 2
 EnemyID 2
 EnemyID 2
-EnemyID 3
-EnemyID 3
+EnemyID 2
 EnemyID 3
 EnemyID 3
 EnemyID 1

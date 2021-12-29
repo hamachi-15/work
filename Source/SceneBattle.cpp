@@ -32,6 +32,7 @@
 #include "Texture.h"
 #include "Sprite.h"
 #include "MetaAI.h"
+#include "ShaderManager.h"
 
 SceneBattle::SceneBattle()
 {
@@ -46,16 +47,13 @@ void SceneBattle::Initialize()
 	Graphics& graphics = Graphics::Instance();
 	ID3D11Device* device = graphics.GetDevice();
 
+	// シーン名設定
+	SetName("SceneBattle");
+
 	// プリミティブのコンスタントバッファの初期設定
 	primitive_falg = true;
 	primitive_context.number = 2;
 	primitive_context.timer = 0.0f;
-
-	// シーン名設定
-	SetName("SceneBattle");
-
-	// データベース初期化
-	GameDataBase::Instance();
 
 	// ライト初期化
 	Light::Initialize();
@@ -89,29 +87,27 @@ void SceneBattle::Initialize()
 	// ステージ読み込み
 	{
 		std::shared_ptr<Actor> actor = ActorManager::Instance().Create();
-		actor->SetUpModel("Data/Model/Filde/Filde.mdl");
+		actor->SetUpModel("Data/Model/Filde/Filde.mdl", nullptr);
 		actor->SetName("Filde");
 		actor->SetPosition(DirectX::XMFLOAT3(0, 0, 0));
 		actor->SetAngle(DirectX::XMFLOAT3(0, DirectX::XMConvertToRadians(-90), 0));
 		actor->SetScale(DirectX::XMFLOAT3(0.1f, 0.1f, 0.1f));
 		actor->AddComponent<Stage>();
-		actor->AddShader<CascadeShadowMap>(Graphics::Instance().GetDevice());
+		actor->SetShaderType(ShaderManager::ShaderType::CascadeShadowMap);
 	}
 
 	// プレイヤー読み込み
 	{
 		std::shared_ptr<Actor> actor = ActorManager::Instance().Create();
-		actor->SetUpModel("Data/Model/RPG-Character/Swordman.mdl");
+		actor->SetUpModel("Data/Model/RPG-Character/Swordman.mdl", "Motion");
 		actor->SetName("Player");
-		actor->SetAnimationNodeName("Motion");
-		actor->SetPosition(DirectX::XMFLOAT3(-100, 16, -116));
-//		actor->SetPosition(DirectX::XMFLOAT3(0, 1, 0));
+		actor->SetPosition(DirectX::XMFLOAT3(-100, 4, -116));
 		actor->SetAngle(DirectX::XMFLOAT3(0, 0, 0));
 		actor->SetScale(DirectX::XMFLOAT3(0.04f, 0.04f, 0.04f));
 		actor->AddComponent<Movement>();
 		actor->AddComponent<Charactor>();
 		actor->AddComponent<Player>();
-		actor->AddShader<LambertShader>(Graphics::Instance().GetDevice());
+		actor->SetShaderType(ShaderManager::ShaderType::Lambert);
 	}
 	ActorManager::Instance().Update(0.01f);
 	ActorManager::Instance().UpdateTransform();
@@ -164,6 +160,10 @@ void SceneBattle::Update(float elapsed_time)
 	if (primitive_context.timer < 40)
 	{
 		primitive_context.timer++;
+	}
+	if (primitive_context.timer >= 40)
+	{
+		primitive_falg = false;
 	}
 
 	//ライト
@@ -245,6 +245,7 @@ void SceneBattle::Render()
 void SceneBattle::ScreenRender(ID3D11DeviceContext* context, RenderContext& render_context, const DirectX::XMFLOAT2& screen_size)
 {
 	Graphics& graphics = Graphics::Instance();
+	ShaderManager& shader_manager = ShaderManager::Instance();
 
 	// スクリーンテクスチャをレンダーターゲットに設定して画面クリア
 	ID3D11RenderTargetView* screen_texture = graphics.GetTexture()->GetRenderTargetView();
@@ -258,7 +259,9 @@ void SceneBattle::ScreenRender(ID3D11DeviceContext* context, RenderContext& rend
 
 	// スカイボックス描画
 	{
-		graphics.GetSkyBoxShader()->Begin(context, render_context);
+		std::shared_ptr<Shader> shader = shader_manager.GetShader(ShaderManager::ShaderType::SkyBox);
+		
+		shader->Begin(context, render_context);
 		sprite->Render(context,
 			sky.get(),
 			0, 0,
@@ -267,7 +270,7 @@ void SceneBattle::ScreenRender(ID3D11DeviceContext* context, RenderContext& rend
 			static_cast<float>(sky->GetWidth()), static_cast<float>(sky->GetHeight()),
 			0,
 			1, 1, 1, 1);
-		graphics.GetSkyBoxShader()->End(context);
+		shader->End(context);
 	}
 
 	// デバッグプリミティブ描画
@@ -318,11 +321,12 @@ void SceneBattle::PostRender(ID3D11DeviceContext* context, RenderContext& render
 }
 
 //-------------------------------------
-//バックバッファ描画
+// バックバッファ描画
 //-------------------------------------
 void SceneBattle::BuckBufferRender(ID3D11DeviceContext* context, RenderContext& render_context, const DirectX::XMFLOAT2& screen_size)
 {
 	Graphics& graphics = Graphics::Instance();
+	ShaderManager& shader_manager = ShaderManager::Instance();
 
 	// レンダーターゲット設定
 	{
@@ -333,8 +337,9 @@ void SceneBattle::BuckBufferRender(ID3D11DeviceContext* context, RenderContext& 
 	// ビューポート設定
 	graphics.SetViewport(screen_size.x, screen_size.y);
 
-	// バックバッファにスクリーンテクスチャを描画
-	graphics.GetSpriteShader()->Begin(context);
+	//バックバッファにスクリーンテクスチャを描画
+	std::shared_ptr<Shader> sprite_shader = shader_manager.GetShader(ShaderManager::ShaderType::Sprite);
+	sprite_shader->Begin(context);
 	// スクリーンテクスチャ
 	sprite->Render(context, graphics.GetTexture(),
 		0, 0,
@@ -344,21 +349,21 @@ void SceneBattle::BuckBufferRender(ID3D11DeviceContext* context, RenderContext& 
 		0,
 		1, 1, 1, 1);
 	// 輝度抽出テクスチャを加算合成
-	sprite->AddRender(context,
-		bloom_texture,
-		0, 0,
-		screen_size.x, screen_size.y,
-		0, 0,
-		(float)bloom_texture->GetWidth(), (float)bloom_texture->GetHeight());
-	graphics.GetSpriteShader()->End(context);
+	//sprite->AddRender(context,
+	//	bloom_texture,
+	//	0, 0,
+	//	screen_size.x, screen_size.y,
+	//	0, 0,
+	//	(float)bloom_texture->GetWidth(), (float)bloom_texture->GetHeight());
+	sprite_shader->End(context);
 
 	// メニュー描画
 	{
 		if (MenuSystem::Instance().IsOpened())
 		{
-			graphics.GetSpriteShader()->Begin(context);
+			sprite_shader->Begin(context);
 			MenuSystem::Instance().Render(context);
-			graphics.GetSpriteShader()->End(context);
+			sprite_shader->End(context);
 		}
 	}
 
@@ -366,20 +371,22 @@ void SceneBattle::BuckBufferRender(ID3D11DeviceContext* context, RenderContext& 
 	UIManager::Instance().Draw(context);
 
 	// シャドウマップ
-	graphics.GetSpriteShader()->Begin(context);
-	for (int i = 0; i < 3; ++i)
+	if (isshadowmap)
 	{
-		sprite->Render(context,
-			ActorManager::Instance().GetShadowTexture(i),
-			0 + 200 * (i), 0,
-			200, 200,
-			0, 0,
-			(float)ActorManager::Instance().GetShadowTexture(i)->GetWidth(), (float)ActorManager::Instance().GetShadowTexture(i)->GetHeight(),
-			0,
-			1, 1, 1, 1);
+		sprite_shader->Begin(context);
+		for (int i = 0; i < 3; ++i)
+		{
+			sprite->Render(context,
+				ActorManager::Instance().GetShadowTexture(i),
+				0 + 200 * (i), 0,
+				200, 200,
+				0, 0,
+				(float)ActorManager::Instance().GetShadowTexture(i)->GetWidth(), (float)ActorManager::Instance().GetShadowTexture(i)->GetHeight(),
+				0,
+				1, 1, 1, 1);
+		}
+		sprite_shader->End(context);
 	}
-	graphics.GetSpriteShader()->End(context);
-
 	// 2Dプリミティブ描画
 	{
 		if (primitive_falg)
@@ -404,6 +411,8 @@ void SceneBattle::OnGui()
 	ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
 
 	ImGui::Begin("Shader", nullptr, ImGuiWindowFlags_None);
+	ImGui::TextColored(ImVec4(1, 1, 0, 1), u8"-------シャドウマップ表示フラグ-------");
+	ImGui::Checkbox("ShadowmapDrawFlag", &isshadowmap);
 
 	ImGui::TextColored(ImVec4(1, 1, 0, 1), u8"-------2Dプリミティブ-------");
 	ImGui::SliderInt("PrimitiveType", &primitive_context.number, 1, 10);
@@ -595,9 +604,9 @@ void SceneBattle::OnGui()
 	//	ImGui::TextWrapped("NB: Cursor & selection are preserved when refocusing last used item in code.");
 	//	ImGui::TreePop();
 	//}
-	ImGui::GetStyle().Colors[ImGuiCol_WindowBg] = ImVec4(1.0f, 1.0f, 1.0f, 0.4f);
-	ImGui::GetStyle().Colors[ImGuiCol_Border].x = 1.0f;
-	ImGui::GetStyle().Colors[ImGuiCol_TitleBg] = ImVec4(0.0f, 1.0f, 1.0f, 0.7f);
-	ImGui::GetStyle().Colors[ImGuiCol_TitleBgActive] = ImVec4(1.0f, 1.0f, 1.0f, 0.7f);
-	ImGui::GetStyle().Colors[ImGuiCol_Text] = ImVec4(0.0f, 0.0f, 0.0f, 0.7f);
+	//ImGui::GetStyle().Colors[ImGuiCol_WindowBg] = ImVec4(1.0f, 1.0f, 1.0f, 0.4f);
+	//ImGui::GetStyle().Colors[ImGuiCol_Border].x = 1.0f;
+	//ImGui::GetStyle().Colors[ImGuiCol_TitleBg] = ImVec4(0.0f, 1.0f, 1.0f, 0.7f);
+	//ImGui::GetStyle().Colors[ImGuiCol_TitleBgActive] = ImVec4(1.0f, 1.0f, 1.0f, 0.7f);
+	//ImGui::GetStyle().Colors[ImGuiCol_Text] = ImVec4(0.0f, 0.0f, 0.0f, 0.7f);
 }

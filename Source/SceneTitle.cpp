@@ -8,6 +8,8 @@
 #include "Player.h"
 #include "Movement.h"
 #include "LambertShader.h"
+#include "ShaderManager.h"
+
 #include "ActorManager.h"
 #include "SceneManager.h"
 #include "SceneLoading.h"
@@ -142,6 +144,9 @@ void SceneTitle::Update(float elapsed_time)
 //----------------------------------
 void SceneTitle::Render()
 {
+	ShaderManager& shader_manager = ShaderManager::Instance();
+	std::shared_ptr<Shader> sprite_shader = shader_manager.GetShader(ShaderManager::ShaderType::Sprite);
+	
 	render_context.light_color = Light::DirLightColor;
 	render_context.ambient_color = Light::Ambient;
 	render_context.light_direction = Light::LightDir;
@@ -167,7 +172,8 @@ void SceneTitle::Render()
 
 	// スカイボックス描画
 	{
-		graphics.GetSkyBoxShader()->Begin(context, render_context);
+		std::shared_ptr<Shader> skybox_shader = shader_manager.GetShader(ShaderManager::ShaderType::SkyBox);
+		skybox_shader->Begin(context, render_context);
 		sprite->Render(context,
 			sky.get(),
 			0, 0,
@@ -176,7 +182,7 @@ void SceneTitle::Render()
 			(float)sky->GetWidth(), (float)sky->GetHeight(),
 			0,
 			1, 1, 1, 1);
-		graphics.GetSkyBoxShader()->End(context);
+		skybox_shader->End(context);
 	}
 	// アクターの描画
 	{
@@ -184,7 +190,7 @@ void SceneTitle::Render()
 	}
 	// ボタン描画
 	{
-		graphics.GetSpriteShader()->Begin(context);
+		sprite_shader->Begin(context);
 		// カーソルがゲームスタートボタンにあったら
 		if (serect_button[0] == SerectButton::Serect_Game_Start)
 		{
@@ -194,7 +200,7 @@ void SceneTitle::Render()
 		{
 			RenderButton(context, start_button.at(static_cast<int>(SerectButton::Unserect_Game_Start)).get(), static_cast<int>(SerectButton::Unserect_Game_Start));
 		}
-		graphics.GetSpriteShader()->End(context);
+		sprite_shader->End(context);
 	}
 	//OnGui();
 }

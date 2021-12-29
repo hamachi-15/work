@@ -48,9 +48,11 @@ Phong::Phong(ID3D11Device* device)
 	}
 }
 
-void Phong::Begin(ID3D11DeviceContext* context, RenderContext& render_context, DirectX::XMFLOAT4 light_color)
+//void Phong::Begin(ID3D11DeviceContext* context, RenderContext& render_context, DirectX::XMFLOAT4 light_color)
+void Phong::Begin(ID3D11DeviceContext* context, RenderContext& render_context)
 {
 	Activate(context);
+
 	ID3D11Buffer* constantBuffers[] =
 	{
 		scene_constant_buffer.Get(),
@@ -76,7 +78,7 @@ void Phong::Begin(ID3D11DeviceContext* context, RenderContext& render_context, D
 	cbscene.eye_position = view;
 
 	cbscene.light_direction = render_context.light_direction;
-	cbscene.light_color = light_color;
+	cbscene.light_color = DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	context->UpdateSubresource(scene_constant_buffer.Get(), 0, 0, &cbscene, 0, 0);
 }
 

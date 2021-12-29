@@ -25,7 +25,9 @@ CEREAL_CLASS_VERSION(ModelResource::Keyframe, 1)
 CEREAL_CLASS_VERSION(ModelResource::Animation, 1)
 CEREAL_CLASS_VERSION(ModelResource, 1)
 
+//---------------------------------------
 // シリアライズ
+//---------------------------------------
 namespace DirectX
 {
 	template<class Archive>
@@ -173,8 +175,10 @@ void ModelResource::Animation::serialize(Archive& archive, int version)
 	);
 }
 
+//---------------------------------------
 // 読み込み
-void ModelResource::Load(ID3D11Device* device, const char* filename)
+//---------------------------------------
+void ModelResource::Load(ID3D11Device* device, const char* filename, const char* ignore_root_motion_node_name)
 {
 	// ディレクトリパス取得
 	char drive[32], dir[256], dirname[256];
@@ -185,11 +189,19 @@ void ModelResource::Load(ID3D11Device* device, const char* filename)
 	Deserialize(filename);
 
 	// モデル構築
-	BuildModel(device, dirname);
+	BuildModel(device, dirname, ignore_root_motion_node_name);
+
+	// ルートモーションのキャンセル処理
+	if (root_motion_node_index != -1)
+	{
+		ModelAnimationCancel();
+	}
 }
 
+//---------------------------------------
 // モデル構築
-void ModelResource::BuildModel(ID3D11Device* device, const char* dirname)
+//---------------------------------------
+void ModelResource::BuildModel(ID3D11Device* device, const char* dirname, const char* ignore_root_motion_node_name)
 {
 	for (Material& material : materials)
 	{
@@ -323,9 +335,51 @@ void ModelResource::BuildModel(ID3D11Device* device, const char* dirname)
 			_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 		}
 	}
+
+	// 無視するルートモーションを検索
+	if (ignore_root_motion_node_name != nullptr)
+	{
+		root_motion_node_index = -1;
+		for (size_t i = 0; i < nodes.size(); ++i)
+		{
+			if (nodes.at(i).name == ignore_root_motion_node_name)
+			{
+				root_motion_node_index = static_cast<int>(i);
+				break;
+			}
+		}
+	}
 }
 
+//---------------------------------------
+// ルートノードのキャンセル処理
+//---------------------------------------
+void ModelResource::ModelAnimationCancel()
+{
+	int animation_count = static_cast<int>(animations.size());
+	// アニメーションデータからキーフレームデータリストを取得
+	for (Animation& animation : animations)
+	{
+		int key_count = static_cast<int>(animation.keyframes.size());
+		for (int key_index = 0; key_index < key_count; ++key_index)
+		{
+			Keyframe& keyframe = animation.keyframes.at(key_index);
+			int nodekey_count = static_cast<int>(keyframe.nodeKeys.size());
+			for (int node_index = 0; node_index < nodekey_count; ++node_index)
+			{
+				if (node_index != root_motion_node_index) continue;
+				NodeKeyData& key_data = keyframe.nodeKeys.at(node_index);
+				key_data.scale = DirectX::XMFLOAT3(1, 1, 1);
+				key_data.rotate = DirectX::XMFLOAT4(0, 0, 0, 1);
+				key_data.translate = DirectX::XMFLOAT3(0, 0, 0);
+			}
+		}
+	}
+}
+
+//---------------------------------------
 // シリアライズ
+//---------------------------------------
 void ModelResource::Serialize(const char* filename)
 {
 	std::ofstream ostream(filename, std::ios::binary);
@@ -350,7 +404,9 @@ void ModelResource::Serialize(const char* filename)
 	}
 }
 
+//---------------------------------------
 // デシリアライズ
+//---------------------------------------
 void ModelResource::Deserialize(const char* filename)
 {
 	std::ifstream istream(filename, std::ios::binary);
@@ -375,7 +431,9 @@ void ModelResource::Deserialize(const char* filename)
 	}
 }
 
+//---------------------------------------
 // ノードインデックスを取得する
+//---------------------------------------
 int ModelResource::FindNodeIndex(NodeId nodeId) const
 {
 	int nodeCount = static_cast<int>(nodes.size());

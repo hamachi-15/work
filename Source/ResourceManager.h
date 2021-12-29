@@ -19,7 +19,7 @@ public:
 		return instance;
 	}
 	// モデルリソース読み込み
-	std::shared_ptr<ModelResource> LoadModelResource(const char* filename);
+	std::shared_ptr<ModelResource> LoadModelResource(const char* filename, const char* ignore_root_motion_node_name);
 
 	// テクスチャ読み込み
 	std::shared_ptr<Texture> LoadTexture(const char* filename);

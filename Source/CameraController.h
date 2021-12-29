@@ -66,7 +66,7 @@ private:
 	DirectX::XMFLOAT3	new_position = { 0, 0, 0 };
 	DirectX::XMFLOAT3	new_target = { 0, 0, 0 };
 	DirectX::XMFLOAT3	target_work[2] = { { 0, 0, 0 }, { 0, 0, 0 } };	// 0 : 座標, 1 : 注視点
-	float				length_limit[2] = { 90, range };
+	float				length_limit[2] = { 20, range };
 	float				side_value = 1;
 
 	// メッセージキー

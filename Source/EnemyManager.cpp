@@ -3,7 +3,7 @@
 #include "Mathf.h"
 
 // シェーダー系インクルード
-#include "LambertShader.h"
+#include "ShaderManager.h"
 
 // データベース系インクルード
 #include "Script.h"
@@ -128,16 +128,21 @@ void EnemyManager::CreateEnemies()
 //-----------------------------------------------
 void EnemyManager::CreateEnemies(int id)
 {
+	// 敵データリストと敵の出現位置データリストを取得
 	std::vector<std::shared_ptr<EnemyData>> data_list = GameDataBase::Instance().GetEnemyDataList();
+	std::vector<std::shared_ptr<EnemyAppearancePosition>> appearance_potition_list = GameDataBase::Instance().GetEnemyAppearanceDataList();
 	int index = 0;
 	for (std::shared_ptr<EnemyData> data : data_list)
 	{
 		// データベースのIDと一致したら敵を生成する
 		if (data->id == id)
 		{
+			// アクター作成
 			std::shared_ptr<Actor> actor = ActorManager::Instance().Create();
-			DirectX::XMFLOAT3 pos = DirectX::XMFLOAT3{ -126, 7, 169 };
-			SetEnemyStatus(actor, data, index, pos);
+			// 出現位置のデータ取得
+			std::shared_ptr<EnemyAppearancePosition> appearance_data = appearance_potition_list.at(index);
+			// ステータス設定
+			SetEnemyStatus(actor, data, appearance_data);
 		}
 		++index;
 	}
@@ -186,26 +191,34 @@ void EnemyManager::SetEnemyStatus(std::shared_ptr<Actor> actor, std::shared_ptr<
 	// 名前の設定
 	std::string name = std::string(enemy_data->name) + std::to_string(appearance_data->id);
 	actor->SetName(name.c_str());
+
 	// 敵データIDの設定
 	actor->SetEnemyDataID(enemy_data->id);
+	
 	// モデルのセットアップ
-	actor->SetUpModel(enemy_data->model_path);
+	if (strcmp(enemy_data->animation_node_name, "NULL") == 0)
+	{
+		actor->SetUpModel(enemy_data->model_path, nullptr);
+	}
+	else
+	{
+		actor->SetUpModel(enemy_data->model_path, enemy_data->animation_node_name);
+	}
 	// 出現位置の設定
 	DirectX::XMFLOAT3 appearance_position = { appearance_data->position_x,appearance_data->position_y, appearance_data->position_z };
 	GetAppearancePosition(actor, { appearance_position.x, appearance_position.y, appearance_position.z }, appearance_data->radius);
+	
 	// スケールの設定
 	actor->SetScale({ enemy_data->scale_x, enemy_data->scale_y, enemy_data->scale_z });
+
 	// アングルの設定
 	actor->SetAngle({ enemy_data->angle_x, enemy_data->angle_y, enemy_data->angle_z });
-	// アニメーションノードの設定
-	actor->SetAnimationNodeName(enemy_data->animation_node_name);
+
 	// シェーダーの設定
-	actor->AddShader<LambertShader>(Graphics::Instance().GetDevice());
+	actor->SetShaderType(ShaderManager::ShaderType::Lambert);
 
 	// 各敵のコンポーネント追加
 	AddComponent(actor, enemy_data, appearance_data->tag);
-
-	
 }
 
 void EnemyManager::SetEnemyStatus(std::shared_ptr<Actor> actor, std::shared_ptr<EnemyData> enemy_data, int& string_id, DirectX::XMFLOAT3& appearance_position)
@@ -218,7 +231,7 @@ void EnemyManager::SetEnemyStatus(std::shared_ptr<Actor> actor, std::shared_ptr<
 	actor->SetEnemyDataID(enemy_data->id);
 
 	// モデルのセットアップ
-	actor->SetUpModel(enemy_data->model_path);
+	actor->SetUpModel(enemy_data->model_path, enemy_data->animation_node_name);
 
 	// 出現位置の設定
 	GetAppearancePosition(actor, { appearance_position.x, appearance_position.y, appearance_position.z }, 2);
@@ -229,22 +242,22 @@ void EnemyManager::SetEnemyStatus(std::shared_ptr<Actor> actor, std::shared_ptr<
 	// アングルの設定
 	actor->SetAngle({ enemy_data->angle_x, enemy_data->angle_y, enemy_data->angle_z });
 
-	// アニメーションノードの設定
-	actor->SetAnimationNodeName(enemy_data->animation_node_name);
-
 	// シェーダーの設定
-	actor->AddShader<LambertShader>(Graphics::Instance().GetDevice());
+	actor->SetShaderType(ShaderManager::ShaderType::Lambert);
 
 	// 各敵のコンポーネント追加
 	std::shared_ptr<Enemy> enemy;
 	actor->AddComponent<Movement>();
 	std::shared_ptr<Charactor> charactor = actor->AddComponent<Charactor>();
+	
 	// 最大HP設定
 	charactor->SetMaxHealth(enemy_data->hp);
+
 	// HP設定
 	charactor->SetHealth(enemy_data->hp);
 
 	// 敵の種類ごとのコンポーネントを追加
+	// TODO 敵を作り終えたら対応する
 	switch (enemy_data->category)
 	{
 	case EnemyCategory::Slime:
