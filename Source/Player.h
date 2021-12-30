@@ -10,15 +10,24 @@ class Player : public Component
 {
 	enum class SubState;
 public:
+	// コンストラクタ
 	Player(){}
+
+	// デストラクタ
 	~Player()override{}
+
 	// 名前取得
 	const char* GetName() const override { return "Player"; }
+
+	// GUI描画
 	void OnGUI() override;
+
 	// 開始処理
 	void Start() override;
+
 	// 更新処理
 	void Update(float elapsed_time) override;
+
 	// メッセージを受信したときの処理
 	bool OnMessages(const Telegram& message);
 
@@ -34,9 +43,6 @@ private: // プレイヤーの状態処理
 
 	// ランニング状態へ遷移
 	void TransitionMoveRunState();
-
-	// 着地状態へ遷移
-	//void TransitionLandState();
 
 	// 攻撃状態へ遷移
 	void TransitionAttackState(SubState sub_state);
@@ -262,6 +268,6 @@ private:
 	std::shared_ptr<Enemy>		lockon_enemy;
 	DirectX::XMFLOAT3			lock_direction;
 	// TODO
-	DirectX::XMFLOAT3 start_position;
-	int fase = 0;
+	DirectX::XMFLOAT3			start_position;
+	int							fase = 0;
 };

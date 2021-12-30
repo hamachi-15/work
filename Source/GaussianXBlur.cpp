@@ -25,7 +25,6 @@ void GaussianXBlur::Begin(ID3D11DeviceContext* context)
 	// ビューポートの設定
 	graphics.SetViewport(static_cast<float>(xblur_texture->GetWidth()), static_cast<float>(xblur_texture->GetHeight()));
 
-	// シェーダーの設定
 	Activate(context);
 }
 

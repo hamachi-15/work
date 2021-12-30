@@ -21,6 +21,11 @@
 #include "ActionOwner.h"
 #include "NightmareDragonActionOwner.h"
 
+//********************************
+// 
+// ナイトメアドラゴンクラス
+// 
+//********************************
 //--------------------------------------
 // コンストラクタ
 //--------------------------------------
@@ -34,6 +39,7 @@ EnemyDragonNightmare::EnemyDragonNightmare()
 EnemyDragonNightmare::~EnemyDragonNightmare()
 {
 }
+
 //--------------------------------------
 // 敵の破棄処理
 //--------------------------------------
@@ -64,6 +70,32 @@ void EnemyDragonNightmare::OnGUI()
 {
 	// ビヘイビア関連情報
 	DrawBehaviorGUI();
+}
+
+
+//--------------------------------------
+// メッセージを受信したときの処理
+//--------------------------------------
+bool EnemyDragonNightmare::OnMessages(const Telegram& message)
+{
+	switch (message.message_box.message)
+	{
+	case MessageType::Message_Hit_Attack:
+		break;
+	case MessageType::Message_GetHit_Attack:
+		//ダメージフラグをオンに
+		OnDamaged();
+		// 衝突した位置を設定
+		SetHitPosition(message.message_box.hit_position);
+		break;
+	case MessageType::Message_Give_Attack_Right:
+		// 攻撃フラグをオンに
+		SetAttackFlag(true);
+		break;
+	case MessageType::Message_Hit_Boddy:
+		break;
+	}
+	return false;
 }
 
 //--------------------------------------
@@ -107,7 +139,21 @@ void EnemyDragonNightmare::Start()
 		parameter.position_mask = CollisionPositionMask::Collision_Mask_Actor_Position;
 		charactor->SetCollision(actor, parameter, CollisionMeshType::Cylinder);
 
-		// 尻尾コリジョン
+		// 右腕コリジョン
+		std::string name = parameter.name;
+		name += "RightWrist";
+		parameter.name = name.c_str();
+		parameter.node_name = "R_Wrist";
+		parameter.radius = 4.0f;
+		parameter.height = 0.0f;
+		parameter.weight = 1.0f;
+		parameter.collision_flg = false;
+		parameter.actor_type = CollisionActorType::Enemy;
+		parameter.element = CollisionElement::Weppon;
+		parameter.position_mask = CollisionPositionMask::Collision_Mask_Member_Position;
+		charactor->SetCollision(actor, parameter, CollisionMeshType::Sphere);
+
+		// 頭コリジョン
 		name.clear();
 		name = actor->GetName();
  		name += "Head";
@@ -213,31 +259,6 @@ void EnemyDragonNightmare::DrawDebugPrimitive()
 
 	//// ターゲット座標の球描画
 	//renderer->DrawSphere(target_position, 0.5f, DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
-}
-
-//--------------------------------------
-// メッセージを受信したときの処理
-//--------------------------------------
-bool EnemyDragonNightmare::OnMessages(const Telegram& message)
-{
-	switch (message.message_box.message)
-	{
-	case MessageType::Message_Hit_Attack:
-		break;
-	case MessageType::Message_GetHit_Attack:
-		//ダメージフラグをオンに
-		OnDamaged();
-		// 衝突した位置を設定
-		SetHitPosition(message.message_box.hit_position);
-		break;
-	case MessageType::Message_Give_Attack_Right:
-		// 攻撃フラグをオンに
-		SetAttackFlag(true);
-		break;
-	case MessageType::Message_Hit_Boddy:
-		break;
-	}
-	return false;
 }
 
 

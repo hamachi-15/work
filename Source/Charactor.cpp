@@ -87,7 +87,7 @@ void Charactor::SetCollision(std::shared_ptr<Actor> actor, CollisionParameter& c
 			cylinder->SetActorID(collision_parameter.actor_id);
 			cylinder->SetCollisionFlag(collision_parameter.collision_flg);			
 			cylinder->SetCollisionElement(collision_parameter.element);
-			cylinder->SetPositionMask(collision_parameter.mask);
+			cylinder->SetPositionMask(collision_parameter.position_mask);
 			// マネージャーに追加
 			CollisionManager::Instance().ReregisterCylinder(cylinder);
 		}
@@ -102,7 +102,7 @@ void Charactor::SetCollision(std::shared_ptr<Actor> actor, CollisionParameter& c
 			sphere->SetNodeName(collision_parameter.node_name);
 			sphere->SetPosition(collision_parameter.position);
 			sphere->SetLocalPosition(collision_parameter.local_position);
-			sphere->SetPositionMask(collision_parameter.mask);
+			sphere->SetPositionMask(collision_parameter.position_mask);
 			sphere->SetRadius(collision_parameter.radius);
 			sphere->SetWeight(collision_parameter.weight);
 			sphere->SetActorID(collision_parameter.actor_id);

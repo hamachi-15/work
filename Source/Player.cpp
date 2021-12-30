@@ -170,7 +170,7 @@ void Player::Start()
 		parameter.collision_flg = true;
 		parameter.actor_id = charactor->GetID();
 		parameter.element = CollisionElement::Body;
-		parameter.mask = CollisionPositionMask::Collision_Mask_Actor_Position;
+		parameter.position_mask = CollisionPositionMask::Collision_Mask_Actor_Position;
 		charactor->SetCollision(actor, parameter, CollisionMeshType::Cylinder);
 
 		// 武器のコリジョン設定
@@ -187,9 +187,8 @@ void Player::Start()
 			parameter.radius = 1.0f;
 			parameter.weight = 1.0f;
 			parameter.collision_flg = false;
-			parameter.actor_id = charactor->GetID();
 			parameter.element = CollisionElement::Weppon;
-			parameter.mask = CollisionPositionMask::Collision_Mask_Local_Member_Position;
+			parameter.position_mask = CollisionPositionMask::Collision_Mask_Local_Member_Position;
 			charactor->SetCollision(actor, parameter, CollisionMeshType::Sphere);
 		}
 
@@ -199,12 +198,8 @@ void Player::Start()
 		parameter.name = "PlayerLeftFoot";
 		parameter.node_name = "B_L_Foot";
 		parameter.position = foot_position;
-		//parameter.radius = 1.0f;
-		//parameter.weight = 1.0f;
-		//parameter.collision_flg = false;
-		//parameter.actor_id = charactor->GetID();
 		parameter.element = CollisionElement::Weppon;
-		parameter.mask = CollisionPositionMask::Collision_Mask_Member_Position;
+		parameter.position_mask = CollisionPositionMask::Collision_Mask_Member_Position;
 		charactor->SetCollision(actor, parameter, CollisionMeshType::Sphere);
 
 		// 右足のコリジョン
@@ -212,12 +207,8 @@ void Player::Start()
 		parameter.name = "PlayerRightFoot";
 		parameter.node_name = "B_R_Foot";
 		parameter.position = foot_position;
-		//parameter.radius = 1.0f;
-		//parameter.weight = 1.0f;
-		//parameter.collision_flg = false;
-		//parameter.actor_id = charactor->GetID();
 		parameter.element = CollisionElement::Weppon;
-		parameter.mask = CollisionPositionMask::Collision_Mask_Member_Position;
+		parameter.position_mask = CollisionPositionMask::Collision_Mask_Member_Position;
 		charactor->SetCollision(actor, parameter, CollisionMeshType::Sphere);
 	}
 	
@@ -1399,9 +1390,9 @@ void Player::UpdateCameraState(float elapsed_time)
 					// 一番近い距離のキャラクターを検索
 					float	length1, length2;
 					EnemyManager& manager = EnemyManager::Instance();
-					for (int ii = 0; ii < manager.GetEnemyCount(); ++ii)
+					for (int i = 0; i < manager.GetEnemyCount(); ++i)
 					{
-						std::shared_ptr<Enemy> enemy = manager.GetEnemy(ii);
+						std::shared_ptr<Enemy> enemy = manager.GetEnemy(i);
 						std::shared_ptr<Actor> enemy_actor = enemy->GetActor();
 
 						if (lockon_state != LockonState::NotLocked)
@@ -1439,9 +1430,9 @@ void Player::UpdateCameraState(float elapsed_time)
 					// ロックオン対象が存在しているかチェックして
 					// 対象がいればロックオンを継続させる
 					EnemyManager& manager = EnemyManager::Instance();
-					for (int ii = 0; ii < manager.GetEnemyCount(); ++ii)
+					for (int i = 0; i < manager.GetEnemyCount(); ++i)
 					{
-						std::shared_ptr<Enemy> enemy = manager.GetEnemy(ii);
+						std::shared_ptr<Enemy> enemy = manager.GetEnemy(i);
 						std::shared_ptr<Actor> enemy_actor = enemy->GetActor();
 
 						if (enemy == old_lockon_enemy)
@@ -1475,9 +1466,9 @@ void Player::UpdateCameraState(float elapsed_time)
 						dz /= l;
 						// 外積を用いて左右判定を行い、角度的に最も近い対象にロックオンを変える
 						float angleMax = FLT_MAX;
-						for (int ii = 0; ii < manager.GetEnemyCount(); ++ii)
+						for (int i = 0; i < manager.GetEnemyCount(); ++i)
 						{
-							std::shared_ptr<Enemy> enemy = manager.GetEnemy(ii);
+							std::shared_ptr<Enemy> enemy = manager.GetEnemy(i);
 							std::shared_ptr<Actor> enemy_actor = enemy->GetActor();
 							if (enemy == old_lockon_enemy)
 								continue;
@@ -1528,8 +1519,8 @@ void Player::UpdateCameraState(float elapsed_time)
 			MessageData::CameraChangeMotionModeData	motioncamera_data;
 			float vx = sinf(angle.y) * 6;
 			float vz = cosf(angle.y) * 6;
-			//motioncamera_data.data.push_back({ 0, {position.x + vx, position.y + 50, position.z + vz }, position });
-			//motioncamera_data.data.push_back({ 90, {position.x + vx, position.y, position.z + vz }, position });
+			motioncamera_data.data.push_back({ 0, {position.x + vx, position.y + 50, position.z + vz }, position });
+			motioncamera_data.data.push_back({ 90, {position.x + vx, position.y, position.z + vz }, position });
 			Messenger::Instance().SendData(MessageData::CameraChangeMotionMode, &motioncamera_data);
 			break;
 		}
@@ -1543,25 +1534,6 @@ void Player::UpdateCameraState(float elapsed_time)
 			motioncamera_data.data.push_back({ 30, {position.x + vx, position.y + 35, position.z + vz }, position });
 			Messenger::Instance().SendData(MessageData::CameraChangeMotionMode, &motioncamera_data);
 			break;
-		}
-	case State::Encounter:
-		if (fase == 0) 
-		{
-			start_position = Camera::Instance().GetEye();
-			fase++;
-		}
-		{
-			// エンカウント時のカメラモーション
-			MessageData::CameraChangeMotionModeData motioncamera_data;
-			float vx = sinf(angle.y) * 4;
-			float vz = cosf(angle.y) * 4;
-			DirectX::XMVECTOR vector = DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&position), DirectX::XMLoadFloat3(&start_position));
-			vector = DirectX::XMVector3Normalize(vector);
-			DirectX::XMFLOAT3 float_vector;
-			DirectX::XMStoreFloat3(&float_vector, vector);
-			motioncamera_data.data.push_back({ 0, {start_position.x, start_position.y, start_position.z}, position });
-			motioncamera_data.data.push_back({ 50, {start_position.x + float_vector.x * 10, start_position.y - 0.5f, start_position.z + float_vector.z * 10 }, position });
-			Messenger::Instance().SendData(MessageData::CameraChangeMotionMode, &motioncamera_data);
 		}
 	}
 }

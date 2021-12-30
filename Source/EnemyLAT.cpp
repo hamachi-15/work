@@ -12,6 +12,11 @@
 #include "JudgmentOwner.h"
 #include "ActionOwner.h"
 
+//********************************
+// 
+// ラットクラス
+// 
+//********************************
 //-----------------------------------------
 // コンストラクタ
 //-----------------------------------------
@@ -27,6 +32,13 @@ EnemyLAT::~EnemyLAT()
 }
 
 //-----------------------------------------
+// 敵の破棄処理
+//-----------------------------------------
+void EnemyLAT::Destroy()
+{
+}
+
+//-----------------------------------------
 // GUI描画
 //-----------------------------------------
 void EnemyLAT::OnGUI()
@@ -38,6 +50,28 @@ void EnemyLAT::OnGUI()
 
 	// ビヘイビア関連情報
 	DrawBehaviorGUI();
+}
+
+//-----------------------------------------
+// メッセージを受信したときの処理
+//-----------------------------------------
+bool EnemyLAT::OnMessages(const Telegram& message)
+{
+	switch (message.message_box.message)
+	{
+	case MessageType::Message_Hit_Attack:
+
+		break;
+	case MessageType::Message_GetHit_Attack:
+		//ダメージフラグをオンに
+		OnDamaged();
+		// 衝突した位置を設定
+		SetHitPosition(message.message_box.hit_position);
+		break;
+	case MessageType::Message_Hit_Boddy:
+		break;
+	}
+	return false;
 }
 
 //-----------------------------------------
@@ -158,13 +192,6 @@ void EnemyLAT::SetBehaviorNode()
 }
 
 //-----------------------------------------
-// 敵の破棄処理
-//-----------------------------------------
-void EnemyLAT::Destroy()
-{
-}
-
-//-----------------------------------------
 // 更新処理
 //-----------------------------------------
 void EnemyLAT::Update(float elapsed_time)
@@ -212,26 +239,4 @@ void EnemyLAT::DrawDebugPrimitive()
 
 	// ターゲット座標の球描画
 	renderer->DrawSphere(target_position, 0.5f, DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
-}
-
-//-----------------------------------------
-// メッセージを受信したときの処理
-//-----------------------------------------
-bool EnemyLAT::OnMessages(const Telegram& message)
-{
-	switch (message.message_box.message)
-	{
-	case MessageType::Message_Hit_Attack:
-
-		break;
-	case MessageType::Message_GetHit_Attack:
-		//ダメージフラグをオンに
-		OnDamaged();
-		// 衝突した位置を設定
-		SetHitPosition(message.message_box.hit_position);
-		break;
-	case MessageType::Message_Hit_Boddy:
-		break;
-	}
-	return false;
 }

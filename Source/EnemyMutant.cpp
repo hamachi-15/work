@@ -11,13 +11,17 @@
 #include "ActionOwner.h"
 #include "BossActionOwner.h"
 #include "Charactor.h"
+
+//********************************
+// 
+// ミュータントクラス
+// 
+//********************************
 //---------------------------------------
 // コンストラクタ
 //---------------------------------------
 EnemyMutant::EnemyMutant()
 {
-	// 名前設定
-	SetName("Mutant");
 }
 
 //---------------------------------------
@@ -52,6 +56,8 @@ void EnemyMutant::Start()
 	std::shared_ptr<Actor> actor = GetActor();
 	std::shared_ptr<Charactor> charactor = actor->GetComponent<Charactor>();
 
+	// 名前設定
+	SetName("Mutant");
 
 	// ムーブメントコンポーネントの設定
 	SetMovement(actor->GetComponent<Movement>());
@@ -113,6 +119,14 @@ void EnemyMutant::Start()
 	behavior_data = new BehaviorData();
 	ai_tree = new BehaviorTree();
 
+	SetBehaviorNode();
+}
+
+//-----------------------------------------
+// ビヘイビアのノード設定処理
+//-----------------------------------------
+void EnemyMutant::SetBehaviorNode()
+{
 	ai_tree->AddNode("", "Root", 0, BehaviorTree::SelectRule::Priority, NULL, NULL);
 	ai_tree->AddNode("Root", "Death", 1, BehaviorTree::SelectRule::Non, new DeathJudgment(this), new DeathAction(this));
 	ai_tree->AddNode("Root", "Damage", 2, BehaviorTree::SelectRule::Non, new DamageJudgment(this), new DamageAction(this));
@@ -127,13 +141,6 @@ void EnemyMutant::Start()
 	//ai_tree->AddNode("Attack", "JumpAttack", 0, BehaviorTree::SelectRule::Non, new JumpAttackJudgmenet(this), new JumpAttackAction(this));
 	ai_tree->AddNode("Scount", "Wander", 1, BehaviorTree::SelectRule::Non, new WanderJudgment(this), new WanderAction(this));
 	ai_tree->AddNode("Scount", "Idle", 2, BehaviorTree::SelectRule::Non, NULL, new IdleAction(this));
-}
-
-//-----------------------------------------
-// ビヘイビアのノード設定処理
-//-----------------------------------------
-void EnemyMutant::SetBehaviorNode()
-{
 }
 
 //---------------------------------------

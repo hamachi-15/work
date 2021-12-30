@@ -1,7 +1,6 @@
 #pragma once
 #include <memory>
 #include "Shader.h"
-#include "GaussianBlurShader.h"
 
 class Texture;
 
@@ -44,5 +43,4 @@ private:
 	std::unique_ptr<Texture> bright_texture;
 	std::unique_ptr<Texture> bloom_texture;
 	std::unique_ptr<Texture> depth_texture;
-	std::unique_ptr<GaussianBlur> bulr;
 };

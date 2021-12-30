@@ -1,6 +1,11 @@
 #pragma once
 #include "Enemy.h"
 
+//********************************
+// 
+// ミュータントクラス
+// 
+//********************************
 class EnemyMutant : public Enemy
 {
 public:

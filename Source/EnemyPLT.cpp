@@ -1,4 +1,3 @@
-#include "EnemyPLT.h"
 
 #include "Model.h"
 
@@ -14,10 +13,18 @@
 #include "PLTActionOwner.h"
 
 #include "DebugRenderer.h"
-#include "EnemyManager.h"
-#include "Charactor.h"
 
+#include "Charactor.h"
 #include "ActorManager.h"
+#include "EnemyManager.h"
+#include "EnemyPLT.h"
+
+
+//**********************************
+// 
+// プラットクラス
+// 
+//**********************************
 //-----------------------------------------
 // コンストラクタ
 //-----------------------------------------
@@ -33,6 +40,25 @@ EnemyPLT::~EnemyPLT()
 }
 
 //-----------------------------------------
+// 破棄処理
+//-----------------------------------------
+void EnemyPLT::Destroy()
+{
+	// アクターの取得
+	std::shared_ptr<Actor> actor = GetActor();
+
+	// コリジョン削除
+	CollisionManager::Instance().UnregisterSphere(CollisionManager::Instance().GetCollisionSphereFromName(right_hand_collision_name.c_str()));
+	CollisionManager::Instance().UnregisterCylinder(CollisionManager::Instance().GetCollisionCylinderFromName(actor->GetName()));
+
+	// 敵マネージャーから削除
+	EnemyManager::Instance().EnemyRemove(GetActor()->GetComponent<EnemyPLT>());
+
+	// アクターマネージャーから削除
+	ActorManager::Instance().Remove(GetActor());
+}
+
+//-----------------------------------------
 // GUI描画
 //-----------------------------------------
 void EnemyPLT::OnGUI()
@@ -44,6 +70,31 @@ void EnemyPLT::OnGUI()
 
 	// ビヘイビア関連情報
 	DrawBehaviorGUI();
+}
+
+//-----------------------------------------
+// メッセージを受信したときの処理
+//-----------------------------------------
+bool EnemyPLT::OnMessages(const Telegram& message)
+{
+	switch (message.message_box.message)
+	{
+	case MessageType::Message_Hit_Attack:
+
+		break;
+	case MessageType::Message_GetHit_Attack:
+		//ダメージフラグをオンに
+		OnDamaged();
+		// 衝突した位置を設定
+		SetHitPosition(message.message_box.hit_position);
+		break;
+	case MessageType::Message_Hit_Boddy:
+		break;
+	case MessageType::Message_Give_Attack_Right:
+		SetAttackFlag(true);
+		break;
+	}
+	return false;
 }
 
 //-----------------------------------------
@@ -165,25 +216,6 @@ void EnemyPLT::SetBehaviorNode()
 }
 
 //-----------------------------------------
-// 破棄処理
-//-----------------------------------------
-void EnemyPLT::Destroy()
-{
-	// アクターの取得
-	std::shared_ptr<Actor> actor = GetActor();
-
-	// コリジョン削除
-	CollisionManager::Instance().UnregisterSphere(CollisionManager::Instance().GetCollisionSphereFromName(right_hand_collision_name.c_str()));
-	CollisionManager::Instance().UnregisterCylinder(CollisionManager::Instance().GetCollisionCylinderFromName(actor->GetName()));
-
-	// 敵マネージャーから削除
-	EnemyManager::Instance().EnemyRemove(GetActor()->GetComponent<EnemyPLT>());
-
-	// アクターマネージャーから削除
-	ActorManager::Instance().Remove(GetActor());
-}
-
-//-----------------------------------------
 // 更新処理
 //-----------------------------------------
 void EnemyPLT::Update(float elapsed_time)
@@ -231,29 +263,4 @@ void EnemyPLT::DrawDebugPrimitive()
 
 	// ターゲット座標の球描画
 	renderer->DrawSphere(target_position, 0.5f, DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
-}
-
-//-----------------------------------------
-// メッセージを受信したときの処理
-//-----------------------------------------
-bool EnemyPLT::OnMessages(const Telegram& message)
-{
-	switch (message.message_box.message)
-	{
-	case MessageType::Message_Hit_Attack:
-
-		break;
-	case MessageType::Message_GetHit_Attack:
-		//ダメージフラグをオンに
-		OnDamaged();
-		// 衝突した位置を設定
-		SetHitPosition(message.message_box.hit_position);
-		break;
-	case MessageType::Message_Hit_Boddy:
-		break;
-	case MessageType::Message_Give_Attack_Right:
-		SetAttackFlag(true);
-		break;
-	}
-	return false;
 }

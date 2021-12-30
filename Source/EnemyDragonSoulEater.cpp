@@ -1,6 +1,7 @@
 #include "SceneManager.h"
 
 #include "Charactor.h"
+#include "ActorManager.h"
 #include "EnemyManager.h"
 #include "EnemyDragonSoulEater.h"
 
@@ -28,10 +29,60 @@ EnemyDragonSoulEater::~EnemyDragonSoulEater()
 }
 
 //------------------------------------
+// 敵の破棄処理
+//------------------------------------
+void EnemyDragonSoulEater::Destroy()
+{
+	// アクターの取得
+	std::shared_ptr<Actor> actor = GetActor();
+
+	// コリジョン削除
+	std::vector<std::shared_ptr<CollisionSphere>> list = CollisionManager::Instance().GetCollisionSphereFromID(GetCharactor()->GetID() + GetIdentity());
+	for (std::shared_ptr<CollisionSphere> sphere : list)
+	{
+		CollisionManager::Instance().UnregisterSphere(sphere);
+	}
+	CollisionManager::Instance().UnregisterCylinder(CollisionManager::Instance().GetCollisionCylinderFromName(actor->GetName()));
+
+	// 敵マネージャーから削除
+	EnemyManager::Instance().EnemyRemove(GetActor()->GetComponent<EnemyDragonSoulEater>());
+
+	// アクターマネージャーから削除
+	ActorManager::Instance().Remove(GetActor());
+}
+
+//------------------------------------
 // GUI描画
 //------------------------------------
 void EnemyDragonSoulEater::OnGUI()
 {
+	// ビヘイビア関連情報
+	DrawBehaviorGUI();
+}
+
+//------------------------------------
+// メッセージを受信したときの処理
+//------------------------------------
+bool EnemyDragonSoulEater::OnMessages(const Telegram& message)
+{
+	switch (message.message_box.message)
+	{
+	case MessageType::Message_Hit_Attack:
+		break;
+	case MessageType::Message_GetHit_Attack:
+		//ダメージフラグをオンに
+		OnDamaged();
+		// 衝突した位置を設定
+		SetHitPosition(message.message_box.hit_position);
+		break;
+	case MessageType::Message_Give_Attack_Right:
+		// 攻撃フラグをオンに
+		SetAttackFlag(true);
+		break;
+	case MessageType::Message_Hit_Boddy:
+		break;
+	}
+	return false;
 }
 
 //------------------------------------
@@ -75,20 +126,6 @@ void EnemyDragonSoulEater::Start()
 		parameter.position_mask = CollisionPositionMask::Collision_Mask_Actor_Position;
 		charactor->SetCollision(actor, parameter, CollisionMeshType::Cylinder);
 
-		// 右腕コリジョン
-		std::string name = parameter.name;
-		name += "RightWrist";
-		parameter.name = name.c_str();
-		parameter.node_name = "R_Wrist";
-		parameter.radius = 4.0f;
-		parameter.height = 0.0f;
-		parameter.weight = 1.0f;
-		parameter.collision_flg = false;
-		parameter.actor_type = CollisionActorType::Enemy;
-		parameter.element = CollisionElement::Weppon;
-		parameter.position_mask = CollisionPositionMask::Collision_Mask_Member_Position;
-		charactor->SetCollision(actor, parameter, CollisionMeshType::Sphere);
-
 		// 頭コリジョン
 		name.clear();
 		name = actor->GetName();
@@ -104,15 +141,13 @@ void EnemyDragonSoulEater::Start()
 		parameter.position_mask = CollisionPositionMask::Collision_Mask_Member_Position;
 		charactor->SetCollision(actor, parameter, CollisionMeshType::Sphere);
 	
-		// 頭コリジョン
+		// 尻尾コリジョン
 		name.clear();
 		name = actor->GetName();
 		name += "Tail";
 		parameter.name = name.c_str();
 		parameter.node_name = "TailEnd";
 		parameter.radius = 3.5f;
-		parameter.height = 0.0f;
-		parameter.weight = 1.0f;
 		parameter.collision_flg = false;
 		parameter.actor_type = CollisionActorType::Enemy;
 		parameter.element = CollisionElement::Weppon;
@@ -162,17 +197,30 @@ void EnemyDragonSoulEater::SetBehaviorNode()
 }
 
 //------------------------------------
-// 敵の破棄処理
-//------------------------------------
-void EnemyDragonSoulEater::Destroy()
-{
-}
-
-//------------------------------------
 // 更新処理
 //------------------------------------
 void EnemyDragonSoulEater::Update(float elapsed_time)
 {
+	// ビヘイビアツリー更新処理
+	if (active_node == nullptr)
+	{
+		active_node = ai_tree->ActiveNodeInference(this, behavior_data);
+	}
+	if (active_node != nullptr && active_node != old_active_node)
+	{
+		ai_tree->Start(active_node);
+	}
+	if (active_node != nullptr)
+	{
+		active_node = ai_tree->Run(this, active_node, behavior_data, elapsed_time);
+	}
+	old_active_node = active_node;
+
+	// 速力更新処理
+	GetMovement()->UpdateVelocity(elapsed_time);
+
+	// 無敵時間更新処理
+	GetCharactor()->UpdateInvincibleTimer(elapsed_time);
 }
 
 //------------------------------------
@@ -181,8 +229,4 @@ void EnemyDragonSoulEater::Update(float elapsed_time)
 void EnemyDragonSoulEater::DrawDebugPrimitive()
 {
 }
-// メッセージを受信したときの処理
-bool EnemyDragonSoulEater::OnMessages(const Telegram& message)
-{
-	return false;
-}
+

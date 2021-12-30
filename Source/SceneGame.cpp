@@ -327,22 +327,23 @@ void SceneGame::PostRender(ID3D11DeviceContext* context, RenderContext& render_c
 	std::shared_ptr<Shader> bloom_shader = shader_manager.GetShader(ShaderManager::ShaderType::Bloom);
 	bloom_texture = dynamic_cast<Bloom*>(bloom_shader.get())->Render(context, render_context);
 
+	std::shared_ptr<Shader> bloom_shader = shader_manager.GetShader(ShaderManager::ShaderType::Bulr);
 
-	//Texture* texture = bulr->Render(graphics.GetTexture());
-	//{
-	//	ID3D11RenderTargetView* render_target_view[1] = { bulr_texture->GetRenderTargetView() };
-	//	graphics.SetRenderTargetView(render_target_view, depth_stencil_view);
-	//}
-	//// ビューポートの設定
-	//graphics.SetViewport(screen_size.x, screen_size.y);
-	//graphics.GetSpriteShader()->Begin(context);
-	//sprite->Render(context,
-	//	texture,
-	//	0, 0,
-	//	screen_size.x, screen_size.y,
-	//	0, 0,
-	//	texture->GetWidth(), texture->GetHeight());
-	//graphics.GetSpriteShader()->End(context);
+	Texture* texture = bulr->Render(graphics.GetTexture());
+	{
+		ID3D11RenderTargetView* render_target_view[1] = { bulr_texture->GetRenderTargetView() };
+		graphics.SetRenderTargetView(render_target_view, depth_stencil_view);
+	}
+	// ビューポートの設定
+	graphics.SetViewport(screen_size.x, screen_size.y);
+	graphics.GetSpriteShader()->Begin(context);
+	sprite->Render(context,
+		texture,
+		0, 0,
+		screen_size.x, screen_size.y,
+		0, 0,
+		texture->GetWidth(), texture->GetHeight());
+	graphics.GetSpriteShader()->End(context);
 }
 
 //-------------------------------------
@@ -455,6 +456,23 @@ bool SceneGame::OnMessages(const Telegram& telegram)
 		
 		// スクリプトにデータを書き込む
 		WriteScript::Instance().WriteSceneDataScript("./Data/Script/SendBattleSceneScript.txt", headder);		
+		
+		// プレイヤーコンポーネント取得
+		std::shared_ptr<Actor> player = ActorManager::Instance().GetActor("Player");
+
+		// エンカウント時のカメラモーション
+		DirectX::XMFLOAT3 start_position = Camera::Instance().GetEye();
+		MessageData::CameraChangeMotionModeData motioncamera_data;
+		// オイラー角・座標取得
+		DirectX::XMFLOAT3 angle = player->GetAngle();
+		DirectX::XMFLOAT3 position = player->GetPosition();
+		// プレイヤーの前方向算出
+		float vx = sinf(angle.y) * 20;
+		float vz = cosf(angle.y) * 20;
+		motioncamera_data.data.push_back({ 0, {start_position.x, start_position.y, start_position.z}, position });
+		motioncamera_data.data.push_back({ 20, {start_position.x + vx, start_position.y - 0.5f, start_position.z + vz }, position });
+		Messenger::Instance().SendData(MessageData::CameraChangeMotionMode, &motioncamera_data);
+
 		return true;
 		break;
 	}
