@@ -114,7 +114,7 @@ public:
 	void SetRunTimer(const float& run_timer) { this->run_timer = run_timer; }
 
 	// アニメーション再生
-	virtual void PlayAnimation(std::shared_ptr<AnimationData> animation) {}
+	virtual void PlayAnimation(std::shared_ptr<AnimationData> animation);
 
 	// ダメージ処理
 	void OnDamaged();
@@ -125,6 +125,8 @@ public:
 	// メッセージを受信したときの処理
 	virtual bool OnMessages(const Telegram& message) = 0;
 
+	// ビヘイビアのGUI描画
+	void DrawBehaviorGUI();
 private:
 	int					identity;			// 何番目の敵か
 	bool				attack_flag = false;		// 攻撃フラグ

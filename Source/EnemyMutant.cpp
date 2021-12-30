@@ -32,12 +32,8 @@ EnemyMutant::~EnemyMutant()
 //---------------------------------------
 void EnemyMutant::OnGUI()
 {
-	std::string str = "";
-	if (active_node != nullptr)
-	{
-		str = active_node->GetName();
-	}
-	ImGui::Text(u8"Behavior　%s", str.c_str());
+	// ビヘイビア関連情報
+	DrawBehaviorGUI();
 }
 
 //-----------------------------------------
@@ -86,7 +82,7 @@ void EnemyMutant::Start()
 		parameter.weight = 6.5f;
 		parameter.collision_flg = true;
 		parameter.element = CollisionElement::Body;
-		parameter.mask = CollisionPositionMask::Collision_Mask_Actor_Position;
+		parameter.position_mask = CollisionPositionMask::Collision_Mask_Actor_Position;
 		charactor->SetCollision(actor, parameter, CollisionMeshType::Cylinder);
 
 
@@ -100,7 +96,7 @@ void EnemyMutant::Start()
 		parameter.weight = 2.0f;
 		parameter.collision_flg = true;
 		parameter.element = CollisionElement::Weppon;
-		parameter.mask = CollisionPositionMask::Collision_Mask_Member_Position;
+		parameter.position_mask = CollisionPositionMask::Collision_Mask_Member_Position;
 		charactor->SetCollision(actor, parameter, CollisionMeshType::Sphere);
 
 		// 左手のコリジョン
@@ -187,10 +183,4 @@ void EnemyMutant::DrawDebugPrimitive()
 	// ターゲット座標の球描画
 	renderer->DrawSphere(target_position, 0.5f, DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
 
-}
-
-void EnemyMutant::PlayAnimation(std::shared_ptr<AnimationData> animation)
-{
-	Model* model = GetActor()->GetModel();
-	model->PlayAnimation(animation->number, animation->roop_flag, animation->blend);
 }

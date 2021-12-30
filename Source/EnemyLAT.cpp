@@ -37,22 +37,7 @@ void EnemyLAT::OnGUI()
 	ImGui::Checkbox("AttackFlag", &attack_flag);
 
 	// ビヘイビア関連情報
-	if (ImGui::CollapsingHeader("BehaviorTree"))
-	{
-		ImGui::TextColored(ImVec4(1, 0, 1, 1), u8"-------アクティブになっているノード------");
-		std::string child_str = "";
-		std::string parent_str = "";
-		if (active_node != nullptr)
-		{
-			parent_str = active_node->GetParent()->GetName();
-			child_str = active_node->GetName();
-		}
-		ImGui::Text(u8"ActiveParentNode　%s", parent_str.c_str());
-		ImGui::Text(u8"ActiveChildNode　%s", child_str.c_str());
-
-		ImGui::TextColored(ImVec4(1, 0, 1, 1), u8"-------ノードツリー-------");
-		ai_tree->DrawNodeGUI();
-	}
+	DrawBehaviorGUI();
 }
 
 //-----------------------------------------
@@ -108,7 +93,7 @@ void EnemyLAT::Start()
 		parameter.collision_flg = true;
 		parameter.actor_type = CollisionActorType::Enemy;
 		parameter.element = CollisionElement::Body;
-		parameter.mask = CollisionPositionMask::Collision_Mask_Actor_Position;
+		parameter.position_mask = CollisionPositionMask::Collision_Mask_Actor_Position;
 		charactor->SetCollision(actor, parameter, CollisionMeshType::Cylinder);
 
 		// 尻尾のコリジョン設定
@@ -124,7 +109,7 @@ void EnemyLAT::Start()
 		parameter.collision_flg = false;
 		parameter.actor_type = CollisionActorType::Enemy;
 		parameter.element = CollisionElement::Weppon;
-		parameter.mask = CollisionPositionMask::Collision_Mask_Member_Position;
+		parameter.position_mask = CollisionPositionMask::Collision_Mask_Member_Position;
 		charactor->SetCollision(actor, parameter, CollisionMeshType::Sphere);
 	}
 
@@ -249,15 +234,4 @@ bool EnemyLAT::OnMessages(const Telegram& message)
 		break;
 	}
 	return false;
-}
-
-//-----------------------------------------
-// アニメーション再生
-//-----------------------------------------
-void EnemyLAT::PlayAnimation(std::shared_ptr<AnimationData> animation)
-{
-	// モデル取得
-	Model* model = GetActor()->GetModel();
-	// アニメーション再生
-	model->PlayAnimation(animation->number, animation->roop_flag, animation->blend);
 }

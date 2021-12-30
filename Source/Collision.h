@@ -70,7 +70,7 @@ struct CollisionParameter
 	bool					collision_flg = false;
 	CollisionActorType		actor_type;
 	CollisionElement		element;
-	CollisionPositionMask	mask;
+	CollisionPositionMask	position_mask;
 };
 
 //-----------------------------------

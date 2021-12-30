@@ -227,6 +227,7 @@
     </ClCompile>
     <ClCompile Include="Source\Enemy.cpp" />
     <ClCompile Include="Source\EnemyDragonNightmare.cpp" />
+    <ClCompile Include="Source\EnemyDragonSoulEater.cpp" />
     <ClCompile Include="Source\EnemyLAT.cpp" />
     <ClCompile Include="Source\EnemyManager.cpp" />
     <ClCompile Include="Source\EnemyMutant.cpp" />
@@ -360,6 +361,7 @@
     </ClInclude>
     <ClInclude Include="Source\Enemy.h" />
     <ClInclude Include="Source\EnemyDragonNightmare.h" />
+    <ClInclude Include="Source\EnemyDragonSoulEater.h" />
     <ClInclude Include="Source\EnemyLAT.h" />
     <ClInclude Include="Source\EnemyManager.h" />
     <ClInclude Include="Source\EnemyMutant.h" />

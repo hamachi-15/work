@@ -30,9 +30,6 @@ public:
 
 	// メッセージを受信したときの処理
 	bool OnMessages(const Telegram& message)override;
-
-	// アニメーション再生処理
-	void PlayAnimation(std::shared_ptr<AnimationData> animation);
 private:
 	std::string right_hand_collision_name;
 };

@@ -2,23 +2,6 @@
 #include "ActionBase.h"
 
 //*****************************
-// 睡眠アクション
-//*****************************
-class SleepAction : public ActionBase
-{
-public:
-	// コンストラクタ
-	SleepAction(Enemy* enemy) : ActionBase(enemy){}
-
-	// 実行前処理
-	void Start(std::string action_name)override;
-
-	// 実行処理
-	ActionBase::State Run(float elapsed_time)override;
-
-};
-
-//*****************************
 // ガードアクション
 //*****************************
 class DefendAction : public ActionBase
@@ -28,10 +11,10 @@ public:
 	DefendAction(Enemy* enemy) : ActionBase(enemy) {}
 
 	// 実行前処理
-	void Start(std::string action_name)override;
+	void Start(std::string action_name) override;
 
 	// 実行処理
-	ActionBase::State Run(float elapsed_time)override;
+	ActionBase::State Run(float elapsed_time) override;
 };
 
 //*****************************
@@ -44,10 +27,10 @@ public:
 	BasicAttackAction(Enemy* enemy) : ActionBase(enemy) {}
 
 	// 実行前処理
-	void Start(std::string action_name)override;
+	void Start(std::string action_name) override;
 
 	// 実行処理
-	ActionBase::State Run(float elapsed_time)override;
+	ActionBase::State Run(float elapsed_time) override;
 };
 
 //*****************************
@@ -60,10 +43,10 @@ public:
 	ClawAttackAction(Enemy* enemy) : ActionBase(enemy){}
 
 	// 実行前処理
-	void Start(std::string action_name)override;
+	void Start(std::string action_name) override;
 
 	// 実行処理
-	ActionBase::State Run(float elapsed_time)override;
+	ActionBase::State Run(float elapsed_time) override;
 };
 
 //*****************************
@@ -76,10 +59,10 @@ public:
 	HornAttackAction(Enemy* enemy) : ActionBase(enemy) {}
 
 	// 実行前処理
-	void Start(std::string action_name)override;
+	void Start(std::string action_name) override;
 
 	// 実行処理
-	ActionBase::State Run(float elapsed_time)override;
+	ActionBase::State Run(float elapsed_time) override;
 };
 
 //*****************************
@@ -92,8 +75,8 @@ public:
 	JumpAttackAction(Enemy* enemy) : ActionBase(enemy) {}
 
 	// 実行前処理
-	void Start(std::string action_name)override;
+	void Start(std::string action_name) override;
 
 	// 実行処理
-	ActionBase::State Run(float elapsed_time)override;
+	ActionBase::State Run(float elapsed_time) override;
 };

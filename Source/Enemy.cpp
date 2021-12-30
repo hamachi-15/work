@@ -1,9 +1,15 @@
-#include "Enemy.h"
 #include "Mathf.h"
+
 #include "Charactor.h"
 #include "ActorManager.h"
+#include "Enemy.h"
+
 #include "BehaviorTree.h"
 #include "BehaviorData.h"
+#include "NodeBase.h"
+
+#include "ImGuiRenderer.h"
+
 Enemy::Enemy()
 {
 }
@@ -72,6 +78,17 @@ void Enemy::SetRandomTargetPosition()
 }
 
 //-----------------------------------------
+// アニメーション再生
+//-----------------------------------------
+void Enemy::PlayAnimation(std::shared_ptr<AnimationData> animation)
+{
+	// モデル取得
+	Model* model = GetActor()->GetModel();
+	// アニメーション再生
+	model->PlayAnimation(animation->number, animation->roop_flag, animation->blend);
+}
+
+//-----------------------------------------
 // ダメージ処理
 //-----------------------------------------
 void Enemy::OnDamaged()
@@ -85,4 +102,28 @@ void Enemy::OnDamaged()
 void Enemy::OnDead()
 {
 	GetCharactor()->SetDeathFlag(true);
+}
+
+//-----------------------------------------
+// ビヘイビアのGUI描画
+//-----------------------------------------
+void Enemy::DrawBehaviorGUI()
+{
+	// ビヘイビア関連情報
+	if (ImGui::CollapsingHeader("BehaviorTree"))
+	{
+		ImGui::TextColored(ImVec4(1, 0, 1, 1), u8"-------アクティブになっているノード------");
+		std::string child_str = "";
+		std::string parent_str = "";
+		if (active_node != nullptr)
+		{
+			parent_str = active_node->GetParent()->GetName();
+			child_str = active_node->GetName();
+		}
+		ImGui::Text(u8"ActiveParentNode　%s", parent_str.c_str());
+		ImGui::Text(u8"ActiveChildNode　%s", child_str.c_str());
+
+		ImGui::TextColored(ImVec4(1, 0, 1, 1), u8"-------ノードツリー-------");
+		ai_tree->DrawNodeGUI();
+	}
 }

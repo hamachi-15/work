@@ -456,6 +456,9 @@
     <ClCompile Include="Source\ShaderManager.cpp">
       <Filter>ソース ファイル\Graphics\Shader</Filter>
     </ClCompile>
+    <ClCompile Include="Source\EnemyDragonSoulEater.cpp">
+      <Filter>ソース ファイル\Character</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\imgui\imconfig.h">
@@ -820,6 +823,9 @@
     </ClInclude>
     <ClInclude Include="Source\ShaderManager.h">
       <Filter>ソース ファイル\Graphics\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\EnemyDragonSoulEater.h">
+      <Filter>ソース ファイル\Character</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

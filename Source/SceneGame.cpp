@@ -108,7 +108,6 @@ void SceneGame::Initialize()
 		actor->SetPosition(DirectX::XMFLOAT3(0, 0, 0));
 		actor->SetAngle(DirectX::XMFLOAT3( 0, DirectX::XMConvertToRadians(-90), 0));
 		actor->SetScale(DirectX::XMFLOAT3(0.1f, 0.1f, 0.1f));
-		//actor->SetScale(DirectX::XMFLOAT3(5.f, 5.f, 5.f));
 		actor->AddComponent<Stage>();
 		actor->SetShaderType(ShaderManager::ShaderType::CascadeShadowMap);
 	}

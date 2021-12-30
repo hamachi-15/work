@@ -17,7 +17,6 @@ public:
 	void Destroy() override;
 	// 更新処理
 	void Update(float elapsed_time) override;
-	void PlayAnimation(std::shared_ptr<AnimationData> animation) override;
 	void DrawDebugPrimitive() override;
 	// メッセージを受信したときの処理
 	bool OnMessages(const Telegram& message)override { return true; };

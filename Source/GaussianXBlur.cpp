@@ -9,7 +9,6 @@ GaussianXBlur::GaussianXBlur(ID3D11Device* device, u_int buffer_width, u_int buf
 	xblur_texture->Create(buffer_width, buffer_height, format);
 	depth_texture = std::make_unique<Texture>();
 	depth_texture->CreateDepthStencil(buffer_width, buffer_height);
-
 }
 
 void GaussianXBlur::Begin(ID3D11DeviceContext* context)
