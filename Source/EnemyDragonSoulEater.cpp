@@ -113,6 +113,17 @@ void EnemyDragonSoulEater::Start()
 		Model* model = GetActor()->GetModel();
 		// ‘Ì‚ÌƒRƒŠƒWƒ‡ƒ“Ý’è
 		CollisionParameter parameter;
+		parameter.name = "SoulEaterDragonAABB";
+		parameter.node_name = "";
+		parameter.position = {};
+		parameter.float3_radius = DirectX::XMFLOAT3(1.5f, 1.5f, 1.5f);
+		parameter.height = 9.0f;
+		parameter.collision_flg = true;
+		parameter.actor_id = charactor->GetID();
+		parameter.element = CollisionElement::Body;
+		parameter.position_mask = CollisionPositionMask::Collision_Mask_Actor_Position;
+		charactor->SetCollision(actor, parameter, CollisionMeshType::AABB);
+		
 		parameter.name = actor->GetName();
 		parameter.node_name = "";
 		parameter.actor_id = charactor->GetID() + GetIdentity();

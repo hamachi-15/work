@@ -159,8 +159,18 @@ void Player::Start()
 	{
 		// モデル取得
 		Model* model = actor->GetModel();
-		// 体のコリジョン設定
 		CollisionParameter parameter;
+		parameter.name = "PlayerAABB";
+		parameter.node_name = "B_Spine";
+		parameter.position = {};
+		parameter.float3_radius = DirectX::XMFLOAT3(4.0f, 9.0f, 4.0f);
+		parameter.collision_flg = true;
+		parameter.actor_id = charactor->GetID();
+		parameter.element = CollisionElement::Body;
+		parameter.position_mask = CollisionPositionMask::Collision_Mask_Member_Position;
+		charactor->SetCollision(actor, parameter, CollisionMeshType::AABB);
+
+		// 体のコリジョン設定
 		parameter.name = "Player";
 		parameter.node_name = "";
 		parameter.position = {};
@@ -168,8 +178,6 @@ void Player::Start()
 		parameter.weight = 5.0f;
 		parameter.height = 9.0f;
 		parameter.collision_flg = true;
-		parameter.actor_id = charactor->GetID();
-		parameter.element = CollisionElement::Body;
 		parameter.position_mask = CollisionPositionMask::Collision_Mask_Actor_Position;
 		charactor->SetCollision(actor, parameter, CollisionMeshType::Cylinder);
 

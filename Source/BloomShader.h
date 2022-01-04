@@ -3,6 +3,7 @@
 #include "Shader.h"
 
 class Texture;
+class GaussianBlur;
 
 class Bloom : public Shader
 {
@@ -39,6 +40,8 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11RasterizerState>	rasterizer_state;
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilState>	depth_stencil_state;
 	Microsoft::WRL::ComPtr<ID3D11SamplerState>		sampler_state;
+	
+	std::shared_ptr<GaussianBlur> bulr;
 	
 	std::unique_ptr<Texture> bright_texture;
 	std::unique_ptr<Texture> bloom_texture;

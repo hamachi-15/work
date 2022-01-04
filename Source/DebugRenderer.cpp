@@ -3,7 +3,7 @@
 #include "Misc.h"
 #include "Shader.h"
 #include "DebugRenderer.h"
-
+#include "Camera.h"
 //-------------------------------
 // コンストラクタ
 //-------------------------------
@@ -130,6 +130,9 @@ DebugRenderer::DebugRenderer(ID3D11Device* device)
 
 	// 円柱メッシュ作成
 	CreateCylinderMesh(device, 1.0f, 1.0f, 0.0f, 1.0f, 16, 1);
+
+	// 立方体メッシュ作成
+	CreateCubeMesh(device);
 }
 
 //-------------------------------
@@ -200,6 +203,88 @@ void DebugRenderer::Render(ID3D11DeviceContext* context, const DirectX::XMFLOAT4
 		context->Draw(cylinder_vertex_count, 0);
 	}
 	cylinders.clear();
+
+	// 立方体描画
+	context->IASetVertexBuffers(0, 1, cube_vertex_buffer.GetAddressOf(), &stride, &offset);
+	for (const Cube& cube : cubes)
+	{
+		// ワールドビュープロジェクション行列作成
+		DirectX::XMMATRIX S = DirectX::XMMatrixScaling(cube.radius.x, cube.radius.y, cube.radius.z);
+		DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(cube.position.x, cube.position.y, cube.position.z);
+		DirectX::XMMATRIX W = S * T;
+		DirectX::XMMATRIX WVP = W * VP;
+
+		// 定数バッファ更新
+		CBMesh cbmesh;
+		cbmesh.color = cube.color;
+		DirectX::XMStoreFloat4x4(&cbmesh.world_view_projection, WVP);
+
+		context->UpdateSubresource(constant_buffer.Get(), 0, 0, &cbmesh, 0, 0);
+		context->Draw(cube_vertex_count, 0);
+	}
+	cubes.clear();
+
+}
+void DebugRenderer::DrawLine(ID3D11DeviceContext* context, ID3D11Device* device, const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection, const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& end)
+{
+	DirectX::XMFLOAT3 vertices[2] =
+	{
+		start,
+		end
+	};
+	// シェーダー設定
+	context->VSSetShader(vertex_shader.Get(), nullptr, 0);
+	context->PSSetShader(pixel_shader.Get(), nullptr, 0);
+	context->IASetInputLayout(input_layout.Get());
+
+	// 定数バッファ設定
+	context->VSSetConstantBuffers(0, 1, constant_buffer.GetAddressOf());
+
+	// レンダーステート設定
+	const float blend_factor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	context->OMSetBlendState(blend_state.Get(), blend_factor, 0xFFFFFFFF);
+	context->OMSetDepthStencilState(depth_stencil_state.Get(), 0);
+	context->RSSetState(rasterizer_state.Get());
+
+	// ビュープロジェクション行列作成
+	DirectX::XMMATRIX V = DirectX::XMLoadFloat4x4(&view);
+	DirectX::XMMATRIX P = DirectX::XMLoadFloat4x4(&projection);
+	DirectX::XMMATRIX VP = V * P;
+	UINT stride = sizeof(DirectX::XMFLOAT3);
+	UINT offset = 0;
+	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+	context->IASetVertexBuffers(0, 1, cube_vertex_buffer.GetAddressOf(), &stride, &offset);
+	D3D11_BUFFER_DESC desc = {};
+
+	desc.ByteWidth = 2;
+	HRESULT hr = device->CreateBuffer(&desc, NULL, cube_vertex_buffer.GetAddressOf());
+	_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+	
+	// ワールドビュープロジェクション行列作成
+	DirectX::XMMATRIX S = DirectX::XMMatrixScaling(1, 1, 1);
+	DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(Camera::Instance().GetEye().x, Camera::Instance().GetEye().y, Camera::Instance().GetEye().z);
+	DirectX::XMMATRIX W = S * T;
+	DirectX::XMMATRIX WVP = W * VP;
+
+	// 定数バッファ更新
+	CBMesh cbmesh;
+	cbmesh.color = DirectX::XMFLOAT4(0, 1,1, 1);
+	DirectX::XMStoreFloat4x4(&cbmesh.world_view_projection, WVP);
+
+	context->UpdateSubresource(constant_buffer.Get(), 0, 0, &cbmesh, 0, 0);
+	context->Draw(2, 0);
+
+}
+//-------------------------------
+// 立方体描画
+//-------------------------------
+void DebugRenderer::DrawCube(const DirectX::XMFLOAT3& center, const DirectX::XMFLOAT3& radius, const DirectX::XMFLOAT4& color)
+{
+	Cube cube;
+	cube.position = center;
+	cube.radius = radius;
+	cube.color = color;
+	cubes.emplace_back(cube);
 }
 
 //-------------------------------
@@ -225,6 +310,83 @@ void DebugRenderer::DrawCylinder(const DirectX::XMFLOAT3& position, float radius
 	cylinder.height = height;
 	cylinder.color = color;
 	cylinders.emplace_back(cylinder);
+}
+
+//-------------------------------
+// 立方体メッシュ作成
+//-------------------------------
+void DebugRenderer::CreateCubeMesh(ID3D11Device* device)
+{
+	// 各頂点
+	DirectX::XMFLOAT3 position[8] =
+	{
+		// 手前側
+		DirectX::XMFLOAT3(-0.5f, -0.5f, -0.5f),
+		DirectX::XMFLOAT3(0.5f,  -0.5f, -0.5f),
+		DirectX::XMFLOAT3(0.5f,   0.5f, -0.5f),
+		DirectX::XMFLOAT3(-0.5f,  0.5f, -0.5f),
+
+		DirectX::XMFLOAT3(-0.5f, -0.5f, 0.5f),
+		DirectX::XMFLOAT3(0.5f,  -0.5f, 0.5f),
+		DirectX::XMFLOAT3(0.5f,   0.5f, 0.5f),
+		DirectX::XMFLOAT3(-0.5f,  0.5f, 0.5f),
+	};
+	// 法線
+	DirectX::XMFLOAT3 normal[6] =
+	{
+		DirectX::XMFLOAT3(0.0f, 0.0f, -1.0f),	// 奥側
+		DirectX::XMFLOAT3(0.0f, 0.0f, 1.0f),	// 手前側
+		DirectX::XMFLOAT3(1.0f, 0.0f, 0.0f),	// 右側
+		DirectX::XMFLOAT3(-1.0f, 0.0f, 0.0f),	// 左側
+		DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f),	// 上側
+		DirectX::XMFLOAT3(0.0f, -1.0f, 0.0f)	// 下側
+	};
+	DirectX::XMFLOAT3 vertices[38] =
+	{
+		// 手前側
+		position[0], position[1],
+		position[1], position[2],
+		position[2], position[3],
+		// 奥側
+		position[4], position[5],
+		position[5], position[6],
+		position[6], position[7],
+		position[7], position[4],
+		// 右側
+		position[1], position[2],
+		position[2], position[6],
+		position[6], position[5],
+		// 左側
+		position[4], position[0],
+		position[0], position[3],
+		position[3], position[7],
+		// 上側
+		position[3], position[2],
+		position[2], position[6],
+		position[6], position[7],
+		// 下側
+		position[0], position[1],
+		position[1], position[5],
+		position[5], position[4]
+	};
+	// 頂点バッファ
+	{
+		D3D11_BUFFER_DESC desc = {};
+		D3D11_SUBRESOURCE_DATA subresourceData = {};
+		cube_vertex_count = static_cast<UINT>(sizeof(vertices));
+		desc.ByteWidth = cube_vertex_count;
+		desc.Usage = D3D11_USAGE_IMMUTABLE;	// D3D11_USAGE_DEFAULT;
+		desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+		desc.CPUAccessFlags = 0;
+		desc.MiscFlags = 0;
+		desc.StructureByteStride = 0;
+		subresourceData.pSysMem = vertices;
+		subresourceData.SysMemPitch = 0;
+		subresourceData.SysMemSlicePitch = 0;
+
+		HRESULT hr = device->CreateBuffer(&desc, &subresourceData, cube_vertex_buffer.GetAddressOf());
+		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+	}
 }
 
 //-------------------------------

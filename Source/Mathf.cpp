@@ -26,3 +26,65 @@ float Mathf::ConvartToRadian(float degrees)
 {
 	return DirectX::XMConvertToRadians(degrees);
 }
+
+//----------------------------------
+// 平面からの最近値算出
+//----------------------------------
+void Mathf::NegaCalculate(DirectX::XMFLOAT3& anser, DirectX::XMFLOAT3& normal, DirectX::XMFLOAT3& radius)
+{
+    if (normal.x > 0)
+    {
+        anser.x += radius.x;
+    }
+    else
+    {
+        anser.x -= radius.x;
+    }
+    if (normal.y > 0)
+    {
+        anser.y += radius.y;
+    }
+    else
+    {
+        anser.y -= radius.y;
+    }
+    if (normal.z > 0)
+    {
+        anser.z += radius.z;
+    }
+    else
+    {
+        anser.z -= radius.z;
+    }
+}
+
+//----------------------------------
+// 平面からの最遠値算出
+//----------------------------------
+void Mathf::PosiCalculate(DirectX::XMFLOAT3& anser, DirectX::XMFLOAT3& normal, DirectX::XMFLOAT3& radius)
+{
+    if (normal.x < 0)
+    {
+        anser.x += radius.x;
+    }
+    else
+    {
+        anser.x -= radius.x;
+    }
+    if (normal.y < 0)
+    {
+        anser.y += radius.y;
+    }
+    else
+    {
+        anser.y -= radius.y;
+    }
+    if (normal.z < 0)
+    {
+        anser.z += radius.z;
+    }
+    else
+    {
+        anser.z -= radius.z;
+    }
+}

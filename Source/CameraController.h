@@ -1,6 +1,7 @@
 #pragma once
 #include <DirectXMath.h>
 #include "MessageData.h"
+#include "DebugRenderer.h"
 
 class CameraController
 {
@@ -19,7 +20,17 @@ public:
 
 	// カメラアングル設定
 	void SetCameraAngle(DirectX::XMFLOAT3 angle) { this->angle = angle; }
+		// カメラの四錐台
+	DirectX::XMFLOAT3	near_position[4] = {};	// Nearの四角形の４頂点の座標
+	DirectX::XMFLOAT3	far_position[4] = {}; 	// Farの四角形の４頂点の座標
+Plane				frustum[6];
 private:
+	// 錐台計算
+	void CalculateFrustum();
+
+	// 平面計算
+	void CalculatePlane(Plane& frustum, DirectX::XMFLOAT3& position1, DirectX::XMFLOAT3& position2, DirectX::XMFLOAT3& position3, DirectX::XMFLOAT3& position4);
+
 	// フリーカメラ
 	void OnFreeMode(void* data);
 
@@ -49,7 +60,13 @@ private:
 		MotionCamera,	// モーションカメラ
 	};
 
+	// メッセージキー
+	uint64_t Camera_Change_FreeMode_key;
+	uint64_t Camera_Change_LockonMode_key;
+	uint64_t Camera_Change_MotionMode_key;
+
 private:
+	// カメラのパラメータ
 	Mode mode = Mode::FreeCamera;
 	DirectX::XMFLOAT3 position = { 0.0f, 0.0f, 0.0f };
 	DirectX::XMFLOAT3 target = { 0.0f, 0.0f, 0.0f };
@@ -58,6 +75,7 @@ private:
 	float range = 40.0f;
 	float max_angleX = DirectX::XMConvertToRadians(45);
 	float min_angleX = DirectX::XMConvertToRadians(-45);
+
 	// モーションカメラ
 	float				motion_timer = 0;
 	std::vector<CameraMotionData>	motion_data;
@@ -69,8 +87,6 @@ private:
 	float				length_limit[2] = { 20, range };
 	float				side_value = 1;
 
-	// メッセージキー
-	uint64_t Camera_Change_FreeMode_key;
-	uint64_t Camera_Change_LockonMode_key;
-	uint64_t Camera_Change_MotionMode_key;
+
+
 };

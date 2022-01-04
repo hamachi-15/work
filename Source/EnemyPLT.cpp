@@ -144,6 +144,17 @@ void EnemyPLT::Start()
 
 		// ‘Ì‚ÌƒRƒŠƒWƒ‡ƒ“Ý’è
 		CollisionParameter parameter;
+		parameter.name = "PLTAABB";
+		parameter.node_name = "PLT:Chest_M_BK";
+		parameter.position = {};
+		parameter.float3_radius = DirectX::XMFLOAT3(5.5f, 13.0f, 5.5f);
+		parameter.height = 9.0f;
+		parameter.collision_flg = true;
+		parameter.actor_id = charactor->GetID();
+		parameter.element = CollisionElement::Body;
+		parameter.position_mask = CollisionPositionMask::Collision_Mask_Member_Position;
+		charactor->SetCollision(actor, parameter, CollisionMeshType::AABB);
+
 		parameter.name = actor->GetName();
 		parameter.node_name = "";
 		parameter.actor_id = charactor->GetID() + GetIdentity();

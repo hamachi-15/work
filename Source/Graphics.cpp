@@ -163,7 +163,7 @@ Graphics::Graphics(HWND hwnd)
 		shader_manager.RegisterShader<SpriteShader>(device.Get());
 		shader_manager.RegisterShader<Primitive>(device.Get());
 		shader_manager.RegisterShader<SkyBoxShader>(device.Get());
-		shader_manager.RegisterShader<GaussianBlur>(device.Get());
+		//shader_manager.RegisterShader<GaussianBlur>(device.Get());
 		shader_manager.RegisterShader<Bloom>(device.Get());
 		shader_manager.RegisterShader<Phong>(device.Get());
 		shader_manager.RegisterShader<LambertShader>(device.Get());

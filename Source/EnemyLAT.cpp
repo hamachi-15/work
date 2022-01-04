@@ -117,8 +117,19 @@ void EnemyLAT::Start()
 		// モデル取得
 		Model* model = actor->GetModel();
 
+		parameter.name = "LATAABB";
+		parameter.node_name = "";
+		parameter.position = {};
+		parameter.float3_radius = DirectX::XMFLOAT3(1.5f, 1.5f, 1.5f);
+		parameter.collision_flg = true;
+		parameter.actor_id = charactor->GetID();
+		parameter.actor_type = CollisionActorType::Enemy;
+		parameter.element = CollisionElement::Body;
+		parameter.position_mask = CollisionPositionMask::Collision_Mask_Actor_Position;
+		charactor->SetCollision(actor, parameter, CollisionMeshType::AABB);
+
 		// 体のコリジョン設定
-		parameter.name = GetName();
+		parameter.name = actor->GetName();
 		parameter.actor_id = charactor->GetID() + GetIdentity();
 		parameter.position = { 0.0f, 0.0f, 0.0f };
 		parameter.radius = 3.0f;
@@ -133,7 +144,9 @@ void EnemyLAT::Start()
 		// 尻尾のコリジョン設定
 		DirectX::XMFLOAT3 tail_position;
 		charactor->GetNodePosition("LAT:tai102_M_BK", tail_position, model);
-		parameter.name = "LATTail";
+		std::string name = actor->GetName();
+		name += "Tail";
+		parameter.name = name.c_str();
 		parameter.node_name = "LAT:tai102_M_BK";
 		parameter.actor_id = charactor->GetID();
 		parameter.position = tail_position;

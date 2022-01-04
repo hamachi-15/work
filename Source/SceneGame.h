@@ -52,7 +52,7 @@ private:
 	BlurRenderContext					blur_render_context;
 	PrimitiveContext					primitive_context;
 
-	std::unique_ptr<CameraController>	camera_controller;
+	//std::unique_ptr<CameraController>	camera_controller;
 
 	std::unique_ptr<Shader>				sprite_cube;
 	std::unique_ptr<Bloom>				bloom;
@@ -73,4 +73,9 @@ private:
 	bool								battle_flag = false;
 	bool								primitive_falg = false;
 	bool								isshadowmap = false;
+
+	DirectX::XMFLOAT3 radius = DirectX::XMFLOAT3(10, 10, 10);
+	DirectX::XMFLOAT3 center = DirectX::XMFLOAT3(-100, 8, -100);
+	DirectX::XMFLOAT4 color = DirectX::XMFLOAT4(1, 1, 1, 1);
+	bool iscull = false;
 };

@@ -11,7 +11,7 @@ public:
 		Sprite,
 		Primitive,
 		SkyBox,
-		Bulr,
+		//Bulr,
 		Bloom,
 		Phong,
 		Lambert,

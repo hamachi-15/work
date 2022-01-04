@@ -1,6 +1,8 @@
 #pragma once
 #include "Telegram.h"
+#include "CameraController.h"
 #include <string>
+#include <memory>
 
 class Scene
 {
@@ -36,4 +38,6 @@ public:
 private:
 	bool ready = false;
 	std::string scene_name; // ƒV[ƒ“‚Ì–¼‘O
+public: // TDDO
+	std::unique_ptr<CameraController>	camera_controller;
 };

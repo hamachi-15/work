@@ -7,7 +7,7 @@
 class Texture;
 class Sprite;
 class CameraController;
-class GaussianBlur;
+//class GaussianBlur;
 class Bloom;
 class Shader;
 
@@ -66,7 +66,7 @@ private:
 	DirectX::XMFLOAT3 LightDir = { 0,0,0 };
 
 	DirectX::XMFLOAT3 shadow_color = { 0.5f, 0.5f, 0.5f };
-	std::unique_ptr<GaussianBlur>		 bulr;
+	//std::unique_ptr<GaussianBlur>		 bulr;
 
 	bool								primitive_falg = false;
 	bool								isshadowmap = false;

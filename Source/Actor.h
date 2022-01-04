@@ -86,6 +86,12 @@ public:
 	// スケールの取得
 	const DirectX::XMFLOAT3 GetScale() const { return scale; }
 
+	// カリングを行うかのフラグ
+	void SetCullingFlag(bool culling_flag) { this->culling_flag = culling_flag; }
+
+	// カリングを行うかのフラグ取得
+	const bool GetCullingFlag() const { return culling_flag; }
+
 	// 行列の取得
 	const DirectX::XMFLOAT4X4& GetTransform() const { return transform; }
 
@@ -131,6 +137,7 @@ private:
 		0, 0, 1, 0,
 		0, 0, 0, 1
 	};
+	bool					culling_flag;
 
 	std::unique_ptr<Model>  model;
 	bool					animation_flag = true; // アニメーション更新を行うかのフラグ

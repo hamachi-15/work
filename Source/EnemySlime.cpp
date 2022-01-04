@@ -74,25 +74,32 @@ void EnemySlime::Start()
 	// 攻撃範囲の設定
 	SetAttackRange(10.0f);
 
-
 	// 最初はターゲット座標を自身の座標に設定
 	SetTargetPosition(actor->GetPosition());
 
 	// コリジョンの設定
 	{
 		Model* model = GetActor()->GetModel();
-		// 体のコリジョン設定
 		CollisionParameter parameter;
+
+		parameter.name = "SlimeAABB";
+		parameter.node_name = "Spine01";
+		parameter.float3_radius = DirectX::XMFLOAT3(5.5f, 5.5f, 5.5f);
+		parameter.collision_flg = true;
+		parameter.actor_id = charactor->GetID();
+		parameter.actor_type = CollisionActorType::Enemy;
+		parameter.element = CollisionElement::Body;
+		parameter.position_mask = CollisionPositionMask::Collision_Mask_Member_Position;
+		charactor->SetCollision(actor, parameter, CollisionMeshType::AABB);
+
+		// 体のコリジョン設定
 		parameter.name = actor->GetName();
 		parameter.node_name = "";
 		parameter.actor_id = charactor->GetID() + GetIdentity();
-		parameter.position = { 0, 0, 0 };
 		parameter.radius = 3.5f;
 		parameter.height = 6.5f;
 		parameter.weight = 6.5f;
 		parameter.collision_flg = true;
-		parameter.actor_type = CollisionActorType::Enemy;
-		parameter.element = CollisionElement::Body;
 		parameter.position_mask = CollisionPositionMask::Collision_Mask_Actor_Position;
 		charactor->SetCollision(actor, parameter, CollisionMeshType::Cylinder);
 

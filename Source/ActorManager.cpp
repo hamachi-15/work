@@ -293,6 +293,9 @@ void ActorManager::ShadowRender(RenderContext& render_context, BlurRenderContext
 		create_chadowmap->Begin(context, render_context);
 		for (std::shared_ptr<Actor>& actor : update_actors)
 		{
+			// カリングフラグが立っていれば描画しない
+			if (actor->GetCullingFlag()) continue;
+			
 			if (strcmp(actor->GetName(), "Filde") == 0) continue;
 			// モデルがあれば描画
 			Model* model = actor->GetModel();
@@ -318,6 +321,9 @@ void ActorManager::Render(RenderContext& render_context)
 
 	for (std::shared_ptr<Actor>& actor : update_actors)
 	{
+		// カリングフラグが立っていれば描画しない
+		if (actor->GetCullingFlag()) continue;
+
 		// 現在セットされているシェーダーとこれからの描画に使うシェーダーが同じか
 		if (actor->GetShaderType() != shader_type)
 		{
@@ -359,6 +365,9 @@ void ActorManager::BrightRender(RenderContext& render_context)
 	phong->Begin(context, render_context);
 	for (std::shared_ptr<Actor>& actor : update_actors)
 	{
+		// カリングフラグが立っていれば描画しない
+		if (actor->GetCullingFlag()) continue;
+		
 		if (strcmp(actor->GetName(), "FildeObjects") != 0) continue;
 		// モデルがあれば描画
 		Model* model = actor->GetModel();

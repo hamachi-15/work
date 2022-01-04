@@ -89,7 +89,7 @@ void Charactor::SetCollision(std::shared_ptr<Actor> actor, CollisionParameter& c
 			cylinder->SetCollisionElement(collision_parameter.element);
 			cylinder->SetPositionMask(collision_parameter.position_mask);
 			// マネージャーに追加
-			CollisionManager::Instance().ReregisterCylinder(cylinder);
+			CollisionManager::Instance().RegisterCylinder(cylinder);
 		}
 		break;
 	case CollisionMeshType::Sphere:
@@ -109,9 +109,29 @@ void Charactor::SetCollision(std::shared_ptr<Actor> actor, CollisionParameter& c
 			sphere->SetCollisionElement(collision_parameter.element);
 			sphere->SetCollisionFlag(collision_parameter.collision_flg);
 			// マネージャーに追加
-			CollisionManager::Instance().ReregisterSphere(sphere);
+			CollisionManager::Instance().RegisterSphere(sphere);
 		}
 		break;
+	case CollisionMeshType::AABB:
+	{
+		// コンポーネント追加
+
+		// パラメータを設定
+		std::shared_ptr<CollisionBox> box = actor->AddComponent<CollisionBox>();
+		box->SetName(collision_parameter.name);
+		box->SetNodeName(collision_parameter.node_name);
+		box->SetPosition(collision_parameter.position);
+		box->SetLocalPosition(collision_parameter.local_position);
+		box->SetPositionMask(collision_parameter.position_mask);
+		box->SetRadius(collision_parameter.float3_radius);
+		box->SetWeight(collision_parameter.weight);
+		box->SetActorID(collision_parameter.actor_id);
+		box->SetCollisionElement(collision_parameter.element);
+		box->SetCollisionFlag(collision_parameter.collision_flg);
+		// マネージャーに追加
+		CollisionManager::Instance().RegisterBox(box);
+	}
+	break;
 	}
 }
 

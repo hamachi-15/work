@@ -14,6 +14,9 @@ CameraController::CameraController()
 	Camera_Change_FreeMode_key = Messenger::Instance().AddReceiver(MessageData::CameraChangeFreeMode, [&](void* data) { OnFreeMode(data); });
 	Camera_Change_LockonMode_key = Messenger::Instance().AddReceiver(MessageData::CameraChangeLockonMode, [&](void* data) { OnLockonMode(data); });
 	Camera_Change_MotionMode_key = Messenger::Instance().AddReceiver(MessageData::CameraChangeMotionMode, [&](void* data) { OnMotionMode(data); });
+	
+	// 錐台算出
+	CalculateFrustum();
 }
 
 //-----------------------------
@@ -47,9 +50,147 @@ void CameraController::Update(float elapsed_time)
 	target.x   += (new_target.x - target.x) * speed;
 	target.y   += (new_target.y - target.y) * speed;
 	target.z   += (new_target.z - target.z) * speed;
+	GamePad& gamepad = Input::Instance().GetGamePad();
 
+	if (gamepad.GetButtonDown() & gamepad.BTN_X)
+	{
+		CalculateFrustum();
+	}
 	// カメラの視点と注視点に設定
 	Camera::Instance().SetLookAt(position, this->target, DirectX::XMFLOAT3(0, 1, 0));
+
+	//CalculateFrustum();
+
+}
+
+//-----------------------------
+// 錐台計算
+//-----------------------------
+void CameraController::CalculateFrustum()
+{
+	Camera& camera = Camera::Instance();
+	//DirectX::XMMATRIX view = DirectX::XMMatrixLookAtLH(DirectX::XMLoadFloat3(&camera.GetEye()), DirectX::XMLoadFloat3(&camera.GetFocus()), DirectX::XMLoadFloat3(&camera.GetUp()));
+	//DirectX::XMMATRIX projection = DirectX::XMMatrixPerspectiveFovLH(DirectX::XMConvertToRadians(45),
+	//	1280.0f / 720.0f,
+	//	20,
+	//	60.0f);
+
+	// ビューとプロジェクション取得
+	DirectX::XMMATRIX view = DirectX::XMLoadFloat4x4(&camera.GetView());
+	DirectX::XMMATRIX projection = DirectX::XMLoadFloat4x4(&camera.GetProjection());
+	
+	// ビュープロジェクションを算出
+	DirectX::XMMATRIX matrix = view * projection;
+	
+	// ビュープロジェクションを逆行列化
+	DirectX::XMMATRIX inverse_matrix = DirectX::XMMatrixInverse(nullptr, matrix);
+	
+	//ビュープロジェクション内の頂点算出用位置ベクトル
+	DirectX::XMVECTOR verts[8] =
+	{
+		// near plane corners
+		{ -1, -1, 0 },	// [0]:左下
+		{  1, -1, 0 },	// [1]:右下
+		{  1,  1, 0 },	// [2]:右上
+		{ -1,  1 ,0 },	// [3]:左上
+
+		// far plane corners.
+		{ -1, -1, 1 },	// [4]:左下
+		{  1, -1, 1 },	// [5]:右下
+		{  1,  1, 1 },	// [6]:右上
+		{ -1,  1, 1 } 	// [7]:左上
+	};
+
+	// ビュープロジェクション行列の逆行列を用いて、各頂点を算出する
+	DirectX::XMStoreFloat3(&near_position[0], DirectX::XMVector3TransformCoord(verts[0], inverse_matrix));
+	DirectX::XMStoreFloat3(&near_position[1], DirectX::XMVector3TransformCoord(verts[1], inverse_matrix));
+	DirectX::XMStoreFloat3(&near_position[2], DirectX::XMVector3TransformCoord(verts[2], inverse_matrix));
+	DirectX::XMStoreFloat3(&near_position[3], DirectX::XMVector3TransformCoord(verts[3], inverse_matrix));
+
+	DirectX::XMStoreFloat3(&far_position[0], DirectX::XMVector3TransformCoord(verts[4], inverse_matrix));
+	DirectX::XMStoreFloat3(&far_position[1], DirectX::XMVector3TransformCoord(verts[5], inverse_matrix));
+	DirectX::XMStoreFloat3(&far_position[2], DirectX::XMVector3TransformCoord(verts[6], inverse_matrix));
+	DirectX::XMStoreFloat3(&far_position[3], DirectX::XMVector3TransformCoord(verts[7], inverse_matrix));
+
+	//// 左側面
+	//CalculatePlane(frustum[0], near_position[3], near_position[0], far_position[3], near_position[3]);
+	//// 右側面
+	//CalculatePlane(frustum[1], near_position[2], near_position[1],far_position[2], near_position[2]);
+	//// 下側面
+	//CalculatePlane(frustum[2], far_position[1], near_position[1],near_position[0], near_position[1]);
+	//// 上側面
+	//CalculatePlane(frustum[3], near_position[3], near_position[2], far_position[3], near_position[3]);
+	//// 奥側面
+	//CalculatePlane(frustum[5], far_position[2], far_position[1], far_position[1], far_position[0]);
+	//// 手前側面
+	//CalculatePlane(frustum[4], near_position[2], near_position[3], near_position[3], near_position[0]);
+
+	// 左側面
+	{
+		DirectX::XMVECTOR vector1 = DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&near_position[3]), DirectX::XMLoadFloat3(&near_position[0]));
+		DirectX::XMVECTOR vector2 = DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&far_position[3]), DirectX::XMLoadFloat3(&near_position[3]));
+		DirectX::XMStoreFloat3(&frustum[0].normal, DirectX::XMVector3Cross(vector1, vector2));
+		DirectX::XMStoreFloat3(&frustum[0].normal, DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&frustum[0].normal)));
+		DirectX::XMStoreFloat(&frustum[0].direction, DirectX::XMVector3Dot(DirectX::XMLoadFloat3(&near_position[0]), DirectX::XMLoadFloat3(&frustum[0].normal)));
+
+	}
+	// 右側面
+	{
+		DirectX::XMVECTOR vector2 = DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&near_position[2]), DirectX::XMLoadFloat3(&near_position[1]));
+		DirectX::XMVECTOR vector1 = DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&far_position[2]), DirectX::XMLoadFloat3(&near_position[2]));
+		DirectX::XMStoreFloat3(&frustum[1].normal, DirectX::XMVector3Cross(vector1, vector2));
+		DirectX::XMStoreFloat3(&frustum[1].normal, DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&frustum[1].normal)));
+
+		DirectX::XMStoreFloat(&frustum[1].direction, DirectX::XMVector3Dot(DirectX::XMLoadFloat3(&far_position[2]), DirectX::XMLoadFloat3(&frustum[1].normal)));
+	}
+	// 下側面
+	{
+		DirectX::XMVECTOR vector2 = DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&far_position[1]), DirectX::XMLoadFloat3(&near_position[1]));
+		DirectX::XMVECTOR vector1 = DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&near_position[0]), DirectX::XMLoadFloat3(&near_position[1]));
+		DirectX::XMStoreFloat3(&frustum[2].normal, DirectX::XMVector3Cross(vector1, vector2));
+		DirectX::XMStoreFloat3(&frustum[2].normal, DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&frustum[2].normal)));
+		DirectX::XMStoreFloat(&frustum[2].direction, DirectX::XMVector3Dot(DirectX::XMLoadFloat3(&far_position[1]), DirectX::XMLoadFloat3(&frustum[2].normal)));
+	}
+	// 上側面
+	{
+		DirectX::XMVECTOR vector2 = DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&near_position[3]), DirectX::XMLoadFloat3(&near_position[2]));
+		DirectX::XMVECTOR vector1 = DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&far_position[3]), DirectX::XMLoadFloat3(&near_position[3]));
+		DirectX::XMStoreFloat3(&frustum[3].normal, DirectX::XMVector3Cross(vector1, vector2));
+		DirectX::XMStoreFloat3(&frustum[3].normal, DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&frustum[3].normal)));
+		DirectX::XMStoreFloat(&frustum[3].direction, DirectX::XMVector3Dot(DirectX::XMLoadFloat3(&far_position[3]), DirectX::XMLoadFloat3(&frustum[3].normal)));
+	}
+	// 奥側面
+	{
+		DirectX::XMVECTOR vector2 = DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&near_position[2]), DirectX::XMLoadFloat3(&near_position[3]));
+		DirectX::XMVECTOR vector1 = DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&near_position[3]), DirectX::XMLoadFloat3(&near_position[0]));
+		DirectX::XMStoreFloat3(&frustum[4].normal, DirectX::XMVector3Cross(vector1, vector2));
+		DirectX::XMStoreFloat3(&frustum[4].normal, DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&frustum[4].normal)));
+		DirectX::XMStoreFloat(&frustum[4].direction, DirectX::XMVector3Dot(DirectX::XMLoadFloat3(&far_position[3]), DirectX::XMLoadFloat3(&frustum[4].normal)));
+	}
+	// 手前側面
+	{
+		DirectX::XMVECTOR vector2 = DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&far_position[2]), DirectX::XMLoadFloat3(&far_position[1]));
+		DirectX::XMVECTOR vector1 = DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&far_position[1]), DirectX::XMLoadFloat3(&far_position[0]));
+
+		DirectX::XMStoreFloat3(&frustum[5].normal, DirectX::XMVector3Cross(vector1, vector2));
+		DirectX::XMStoreFloat3(&frustum[5].normal, DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&frustum[5].normal)));
+		DirectX::XMStoreFloat(&frustum[5].direction, DirectX::XMVector3Dot(DirectX::XMLoadFloat3(&near_position[3]), DirectX::XMLoadFloat3(&frustum[5].normal)));
+	}
+}
+
+// ----------------------------
+// 平面算出
+// ----------------------------
+void CameraController::CalculatePlane(Plane& frustum, DirectX::XMFLOAT3& position1, DirectX::XMFLOAT3& position2, DirectX::XMFLOAT3& position3, DirectX::XMFLOAT3& position4)
+{
+	// 平面の法線算出
+	DirectX::XMVECTOR vector1 = DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&position1), DirectX::XMLoadFloat3(&position2));
+	DirectX::XMVECTOR vector2 = DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&position3), DirectX::XMLoadFloat3(&position4));
+	DirectX::XMStoreFloat3(&frustum.normal, DirectX::XMVector3Cross(vector1, vector2));
+	DirectX::XMStoreFloat3(&frustum.normal, DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&frustum.normal)));
+	
+	// 原点からの最短距離算出
+	DirectX::XMStoreFloat(&frustum.direction, DirectX::XMVector3Dot(DirectX::XMLoadFloat3(&position1), DirectX::XMLoadFloat3(&frustum.normal)));
 }
 
 //-----------------------------

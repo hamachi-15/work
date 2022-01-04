@@ -110,7 +110,7 @@ void Movement::Turn(DirectX::XMFLOAT3& direction, float elapsed_time)
 	// 左右判定を行うために２つの単位ベクトルの外積を計算する
 	float cross = (frontX * direction.z) - (frontZ * direction.x);
 
-	// 2Dの外積値が生の場合か負の場合かによって左右判定が行える
+	// 2Dの外積値が正の場合か負の場合かによって左右判定が行える
 	// 左右判定を行うことによって左右回転を選択する
 	if (cross < 0.0f)
 	{

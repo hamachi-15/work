@@ -59,7 +59,7 @@ private:
 	DirectX::XMFLOAT3 velocity = { 0, 0, 0 };
 	bool		isground = false;
 	float		slope_rate = 1.0f;
-	float		friction = 1.5f;
+	float		friction = 3.0f;
 	float		acceleration = 1000.0f;
 	float		move_vecX = 0.0f;
 	float		move_vecZ = 0.0f;

@@ -78,7 +78,7 @@ void SceneGame::Initialize()
 	);
 	camera.SetPerspectiveFov(DirectX::XMConvertToRadians(45),
 		graphics.GetScreenWidth() / graphics.GetScreenHeight(),
-		0.01f,
+		1,
 		2000.0f);
 
 	// カメラコントローラー初期化
@@ -136,6 +136,7 @@ void SceneGame::Initialize()
 	}
 	ActorManager::Instance().Update(0.01f);
 	ActorManager::Instance().UpdateTransform();
+
 	MetaAI::Instance();
 }
 
@@ -212,7 +213,7 @@ void SceneGame::Update(float elapsed_time)
 		actor->GetPosition().z });
 	camera_controller->Update(elapsed_time);
 
-	// メタAIの更新処理
+		// メタAIの更新処理
 	MetaAI::Instance().Update(elapsed_time);
 
 	// アクター更新処理
@@ -292,12 +293,16 @@ void SceneGame::ScreenRender(ID3D11DeviceContext* context, RenderContext& render
 	// デバッグプリミティブ描画
 	{
 		// 敵縄張りのデバッグプリミティブ描画
-		EnemyTerritoryManager::Instance().Render();
+	//	EnemyTerritoryManager::Instance().Render();
 		// 敵のデバッグプリミティブ描画
-		EnemyManager::Instance().DrawDebugPrimitive();
+	//	EnemyManager::Instance().DrawDebugPrimitive();
 		// 当たり判定ののデバッグプリミティブ描画
 		CollisionManager::Instance().Draw();
-
+		for (int i = 0; i < 4; ++i)
+		{
+			graphics.GetDebugRenderer()->DrawSphere(camera_controller->far_position[i], 0.4f, color);
+			graphics.GetDebugRenderer()->DrawSphere(camera_controller->near_position[i], 0.4f, color);
+		}
 		graphics.GetDebugRenderer()->Render(context, render_context.view, render_context.projection);
 	}
 
@@ -327,23 +332,23 @@ void SceneGame::PostRender(ID3D11DeviceContext* context, RenderContext& render_c
 	std::shared_ptr<Shader> bloom_shader = shader_manager.GetShader(ShaderManager::ShaderType::Bloom);
 	bloom_texture = dynamic_cast<Bloom*>(bloom_shader.get())->Render(context, render_context);
 
-	std::shared_ptr<Shader> bloom_shader = shader_manager.GetShader(ShaderManager::ShaderType::Bulr);
+	//std::shared_ptr<Shader> bloom_shader = shader_manager.GetShader(ShaderManager::ShaderType::Bulr);
 
-	Texture* texture = bulr->Render(graphics.GetTexture());
-	{
-		ID3D11RenderTargetView* render_target_view[1] = { bulr_texture->GetRenderTargetView() };
-		graphics.SetRenderTargetView(render_target_view, depth_stencil_view);
-	}
-	// ビューポートの設定
-	graphics.SetViewport(screen_size.x, screen_size.y);
-	graphics.GetSpriteShader()->Begin(context);
-	sprite->Render(context,
-		texture,
-		0, 0,
-		screen_size.x, screen_size.y,
-		0, 0,
-		texture->GetWidth(), texture->GetHeight());
-	graphics.GetSpriteShader()->End(context);
+	//Texture* texture = bulr->Render(graphics.GetTexture());
+	//{
+	//	ID3D11RenderTargetView* render_target_view[1] = { bulr_texture->GetRenderTargetView() };
+	//	graphics.SetRenderTargetView(render_target_view, depth_stencil_view);
+	//}
+	//// ビューポートの設定
+	//graphics.SetViewport(screen_size.x, screen_size.y);
+	//graphics.GetSpriteShader()->Begin(context);
+	//sprite->Render(context,
+	//	texture,
+	//	0, 0,
+	//	screen_size.x, screen_size.y,
+	//	0, 0,
+	//	texture->GetWidth(), texture->GetHeight());
+	//graphics.GetSpriteShader()->End(context);
 }
 
 //-------------------------------------
@@ -496,6 +501,9 @@ void SceneGame::OnGui()
 	ImGui::SliderInt("PrimitiveType", &primitive_context.number, 1, 10);
 	ImGui::InputFloat("Timer", &primitive_context.timer);
 	ImGui::Checkbox("PrimitiveFlag", &primitive_falg);
+
+	ImGui::InputFloat3("box", &center.x);
+
 	ImGui::End();
 }
 

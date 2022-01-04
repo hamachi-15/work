@@ -4,6 +4,72 @@
 #include "Charactor.h"
 #include "SceneManager.h"
 #include "Model.h"
+//#include "Scene.h"
+
+#include "DebugRenderer.h"
+#include "Mathf.h"
+
+//*************************************
+// 
+// ボックス衝突オブジェクト
+// 
+//*************************************
+//-----------------------------------
+// 更新処理
+//-----------------------------------
+void CollisionBox::Update(float elapsed_time)
+{
+    Model* model = GetActor()->GetModel();
+
+    // コリジョンフラグが立っていなけれは更新しない
+    if (GetCollisionFlag() == false) return;
+
+    switch (GetPositionMask())
+    {
+    case CollisionPositionMask::Collision_Mask_Actor_Position:
+        break;
+        // クラスメンバの座標の更新
+    case CollisionPositionMask::Collision_Mask_Member_Position:
+    {
+        Model::Node* node = model->FindNode(GetNodeName());
+        DirectX::XMFLOAT3 position = {
+            node->world_transform._41,
+            node->world_transform._42,
+            node->world_transform._43 };
+        SetPosition(position);
+    }
+    break;
+    // ローカル座標からの座標の更新
+    case CollisionPositionMask::Collision_Mask_Local_Member_Position:
+    {
+        DirectX::XMFLOAT3 collision_position;
+        Model::Node* node = model->FindNode(GetNodeName());
+        DirectX::XMMATRIX world_transform_matrix = DirectX::XMLoadFloat4x4(&node->world_transform);
+        DirectX::XMFLOAT3 local_position = GetLocalPosition();
+        DirectX::XMVECTOR position = DirectX::XMVector3TransformCoord(
+            DirectX::XMLoadFloat3(&local_position), world_transform_matrix);
+        DirectX::XMStoreFloat3(&collision_position, position);
+        SetPosition(collision_position);
+    }
+    break;
+    }
+}
+
+//-----------------------------------
+// 描画処理
+//-----------------------------------
+void CollisionBox::Draw()
+{
+    DebugRenderer* renderer = Graphics::Instance().GetDebugRenderer();
+    if (GetPositionMask() == CollisionPositionMask::Collision_Mask_Actor_Position)
+    {
+        renderer->DrawCube(GetActor()->GetPosition(), GetRadius(), { 1.0f, 1.0f, 0.0f, 1.0f });
+    }
+    else
+    {
+        renderer->DrawCube(GetPosition(), GetRadius(), { 1.0f, 1.0f, 0.0f, 1.0f });
+    }
+}
 
 //-----------------------------------------
 // 更新処理
@@ -124,6 +190,20 @@ void CollisionCylinder::Draw()
 //-----------------------------------------
 void CollisionManager::Update()
 {
+    // ボックス破棄処理
+    for (std::shared_ptr<CollisionBox> box : remove_boxes)
+    {
+        std::vector<std::shared_ptr<CollisionBox>>::iterator remove = std::find(boxes.begin(), boxes.end(), box);
+        boxes.erase(remove);
+    }
+    std::vector<std::shared_ptr<CollisionBox>>::iterator iterate_box_remove = remove_boxes.begin();
+    for (; iterate_box_remove != remove_boxes.end(); iterate_box_remove = remove_boxes.begin())
+    {
+        remove_boxes.erase(iterate_box_remove);
+    }
+    remove_boxes.clear();
+
+    // 球破棄処理
     for (std::shared_ptr<CollisionSphere> sphere : remove_spheres)
     {
         std::vector<std::shared_ptr<CollisionSphere>>::iterator remove = std::find(spheres.begin(), spheres.end(), sphere);
@@ -136,6 +216,7 @@ void CollisionManager::Update()
     }
     remove_spheres.clear();
 
+    // 円柱破棄処理
     for (std::shared_ptr<CollisionCylinder> cylinder : remove_cylinderes)
     {
         std::vector<std::shared_ptr<CollisionCylinder>>::iterator remove = std::find(cylinderes.begin(), cylinderes.end(), cylinder);
@@ -149,6 +230,57 @@ void CollisionManager::Update()
     remove_cylinderes.clear();
 
     ObjectCollisionResult result;
+
+    // カメラの錐台内にいるかの判定
+    {
+        Scene* scene = SceneManager::Instance().GetCurrentScene();
+        size_t box_count = boxes.size();
+        for (std::shared_ptr<CollisionBox> aabb : boxes)
+        {
+            // カリングを行うかのフラグ
+            bool culling_flag = true;
+            int index = 0;
+            for (; index < 6; ++index)
+            {
+                //各平面の法線の成分を用いてAABBの８頂点の中から最近点と最遠点を求める
+                DirectX::XMFLOAT3 NegaPos = aabb->GetActor()->GetPosition();	// 最近点
+                DirectX::XMFLOAT3 PosiPos = aabb->GetActor()->GetPosition();	// 最遠点
+                // 半径取得
+                DirectX::XMFLOAT3 radius = aabb->GetRadius();
+
+                // 錐台の平面取得
+                Plane frustum = scene->camera_controller->frustum[index];
+
+                // 最近点算出
+                Mathf::NegaCalculate(NegaPos, frustum.normal, radius);
+
+                // 最遠点算出
+                Mathf::PosiCalculate(PosiPos, frustum.normal, radius);
+
+                //  各平面との内積を計算し、交差・内外判定(表裏判定)を行う 
+                //  外部と分かれば処理をbreakし確定させる
+                //  交差状態であれば、ステータスを変更してから次の平面とのチェックに続ける
+                //  内部であれば、そのまま次の平面とのチェックに続ける
+                float PosiLength, NegaLength;
+                DirectX::XMStoreFloat(&PosiLength, DirectX::XMVector3Dot(DirectX::XMLoadFloat3(&frustum.normal), DirectX::XMLoadFloat3(&PosiPos)));
+                DirectX::XMStoreFloat(&NegaLength, DirectX::XMVector3Dot(DirectX::XMLoadFloat3(&frustum.normal), DirectX::XMLoadFloat3(&NegaPos)));
+                if (PosiLength < frustum.direction && NegaLength < frustum.direction)
+                {
+                    break;
+                }
+            }
+            // ボックスが錐台外にあればカリングを行う
+            if (index != 6)
+            {
+                aabb->GetActor()->SetCullingFlag(true);
+            }
+            else
+            {
+                aabb->GetActor()->SetCullingFlag(false);
+            }
+        }
+    }
+
     // 球vs球の交差判定
     {   
         size_t sphere_count = spheres.size();
@@ -285,6 +417,10 @@ void CollisionManager::Update()
 //-----------------------------------------
 void CollisionManager::Draw()
 {
+    for (std::shared_ptr<CollisionBox> box : boxes)
+    {
+        box->Draw();
+    }
     for (std::shared_ptr<CollisionSphere> sphere : spheres)
     {
         sphere->Draw();
@@ -322,11 +458,30 @@ void CollisionManager::Destroy()
 }
 
 //-----------------------------------------
+// AABBコリジョン登録
+//-----------------------------------------
+void CollisionManager::RegisterBox(std::shared_ptr<CollisionBox> collision)
+{
+    // AABB配列にコリジョンを追加
+    boxes.emplace_back(collision);
+}
+
+//-----------------------------------------
+// AABBコリジョン解除
+//-----------------------------------------
+void CollisionManager::UnregisterBox(std::shared_ptr<CollisionBox> collision)
+{
+    // 破棄用AABB配列にコリジョンを追加
+    remove_boxes.emplace_back(collision);
+}
+
+//-----------------------------------------
 //　球コリジョンの登録
 //-----------------------------------------
-void CollisionManager::ReregisterSphere(std::shared_ptr<CollisionSphere> collision)
+void CollisionManager::RegisterSphere(std::shared_ptr<CollisionSphere> collision)
 {
-    spheres.emplace_back(collision); 
+    // 球配列にコリジョンを追加
+    spheres.emplace_back(collision);
 }
 
 //-----------------------------------------
@@ -341,8 +496,9 @@ void CollisionManager::UnregisterSphere(std::shared_ptr<CollisionSphere> collisi
 //-----------------------------------------
 //　円柱コリジョンの登録
 //-----------------------------------------
-void CollisionManager::ReregisterCylinder(std::shared_ptr<CollisionCylinder> collision)
+void CollisionManager::RegisterCylinder(std::shared_ptr<CollisionCylinder> collision)
 {
+    // 円柱配列にコリジョンを追加
     cylinderes.emplace_back(collision);
 }
 

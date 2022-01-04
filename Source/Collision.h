@@ -20,6 +20,7 @@ enum class CollisionMeshType
 {
 	Sphere,
 	Cylinder,
+	AABB
 };
 
 // コリジョンの属性
@@ -60,6 +61,7 @@ struct CollisionParameter
 	DirectX::XMFLOAT3		position = { 0, 0, 0 };
 	DirectX::XMFLOAT3		local_position = { 0, 0, 0 };
 	DirectX::XMFLOAT3		node_position = { 0, 0, 0 };
+	DirectX::XMFLOAT3		float3_radius = { 0, 0, 0 };
 	const char*				name;
 	const char*				node_name;
 	int						actor_id = -1;		// コリジョンを持っているアクターのID
@@ -165,21 +167,25 @@ public:
 	
 	// IDを取得
 	int GetActorID() const { return actor_id; }
+
 	// IDを設定
 	void SetActorID(int id) { actor_id = id; }
 	
 	// コリジョンの属性取得
 	CollisionElement GetCollisionElement() { return element; }
+
 	// コリジョンの属性設定
 	void SetCollisionElement(CollisionElement element) { this->element = element; }
 	
 	// コリジョンメッシュの種類取得
 	CollisionPositionMask GetPositionMask() { return position_mask; }
+
 	// コリジョンメッシュの種類設定
 	void SetPositionMask(CollisionPositionMask mask) { this->position_mask = mask; }
 
 	// コリジョンフラグ取得
 	bool GetCollisionFlag() { return collision_flag; }
+
 	// コリジョンフラグ設定
 	void SetCollisionFlag(bool flag) { this->collision_flag = flag; }
 private:
@@ -196,9 +202,37 @@ private:
 	CollisionPositionMask	position_mask;
 };
 
-//-----------------------------------
+//*************************************
+// 
+// ボックス衝突オブジェクト
+// 
+//*************************************
+class CollisionBox : public CollisionObject
+{
+public:
+	CollisionBox() {}
+	~CollisionBox() override {}
+
+	// 更新処理
+	void Update(float elapsed_time) override;
+
+	// 描画処理
+	void Draw();
+
+	// 半径設定
+	void SetRadius(const DirectX::XMFLOAT3 radius) { this->radius = radius; }
+
+	// 半径取得
+	const DirectX::XMFLOAT3& GetRadius() const { return radius; }
+private:
+	DirectX::XMFLOAT3 radius;
+};
+
+//*************************************
+// 
 // 球状衝突オブジェクト
-//-----------------------------------
+// 
+//*************************************
 class CollisionSphere : public CollisionObject
 {
 public:
@@ -211,13 +245,13 @@ public:
 	// 描画処理
 	void Draw();
 
-private:
-	float				radius = 0.5f;
 };
 
-//-----------------------------------
-// 円柱コリジョン
-//-----------------------------------
+//*************************************
+// 
+// 円柱衝突オブジェクト
+// 
+//*************************************
 class CollisionCylinder : public CollisionObject
 {
 public:
@@ -238,9 +272,11 @@ private:
 	float				height = 0.5f;
 };
 
-//-----------------------------------
+//*************************************
+// 
 // コリジョンマネージャー
-//-----------------------------------
+// 
+//*************************************
 class CollisionManager
 {
 private:
@@ -267,14 +303,20 @@ public:
 	// コリジョンリストを全破棄
 	void Destroy();
 
+	// AABBコリジョン登録
+	void RegisterBox(std::shared_ptr<CollisionBox> collision);
+
+	// AABBコリジョン解除
+	void UnregisterBox(std::shared_ptr<CollisionBox> collision);
+
 	//　球コリジョンの登録
-	void ReregisterSphere(std::shared_ptr<CollisionSphere> collision);
+	void RegisterSphere(std::shared_ptr<CollisionSphere> collision);
 
 	// 球コリジョンの解除
 	void UnregisterSphere(std::shared_ptr<CollisionSphere> collision);
 
 	//　円柱コリジョンの登録
-	void ReregisterCylinder(std::shared_ptr<CollisionCylinder> collision);
+	void RegisterCylinder(std::shared_ptr<CollisionCylinder> collision);
 
 	// 円柱コリジョンの解除
 	void UnregisterCylinder(std::shared_ptr<CollisionCylinder> collision);
@@ -304,7 +346,10 @@ private:
 	
 private:
 	CollisionRayCast raycast;
-	
+
+	std::vector<std::shared_ptr<CollisionBox>> boxes;// 更新などをする用の円柱コリジョン配列
+	std::vector<std::shared_ptr<CollisionBox>> remove_boxes;// マネージャーから削除する用の円柱コリジョン配列
+
 	std::vector<std::shared_ptr<CollisionSphere>>	spheres;// 更新などをする用の球コリジョン配列
 	std::vector<std::shared_ptr<CollisionSphere>>	remove_spheres;// マネージャーから削除する用の球コリジョン配列
 

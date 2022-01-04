@@ -260,11 +260,11 @@ void EnemyManager::SetEnemyStatus(std::shared_ptr<Actor> actor, std::shared_ptr<
 	// TODO “G‚ðì‚èI‚¦‚½‚ç‘Î‰ž‚·‚é
 	switch (enemy_data->category)
 	{
-	case EnemyCategory::Slime:
 	case EnemyCategory::LAT:
+		enemy = actor->AddComponent<EnemyLAT>();
+		break;
+	case EnemyCategory::Slime:
 		enemy = actor->AddComponent<EnemySlime>();
-		//break;
-		//enemy = actor->AddComponent<EnemyLAT>();
 		break;
 	case EnemyCategory::PLT:
 		enemy = actor->AddComponent<EnemyPLT>();
@@ -313,10 +313,10 @@ void EnemyManager::AddComponent(std::shared_ptr<Actor> actor, std::shared_ptr<En
 	switch (enemy_data->category)
 	{
 	case EnemyCategory::Slime:
-	case EnemyCategory::LAT:
 		enemy = actor->AddComponent<EnemySlime>();
-		//break;
-		//enemy = actor->AddComponent<EnemyLAT>();
+		break;
+	case EnemyCategory::LAT:
+		enemy = actor->AddComponent<EnemyLAT>();
 		break;
 	case EnemyCategory::PLT:
 		enemy = actor->AddComponent<EnemyPLT>();

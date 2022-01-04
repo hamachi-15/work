@@ -13,6 +13,7 @@
 #include "CascadeShadowMapShader.h"
 #include "LambertShader.h"
 #include "BloomShader.h"
+#include "GaussianBlurShader.h"
 
 #include "Actor.h"
 #include "ActorManager.h"
