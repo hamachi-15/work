@@ -82,6 +82,7 @@ void EnemySlime::Start()
 		Model* model = GetActor()->GetModel();
 		CollisionParameter parameter;
 
+		// カリング用のコリジョン
 		parameter.name = "SlimeAABB";
 		parameter.node_name = "Spine01";
 		parameter.float3_radius = DirectX::XMFLOAT3(5.5f, 5.5f, 5.5f);

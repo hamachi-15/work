@@ -1,5 +1,6 @@
 #include <imgui.h>
 #include <stdio.h>
+#include "Mathf.h"
 #include "SceneBattle.h"
 #include "Graphics.h"
 #include "Camera.h"
@@ -67,14 +68,14 @@ void SceneBattle::Initialize()
 		DirectX::XMFLOAT3(0, 1, 0)
 	);
 	camera.SetPerspectiveFov(
-		DirectX::XMConvertToRadians(45),
+		Mathf::ConvartToRadian(45),
 		graphics.GetScreenWidth() / graphics.GetScreenHeight(),
 		0.1f,
 		800.0f);
 
 	// カメラコントローラー初期化
 	camera_controller = std::make_unique<CameraController>();
-	camera_controller->SetCameraAngle({ DirectX::XMConvertToRadians(25), 0.0f, 0.0f });
+	camera_controller->SetCameraAngle({ Mathf::ConvartToRadian(25), 0.0f, 0.0f });
 
 	// シェーダー初期化
 	bloom = std::make_unique<Bloom>(device);
@@ -91,7 +92,7 @@ void SceneBattle::Initialize()
 		actor->SetUpModel("Data/Model/Filde/Filde.mdl", nullptr);
 		actor->SetName("Filde");
 		actor->SetPosition(DirectX::XMFLOAT3(0, 0, 0));
-		actor->SetAngle(DirectX::XMFLOAT3(0, DirectX::XMConvertToRadians(-90), 0));
+		actor->SetAngle(DirectX::XMFLOAT3(0, Mathf::ConvartToRadian(-90), 0));
 		actor->SetScale(DirectX::XMFLOAT3(0.1f, 0.1f, 0.1f));
 		actor->AddComponent<Stage>();
 		actor->SetShaderType(ShaderManager::ShaderType::CascadeShadowMap);

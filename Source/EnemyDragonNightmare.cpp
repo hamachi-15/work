@@ -17,9 +17,9 @@
 #include "BehaviorTree.h"
 #include "BehaviorData.h"
 #include "JudgmentOwner.h"
-#include "NightmareDragonJudgmentOwner.h"
+#include "DragonJudgmentOwner.h"
 #include "ActionOwner.h"
-#include "NightmareDragonActionOwner.h"
+#include "DragonActionOwner.h"
 
 //********************************
 // 
@@ -124,8 +124,8 @@ void EnemyDragonNightmare::Start()
 	// コリジョンの設定
 	{
 		Model* model = GetActor()->GetModel();
-		// 体のコリジョン設定
 		CollisionParameter parameter;
+		// カリング用のコリジョン
 		parameter.name = "NightmareDragonAABB";
 		parameter.node_name = "";
 		parameter.position = {};
@@ -137,7 +137,7 @@ void EnemyDragonNightmare::Start()
 		parameter.position_mask = CollisionPositionMask::Collision_Mask_Actor_Position;
 		charactor->SetCollision(actor, parameter, CollisionMeshType::AABB);
 
-		
+		// 体のコリジョン設定
 		parameter.name = actor->GetName();
 		parameter.node_name = "";
 		parameter.actor_id = charactor->GetID() + GetIdentity();
@@ -173,6 +173,20 @@ void EnemyDragonNightmare::Start()
 		parameter.node_name = "UpperHead02";
 		parameter.radius = 6.5f;
 		parameter.height = 0.0f;
+		parameter.weight = 1.0f;
+		parameter.collision_flg = false;
+		parameter.actor_type = CollisionActorType::Enemy;
+		parameter.element = CollisionElement::Weppon;
+		parameter.position_mask = CollisionPositionMask::Collision_Mask_Member_Position;
+		charactor->SetCollision(actor, parameter, CollisionMeshType::Sphere);
+	
+		// 口のコリジョン
+		name.clear();
+		name = actor->GetName();
+		name += "mouth";
+		parameter.name = name.c_str();
+		parameter.node_name = "Jaw02";
+		parameter.radius = 6.5f;
 		parameter.weight = 1.0f;
 		parameter.collision_flg = false;
 		parameter.actor_type = CollisionActorType::Enemy;
@@ -215,9 +229,7 @@ void EnemyDragonNightmare::SetBehaviorNode()
 		ai_tree->AddNode("Battle", "Pursuit",     2, BehaviorTree::SelectRule::Non,		 NULL,							new PursuitAction(this));
 		ai_tree->AddNode("Attack", "BasicAttack", 1, BehaviorTree::SelectRule::Non,		 new BasicAttackJudgment(this), new BasicAttackAction(this));
 		ai_tree->AddNode("Attack", "ClawAttack",  2, BehaviorTree::SelectRule::Non,		 new ClawAttackJudgment(this),  new ClawAttackAction(this));
-		ai_tree->AddNode("Attack", "HornAttack",  3, BehaviorTree::SelectRule::Non,		 new ClawAttackJudgment(this),  new HornAttackAction(this));
-		ai_tree->AddNode("Attack", "JumpAttack",  4, BehaviorTree::SelectRule::Non,		 new JumpAttackJudgment(this),  new JumpAttackAction(this));
-		ai_tree->AddNode("Scount", "Wander",      1, BehaviorTree::SelectRule::Non,		 new WanderJudgment(this),		new WanderAction(this));
+		ai_tree->AddNode("Attack", "HornAttack",  3, BehaviorTree::SelectRule::Non,		 new ClawAttackJudgment(this),  new HornAttackAction(this));		ai_tree->AddNode("Scount", "Wander",      1, BehaviorTree::SelectRule::Non,		 new WanderJudgment(this),		new WanderAction(this));
 		ai_tree->AddNode("Scount", "Idle",        2, BehaviorTree::SelectRule::Non,		 NULL,							new IdleAction(this));
 	}
 }

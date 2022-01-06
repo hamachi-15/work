@@ -414,12 +414,6 @@
     <ClCompile Include="Source\CascadeShadowMapShader.cpp">
       <Filter>ソース ファイル\Graphics\Shader</Filter>
     </ClCompile>
-    <ClCompile Include="Source\NightmareDragonActionOwner.cpp">
-      <Filter>ソース ファイル\AI\NightmareDragonAI</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\NightmareDragonJudgmentOwner.cpp">
-      <Filter>ソース ファイル\AI\NightmareDragonAI</Filter>
-    </ClCompile>
     <ClCompile Include="Source\SlimeActionOwner.cpp">
       <Filter>ソース ファイル\AI\SlimeAI</Filter>
     </ClCompile>
@@ -458,6 +452,12 @@
     </ClCompile>
     <ClCompile Include="Source\EnemyDragonSoulEater.cpp">
       <Filter>ソース ファイル\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\DragonActionOwner.cpp">
+      <Filter>ソース ファイル\AI\NightmareDragonAI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\DragonJudgmentOwner.cpp">
+      <Filter>ソース ファイル\AI\NightmareDragonAI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -773,12 +773,6 @@
     <ClInclude Include="Source\CascadeShadowMapShader.h">
       <Filter>ソース ファイル\Graphics\Shader</Filter>
     </ClInclude>
-    <ClInclude Include="Source\NightmareDragonActionOwner.h">
-      <Filter>ソース ファイル\AI\NightmareDragonAI</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\NightmareDragonJudgmentOwner.h">
-      <Filter>ソース ファイル\AI\NightmareDragonAI</Filter>
-    </ClInclude>
     <ClInclude Include="Source\SlimeActionOwner.h">
       <Filter>ソース ファイル\AI\SlimeAI</Filter>
     </ClInclude>
@@ -826,6 +820,12 @@
     </ClInclude>
     <ClInclude Include="Source\EnemyDragonSoulEater.h">
       <Filter>ソース ファイル\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\DragonActionOwner.h">
+      <Filter>ソース ファイル\AI\NightmareDragonAI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\DragonJudgmentOwner.h">
+      <Filter>ソース ファイル\AI\NightmareDragonAI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

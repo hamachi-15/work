@@ -8,7 +8,9 @@
 #include "BehaviorTree.h"
 #include "BehaviorData.h"
 #include "ActionOwner.h"
+#include "DragonActionOwner.h"
 #include "JudgmentOwner.h"
+#include "DragonJudgmentOwner.h"
 //*********************************
 // 
 // ソウルイータードラゴンクラス
@@ -111,8 +113,8 @@ void EnemyDragonSoulEater::Start()
 	// コリジョンの設定
 	{
 		Model* model = GetActor()->GetModel();
-		// 体のコリジョン設定
 		CollisionParameter parameter;
+		// カリング用のコリジョン
 		parameter.name = "SoulEaterDragonAABB";
 		parameter.node_name = "";
 		parameter.position = {};
@@ -124,6 +126,7 @@ void EnemyDragonSoulEater::Start()
 		parameter.position_mask = CollisionPositionMask::Collision_Mask_Actor_Position;
 		charactor->SetCollision(actor, parameter, CollisionMeshType::AABB);
 		
+		// 体のコリジョン設定
 		parameter.name = actor->GetName();
 		parameter.node_name = "";
 		parameter.actor_id = charactor->GetID() + GetIdentity();

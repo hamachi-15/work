@@ -117,6 +117,7 @@ void EnemyLAT::Start()
 		// モデル取得
 		Model* model = actor->GetModel();
 
+		// カリング用のコリジョン
 		parameter.name = "LATAABB";
 		parameter.node_name = "";
 		parameter.position = {};

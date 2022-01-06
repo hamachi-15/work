@@ -4,6 +4,7 @@
 
 // シェーダー系インクルード
 #include "ShaderManager.h"
+#include "PhongVarianceShadowMap.h"
 
 // データベース系インクルード
 #include "Script.h"
@@ -19,8 +20,7 @@
 #include "EnemyPLT.h"
 #include "EnemyLAT.h"
 #include "EnemyDragonNightmare.h"
-#include "PhongVarianceShadowMap.h"
-
+#include "EnemyDragonSoulEater.h"
 
 //-----------------------------------------------
 // コンストラクタ
@@ -273,11 +273,12 @@ void EnemyManager::SetEnemyStatus(std::shared_ptr<Actor> actor, std::shared_ptr<
 		enemy = actor->AddComponent<EnemyMutant>();
 		break;
 	case EnemyCategory::NightmareDragon:
-		//break;
-	case EnemyCategory::SoulEaterDragon:
-		//break;
-	case EnemyCategory::DragonUsurper:
 		enemy = actor->AddComponent<EnemyDragonNightmare>();
+		break;
+	case EnemyCategory::SoulEaterDragon:
+		enemy = actor->AddComponent<EnemyDragonSoulEater>();
+		break;
+	case EnemyCategory::DragonUsurper:
 		break;
 	}
 

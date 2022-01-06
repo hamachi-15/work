@@ -160,6 +160,7 @@ void Player::Start()
 		// モデル取得
 		Model* model = actor->GetModel();
 		CollisionParameter parameter;
+		// カリング用のコリジョン
 		parameter.name = "PlayerAABB";
 		parameter.node_name = "B_Spine";
 		parameter.position = {};

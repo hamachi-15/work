@@ -2,7 +2,9 @@
 #include "ActionBase.h"
 
 //*****************************
+// 
 // ガードアクション
+// 
 //*****************************
 class DefendAction : public ActionBase
 {
@@ -18,7 +20,9 @@ public:
 };
 
 //*****************************
+// 
 // 噛みつき攻撃
+// 
 //*****************************
 class BasicAttackAction : public ActionBase
 {
@@ -34,13 +38,15 @@ public:
 };
 
 //*****************************
+// 
 // 爪攻撃
+// 
 //*****************************
 class ClawAttackAction : public ActionBase
 {
 public:
 	// コンストラクタ
-	ClawAttackAction(Enemy* enemy) : ActionBase(enemy){}
+	ClawAttackAction(Enemy* enemy) : ActionBase(enemy) {}
 
 	// 実行前処理
 	void Start(std::string action_name) override;
@@ -50,7 +56,9 @@ public:
 };
 
 //*****************************
+// 
 // 角攻撃
+// 
 //*****************************
 class HornAttackAction : public ActionBase
 {
@@ -66,7 +74,9 @@ public:
 };
 
 //*****************************
+// 
 // ジャンプ攻撃
+// 
 //*****************************
 class JumpAttackAction : public ActionBase
 {

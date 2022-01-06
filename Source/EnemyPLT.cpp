@@ -142,8 +142,8 @@ void EnemyPLT::Start()
 		// モデル取得
 		Model* model = GetActor()->GetModel();
 
-		// 体のコリジョン設定
 		CollisionParameter parameter;
+		// カリング用のコリジョン
 		parameter.name = "PLTAABB";
 		parameter.node_name = "PLT:Chest_M_BK";
 		parameter.position = {};
@@ -155,6 +155,7 @@ void EnemyPLT::Start()
 		parameter.position_mask = CollisionPositionMask::Collision_Mask_Member_Position;
 		charactor->SetCollision(actor, parameter, CollisionMeshType::AABB);
 
+		// 体のコリジョン設定
 		parameter.name = actor->GetName();
 		parameter.node_name = "";
 		parameter.actor_id = charactor->GetID() + GetIdentity();

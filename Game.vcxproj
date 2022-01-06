@@ -219,6 +219,8 @@
     <ClCompile Include="Source\DebugRenderer.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="Source\DragonActionOwner.cpp" />
+    <ClCompile Include="Source\DragonJudgmentOwner.cpp" />
     <ClCompile Include="Source\Effect.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
@@ -268,8 +270,6 @@
     <ClCompile Include="Source\ModelVarianceShadowMap.cpp" />
     <ClCompile Include="Source\Mouse.cpp" />
     <ClCompile Include="Source\Movement.cpp" />
-    <ClCompile Include="Source\NightmareDragonActionOwner.cpp" />
-    <ClCompile Include="Source\NightmareDragonJudgmentOwner.cpp" />
     <ClCompile Include="Source\NodeBase.cpp" />
     <ClCompile Include="Source\OperateDictionaryMenu.cpp" />
     <ClCompile Include="Source\PhongShader.cpp" />
@@ -353,6 +353,8 @@
     <ClInclude Include="Source\DebugRenderer.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="Source\DragonActionOwner.h" />
+    <ClInclude Include="Source\DragonJudgmentOwner.h" />
     <ClInclude Include="Source\Effect.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClInclude>
@@ -416,8 +418,6 @@
     <ClInclude Include="Source\ModelVarianceShadowMap.h" />
     <ClInclude Include="Source\Mouse.h" />
     <ClInclude Include="Source\Movement.h" />
-    <ClInclude Include="Source\NightmareDragonActionOwner.h" />
-    <ClInclude Include="Source\NightmareDragonJudgmentOwner.h" />
     <ClInclude Include="Source\NodeBase.h" />
     <ClInclude Include="Source\OperateDictionaryMenu.h" />
     <ClInclude Include="Source\PhongShader.h" />
