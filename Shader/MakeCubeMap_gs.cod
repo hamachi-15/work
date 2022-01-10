@@ -53,13 +53,13 @@
 // SV_RenderTargetArrayIndex     0   x           5  RTINDEX    uint   x   
 //
 gs_5_0
-dcl_globalFlags refactoringAllowed | skipOptimization
+dcl_globalFlags refactoringAllowed
 dcl_constantbuffer CB0[32], dynamicIndexed
 dcl_input_siv v[3][0].xyzw, position
 dcl_input v[3][1].xyz
 dcl_input v[3][2].xy
 dcl_input v[3][3].xyzw
-dcl_temps 6
+dcl_temps 3
 dcl_inputprimitive triangle 
 dcl_stream m0
 dcl_outputtopology trianglestrip 
@@ -70,86 +70,40 @@ dcl_output o3.xyz
 dcl_output o4.xy
 dcl_output_siv o5.x, rendertarget_array_index
 dcl_maxout 18
-//
-// Initial variable locations:
-//   m0 <- output; 
-//   v[0][0].x <- input[0].position.x; v[0][0].y <- input[0].position.y; v[0][0].z <- input[0].position.z; v[0][0].w <- input[0].position.w; 
-//   v[0][1].x <- input[0].normal.x; v[0][1].y <- input[0].normal.y; v[0][1].z <- input[0].normal.z; 
-//   v[0][2].x <- input[0].texcoord.x; v[0][2].y <- input[0].texcoord.y; 
-//   v[0][3].x <- input[0].color.x; v[0][3].y <- input[0].color.y; v[0][3].z <- input[0].color.z; v[0][3].w <- input[0].color.w; 
-//   v[1][0].x <- input[1].position.x; v[1][0].y <- input[1].position.y; v[1][0].z <- input[1].position.z; v[1][0].w <- input[1].position.w; 
-//   v[1][1].x <- input[1].normal.x; v[1][1].y <- input[1].normal.y; v[1][1].z <- input[1].normal.z; 
-//   v[1][2].x <- input[1].texcoord.x; v[1][2].y <- input[1].texcoord.y; 
-//   v[1][3].x <- input[1].color.x; v[1][3].y <- input[1].color.y; v[1][3].z <- input[1].color.z; v[1][3].w <- input[1].color.w; 
-//   v[2][0].x <- input[2].position.x; v[2][0].y <- input[2].position.y; v[2][0].z <- input[2].position.z; v[2][0].w <- input[2].position.w; 
-//   v[2][1].x <- input[2].normal.x; v[2][1].y <- input[2].normal.y; v[2][1].z <- input[2].normal.z; 
-//   v[2][2].x <- input[2].texcoord.x; v[2][2].y <- input[2].texcoord.y; 
-//   v[2][3].x <- input[2].color.x; v[2][3].y <- input[2].color.y; v[2][3].z <- input[2].color.z; v[2][3].w <- input[2].color.w
-//
-#line 8 "E:\就職作品\ライブラリ\Game\HLSL\MakeCubeMap_gs.hlsl"
-mov r0.x, l(0)  // r0.x <- f
-mov r0.y, r0.x  // r0.y <- f
+mov r0.x, l(0)
 loop 
-  ilt r0.z, r0.y, l(6)
-  breakc_z r0.z
-
-#line 10
-  itof r1.xyz, l(0, 0, 0, 0)  // r1.x <- element.wposition.x; r1.y <- element.wposition.y; r1.z <- element.wposition.z
-
-#line 11
-  mov r0.y, r0.y  // r0.y <- element.RTindex
-
-#line 12
-  mov r0.z, l(0)  // r0.z <- i
-  mov r0.w, r0.z  // r0.w <- i
+  ige r0.y, r0.x, l(6)
+  breakc_nz r0.y
+  ishl r0.y, r0.x, l(2)
+  mov r0.z, l(0)
   loop 
-    ilt r1.w, r0.w, l(3)
-    breakc_z r1.w
-
-#line 15
-    imul null, r1.w, r0.y, l(4)
-    dp4 r2.x, cb0[r1.w + 4].xyzw, v[r0.w + 0][0].xyzw  // r2.x <- P.x
-    dp4 r2.y, cb0[r1.w + 5].xyzw, v[r0.w + 0][0].xyzw  // r2.y <- P.y
-    dp4 r2.z, cb0[r1.w + 6].xyzw, v[r0.w + 0][0].xyzw  // r2.z <- P.z
-    dp4 r2.w, cb0[r1.w + 7].xyzw, v[r0.w + 0][0].xyzw  // r2.w <- P.w
-
-#line 16
-    dp4 r3.x, cb0[28].xyzw, r2.xyzw  // r3.x <- element.position.x
-    dp4 r3.y, cb0[29].xyzw, r2.xyzw  // r3.y <- element.position.y
-    dp4 r3.z, cb0[30].xyzw, r2.xyzw  // r3.z <- element.position.z
-    dp4 r3.w, cb0[31].xyzw, r2.xyzw  // r3.w <- element.position.w
-
-#line 18
-    dp3 r1.w, v[r0.w + 0][1].xyzx, v[r0.w + 0][1].xyzx
-    rsq r1.w, r1.w
-    mul r2.xyz, r1.wwww, v[r0.w + 0][1].xyzx  // r2.x <- element.wnormal.x; r2.y <- element.wnormal.y; r2.z <- element.wnormal.z
-
-#line 20
-    mov r4.xyzw, v[r0.w + 0][3].xyzw  // r4.x <- element.color.x; r4.y <- element.color.y; r4.z <- element.color.z; r4.w <- element.color.w
-
-#line 23
-    mov r5.xy, v[r0.w + 0][2].xyxx  // r5.x <- element.texcoord.x; r5.y <- element.texcoord.y
-
-#line 25
-    mov o0.xyzw, r3.xyzw
-    mov o1.xyzw, r4.xyzw
-    mov o2.xyz, r2.xyzx
-    mov o3.xyz, r1.xyzx
-    mov o4.xy, r5.xyxx
-    mov o5.x, r0.y
+    ige r0.w, r0.z, l(3)
+    breakc_nz r0.w
+    dp4 r1.x, cb0[r0.y + 4].xyzw, v[r0.z + 0][0].xyzw
+    dp4 r1.y, cb0[r0.y + 5].xyzw, v[r0.z + 0][0].xyzw
+    dp4 r1.z, cb0[r0.y + 6].xyzw, v[r0.z + 0][0].xyzw
+    dp4 r1.w, cb0[r0.y + 7].xyzw, v[r0.z + 0][0].xyzw
+    dp4 r0.w, cb0[28].xyzw, r1.xyzw
+    dp4 r2.x, cb0[29].xyzw, r1.xyzw
+    dp4 r2.y, cb0[30].xyzw, r1.xyzw
+    dp4 r1.x, cb0[31].xyzw, r1.xyzw
+    dp3 r1.y, v[r0.z + 0][1].xyzx, v[r0.z + 0][1].xyzx
+    rsq r1.y, r1.y
+    mul r1.yzw, r1.yyyy, v[r0.z + 0][1].xxyz
+    mov o0.x, r0.w
+    mov o0.y, r2.x
+    mov o0.z, r2.y
+    mov o0.w, r1.x
+    mov o1.xyzw, v[r0.z + 0][3].xyzw
+    mov o2.xyz, r1.yzwy
+    mov o3.xyz, l(0,0,0,0)
+    mov o4.xy, v[r0.z + 0][2].xyxx
+    mov o5.x, r0.x
     emit_stream m0
-
-#line 26
-    iadd r0.w, r0.w, l(1)
+    iadd r0.z, r0.z, l(1)
   endloop 
-
-#line 27
   cut_stream m0
-
-#line 28
-  iadd r0.y, r0.y, l(1)
+  iadd r0.x, r0.x, l(1)
 endloop 
-
-#line 29
 ret 
-// Approximately 39 instruction slots used
+// Approximately 36 instruction slots used

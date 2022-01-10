@@ -7,6 +7,21 @@
 class Mathf
 {
 public:
+	// ベクトル算出
+	static DirectX::XMVECTOR ReturnVectorSubtract(const DirectX::XMFLOAT3& subtract1, const DirectX::XMFLOAT3& subtract2);
+	static DirectX::XMFLOAT3 ReturnFloatSubtract(const DirectX::XMFLOAT3& subtract1, const DirectX::XMFLOAT3& subtract2);
+
+	// ベクトルの長さ算出
+	static float VectorLength(const DirectX::XMVECTOR& vector);
+
+	// 角度から前方向を算出
+	static DirectX::XMVECTOR ReturnVectorFront(const DirectX::XMFLOAT3& angle);
+	static DirectX::XMFLOAT3 ReturnFloatFront(const DirectX::XMFLOAT3& angle);
+
+	// 内積算出
+	static DirectX::XMVECTOR ReturnVectorDot(const DirectX::XMVECTOR& vector1, const DirectX::XMVECTOR& vector2);
+	static float ReturnFloatDot(const DirectX::XMVECTOR& vector1, const DirectX::XMVECTOR& vector2);
+
 	// 線形補完
 	static float Lerp(float a, float b, float t);
 	

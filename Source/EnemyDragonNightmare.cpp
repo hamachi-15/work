@@ -127,42 +127,25 @@ void EnemyDragonNightmare::Start()
 		CollisionParameter parameter;
 		// カリング用のコリジョン
 		parameter.name = "NightmareDragonAABB";
-		parameter.node_name = "";
-		parameter.position = {};
-		parameter.float3_radius = DirectX::XMFLOAT3(1.5f, 1.5f, 1.5f);
-		parameter.height = 9.0f;
+		parameter.node_name = "Spine02";
+		parameter.float3_radius = DirectX::XMFLOAT3(40.5f, 25.5f, 60.5f);
 		parameter.collision_flg = true;
 		parameter.actor_id = charactor->GetID();
 		parameter.element = CollisionElement::Body;
-		parameter.position_mask = CollisionPositionMask::Collision_Mask_Actor_Position;
+		parameter.position_mask = CollisionPositionMask::Collision_Mask_Member_Position;
 		charactor->SetCollision(actor, parameter, CollisionMeshType::AABB);
-
-		// 体のコリジョン設定
-		parameter.name = actor->GetName();
-		parameter.node_name = "";
-		parameter.actor_id = charactor->GetID() + GetIdentity();
-		parameter.position = { 0, 0, 0 };
-		parameter.radius = 20.5f;
-		parameter.height = 26.5f;
-		parameter.weight = 6.5f;
-		parameter.collision_flg = true;
-		parameter.actor_type = CollisionActorType::Enemy;
-		parameter.element = CollisionElement::Body;
-		parameter.position_mask = CollisionPositionMask::Collision_Mask_Actor_Position;
-		charactor->SetCollision(actor, parameter, CollisionMeshType::Cylinder);
 
 		// 右腕コリジョン
 		std::string name = parameter.name;
 		name += "RightWrist";
 		parameter.name = name.c_str();
 		parameter.node_name = "R_Wrist";
+		parameter.actor_id = charactor->GetID() + GetIdentity();
 		parameter.radius = 4.0f;
-		parameter.height = 0.0f;
 		parameter.weight = 1.0f;
 		parameter.collision_flg = false;
 		parameter.actor_type = CollisionActorType::Enemy;
 		parameter.element = CollisionElement::Weppon;
-		parameter.position_mask = CollisionPositionMask::Collision_Mask_Member_Position;
 		charactor->SetCollision(actor, parameter, CollisionMeshType::Sphere);
 
 		// 頭コリジョン
@@ -172,12 +155,6 @@ void EnemyDragonNightmare::Start()
 		parameter.name = name.c_str();
 		parameter.node_name = "UpperHead02";
 		parameter.radius = 6.5f;
-		parameter.height = 0.0f;
-		parameter.weight = 1.0f;
-		parameter.collision_flg = false;
-		parameter.actor_type = CollisionActorType::Enemy;
-		parameter.element = CollisionElement::Weppon;
-		parameter.position_mask = CollisionPositionMask::Collision_Mask_Member_Position;
 		charactor->SetCollision(actor, parameter, CollisionMeshType::Sphere);
 	
 		// 口のコリジョン
@@ -187,12 +164,19 @@ void EnemyDragonNightmare::Start()
 		parameter.name = name.c_str();
 		parameter.node_name = "Jaw02";
 		parameter.radius = 6.5f;
-		parameter.weight = 1.0f;
-		parameter.collision_flg = false;
-		parameter.actor_type = CollisionActorType::Enemy;
-		parameter.element = CollisionElement::Weppon;
-		parameter.position_mask = CollisionPositionMask::Collision_Mask_Member_Position;
 		charactor->SetCollision(actor, parameter, CollisionMeshType::Sphere);
+
+		// 体のコリジョン設定
+		parameter.name = actor->GetName();
+		parameter.node_name = "";
+		parameter.radius = 20.5f;
+		parameter.height = 26.5f;
+		parameter.weight = 6.5f;
+		parameter.collision_flg = true;
+		parameter.element = CollisionElement::Body;
+		parameter.position_mask = CollisionPositionMask::Collision_Mask_Actor_Position;
+		charactor->SetCollision(actor, parameter, CollisionMeshType::Cylinder);
+
 	}
 
 	// ビヘイビアツリー設定
@@ -220,17 +204,18 @@ void EnemyDragonNightmare::SetBehaviorNode()
 	} // シーンがバトルシーンの時のノード設定
 	else //if (strcmp(name, "SceneBattle") == 0)
 	{
-		ai_tree->AddNode("",	   "Root",        0, BehaviorTree::SelectRule::Priority, NULL,							NULL);
-		ai_tree->AddNode("Root",   "Death",       1, BehaviorTree::SelectRule::Non,		 new DeathJudgment(this),		new DeathAction(this));
-		ai_tree->AddNode("Root",   "Damage",      2, BehaviorTree::SelectRule::Non,		 new DamageJudgment(this),		new DamageAction(this));
-		ai_tree->AddNode("Root",   "Battle",      3, BehaviorTree::SelectRule::Priority, new BattleJudgment(this),		NULL);
-		ai_tree->AddNode("Root",   "Scount",      4, BehaviorTree::SelectRule::Priority, NULL,							NULL);
-		ai_tree->AddNode("Battle", "Attack",      1, BehaviorTree::SelectRule::Priority, new AttackJudgment(this),		NULL);
-		ai_tree->AddNode("Battle", "Pursuit",     2, BehaviorTree::SelectRule::Non,		 NULL,							new PursuitAction(this));
-		ai_tree->AddNode("Attack", "BasicAttack", 1, BehaviorTree::SelectRule::Non,		 new BasicAttackJudgment(this), new BasicAttackAction(this));
-		ai_tree->AddNode("Attack", "ClawAttack",  2, BehaviorTree::SelectRule::Non,		 new ClawAttackJudgment(this),  new ClawAttackAction(this));
-		ai_tree->AddNode("Attack", "HornAttack",  3, BehaviorTree::SelectRule::Non,		 new ClawAttackJudgment(this),  new HornAttackAction(this));		ai_tree->AddNode("Scount", "Wander",      1, BehaviorTree::SelectRule::Non,		 new WanderJudgment(this),		new WanderAction(this));
-		ai_tree->AddNode("Scount", "Idle",        2, BehaviorTree::SelectRule::Non,		 NULL,							new IdleAction(this));
+		ai_tree->AddNode("",	   "Root",			 0,	BehaviorTree::SelectRule::Priority,	 NULL,								NULL);
+		ai_tree->AddNode("Root",   "Death",			 1,	BehaviorTree::SelectRule::Non,		 new DeathJudgment(this),			new DeathAction(this));
+		ai_tree->AddNode("Root",   "Damage",		 2,	BehaviorTree::SelectRule::Non,		 new DamageJudgment(this),			new DamageAction(this));
+		ai_tree->AddNode("Root",   "Battle",		 3,	BehaviorTree::SelectRule::Priority,	 new BattleJudgment(this),			NULL);
+		ai_tree->AddNode("Root",   "Scount",		 4,	BehaviorTree::SelectRule::Priority,	 NULL,								NULL);
+		ai_tree->AddNode("Battle", "Attack",		 1,	BehaviorTree::SelectRule::Priority,	 new AttackJudgment(this),			NULL);
+		ai_tree->AddNode("Battle", "Pursuit",		 2,	BehaviorTree::SelectRule::Non,		 NULL,								new PursuitAction(this));
+		ai_tree->AddNode("Scount", "Idle",			 1,	BehaviorTree::SelectRule::Non,		 NULL,								new IdleAction(this));
+		ai_tree->AddNode("Attack", "BasicAttack",	 1,	BehaviorTree::SelectRule::Non,		 new BasicAttackJudgment(this),		new BasicAttackAction(this));
+		ai_tree->AddNode("Attack", "ClawAttack",	 2,	BehaviorTree::SelectRule::Non,		 new ClawAttackJudgment(this),		new ClawAttackAction(this));
+		ai_tree->AddNode("Attack", "HornAttack",	 3,	BehaviorTree::SelectRule::Non,		 new ClawAttackJudgment(this),		new HornAttackAction(this));
+		ai_tree->AddNode("Attack", "BodyPressAttack",3,	BehaviorTree::SelectRule::Non,		 new BodyPressAttackJudgment(this),	new BodyPressAttackAction(this));
 	}
 }
 

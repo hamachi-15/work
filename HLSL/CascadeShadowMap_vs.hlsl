@@ -19,11 +19,9 @@ PSInput main(VSInput input)
 
 	float3 N = normalize(n);
 	output.normal = N;
-	output.color.rgb = input.color.rgb * material_color.rgb;
-	output.color.a = input.color.a * material_color.a;
+	output.color.rgb = input.color.rgb;
+	output.color.a = input.color.a;
 	output.texcoord = input.texcoord;
 
-	//output.shadow = GetShadowTex(light_view_projection, wpos);
 	return output;
-
 }

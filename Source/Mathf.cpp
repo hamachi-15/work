@@ -1,6 +1,68 @@
 #include <stdlib.h>
 #include "Mathf.h"
 #include <DirectXMath.h>
+//----------------------------------
+// ƒxƒNƒgƒ‹ŽZo,XMVECTORŒ^‚ð•Ô‚·
+//----------------------------------
+DirectX::XMVECTOR Mathf::ReturnVectorSubtract(const DirectX::XMFLOAT3& subtract1, const DirectX::XMFLOAT3& subtract2)
+{
+    return DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&subtract1), DirectX::XMLoadFloat3(&subtract2));
+}
+
+//----------------------------------
+// ƒxƒNƒgƒ‹ŽZo,XMFLOAT3Œ^‚ð•Ô‚·
+//----------------------------------
+DirectX::XMFLOAT3 Mathf::ReturnFloatSubtract(const DirectX::XMFLOAT3& subtract1, const DirectX::XMFLOAT3& subtract2)
+{
+    DirectX::XMFLOAT3 subtract;
+    DirectX::XMStoreFloat3(&subtract, DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&subtract1), DirectX::XMLoadFloat3(&subtract2)));
+    return subtract;
+}
+
+//----------------------------------
+// ƒxƒNƒgƒ‹‚Ì’·‚³ŽZo
+//----------------------------------
+float Mathf::VectorLength(const DirectX::XMVECTOR& vector)
+{
+    float anser;
+    DirectX::XMStoreFloat(&anser, DirectX::XMVector3Length(vector));
+    return anser;
+}
+
+//----------------------------------
+// Šp“x‚©‚ç‘O•ûŒü‚ðŽZo,XMVECTORŒ^‚ð•Ô‚·
+//----------------------------------
+DirectX::XMVECTOR Mathf::ReturnVectorFront(const DirectX::XMFLOAT3& angle)
+{
+    DirectX::XMFLOAT3 front = DirectX::XMFLOAT3(sinf(angle.x), 0, cosf(angle.z));
+    return DirectX::XMLoadFloat3(&front);
+}
+
+//----------------------------------
+// Šp“x‚©‚ç‘O•ûŒü‚ðŽZo,XMFLOAT3Œ^‚ð•Ô‚·
+//----------------------------------
+DirectX::XMFLOAT3 Mathf::ReturnFloatFront(const DirectX::XMFLOAT3& angle)
+{
+    return DirectX::XMFLOAT3(sinf(angle.x), 0, cosf(angle.z));
+}
+
+//----------------------------------
+// “àÏŽZo,XMVECTORŒ^‚ð•Ô‚·
+//----------------------------------
+DirectX::XMVECTOR Mathf::ReturnVectorDot(const DirectX::XMVECTOR& vector1, const DirectX::XMVECTOR& vector2)
+{
+    return DirectX::XMVector3Dot(vector1, vector2);
+}
+
+//----------------------------------
+// “àÏŽZo,XMFLOAT3Œ^‚ð•Ô‚·
+//----------------------------------
+float Mathf::ReturnFloatDot(const DirectX::XMVECTOR& vector1, const DirectX::XMVECTOR& vector2)
+{
+    float dot;
+    DirectX::XMStoreFloat(&dot, DirectX::XMVector3Dot(vector1, vector2));
+    return dot;
+}
 
 //----------------------------------
 // üŒ`•âŠ®
@@ -40,6 +102,7 @@ void Mathf::NegaCalculate(DirectX::XMFLOAT3& anser, DirectX::XMFLOAT3& normal, D
     {
         anser.x -= radius.x;
     }
+
     if (normal.y > 0)
     {
         anser.y += radius.y;
@@ -48,6 +111,7 @@ void Mathf::NegaCalculate(DirectX::XMFLOAT3& anser, DirectX::XMFLOAT3& normal, D
     {
         anser.y -= radius.y;
     }
+
     if (normal.z > 0)
     {
         anser.z += radius.z;
@@ -71,6 +135,7 @@ void Mathf::PosiCalculate(DirectX::XMFLOAT3& anser, DirectX::XMFLOAT3& normal, D
     {
         anser.x -= radius.x;
     }
+
     if (normal.y < 0)
     {
         anser.y += radius.y;
@@ -79,6 +144,7 @@ void Mathf::PosiCalculate(DirectX::XMFLOAT3& anser, DirectX::XMFLOAT3& normal, D
     {
         anser.y -= radius.y;
     }
+
     if (normal.z < 0)
     {
         anser.z += radius.z;

@@ -109,6 +109,7 @@ void SceneGame::Initialize()
 		actor->SetPosition(DirectX::XMFLOAT3(0, 0, 0));
 		actor->SetAngle(DirectX::XMFLOAT3( 0, Mathf::ConvartToRadian(-90), 0));
 		actor->SetScale(DirectX::XMFLOAT3(0.1f, 0.1f, 0.1f));
+		//actor->SetScale(DirectX::XMFLOAT3(1.f, 1.f, 1.f));
 		actor->AddComponent<Stage>();
 		actor->SetShaderType(ShaderManager::ShaderType::CascadeShadowMap);
 	}
@@ -119,6 +120,7 @@ void SceneGame::Initialize()
 		actor->SetPosition(DirectX::XMFLOAT3(0, 0, 0));
 		actor->SetAngle(DirectX::XMFLOAT3(0, Mathf::ConvartToRadian(-90), 0));
 		actor->SetScale(DirectX::XMFLOAT3(0.1f, 0.1f, 0.1f));
+		//actor->SetScale(DirectX::XMFLOAT3(1.f, 1.f, 1.f));
 		actor->AddComponent<Stage>();
 		actor->SetShaderType(ShaderManager::ShaderType::Lambert);
 	}
@@ -130,6 +132,7 @@ void SceneGame::Initialize()
 		actor->SetPosition(DirectX::XMFLOAT3(-100, 6, -116));
 		actor->SetAngle(DirectX::XMFLOAT3(0, 0, 0));
 		actor->SetScale(DirectX::XMFLOAT3(0.04f, 0.04f, 0.04f));
+		//actor->SetScale(DirectX::XMFLOAT3(0.8f, 0.8f, 0.8f));
 		actor->AddComponent<Movement>();
 		actor->AddComponent<Charactor>();
 		actor->AddComponent<Player>();
@@ -149,6 +152,7 @@ void SceneGame::Finalize()
 	// アクターの破棄
 	ActorManager::Instance().AllDestroy();
 
+	// コリジョンの破棄
 	CollisionManager::Instance().Destroy();
 
 	// メッセンジャーのクリア
@@ -214,7 +218,7 @@ void SceneGame::Update(float elapsed_time)
 		actor->GetPosition().z });
 	camera_controller->Update(elapsed_time);
 
-		// メタAIの更新処理
+	// メタAIの更新処理
 	MetaAI::Instance().Update(elapsed_time);
 
 	// アクター更新処理

@@ -22,8 +22,8 @@ float4 main(PSInput input) : SV_TARGET
 	color *= input.color * float4(A + D + S, 1.0);
 
 	// ÉtÉHÉO
-	//float3 fog_color = float3(0.0f, 0.0f, 0.5f);
-	//color.rgb = Fog(color.rgb, eye_pos, P, fog_color, 500.0f, 700.0f);
+	float3 fog_color = float3(0.0f, 0.0f, 0.5f);
+	color.rgb = Fog(color.rgb, eye_pos.xyz, P, fog_color, 500.0f, 700.0f);
 
 	float3 CS = (float3)1;
 	CS = GetCascadeShadow(P);

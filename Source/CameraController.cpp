@@ -59,7 +59,7 @@ void CameraController::Update(float elapsed_time)
 	// ƒJƒƒ‰‚ÌŽ‹“_‚Æ’Ž‹“_‚ÉÝ’è
 	Camera::Instance().SetLookAt(position, this->target, DirectX::XMFLOAT3(0, 1, 0));
 
-	//CalculateFrustum();
+	CalculateFrustum();
 
 }
 

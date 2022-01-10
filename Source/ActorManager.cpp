@@ -128,6 +128,9 @@ void ActorManager::Update(float elapsed_time)
 
 	for (std::shared_ptr<Actor>& actor : update_actors)
 	{
+		// カリングフラグが立っていれば更新処理はしない
+		if (actor->GetCullingFlag()) continue;
+		
 		actor->Update(elapsed_time);
 	}
 
@@ -151,7 +154,10 @@ void ActorManager::UpdateTransform()
 {
 	for (std::shared_ptr<Actor>& actor : update_actors)
 	{
-		actor->UpdateTransform(); 
+		// カリングフラグが立っていれば更新処理はしない
+		if (actor->GetCullingFlag()) continue;
+		
+		actor->UpdateTransform();
 	}
 }
 

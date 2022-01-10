@@ -99,7 +99,6 @@ public:
 	// UŒ‚”ÍˆÍæ“¾
 	float GetAttackRange() const { return attack_range; }
 
-
 	// õ“G”ÍˆÍİ’è
 	void SetSearchRange(const float search_range) { this->search_range = search_range; }
 
@@ -107,8 +106,14 @@ public:
 	void SetAttackFlag(bool attack_flag) { this->attack_flag = attack_flag; }
 	
 	// UŒ‚ƒtƒ‰ƒOæ“¾
-	bool GetAttackFlag() const { return attack_flag; }
+	const bool& GetAttackFlag() const { return attack_flag; }
 	
+	// “{‚èó‘Ôƒtƒ‰ƒOİ’è
+	void SetAngerFlag(bool anger_flag) { this->anger_flag = anger_flag; }
+
+	// “{‚èó‘Ôƒtƒ‰ƒOæ“¾
+	const bool& GetAngerFlag() const { return anger_flag; }
+
 	float GetRunTimer() const { return run_timer; }
 
 	void SetRunTimer(const float& run_timer) { this->run_timer = run_timer; }
@@ -130,6 +135,7 @@ public:
 private:
 	int					identity;			// ‰½”Ô–Ú‚Ì“G‚©
 	bool				attack_flag = false;		// UŒ‚ƒtƒ‰ƒO
+	bool				anger_flag = false;				 // “{‚èó‘Ôƒtƒ‰ƒO
 	std::shared_ptr<Movement>  movement;
 	std::shared_ptr<Charactor> charactor;
 protected:
@@ -143,7 +149,7 @@ protected:
 	NodeBase*			old_active_node = nullptr;
 	float				run_timer = 0.0f;
 	float				territory_range = 10.0f; // “ê’£‚è‚Ì”ÍˆÍ
-	float				search_range = 5.0f; // õ“G”ÍˆÍ
-	float				attack_range = 1.5f; // UŒ‚‚ÉˆÚ‚é”ÍˆÍ
+	float				search_range = 5.0f;	 // õ“G”ÍˆÍ
+	float				attack_range = 1.5f;	 // UŒ‚‚ÉˆÚ‚é”ÍˆÍ
 };
 

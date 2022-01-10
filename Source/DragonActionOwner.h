@@ -78,11 +78,11 @@ public:
 // ジャンプ攻撃
 // 
 //*****************************
-class JumpAttackAction : public ActionBase
+class BodyPressAttackAction : public ActionBase
 {
 public:
 	// コンストラクタ
-	JumpAttackAction(Enemy* enemy) : ActionBase(enemy) {}
+	BodyPressAttackAction(Enemy* enemy) : ActionBase(enemy) {}
 
 	// 実行前処理
 	void Start(std::string action_name) override;

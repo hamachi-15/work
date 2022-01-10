@@ -247,9 +247,9 @@ void Shader::Draw(ID3D11DeviceContext* context, const Model* model)
 		u_int index = 0;
 		for (const ModelResource::Subset& subset : mesh.subsets)
 		{
-			CBSubset cbsubset;
-			cbsubset.material_color = subset.material->color;
-			context->UpdateSubresource(subset_constant_buffer.Get(), 0, 0, &cbsubset, 0, 0);
+			//CBSubset cbsubset;
+			//cbsubset.material_color = subset.material->color;
+			//context->UpdateSubresource(subset_constant_buffer.Get(), 0, 0, &cbsubset, 0, 0);
 			context->PSSetShaderResources(0, 1, subset.material->shaderResourceView.GetAddressOf());
 			count += subset.indexCount;
 			index += subset.startIndex;

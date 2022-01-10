@@ -1,19 +1,6 @@
 #pragma once
 #include "JudgmentBase.h"
 
-//*****************************************
-// 
-// ジャンプ攻撃ノードに移行できるか判定
-// 
-//*****************************************
-class JumpAttackJudgment : public JudgmentBase
-{
-public:
-	JumpAttackJudgment(Enemy* enemy) :JudgmentBase(enemy) {};
-	// 判定
-	bool Judgment();
-
-};
 
 //*****************************************
 // 
@@ -23,10 +10,11 @@ public:
 class ClawAttackJudgment : public JudgmentBase
 {
 public:
-	ClawAttackJudgment(Enemy* enemy) :JudgmentBase(enemy) {};
+	// コンストラクタ
+	ClawAttackJudgment(Enemy* enemy) :JudgmentBase(enemy) {}
 
 	// 判定
-	bool Judgment();
+	bool Judgment() override;
 };
 
 //*****************************************
@@ -37,10 +25,11 @@ public:
 class BasicAttackJudgment : public JudgmentBase
 {
 public:
-	BasicAttackJudgment(Enemy* enemy) :JudgmentBase(enemy) {};
+	// コンストラクタ
+	BasicAttackJudgment(Enemy* enemy) :JudgmentBase(enemy) {}
 
 	// 判定
-	bool Judgment();
+	bool Judgment() override;
 };
 
 //*****************************************
@@ -51,8 +40,24 @@ public:
 class HornAttackJudgment : public JudgmentBase
 {
 public:
-	HornAttackJudgment(Enemy* enemy) :JudgmentBase(enemy) {};
+	// コンストラクタ
+	HornAttackJudgment(Enemy* enemy) :JudgmentBase(enemy) {}
 
 	// 判定
-	bool Judgment();
+	bool Judgment() override;
+};
+
+//*****************************************
+// 
+// ボディプレス攻撃ノードに移行できるか判定
+// 
+//*****************************************
+class BodyPressAttackJudgment : public JudgmentBase
+{
+public:
+	// コンストラクタ
+	BodyPressAttackJudgment(Enemy* enemy) : JudgmentBase(enemy) {}
+
+	// 判定
+	bool Judgment() override;
 };

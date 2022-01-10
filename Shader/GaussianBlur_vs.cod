@@ -29,7 +29,7 @@
 // TEXCOORD                 7   xyzw        9     NONE   float   xyzw
 //
 vs_5_0
-dcl_globalFlags refactoringAllowed | skipOptimization
+dcl_globalFlags refactoringAllowed
 dcl_output_siv o0.xyzw, position
 dcl_output o1.xyzw
 dcl_output o2.xyzw
@@ -40,46 +40,15 @@ dcl_output o6.xyzw
 dcl_output o7.xyzw
 dcl_output o8.xyzw
 dcl_output o9.xyzw
-dcl_temps 10
-//
-// Initial variable locations:
-//   v0.x <- input.position.x; v0.y <- input.position.y; v0.z <- input.position.z; 
-//   v1.x <- input.color.x; v1.y <- input.color.y; v1.z <- input.color.z; v1.w <- input.color.w; 
-//   v2.x <- input.tex.x; v2.y <- input.tex.y; 
-//   v3.x <- input.normal.x; v3.y <- input.normal.y; v3.z <- input.normal.z; 
-//   o9.x <- <main return value>.tex7.x; o9.y <- <main return value>.tex7.y; o9.z <- <main return value>.tex7.z; o9.w <- <main return value>.tex7.w; 
-//   o8.x <- <main return value>.tex6.x; o8.y <- <main return value>.tex6.y; o8.z <- <main return value>.tex6.z; o8.w <- <main return value>.tex6.w; 
-//   o7.x <- <main return value>.tex5.x; o7.y <- <main return value>.tex5.y; o7.z <- <main return value>.tex5.z; o7.w <- <main return value>.tex5.w; 
-//   o6.x <- <main return value>.tex4.x; o6.y <- <main return value>.tex4.y; o6.z <- <main return value>.tex4.z; o6.w <- <main return value>.tex4.w; 
-//   o5.x <- <main return value>.tex3.x; o5.y <- <main return value>.tex3.y; o5.z <- <main return value>.tex3.z; o5.w <- <main return value>.tex3.w; 
-//   o4.x <- <main return value>.tex2.x; o4.y <- <main return value>.tex2.y; o4.z <- <main return value>.tex2.z; o4.w <- <main return value>.tex2.w; 
-//   o3.x <- <main return value>.tex1.x; o3.y <- <main return value>.tex1.y; o3.z <- <main return value>.tex1.z; o3.w <- <main return value>.tex1.w; 
-//   o2.x <- <main return value>.tex0.x; o2.y <- <main return value>.tex0.y; o2.z <- <main return value>.tex0.z; o2.w <- <main return value>.tex0.w; 
-//   o1.x <- <main return value>.color.x; o1.y <- <main return value>.color.y; o1.z <- <main return value>.color.z; o1.w <- <main return value>.color.w; 
-//   o0.x <- <main return value>.position.x; o0.y <- <main return value>.position.y; o0.z <- <main return value>.position.z; o0.w <- <main return value>.position.w
-//
-#line 7 "E:\就職作品\ライブラリ\Game\HLSL\GaussianBlur_vs.hlsl"
-itof r0.xyzw, l(0, 0, 0, 0)  // r0.x <- output.position.x; r0.y <- output.position.y; r0.z <- output.position.z; r0.w <- output.position.w
-itof r1.xyzw, l(0, 0, 0, 0)  // r1.x <- output.color.x; r1.y <- output.color.y; r1.z <- output.color.z; r1.w <- output.color.w
-itof r2.xyzw, l(0, 0, 0, 0)  // r2.x <- output.tex0.x; r2.y <- output.tex0.y; r2.z <- output.tex0.z; r2.w <- output.tex0.w
-itof r3.xyzw, l(0, 0, 0, 0)  // r3.x <- output.tex1.x; r3.y <- output.tex1.y; r3.z <- output.tex1.z; r3.w <- output.tex1.w
-itof r4.xyzw, l(0, 0, 0, 0)  // r4.x <- output.tex2.x; r4.y <- output.tex2.y; r4.z <- output.tex2.z; r4.w <- output.tex2.w
-itof r5.xyzw, l(0, 0, 0, 0)  // r5.x <- output.tex3.x; r5.y <- output.tex3.y; r5.z <- output.tex3.z; r5.w <- output.tex3.w
-itof r6.xyzw, l(0, 0, 0, 0)  // r6.x <- output.tex4.x; r6.y <- output.tex4.y; r6.z <- output.tex4.z; r6.w <- output.tex4.w
-itof r7.xyzw, l(0, 0, 0, 0)  // r7.x <- output.tex5.x; r7.y <- output.tex5.y; r7.z <- output.tex5.z; r7.w <- output.tex5.w
-itof r8.xyzw, l(0, 0, 0, 0)  // r8.x <- output.tex6.x; r8.y <- output.tex6.y; r8.z <- output.tex6.z; r8.w <- output.tex6.w
-itof r9.xyzw, l(0, 0, 0, 0)  // r9.x <- output.tex7.x; r9.y <- output.tex7.y; r9.z <- output.tex7.z; r9.w <- output.tex7.w
-
-#line 14
-mov o0.xyzw, r0.xyzw
-mov o1.xyzw, r1.xyzw
-mov o2.xyzw, r2.xyzw
-mov o3.xyzw, r3.xyzw
-mov o4.xyzw, r4.xyzw
-mov o5.xyzw, r5.xyzw
-mov o6.xyzw, r6.xyzw
-mov o7.xyzw, r7.xyzw
-mov o8.xyzw, r8.xyzw
-mov o9.xyzw, r9.xyzw
+mov o0.xyzw, l(0,0,0,0)
+mov o1.xyzw, l(0,0,0,0)
+mov o2.xyzw, l(0,0,0,0)
+mov o3.xyzw, l(0,0,0,0)
+mov o4.xyzw, l(0,0,0,0)
+mov o5.xyzw, l(0,0,0,0)
+mov o6.xyzw, l(0,0,0,0)
+mov o7.xyzw, l(0,0,0,0)
+mov o8.xyzw, l(0,0,0,0)
+mov o9.xyzw, l(0,0,0,0)
 ret 
-// Approximately 21 instruction slots used
+// Approximately 11 instruction slots used
