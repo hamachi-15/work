@@ -1,10 +1,15 @@
 #include "DragonJudgmentOwner.h"
+// 判定の汎用関数をまとめたやつ
+#include "JudgmentUniversal.h"
+// アクター関係
+#include "Charactor.h"
 #include "ActorManager.h"
 #include "Enemy.h"
-#include "Charactor.h"
 #include "Telegram.h"
+// AI系
 #include "MetaAI.h"
-#include "Mathf.h"
+// 算出系
+//#include "Mathf.h"
 //*****************************************
 // 
 // 爪攻撃ノードに移行できるか判定
@@ -18,7 +23,18 @@ bool ClawAttackJudgment::Judgment()
 	// 怒り状態ならfalseを返す
 	if (owner->GetAngerFlag()) return false;
 	
-	
+	// プレイヤーとドラゴンのアクターを取得
+	std::shared_ptr<Actor> player = ActorManager::Instance().GetActor("Player");
+	std::shared_ptr<Actor> enemy = owner->GetActor();
+
+	// 敵とプレイヤーの座標取得
+	DirectX::XMFLOAT3 player_position = player->GetPosition();
+	DirectX::XMFLOAT3 enemy_position = enemy->GetPosition();
+	DirectX::XMFLOAT3 enemy_angle = enemy->GetAngle();
+
+	// プレイヤーがドラゴンの前方にいるか判定
+	return JudgmentUniversal::JudgementTargetInFront(enemy_position, enemy_angle, player_position);
+
 	return true;
 }
 
@@ -35,6 +51,18 @@ bool BasicAttackJudgment::Judgment()
 	// 怒り状態ならfalseを返す
 	if (owner->GetAngerFlag()) return false;
 
+	// プレイヤーとドラゴンのアクターを取得
+	std::shared_ptr<Actor> player = ActorManager::Instance().GetActor("Player");
+	std::shared_ptr<Actor> enemy = owner->GetActor();
+
+	// 敵とプレイヤーの座標取得
+	DirectX::XMFLOAT3 player_position = player->GetPosition();
+	DirectX::XMFLOAT3 enemy_position = enemy->GetPosition();
+	DirectX::XMFLOAT3 enemy_angle = enemy->GetAngle();
+
+	// プレイヤーがドラゴンの前方にいるか判定
+	return JudgmentUniversal::JudgementTargetInFront(enemy_position, enemy_angle, player_position);
+
 	return false;
 }
 
@@ -50,6 +78,19 @@ bool HornAttackJudgment::Judgment()
 {
 	// 怒り状態じゃなければfalseを返す
 	if (!owner->GetAngerFlag()) return false;
+
+	// プレイヤーとドラゴンのアクターを取得
+	std::shared_ptr<Actor> player = ActorManager::Instance().GetActor("Player");
+	std::shared_ptr<Actor> enemy = owner->GetActor();
+
+	// 敵とプレイヤーの座標取得
+	DirectX::XMFLOAT3 player_position = player->GetPosition();
+	DirectX::XMFLOAT3 enemy_position = enemy->GetPosition();
+	DirectX::XMFLOAT3 enemy_angle = enemy->GetAngle();
+
+	// プレイヤーがドラゴンの前方にいるか判定
+	return JudgmentUniversal::JudgementTargetInFront(enemy->GetPosition(), enemy->GetAngle(), player->GetPosition());
+
 	return false;
 }
 
@@ -66,24 +107,40 @@ bool BodyPressAttackJudgment::Judgment()
 	// 怒り状態じゃなければfalseを返す
 	if (!owner->GetAngerFlag()) return false;
 
+	// プレイヤーとドラゴンのアクターを取得
 	std::shared_ptr<Actor> player = ActorManager::Instance().GetActor("Player");
 	std::shared_ptr<Actor> enemy = owner->GetActor();
 
 	// 敵とプレイヤーの座標取得
 	DirectX::XMFLOAT3 player_position = player->GetPosition();
 	DirectX::XMFLOAT3 enemy_position = enemy->GetPosition();
+	DirectX::XMFLOAT3 enemy_angle = enemy->GetAngle();
+	
+	// プレイヤーがドラゴンの前方にいるか判定
+	return JudgmentUniversal::JudgementTargetInFront(enemy_position, enemy_angle, player_position);
+}
 
-	// 敵とプレイヤーのベクトル算出
-	DirectX::XMVECTOR vector = Mathf::ReturnVectorSubtract(player_position, enemy_position);
+//*****************************************
+// 
+// 軸合わせノードに移行できるか判定
+// 
+//*****************************************
+//-----------------------------------------
+//判定
+//-----------------------------------------
+bool AligningJudgment::Judgment()
+{
+	// プレイヤーとドラゴンのアクターを取得
+	std::shared_ptr<Actor> player = ActorManager::Instance().GetActor("Player");
+	std::shared_ptr<Actor> enemy = owner->GetActor();
 
-	// 敵の角度から前方向を算出
-	DirectX::XMVECTOR front = Mathf::ReturnVectorFront(enemy->GetAngle());
+	// プレイヤーがドラゴンの前方にいるか判定
+	if (!JudgmentUniversal::JudgementTargetInFront(enemy->GetPosition(), enemy->GetAngle(), player->GetPosition()))
+	{
+		// 前方にいなければtrue
+		return true;
+	}
 
-	// 敵の前方向とベクトルから内積算出
-	float dot = Mathf::ReturnFloatDot(front, vector);
-
-	// 内積が負の数ならfalseを返す
-	if (dot < 0) return false;
-
-	return true;
+	// 前方にいればfalse
+	return false;
 }

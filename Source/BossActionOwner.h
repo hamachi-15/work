@@ -15,7 +15,7 @@ class PunchAttackAction : public ActionBase
 {
 public:
 	PunchAttackAction(Enemy* enemy) : ActionBase(enemy) {}
-	void Start(std::string action_name);
+	void Start();
 	ActionBase::State Run(float elapsed_time);
 };
 
@@ -24,7 +24,7 @@ class SwipingAttackAction : public ActionBase
 {
 public:
 	SwipingAttackAction(Enemy* enemy) : ActionBase(enemy) {}
-	void Start(std::string action_name);
+	void Start();
 	ActionBase::State Run(float elapsed_time);
 
 };

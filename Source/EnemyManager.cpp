@@ -1,4 +1,4 @@
-#include "Graphics.h"
+ #include "Graphics.h"
 
 #include "Mathf.h"
 
@@ -16,7 +16,6 @@
 #include "ActorManager.h"
 #include "EnemyManager.h"
 #include "EnemySlime.h"
-#include "EnemyMutant.h"
 #include "EnemyPLT.h"
 #include "EnemyLAT.h"
 #include "EnemyDragonNightmare.h"
@@ -269,9 +268,6 @@ void EnemyManager::SetEnemyStatus(std::shared_ptr<Actor> actor, std::shared_ptr<
 	case EnemyCategory::PLT:
 		enemy = actor->AddComponent<EnemyPLT>();
 		break;
-	case EnemyCategory::Mutant:
-		enemy = actor->AddComponent<EnemyMutant>();
-		break;
 	case EnemyCategory::NightmareDragon:
 		enemy = actor->AddComponent<EnemyDragonNightmare>();
 		break;
@@ -321,9 +317,6 @@ void EnemyManager::AddComponent(std::shared_ptr<Actor> actor, std::shared_ptr<En
 		break;
 	case EnemyCategory::PLT:
 		enemy = actor->AddComponent<EnemyPLT>();
-		break;
-	case EnemyCategory::Mutant:
-		enemy = actor->AddComponent<EnemyMutant>();
 		break;
 	case EnemyCategory::NightmareDragon:
 		//break;

@@ -3,6 +3,24 @@
 
 //*****************************
 // 
+// 軸合わせアクション
+// 
+//*****************************
+class AligningAction : public ActionBase
+{
+public:
+	// コンストラクタ
+	AligningAction(Enemy* enemy) : ActionBase(enemy) {}
+	
+	// 実行前処理
+	void Start() override;
+
+	// 実行処理
+	ActionBase::State Run(float elapsed_time) override;
+};
+
+//*****************************
+// 
 // ガードアクション
 // 
 //*****************************
@@ -13,7 +31,7 @@ public:
 	DefendAction(Enemy* enemy) : ActionBase(enemy) {}
 
 	// 実行前処理
-	void Start(std::string action_name) override;
+	void Start() override;
 
 	// 実行処理
 	ActionBase::State Run(float elapsed_time) override;
@@ -31,7 +49,7 @@ public:
 	BasicAttackAction(Enemy* enemy) : ActionBase(enemy) {}
 
 	// 実行前処理
-	void Start(std::string action_name) override;
+	void Start() override;
 
 	// 実行処理
 	ActionBase::State Run(float elapsed_time) override;
@@ -49,7 +67,7 @@ public:
 	ClawAttackAction(Enemy* enemy) : ActionBase(enemy) {}
 
 	// 実行前処理
-	void Start(std::string action_name) override;
+	void Start() override;
 
 	// 実行処理
 	ActionBase::State Run(float elapsed_time) override;
@@ -67,7 +85,7 @@ public:
 	HornAttackAction(Enemy* enemy) : ActionBase(enemy) {}
 
 	// 実行前処理
-	void Start(std::string action_name) override;
+	void Start() override;
 
 	// 実行処理
 	ActionBase::State Run(float elapsed_time) override;
@@ -75,7 +93,7 @@ public:
 
 //*****************************
 // 
-// ジャンプ攻撃
+// ボディプレス攻撃
 // 
 //*****************************
 class BodyPressAttackAction : public ActionBase
@@ -85,7 +103,25 @@ public:
 	BodyPressAttackAction(Enemy* enemy) : ActionBase(enemy) {}
 
 	// 実行前処理
-	void Start(std::string action_name) override;
+	void Start() override;
+
+	// 実行処理
+	ActionBase::State Run(float elapsed_time) override;
+};
+
+//*****************************
+// 
+// 火球攻撃
+// 
+//*****************************
+class FireBollAttackAction : public ActionBase
+{
+public:
+	// コンストラクタ
+	FireBollAttackAction (Enemy* enemy) : ActionBase(enemy) {}
+
+	// 実行前処理
+	void Start() override;
 
 	// 実行処理
 	ActionBase::State Run(float elapsed_time) override;

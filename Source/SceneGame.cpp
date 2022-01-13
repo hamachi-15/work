@@ -462,10 +462,10 @@ bool SceneGame::OnMessages(const Telegram& telegram)
 
 		BattleSceneDataHeadder headder;
 		// ある地点と敵座標との距離を計算して一定範囲内の距離ならIDを追加
-		DistanceBetweenEnemyAndPoint(headder, DirectX::XMLoadFloat3(&telegram.message_box.hit_position), enemy_search_range);		
+		DistanceBetweenEnemyAndPoint(headder, DirectX::XMLoadFloat3(&telegram.message_box.hit_position), enemy_search_range);
 		
 		// スクリプトにデータを書き込む
-		WriteScript::Instance().WriteSceneDataScript("./Data/Script/SendBattleSceneScript.txt", headder);		
+		WriteScript::Instance().WriteSceneDataScript("./Data/Script/SendBattleSceneScript.txt", headder);
 		
 		// プレイヤーコンポーネント取得
 		std::shared_ptr<Actor> player = ActorManager::Instance().GetActor("Player");

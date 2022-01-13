@@ -13,7 +13,7 @@ public:
 	WanderAction(Enemy* enemy) :ActionBase(enemy) {}
 
 	// 実行前処理
-	void Start(std::string action_name) override;
+	void Start() override;
 
 	// 実行処理
 	ActionBase::State Run(float elapsed_time) override;
@@ -31,7 +31,7 @@ public:
 	PursuitAction(Enemy* enemy) :ActionBase(enemy) {}
 
 	// 実行前処理
-	void Start(std::string action_name) override;
+	void Start() override;
 
 	// 実行処理
 	ActionBase::State Run(float elapsed_time) override;
@@ -49,7 +49,7 @@ public:
 	IdleAction(Enemy* enemy) :ActionBase(enemy) {}
 
 	// 実行前処理
-	void Start(std::string action_name) override;
+	void Start() override;
 
 	// 実行処理
 	ActionBase::State Run(float elapsed_time) override;
@@ -67,7 +67,7 @@ public:
 	DamageAction(Enemy* enemy) :ActionBase(enemy) {}
 
 	// 実行前処理
-	void Start(std::string action_name) override;
+	void Start() override;
 
 	// 実行処理
 	ActionBase::State Run(float elapsed_time) override;
@@ -85,7 +85,7 @@ public:
 	DeathAction(Enemy* enemy) :ActionBase(enemy) {}
 
 	// 実行前処理
-	void Start(std::string action_name) override;
+	void Start() override;
 
 	// 実行処理
 	ActionBase::State Run(float elapsed_time) override;
@@ -103,7 +103,7 @@ public:
 	LeaveAction(Enemy* enemy) :ActionBase(enemy) {}
 
 	// 実行前処理
-	void Start(std::string action_name) override;
+	void Start() override;
 
 	// 実行処理
 	ActionBase::State Run(float elapsed_time) override;
@@ -121,7 +121,7 @@ public:
 	RecoverAction(Enemy* enemy) :ActionBase(enemy) {}
 
 	// 実行前処理
-	void Start(std::string action_name) override;
+	void Start() override;
 
 	// 実行処理
 	ActionBase::State Run(float elapsed_time) override;
@@ -139,7 +139,7 @@ public:
 	SleepAction(Enemy* enemy) : ActionBase(enemy) {}
 
 	// 実行前処理
-	void Start(std::string action_name) override;
+	void Start() override;
 
 	// 実行処理
 	ActionBase::State Run(float elapsed_time) override;

@@ -45,6 +45,8 @@ void EnemyDragonSoulEater::Destroy()
 		CollisionManager::Instance().UnregisterSphere(sphere);
 	}
 	CollisionManager::Instance().UnregisterCylinder(CollisionManager::Instance().GetCollisionCylinderFromName(actor->GetName()));
+	// 立方体コリジョン削除
+	CollisionManager::Instance().UnregisterBox(CollisionManager::Instance().GetCollisionBoxFromName(actor->GetName()));
 
 	// 敵マネージャーから削除
 	EnemyManager::Instance().EnemyRemove(GetActor()->GetComponent<EnemyDragonSoulEater>());
@@ -192,7 +194,7 @@ void EnemyDragonSoulEater::SetBehaviorNode()
 		ai_tree->AddNode("Root", "Sleep", 1, BehaviorTree::SelectRule::Non, NULL, new SleepAction(this));
 
 	} // シーンがバトルシーンの時のノード設定
-	else //if (strcmp(name, "SceneBattle") == 0)
+	else
 	{
 		ai_tree->AddNode("", "Root", 0, BehaviorTree::SelectRule::Priority, NULL, NULL);
 		ai_tree->AddNode("Root", "Death", 1, BehaviorTree::SelectRule::Non, new DeathJudgment(this), new DeathAction(this));
@@ -204,7 +206,7 @@ void EnemyDragonSoulEater::SetBehaviorNode()
 		ai_tree->AddNode("Attack", "BasicAttack", 1, BehaviorTree::SelectRule::Non, new BasicAttackJudgment(this), new BasicAttackAction(this));
 		ai_tree->AddNode("Attack", "ClawAttack", 2, BehaviorTree::SelectRule::Non, new ClawAttackJudgment(this), new ClawAttackAction(this));
 		ai_tree->AddNode("Attack", "HornAttack", 3, BehaviorTree::SelectRule::Non, new ClawAttackJudgment(this), new HornAttackAction(this));
-	//	ai_tree->AddNode("Attack", "JumpAttack", 4, BehaviorTree::SelectRule::Non, new JumpAttackJudgment(this), new JumpAttackAction(this));
+	//	ai_tree->AddNode("Attack", "FireBollAttack", 4, BehaviorTree::SelectRule::Non, new JumpAttackJudgment(this), new JumpAttackAction(this));
 		ai_tree->AddNode("Scount", "Wander", 1, BehaviorTree::SelectRule::Non, new WanderJudgment(this), new WanderAction(this));
 		ai_tree->AddNode("Scount", "Idle", 2, BehaviorTree::SelectRule::Non, NULL, new IdleAction(this));
 	}
@@ -215,20 +217,8 @@ void EnemyDragonSoulEater::SetBehaviorNode()
 //------------------------------------
 void EnemyDragonSoulEater::Update(float elapsed_time)
 {
-	// ビヘイビアツリー更新処理
-	if (active_node == nullptr)
-	{
-		active_node = ai_tree->ActiveNodeInference(this, behavior_data);
-	}
-	if (active_node != nullptr && active_node != old_active_node)
-	{
-		ai_tree->Start(active_node);
-	}
-	if (active_node != nullptr)
-	{
-		active_node = ai_tree->Run(this, active_node, behavior_data, elapsed_time);
-	}
-	old_active_node = active_node;
+	// ビヘイビア更新処理
+	BehaviorUpdate(elapsed_time);
 
 	// 速力更新処理
 	GetMovement()->UpdateVelocity(elapsed_time);

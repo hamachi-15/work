@@ -205,6 +205,7 @@ void DebugRenderer::Render(ID3D11DeviceContext* context, const DirectX::XMFLOAT4
 	cylinders.clear();
 
 	// 立方体描画
+	stride = sizeof(DirectX::XMFLOAT3);
 	context->IASetVertexBuffers(0, 1, cube_vertex_buffer.GetAddressOf(), &stride, &offset);
 	for (const Cube& cube : cubes)
 	{
@@ -227,52 +228,52 @@ void DebugRenderer::Render(ID3D11DeviceContext* context, const DirectX::XMFLOAT4
 }
 void DebugRenderer::DrawLine(ID3D11DeviceContext* context, ID3D11Device* device, const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection, const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& end)
 {
-	DirectX::XMFLOAT3 vertices[2] =
-	{
-		start,
-		end
-	};
-	// シェーダー設定
-	context->VSSetShader(vertex_shader.Get(), nullptr, 0);
-	context->PSSetShader(pixel_shader.Get(), nullptr, 0);
-	context->IASetInputLayout(input_layout.Get());
+	//DirectX::XMFLOAT3 vertices[2] =
+	//{
+	//	start,
+	//	end
+	//};
+	//// シェーダー設定
+	//context->VSSetShader(vertex_shader.Get(), nullptr, 0);
+	//context->PSSetShader(pixel_shader.Get(), nullptr, 0);
+	//context->IASetInputLayout(input_layout.Get());
 
-	// 定数バッファ設定
-	context->VSSetConstantBuffers(0, 1, constant_buffer.GetAddressOf());
+	//// 定数バッファ設定
+	//context->VSSetConstantBuffers(0, 1, constant_buffer.GetAddressOf());
 
-	// レンダーステート設定
-	const float blend_factor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-	context->OMSetBlendState(blend_state.Get(), blend_factor, 0xFFFFFFFF);
-	context->OMSetDepthStencilState(depth_stencil_state.Get(), 0);
-	context->RSSetState(rasterizer_state.Get());
+	//// レンダーステート設定
+	//const float blend_factor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	//context->OMSetBlendState(blend_state.Get(), blend_factor, 0xFFFFFFFF);
+	//context->OMSetDepthStencilState(depth_stencil_state.Get(), 0);
+	//context->RSSetState(rasterizer_state.Get());
 
-	// ビュープロジェクション行列作成
-	DirectX::XMMATRIX V = DirectX::XMLoadFloat4x4(&view);
-	DirectX::XMMATRIX P = DirectX::XMLoadFloat4x4(&projection);
-	DirectX::XMMATRIX VP = V * P;
-	UINT stride = sizeof(DirectX::XMFLOAT3);
-	UINT offset = 0;
-	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
-	context->IASetVertexBuffers(0, 1, cube_vertex_buffer.GetAddressOf(), &stride, &offset);
-	D3D11_BUFFER_DESC desc = {};
+	//// ビュープロジェクション行列作成
+	//DirectX::XMMATRIX V = DirectX::XMLoadFloat4x4(&view);
+	//DirectX::XMMATRIX P = DirectX::XMLoadFloat4x4(&projection);
+	//DirectX::XMMATRIX VP = V * P;
+	//UINT stride = sizeof(DirectX::XMFLOAT3);
+	//UINT offset = 0;
+	//context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+	//context->IASetVertexBuffers(0, 1, cube_vertex_buffer.GetAddressOf(), &stride, &offset);
+	//D3D11_BUFFER_DESC desc = {};
 
-	desc.ByteWidth = 2;
-	HRESULT hr = device->CreateBuffer(&desc, NULL, cube_vertex_buffer.GetAddressOf());
-	_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
-	
-	// ワールドビュープロジェクション行列作成
-	DirectX::XMMATRIX S = DirectX::XMMatrixScaling(1, 1, 1);
-	DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(Camera::Instance().GetEye().x, Camera::Instance().GetEye().y, Camera::Instance().GetEye().z);
-	DirectX::XMMATRIX W = S * T;
-	DirectX::XMMATRIX WVP = W * VP;
+	//desc.ByteWidth = 2;
+	//HRESULT hr = device->CreateBuffer(&desc, NULL, cube_vertex_buffer.GetAddressOf());
+	//_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+	//
+	//// ワールドビュープロジェクション行列作成
+	//DirectX::XMMATRIX S = DirectX::XMMatrixScaling(1, 1, 1);
+	//DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(Camera::Instance().GetEye().x, Camera::Instance().GetEye().y, Camera::Instance().GetEye().z);
+	//DirectX::XMMATRIX W = S * T;
+	//DirectX::XMMATRIX WVP = W * VP;
 
-	// 定数バッファ更新
-	CBMesh cbmesh;
-	cbmesh.color = DirectX::XMFLOAT4(0, 1,1, 1);
-	DirectX::XMStoreFloat4x4(&cbmesh.world_view_projection, WVP);
+	//// 定数バッファ更新
+	//CBMesh cbmesh;
+	//cbmesh.color = DirectX::XMFLOAT4(0, 1,1, 1);
+	//DirectX::XMStoreFloat4x4(&cbmesh.world_view_projection, WVP);
 
-	context->UpdateSubresource(constant_buffer.Get(), 0, 0, &cbmesh, 0, 0);
-	context->Draw(2, 0);
+	//context->UpdateSubresource(constant_buffer.Get(), 0, 0, &cbmesh, 0, 0);
+	//context->Draw(2, 0);
 
 }
 //-------------------------------
@@ -373,7 +374,7 @@ void DebugRenderer::CreateCubeMesh(ID3D11Device* device)
 	{
 		D3D11_BUFFER_DESC desc = {};
 		D3D11_SUBRESOURCE_DATA subresourceData = {};
-		cube_vertex_count = static_cast<UINT>(sizeof(vertices));
+		cube_vertex_count = static_cast<UINT>(sizeof(DirectX::XMFLOAT3) * 38);
 		desc.ByteWidth = cube_vertex_count;
 		desc.Usage = D3D11_USAGE_IMMUTABLE;	// D3D11_USAGE_DEFAULT;
 		desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;

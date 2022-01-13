@@ -61,3 +61,18 @@ public:
 	// 判定
 	bool Judgment() override;
 };
+
+//*****************************************
+// 
+// 軸合わせノードに移行できるか判定
+// 
+//*****************************************
+class AligningJudgment :public JudgmentBase
+{
+public:
+	// コンストラクタ
+	AligningJudgment(Enemy* enemy) : JudgmentBase(enemy) {}
+
+	//判定
+	bool Judgment() override;
+};

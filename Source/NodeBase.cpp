@@ -178,7 +178,7 @@ NodeBase* NodeBase::Inference(Enemy* enemy, BehaviorData* data)
 // ŽÀs‘Oˆ—
 void NodeBase::Start()
 {
-	action->Start(GetName());
+	action->Start();
 }
 
 ActionBase::State NodeBase::Run(float elapsed_time)

@@ -17,16 +17,13 @@
 //-----------------------------------
 // 待機行動前処理
 //-----------------------------------
-void IdleAction::Start(std::string action_name)
+void IdleAction::Start()
 {
 	std::string owner_name = owner->GetName();
-	// アニメーションデータベースからアニメーションデータを取得
-	std::shared_ptr<AnimationData> animation = GameDataBase::Instance().GetAnimationData(owner_name +"Idle");
-	// アニメーションデータを取得出来たら再生
-	if (animation != nullptr)
-	{
-		owner->PlayAnimation(animation);
-	}
+	owner_name +="Idle";
+
+	// アニメーション再生
+	owner->PlayAnimation(owner_name.c_str());
 }
 
 ActionBase::State IdleAction::Run(float elapsed_time)
@@ -63,16 +60,13 @@ ActionBase::State IdleAction::Run(float elapsed_time)
 // ダメージ行動
 // 
 //***********************************
-void DamageAction::Start(std::string action_name)
+void DamageAction::Start()
 {
 	std::string animation_name = owner->GetName();
-	// アニメーションデータベースからアニメーションデータを取得
-	std::shared_ptr<AnimationData> animation = GameDataBase::Instance().GetAnimationData(animation_name + "Damage");
-	// アニメーションデータを取得出来たら再生
-	if (animation != nullptr)
-	{
-		owner->PlayAnimation(animation);
-	}
+	animation_name += "Damage";
+
+	// アニメーション再生
+	owner->PlayAnimation(animation_name.c_str());
 }
 
 ActionBase::State DamageAction::Run(float elapsed_time)
@@ -124,17 +118,14 @@ ActionBase::State DamageAction::Run(float elapsed_time)
 // 死亡行動
 // 
 //***********************************
-void DeathAction::Start(std::string action_name)
+void DeathAction::Start()
 {
 	// 死亡アニメーション再生
 	std::string animation_name = owner->GetName();
-	// アニメーションデータベースからアニメーションデータを取得
-	std::shared_ptr<AnimationData> animation = GameDataBase::Instance().GetAnimationData(animation_name + "Death");
-	// アニメーションデータを取得出来たら再生
-	if (animation != nullptr)
-	{
-		owner->PlayAnimation(animation);
-	}
+	animation_name += "Death";
+
+	// アニメーション再生
+	owner->PlayAnimation(animation_name.c_str());
 }
 
 ActionBase::State DeathAction::Run(float elapsed_time)
@@ -153,16 +144,13 @@ ActionBase::State DeathAction::Run(float elapsed_time)
 // 徘徊行動
 // 
 //***********************************
-void WanderAction::Start(std::string action_name)
+void WanderAction::Start()
 {
 	std::string animation_name = owner->GetName();
-	// アニメーションデータベースからアニメーションデータを取得
-	std::shared_ptr<AnimationData> animation = GameDataBase::Instance().GetAnimationData(animation_name + "Walk");
-	// アニメーションデータを取得出来たら再生
-	if (animation != nullptr)
-	{
-		owner->PlayAnimation(animation);
-	}
+	animation_name += "Walk";
+
+	// アニメーション再生
+	owner->PlayAnimation(animation_name.c_str());
 }
 
 ActionBase::State WanderAction::Run(float elapsed_time)
@@ -203,16 +191,13 @@ ActionBase::State WanderAction::Run(float elapsed_time)
 // 逃走行動
 // 
 //***********************************
-void LeaveAction::Start(std::string action_name)
+void LeaveAction::Start()
 {
 	std::string animation_name = owner->GetName();
-	// アニメーションデータベースからアニメーションデータを取得
-	std::shared_ptr<AnimationData> animation = GameDataBase::Instance().GetAnimationData(animation_name + "Walk");
-	// アニメーションデータを取得出来たら再生
-	if (animation != nullptr)
-	{
-		owner->PlayAnimation(animation);
-	}
+	animation_name += "Walk";
+
+	// アニメーション再生
+	owner->PlayAnimation(animation_name.c_str());
 }
 
 ActionBase::State LeaveAction::Run(float elapsed_time)
@@ -269,16 +254,14 @@ ActionBase::State LeaveAction::Run(float elapsed_time)
 	return ActionBase::State::Run;
 }
 
-void RecoverAction::Start(std::string action_name)
+void RecoverAction::Start()
 {
 	std::string animation_name = owner->GetName();;
-	// アニメーションデータベースからアニメーションデータを取得
-	std::shared_ptr<AnimationData> animation = GameDataBase::Instance().GetAnimationData(animation_name + "Idle");
-	// アニメーションデータを取得出来たら再生
-	if (animation != nullptr)
-	{
-		owner->PlayAnimation(animation);
-	}
+	animation_name += "Idle";
+
+	// アニメーション再生
+	owner->PlayAnimation(animation_name.c_str());
+
 }
 
 ActionBase::State RecoverAction::Run(float elapsed_time)
@@ -312,16 +295,13 @@ ActionBase::State RecoverAction::Run(float elapsed_time)
 // 追跡行動
 // 
 //***********************************
-void PursuitAction::Start(std::string action_name)
+void PursuitAction::Start()
 {
 	std::string animation_name = owner->GetName();;
-	// アニメーションデータベースからアニメーションデータを取得
-	std::shared_ptr<AnimationData> animation = GameDataBase::Instance().GetAnimationData(animation_name + "Walk");
-	// アニメーションデータを取得出来たら再生
-	if (animation != nullptr)
-	{
-		owner->PlayAnimation(animation);
-	}
+	animation_name += "Walk";
+
+	// アニメーション再生
+	owner->PlayAnimation(animation_name.c_str());
 }
 
 ActionBase::State PursuitAction::Run(float elapsed_time)
@@ -377,16 +357,13 @@ ActionBase::State PursuitAction::Run(float elapsed_time)
 // -----------------------------
 // 実行前処理
 //------------------------------
-void SleepAction::Start(std::string action_name)
+void SleepAction::Start()
 {
 	std::string owner_name = owner->GetName();
-	// アニメーションデータベースからアニメーションデータを取得
-	std::shared_ptr<AnimationData> animation = GameDataBase::Instance().GetAnimationData(owner_name + "Sleep");
-	// アニメーションデータを取得出来たら再生
-	if (animation != nullptr)
-	{
-		owner->PlayAnimation(animation);
-	}
+	owner_name += "Sleep";
+
+	// アニメーション再生
+	owner->PlayAnimation(owner_name.c_str());
 }
 
 //------------------------------

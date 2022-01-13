@@ -10,8 +10,8 @@ class HeavyBodyAttackAction : public ActionBase
 public:
 	// コンストラクタ
 	HeavyBodyAttackAction(Enemy* enemy) :ActionBase(enemy) {}
-	void Start(std::string action_name);
-	ActionBase::State Run(float elapsed_time);
+	void Start() override;
+	ActionBase::State Run(float elapsed_time) override;
 };
 
 //***********************************
@@ -24,6 +24,6 @@ class BodyAttackAction : public ActionBase
 public:
 	// コンストラクタ
 	BodyAttackAction(Enemy* enemy) :ActionBase(enemy) {}
-	void Start(std::string action_name);
-	ActionBase::State Run(float elapsed_time);
+	void Start() override;
+	ActionBase::State Run(float elapsed_time) override;
 };

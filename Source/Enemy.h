@@ -1,8 +1,6 @@
 #pragma once
 #include "Component.h"
 #include "Movement.h"
-//#include "Charactor.h"
-#include "AnimationData.h"
 
 class BehaviorTree;
 class BehaviorData;
@@ -33,17 +31,20 @@ public:
 	// 更新処理
 	void Update(float elapsed_time) override {};
 	
-	// アイデンティティ設定
-	void SetIdentity(int identity) { this->identity = identity; }
-	
-	// アイデンティティ取得
-	int GetIdentity() { return this->identity; }
-	
+	// ビヘイビア更新処理
+	void BehaviorUpdate(float elapsed_time);
+
 	// 当たり範囲デバッグプリミティブ描画
 	virtual void DrawDebugPrimitive(){}
 	
 	// 敵の破棄処理
 	virtual void Destroy() = 0;
+
+	// アイデンティティ設定
+	void SetIdentity(int identity) { this->identity = identity; }
+	
+	// アイデンティティ取得
+	int GetIdentity() { return this->identity; }
 	
 	// ビヘイビアのノード設定処理
 	virtual void SetBehaviorNode() = 0;
@@ -54,10 +55,10 @@ public:
 	// ムーブメントの取得
 	std::shared_ptr<Movement> GetMovement() const { return movement; }
 	
-	// ムーブメントの設定
+	// キャラクターの設定
 	void SetCharactor(std::shared_ptr<Charactor> charactor) { this->charactor = charactor; }
 	
-	// ムーブメントの取得
+	// キャラクターの取得
 	std::shared_ptr<Charactor> GetCharactor() const { return charactor; }
 
 	// 範囲内にプレイヤーがいないか探す
@@ -119,7 +120,7 @@ public:
 	void SetRunTimer(const float& run_timer) { this->run_timer = run_timer; }
 
 	// アニメーション再生
-	virtual void PlayAnimation(std::shared_ptr<AnimationData> animation);
+	virtual void PlayAnimation(const char* animation_name);
 
 	// ダメージ処理
 	void OnDamaged();

@@ -48,8 +48,14 @@ void EnemyPLT::Destroy()
 	std::shared_ptr<Actor> actor = GetActor();
 
 	// コリジョン削除
+	// 球コリジョン削除
 	CollisionManager::Instance().UnregisterSphere(CollisionManager::Instance().GetCollisionSphereFromName(right_hand_collision_name.c_str()));
+	
+	// 円柱コリジョン削除
 	CollisionManager::Instance().UnregisterCylinder(CollisionManager::Instance().GetCollisionCylinderFromName(actor->GetName()));
+	
+	// 立方体コリジョン削除
+	CollisionManager::Instance().UnregisterBox(CollisionManager::Instance().GetCollisionBoxFromName(actor->GetName()));
 
 	// 敵マネージャーから削除
 	EnemyManager::Instance().EnemyRemove(GetActor()->GetComponent<EnemyPLT>());
@@ -120,13 +126,6 @@ void EnemyPLT::Start()
 	// マネージャーに登録
 	EnemyManager::Instance().EnemyRegister(actor->GetComponent<EnemyPLT>());
 
-	// テリトリー範囲の設定
-	//SetTerritoryRange(50.0f);
-
-	// テリトリー範囲の設定
-	DirectX::XMFLOAT3 position = actor->GetPosition();
-	//SetTerritoryOrigin(position);
-
 	// 索敵範囲の設定
 	SetSearchRange(30.0f);
 
@@ -150,7 +149,7 @@ void EnemyPLT::Start()
 		parameter.float3_radius = DirectX::XMFLOAT3(5.5f, 13.0f, 5.5f);
 		parameter.height = 9.0f;
 		parameter.collision_flg = true;
-		parameter.actor_id = charactor->GetID();
+		parameter.actor_id = charactor->GetID() + GetIdentity();
 		parameter.element = CollisionElement::Body;
 		parameter.position_mask = CollisionPositionMask::Collision_Mask_Member_Position;
 		charactor->SetCollision(actor, parameter, CollisionMeshType::AABB);
@@ -158,7 +157,6 @@ void EnemyPLT::Start()
 		// 体のコリジョン設定
 		parameter.name = actor->GetName();
 		parameter.node_name = "";
-		parameter.actor_id = charactor->GetID() + GetIdentity();
 		parameter.radius = 5.0f;
 		parameter.height = 15.0f;
 		parameter.weight = 10.0f;
@@ -232,20 +230,9 @@ void EnemyPLT::SetBehaviorNode()
 //-----------------------------------------
 void EnemyPLT::Update(float elapsed_time)
 {
-	// ビヘイビアツリー更新処理
-	if (active_node == nullptr)
-	{
-		active_node = ai_tree->ActiveNodeInference(this, behavior_data);
-	}
-	if (active_node != nullptr && active_node != old_active_node)
-	{
-		ai_tree->Start(active_node);
-	}
-	if (active_node != nullptr)
-	{
-		active_node = ai_tree->Run(this, active_node, behavior_data, elapsed_time);
-	}
-	old_active_node = active_node;
+	// ビヘイビア更新処理
+	BehaviorUpdate(elapsed_time);
+
 	// 速力更新処理
 	GetMovement()->UpdateVelocity(elapsed_time);
 

@@ -3,6 +3,11 @@
 #include "Camera.h"
 #include "Messenger.h"
 
+//*************************************
+// 
+// カメラマネージャークラス
+// 
+//*************************************
 //-----------------------------
 // コンストラクタ
 //-----------------------------
@@ -240,7 +245,7 @@ void CameraController::OnMotionMode(void* data)
 	if (mode != Mode::MotionCamera)
 	{
 		motion_timer = 0.0f;
-	}		
+	}
 	mode = Mode::MotionCamera;
 	motion_data.clear();
 	motion_data = camera_data->data;

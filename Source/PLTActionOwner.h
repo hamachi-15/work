@@ -9,7 +9,7 @@ public:
 	BlowAttackAction(Enemy* enemy) : ActionBase(enemy){}
 
 	// パンチ攻撃行動前処理
-	void Start(std::string action_name)override;
+	void Start()override;
 	
 	// パンチ攻撃行動処理
 	ActionBase::State Run(float elapsed_time) override;

@@ -109,9 +109,6 @@
     <Filter Include="ソース ファイル\HLSL\ShadowMap\ToShadowMap">
       <UniqueIdentifier>{94c20f59-bc46-4705-958a-495cc995b214}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ソース ファイル\AI\NightmareDragonAI">
-      <UniqueIdentifier>{6d44e4ac-0956-4829-bb3d-722f29238093}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ソース ファイル\AI\SlimeAI">
       <UniqueIdentifier>{eaa1d039-6703-4936-84f5-eebb62479f11}</UniqueIdentifier>
     </Filter>
@@ -121,14 +118,14 @@
     <Filter Include="ソース ファイル\AI\LATAI">
       <UniqueIdentifier>{2ad7e630-7557-4f27-b67e-c2f2a8189a92}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ソース ファイル\AI\BossAI">
-      <UniqueIdentifier>{a08e178c-6117-48b3-a432-cd0e4db69e59}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ソース ファイル\HLSL\2DPrimitive">
       <UniqueIdentifier>{f2243f7b-08de-412d-aee5-27a3d33d8c8a}</UniqueIdentifier>
     </Filter>
     <Filter Include="ソース ファイル\HLSL\Phong">
       <UniqueIdentifier>{d9c22e51-bc45-4644-a4a3-1121cf41e174}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\AI\DragonAI">
+      <UniqueIdentifier>{6d44e4ac-0956-4829-bb3d-722f29238093}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -351,9 +348,6 @@
     <ClCompile Include="Source\EnemyPLT.cpp">
       <Filter>ソース ファイル\Character</Filter>
     </ClCompile>
-    <ClCompile Include="Source\EnemyMutant.cpp">
-      <Filter>ソース ファイル\Character</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Effect.cpp">
       <Filter>ソース ファイル\Effect</Filter>
     </ClCompile>
@@ -408,12 +402,6 @@
     <ClCompile Include="Source\LATActionOwner.cpp">
       <Filter>ソース ファイル\AI\LATAI</Filter>
     </ClCompile>
-    <ClCompile Include="Source\BossActionOwner.cpp">
-      <Filter>ソース ファイル\AI\BossAI</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\BossJudgmenetOwner.cpp">
-      <Filter>ソース ファイル\AI\BossAI</Filter>
-    </ClCompile>
     <ClCompile Include="Source\EnemyTerritory.cpp">
       <Filter>ソース ファイル\System</Filter>
     </ClCompile>
@@ -433,10 +421,25 @@
       <Filter>ソース ファイル\Character</Filter>
     </ClCompile>
     <ClCompile Include="Source\DragonActionOwner.cpp">
-      <Filter>ソース ファイル\AI\NightmareDragonAI</Filter>
+      <Filter>ソース ファイル\AI\DragonAI</Filter>
     </ClCompile>
     <ClCompile Include="Source\DragonJudgmentOwner.cpp">
-      <Filter>ソース ファイル\AI\NightmareDragonAI</Filter>
+      <Filter>ソース ファイル\AI\DragonAI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\SceneOver.cpp">
+      <Filter>ソース ファイル\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\SceneClear.cpp">
+      <Filter>ソース ファイル\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\JudgmentUniversal.cpp">
+      <Filter>ソース ファイル\AI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Universal.cpp">
+      <Filter>ソース ファイル\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\ActionBase.cpp">
+      <Filter>ソース ファイル\AI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -701,9 +704,6 @@
     <ClInclude Include="Source\EnemyPLT.h">
       <Filter>ソース ファイル\Character</Filter>
     </ClInclude>
-    <ClInclude Include="Source\EnemyMutant.h">
-      <Filter>ソース ファイル\Character</Filter>
-    </ClInclude>
     <ClInclude Include="Source\GameData\AnimationData.h">
       <Filter>ソース ファイル\GameData</Filter>
     </ClInclude>
@@ -761,12 +761,6 @@
     <ClInclude Include="Source\LATActionOwner.h">
       <Filter>ソース ファイル\AI\LATAI</Filter>
     </ClInclude>
-    <ClInclude Include="Source\BossActionOwner.h">
-      <Filter>ソース ファイル\AI\BossAI</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\BossJudgmenetOwner.h">
-      <Filter>ソース ファイル\AI\BossAI</Filter>
-    </ClInclude>
     <ClInclude Include="Source\EnemyTerritory.h">
       <Filter>ソース ファイル\System</Filter>
     </ClInclude>
@@ -795,10 +789,22 @@
       <Filter>ソース ファイル\Character</Filter>
     </ClInclude>
     <ClInclude Include="Source\DragonActionOwner.h">
-      <Filter>ソース ファイル\AI\NightmareDragonAI</Filter>
+      <Filter>ソース ファイル\AI\DragonAI</Filter>
     </ClInclude>
     <ClInclude Include="Source\DragonJudgmentOwner.h">
-      <Filter>ソース ファイル\AI\NightmareDragonAI</Filter>
+      <Filter>ソース ファイル\AI\DragonAI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\SceneOver.h">
+      <Filter>ソース ファイル\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\SceneClear.h">
+      <Filter>ソース ファイル\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\JudgmentUniversal.h">
+      <Filter>ソース ファイル\AI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Universal.h">
+      <Filter>ソース ファイル\Character</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

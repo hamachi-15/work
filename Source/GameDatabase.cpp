@@ -135,6 +135,7 @@ GameDataBase::GameDataBase()
 		AttackCollitionTimeReader* data = &((AttackCollitionTimeReader*)&collision_time_buffer[sizeof(collision_time_data_headder) + collision_time_data_headder.string_length])[i];
 		collision_time_data[i]->id = data->id;
 		collision_time_data[i]->attack_category = data->attack_category;
+		collision_time_data[i]->attacker_category = data->attacker_category;
 		collision_time_data[i]->start_time = data->start_time;
 		collision_time_data[i]->end_time = data->end_time;
 	}
@@ -170,22 +171,42 @@ GameDataBase::~GameDataBase()
 	delete[] animation_data_text_buffer;
 }
 
-//-----------------------------------
-// コリジョンを行う時間データ取得
-//-----------------------------------
-std::shared_ptr<AttackCollitionTime> GameDataBase::GetAttackCollitionTimeData(AttackCategory category) const
+//---------------------------------------------------------------------------------
+// 攻撃者のカテゴリーと攻撃カテゴリーから当たり判定を行うアニメーション区間を取得
+//---------------------------------------------------------------------------------
+std::shared_ptr<AttackCollitionTime> GameDataBase::GetAttackCollitionTimeData(AttackCategory attack_category, EnemyCategory attacker_category) const
 {
 	// 同じ攻撃カテゴリーを持つデータを返す
 	for (std::shared_ptr<AttackCollitionTime> data : collision_time_data)
 	{
-		if (data->attack_category == category)
+		if (data->attack_category == attack_category &&
+			data->attacker_category == attacker_category)
 		{
 			return data;
 		}
 	}
 	return nullptr;
 }
+
+//-----------------------------------
+// コリジョンを行う時間データ取得
+//-----------------------------------
+std::shared_ptr<AttackCollitionTime> GameDataBase::GetAttackCollitionTimeData(AttackCategory attack_category) const
+{
+	// 同じ攻撃カテゴリーを持つデータを返す
+	for (std::shared_ptr<AttackCollitionTime> data : collision_time_data)
+	{
+		if (data->attack_category == attack_category)
+		{
+			return data;
+		}
+	}
+	return nullptr;
+}
+
+//-----------------------------------
 // 敵データIDから敵データ取得
+//-----------------------------------
 std::shared_ptr<EnemyData> GameDataBase::GetEnemyDataFromID(int& enemy_id) const
 {
 	for (std::shared_ptr<EnemyData> data : enemy_data)

@@ -41,65 +41,122 @@
 // SV_TARGET                0   xyzw        0   TARGET   float   xyzw
 //
 ps_5_0
-dcl_globalFlags refactoringAllowed
+dcl_globalFlags refactoringAllowed | skipOptimization
 dcl_constantbuffer CB0[9], immediateIndexed
 dcl_sampler s0, mode_default
 dcl_resource_texture2d (float,float,float,float) t0
 dcl_input_ps linear v1.xyz
 dcl_output o0.xyzw
-dcl_temps 2
-add r0.xyz, v1.zxyz, -cb0[8].zxyz
+dcl_temps 3
+//
+// Initial variable locations:
+//   v0.x <- input.position.x; v0.y <- input.position.y; v0.z <- input.position.z; v0.w <- input.position.w; 
+//   v1.x <- input.world_pos.x; v1.y <- input.world_pos.y; v1.z <- input.world_pos.z; 
+//   v2.x <- input.texcoord.x; v2.y <- input.texcoord.y; 
+//   v3.x <- input.color.x; v3.y <- input.color.y; v3.z <- input.color.z; v3.w <- input.color.w; 
+//   o0.x <- <main return value>.x; o0.y <- <main return value>.y; o0.z <- <main return value>.z; o0.w <- <main return value>.w
+//
+#line 5 "E:\就職作品\ライブラリ\Game\HLSL\SkyBox_ps.hlsl"
+mov r0.xyz, -cb0[8].xyzx
+add r0.xyz, r0.xyzx, v1.xyzx
 dp3 r0.w, r0.xyzx, r0.xyzx
 rsq r0.w, r0.w
-mul r0.xyz, r0.wwww, r0.xyzx
-max r0.w, |r0.y|, |r0.x|
-div r0.w, l(1.000000, 1.000000, 1.000000, 1.000000), r0.w
-min r1.x, |r0.y|, |r0.x|
-mul r0.w, r0.w, r1.x
-mul r1.x, r0.w, r0.w
-mad r1.y, r1.x, l(0.020835), l(-0.085133)
-mad r1.y, r1.x, r1.y, l(0.180141)
-mad r1.y, r1.x, r1.y, l(-0.330299)
-mad r1.x, r1.x, r1.y, l(0.999866)
-mul r1.y, r0.w, r1.x
-mad r1.y, r1.y, l(-2.000000), l(1.570796)
-lt r1.z, |r0.y|, |r0.x|
-and r1.y, r1.z, r1.y
-mad r0.w, r0.w, r1.x, r1.y
-lt r1.x, r0.y, -r0.y
+mul r0.xyz, r0.wwww, r0.xyzx  // r0.x <- E.x; r0.y <- E.y; r0.z <- E.z
+
+#line 6
+nop 
+mov r0.xyz, r0.xyzx
+
+#line 45 "E:\就職作品\ライブラリ\Game\HLSL\SkyBox.hlsli"
+mov r0.w, -r0.z
+max r0.w, r0.w, r0.z
+mov r1.x, -r0.x
+max r1.y, r0.x, r1.x
+min r1.z, r0.w, r1.y
+max r1.w, r0.w, r1.y
+div r1.w, l(1.000000, 1.000000, 1.000000, 1.000000), r1.w
+mul r1.z, r1.w, r1.z
+mul r1.w, r1.z, r1.z
+mul r2.x, r1.w, l(0.020835)
+add r2.x, r2.x, l(-0.085133)
+mul r2.x, r1.w, r2.x
+add r2.x, r2.x, l(0.180141)
+mul r2.x, r1.w, r2.x
+add r2.x, r2.x, l(-0.330299)
+mul r1.w, r1.w, r2.x
+add r1.w, r1.w, l(0.999866)
+mul r1.z, r1.w, r1.z
+lt r0.w, r1.y, r0.w
+mul r1.y, r1.z, l(-2.000000)
+add r1.y, r1.y, l(1.570796)
+and r0.w, r0.w, r1.y
+add r0.w, r1.z, r0.w
+lt r1.x, r0.x, r1.x
 and r1.x, r1.x, l(0xc0490fdb)
 add r0.w, r0.w, r1.x
-min r1.x, r0.y, r0.x
-lt r1.x, r1.x, -r1.x
-max r1.y, r0.y, r0.x
-ge r1.y, r1.y, -r1.y
+min r1.x, r0.x, r0.z
+max r1.y, r0.x, r0.z
+mov r1.z, -r1.x
+lt r1.x, r1.x, r1.z
+mov r1.z, -r1.y
+ge r1.y, r1.y, r1.z
 and r1.x, r1.y, r1.x
-movc r0.w, r1.x, -r0.w, r0.w
-mad r0.w, r0.w, l(0.159155), l(0.500000)
-add r1.x, -r0.w, l(1.000000)
-dp2 r0.x, r0.xyxx, r0.xyxx
+mov r1.y, -r0.w
+movc r0.w, r1.x, r1.y, r0.w
+mul r0.w, r0.w, l(0.159155)
+add r0.w, r0.w, l(0.500000)
+mov r0.w, -r0.w
+add r1.x, r0.w, l(1.000000)  // r1.x <- tex.x
+
+#line 46
+dp2 r0.x, r0.xzxx, r0.xzxx
 sqrt r0.x, r0.x
-max r0.y, r0.x, |r0.z|
-div r0.y, l(1.000000, 1.000000, 1.000000, 1.000000), r0.y
-min r0.w, r0.x, |r0.z|
-mul r0.y, r0.y, r0.w
-mul r0.w, r0.y, r0.y
-mad r1.z, r0.w, l(0.020835), l(-0.085133)
-mad r1.z, r0.w, r1.z, l(0.180141)
-mad r1.z, r0.w, r1.z, l(-0.330299)
-mad r0.w, r0.w, r1.z, l(0.999866)
-mul r1.z, r0.w, r0.y
-mad r1.z, r1.z, l(-2.000000), l(1.570796)
-lt r1.w, r0.x, |r0.z|
-and r1.z, r1.w, r1.z
-mad r0.y, r0.y, r0.w, r1.z
-min r0.w, r0.x, r0.z
-max r0.x, r0.x, r0.z
-ge r0.x, r0.x, -r0.x
-lt r0.z, r0.w, -r0.w
-and r0.x, r0.x, r0.z
-movc r0.x, r0.x, -r0.y, r0.y
-mad r1.y, r0.x, l(-0.318310), l(0.500000)
-sample_indexable(texture2d)(float,float,float,float) o0.xyzw, r1.xyxx, t0.xyzw, s0
+mov r0.z, -r0.y
+max r0.z, r0.z, r0.y
+mov r0.w, -r0.x
+max r1.z, r0.w, r0.x
+min r1.w, r0.z, r1.z
+max r2.x, r0.z, r1.z
+div r2.x, l(1.000000, 1.000000, 1.000000, 1.000000), r2.x
+mul r1.w, r1.w, r2.x
+mul r2.x, r1.w, r1.w
+mul r2.y, r2.x, l(0.020835)
+add r2.y, r2.y, l(-0.085133)
+mul r2.y, r2.y, r2.x
+add r2.y, r2.y, l(0.180141)
+mul r2.y, r2.y, r2.x
+add r2.y, r2.y, l(-0.330299)
+mul r2.x, r2.y, r2.x
+add r2.x, r2.x, l(0.999866)
+mul r1.w, r1.w, r2.x
+lt r0.z, r1.z, r0.z
+mul r1.z, r1.w, l(-2.000000)
+add r1.z, r1.z, l(1.570796)
+and r0.z, r0.z, r1.z
+add r0.z, r1.w, r0.z
+lt r0.w, r0.x, r0.w
+and r0.w, r0.w, l(0xc0490fdb)
+add r0.z, r0.w, r0.z
+min r0.w, r0.x, r0.y
+max r0.x, r0.x, r0.y
+mov r0.y, -r0.w
+lt r0.y, r0.w, r0.y
+mov r0.w, -r0.x
+ge r0.x, r0.x, r0.w
+and r0.x, r0.x, r0.y
+mov r0.y, -r0.z
+movc r0.x, r0.x, r0.y, r0.z
+mul r0.x, r0.x, l(-0.318310)
+add r1.y, r0.x, l(0.500000)  // r1.y <- tex.y
+
+#line 48
+mov r1.x, r1.x  // r1.x <- <EquirectangularProjection return value>.x
+mov r1.y, r1.y  // r1.y <- <EquirectangularProjection return value>.y
+
+#line 6 "E:\就職作品\ライブラリ\Game\HLSL\SkyBox_ps.hlsl"
+sample_indexable(texture2d)(float,float,float,float) r0.xyzw, r1.xyxx, t0.xyzw, s0  // r0.x <- color.x; r0.y <- color.y; r0.z <- color.z; r0.w <- color.w
+
+#line 7
+mov o0.xyzw, r0.xyzw
 ret 
-// Approximately 54 instruction slots used
+// Approximately 90 instruction slots used

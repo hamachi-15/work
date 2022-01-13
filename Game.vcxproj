@@ -193,6 +193,7 @@
     <ClCompile Include="External\imgui\imgui_widgets.cpp" />
     <ClCompile Include="Source\2DPrimitive.cpp" />
     <ClCompile Include="Source\3DObj.cpp" />
+    <ClCompile Include="Source\ActionBase.cpp" />
     <ClCompile Include="Source\ActionOwner.cpp" />
     <ClCompile Include="Source\Actor.cpp" />
     <ClCompile Include="Source\ActorManager.cpp" />
@@ -202,11 +203,6 @@
     <ClCompile Include="Source\BehaviorData.cpp" />
     <ClCompile Include="Source\BehaviorTree.cpp" />
     <ClCompile Include="Source\BloomShader.cpp" />
-    <ClCompile Include="Source\BossActionOwner.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="Source\BossJudgmenetOwner.cpp" />
     <ClCompile Include="Source\Button.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
@@ -232,7 +228,6 @@
     <ClCompile Include="Source\EnemyDragonSoulEater.cpp" />
     <ClCompile Include="Source\EnemyLAT.cpp" />
     <ClCompile Include="Source\EnemyManager.cpp" />
-    <ClCompile Include="Source\EnemyMutant.cpp" />
     <ClCompile Include="Source\EnemyPLT.cpp" />
     <ClCompile Include="Source\EnemySlime.cpp" />
     <ClCompile Include="Source\EnemyTerritory.cpp" />
@@ -249,6 +244,7 @@
     <ClCompile Include="Source\ImGuiRenderer.cpp" />
     <ClCompile Include="Source\Input.cpp" />
     <ClCompile Include="Source\JudgmentOwner.cpp" />
+    <ClCompile Include="Source\JudgmentUniversal.cpp" />
     <ClCompile Include="Source\LambertShader.cpp" />
     <ClCompile Include="Source\LATActionOwner.cpp" />
     <ClCompile Include="Source\Light.cpp" />
@@ -286,10 +282,12 @@
     <ClCompile Include="Source\PLTJudgmentOwner.cpp" />
     <ClCompile Include="Source\ResourceManager.cpp" />
     <ClCompile Include="Source\SceneBattle.cpp" />
+    <ClCompile Include="Source\SceneClear.cpp" />
     <ClCompile Include="Source\SceneGame.cpp" />
     <ClCompile Include="Source\SceneGameOver.cpp" />
     <ClCompile Include="Source\SceneLoading.cpp" />
     <ClCompile Include="Source\SceneManager.cpp" />
+    <ClCompile Include="Source\SceneOver.cpp" />
     <ClCompile Include="Source\SceneTitle.cpp" />
     <ClCompile Include="Source\SceneTutorial.cpp" />
     <ClCompile Include="Source\Script.cpp" />
@@ -310,6 +308,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Source\UI.cpp" />
+    <ClCompile Include="Source\Universal.cpp" />
     <ClCompile Include="Source\VarianceShadowMap.cpp" />
     <ClCompile Include="Source\WinMain.cpp" />
   </ItemGroup>
@@ -333,11 +332,6 @@
     <ClInclude Include="Source\BehaviorData.h" />
     <ClInclude Include="Source\BehaviorTree.h" />
     <ClInclude Include="Source\BloomShader.h" />
-    <ClInclude Include="Source\BossActionOwner.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="Source\BossJudgmenetOwner.h" />
     <ClInclude Include="Source\Button.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClInclude>
@@ -364,7 +358,6 @@
     <ClInclude Include="Source\EnemyDragonSoulEater.h" />
     <ClInclude Include="Source\EnemyLAT.h" />
     <ClInclude Include="Source\EnemyManager.h" />
-    <ClInclude Include="Source\EnemyMutant.h" />
     <ClInclude Include="Source\EnemyPLT.h" />
     <ClInclude Include="Source\EnemySlime.h" />
     <ClInclude Include="Source\EnemyTerritory.h" />
@@ -391,6 +384,7 @@
     <ClInclude Include="Source\Input.h" />
     <ClInclude Include="Source\JudgmentBase.h" />
     <ClInclude Include="Source\JudgmentOwner.h" />
+    <ClInclude Include="Source\JudgmentUniversal.h" />
     <ClInclude Include="Source\LambertShader.h" />
     <ClInclude Include="Source\LATActionOwner.h" />
     <ClInclude Include="Source\Light.h" />
@@ -434,9 +428,11 @@
     <ClInclude Include="Source\ResourceManager.h" />
     <ClInclude Include="Source\Scene.h" />
     <ClInclude Include="Source\SceneBattle.h" />
+    <ClInclude Include="Source\SceneClear.h" />
     <ClInclude Include="Source\SceneGame.h" />
     <ClInclude Include="Source\SceneLoading.h" />
     <ClInclude Include="Source\SceneManager.h" />
+    <ClInclude Include="Source\SceneOver.h" />
     <ClInclude Include="Source\SceneTitle.h" />
     <ClInclude Include="Source\SceneTutorial.h" />
     <ClInclude Include="Source\Script.h" />
@@ -459,6 +455,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Source\UI.h" />
+    <ClInclude Include="Source\Universal.h" />
     <ClInclude Include="Source\VarianceShadowMap.h" />
   </ItemGroup>
   <ItemGroup>

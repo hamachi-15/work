@@ -1,5 +1,6 @@
 #pragma once
 #include <d3d11.h>
+#include <string>
 #include <wrl.h>
 #include <memory>
 #include <DirectXMath.h>
@@ -82,5 +83,5 @@ protected:
 	Microsoft::WRL::ComPtr<ID3D11Buffer>			mesh_constant_buffer = nullptr;
 	Microsoft::WRL::ComPtr<ID3D11Buffer>			subset_constant_buffer = nullptr;
 
-
+	std::string subresource_texture_filename;
 };

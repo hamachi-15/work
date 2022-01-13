@@ -2,7 +2,13 @@
 #include <DirectXMath.h>
 #include "MessageData.h"
 #include "DebugRenderer.h"
+#include "Mathf.h"
 
+//*************************************
+// 
+// カメラマネージャークラス
+// 
+//*************************************
 class CameraController
 {
 public:
@@ -50,7 +56,7 @@ private:
 	void UpdateMotionCamera(float elapsed_time);
 
 	// 横軸のズレ方向算出
-	float CalcSide(DirectX::XMFLOAT3 p1, DirectX::XMFLOAT3 p2);
+	float CalcSide(DirectX::XMFLOAT3 position1, DirectX::XMFLOAT3 position2);
 private:
 	// モード
 	enum class Mode
@@ -67,26 +73,23 @@ private:
 
 private:
 	// カメラのパラメータ
-	Mode mode = Mode::FreeCamera;
-	DirectX::XMFLOAT3 position = { 0.0f, 0.0f, 0.0f };
-	DirectX::XMFLOAT3 target = { 0.0f, 0.0f, 0.0f };
-	DirectX::XMFLOAT3 angle = { 0.0f, 0.0f, 0.0f };
-	float roll_speed = DirectX::XMConvertToRadians(90);
-	float range = 50.0f;
-	float max_angleX = DirectX::XMConvertToRadians(45);
-	float min_angleX = DirectX::XMConvertToRadians(-45);
+	Mode mode =						Mode::FreeCamera;
+	DirectX::XMFLOAT3				position = { 0.0f, 0.0f, 0.0f };
+	DirectX::XMFLOAT3				target = { 0.0f, 0.0f, 0.0f };
+	DirectX::XMFLOAT3				angle = { 0.0f, 0.0f, 0.0f };
+	float							roll_speed = Mathf::ConvartToRadian(90);
+	float							range = 50.0f;
+	float							max_angleX = Mathf::ConvartToRadian(45);
+	float							min_angleX = Mathf::ConvartToRadian(-45);
 
 	// モーションカメラ
-	float				motion_timer = 0;
+	float							motion_timer = 0;
 	std::vector<CameraMotionData>	motion_data;
 
 	// ロックオン処理
-	DirectX::XMFLOAT3	new_position = { 0, 0, 0 };
-	DirectX::XMFLOAT3	new_target = { 0, 0, 0 };
-	DirectX::XMFLOAT3	target_work[2] = { { 0, 0, 0 }, { 0, 0, 0 } };	// 0 : 座標, 1 : 注視点
-	float				length_limit[2] = { 20, range };
-	float				side_value = 1;
-
-
-
+	DirectX::XMFLOAT3				new_position = { 0, 0, 0 };
+	DirectX::XMFLOAT3				new_target = { 0, 0, 0 };
+	DirectX::XMFLOAT3				target_work[2] = { { 0, 0, 0 }, { 0, 0, 0 } };	// 0 : 座標, 1 : 注視点
+	float							length_limit[2] = { 20, range };
+	float							side_value = 1;
 };

@@ -327,11 +327,15 @@ public:
 	// レイとモデルの交差判定
 	bool IntersectRayVsModel(DirectX::XMFLOAT3 start, DirectX::XMFLOAT3 end, Model* model, HitResult& result);
 
+	// 名前から立方体コリジョン取得
+	std::shared_ptr<CollisionBox> GetCollisionBoxFromName(const char* name);
+
 	// 名前から球コリジョン取得
 	std::shared_ptr<CollisionSphere> GetCollisionSphereFromName(const char* name);
 
 	// IDから球コリジョンを取得
 	std::vector<std::shared_ptr<CollisionSphere>> GetCollisionSphereFromID(int id);
+
 	// 名前から円柱コリジョン取得
 	std::shared_ptr<CollisionCylinder> GetCollisionCylinderFromName(const char* name);
 

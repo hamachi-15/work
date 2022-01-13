@@ -40,28 +40,6 @@ EnemyDragonNightmare::~EnemyDragonNightmare()
 {
 }
 
-//--------------------------------------
-// 敵の破棄処理
-//--------------------------------------
-void EnemyDragonNightmare::Destroy()
-{
-	// アクターの取得
-	std::shared_ptr<Actor> actor = GetActor();
-
-	// コリジョン削除
-	std::vector<std::shared_ptr<CollisionSphere>> list = CollisionManager::Instance().GetCollisionSphereFromID(GetCharactor()->GetID() + GetIdentity());
-	for (std::shared_ptr<CollisionSphere> sphere : list)
-	{
-		CollisionManager::Instance().UnregisterSphere(sphere);
-	}
-	CollisionManager::Instance().UnregisterCylinder(CollisionManager::Instance().GetCollisionCylinderFromName(actor->GetName()));
-
-	// 敵マネージャーから削除
-	EnemyManager::Instance().EnemyRemove(GetActor()->GetComponent<EnemyDragonNightmare>());
-
-	// アクターマネージャーから削除
-	ActorManager::Instance().Remove(GetActor());
-}
 
 //--------------------------------------
 // GUI描画
@@ -202,7 +180,7 @@ void EnemyDragonNightmare::SetBehaviorNode()
 		ai_tree->AddNode("Root", "Sleep",  1, BehaviorTree::SelectRule::Non,		NULL, new SleepAction(this));
 
 	} // シーンがバトルシーンの時のノード設定
-	else //if (strcmp(name, "SceneBattle") == 0)
+	else
 	{
 		ai_tree->AddNode("",	   "Root",			 0,	BehaviorTree::SelectRule::Priority,	 NULL,								NULL);
 		ai_tree->AddNode("Root",   "Death",			 1,	BehaviorTree::SelectRule::Non,		 new DeathJudgment(this),			new DeathAction(this));
@@ -220,24 +198,41 @@ void EnemyDragonNightmare::SetBehaviorNode()
 }
 
 //--------------------------------------
+// 敵の破棄処理
+//--------------------------------------
+void EnemyDragonNightmare::Destroy()
+{
+	// アクターの取得
+	std::shared_ptr<Actor> actor = GetActor();
+
+	// コリジョン削除
+	// 球コリジョン削除
+	std::vector<std::shared_ptr<CollisionSphere>> list = CollisionManager::Instance().GetCollisionSphereFromID(GetCharactor()->GetID() + GetIdentity());
+	for (std::shared_ptr<CollisionSphere> sphere : list)
+	{
+		CollisionManager::Instance().UnregisterSphere(sphere);
+	}
+
+	// 円柱コリジョン削除
+	CollisionManager::Instance().UnregisterCylinder(CollisionManager::Instance().GetCollisionCylinderFromName(actor->GetName()));
+
+	// 立方体コリジョン削除
+	CollisionManager::Instance().UnregisterBox(CollisionManager::Instance().GetCollisionBoxFromName("NightmareDragonAABB"));
+
+	// 敵マネージャーから削除
+	EnemyManager::Instance().EnemyRemove(GetActor()->GetComponent<EnemyDragonNightmare>());
+
+	// アクターマネージャーから削除
+	ActorManager::Instance().Remove(GetActor());
+}
+
+//--------------------------------------
 // 更新処理
 //--------------------------------------
 void EnemyDragonNightmare::Update(float elapsed_time)
 {
-	// ビヘイビアツリー更新処理
-	if (active_node == nullptr)
-	{
-		active_node = ai_tree->ActiveNodeInference(this, behavior_data);
-	}
-	if (active_node != nullptr && active_node != old_active_node)
-	{
-		ai_tree->Start(active_node);
-	}
-	if (active_node != nullptr)
-	{
-		active_node = ai_tree->Run(this, active_node, behavior_data, elapsed_time);
-	}
-	old_active_node = active_node;
+	// ビヘイビア更新処理
+	BehaviorUpdate(elapsed_time);
 
 	// 速力更新処理
 	GetMovement()->UpdateVelocity(elapsed_time);

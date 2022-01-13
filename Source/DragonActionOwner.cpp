@@ -1,13 +1,35 @@
+#include "GameDatabase.h"
+#include "EnemyCategory.h"
+
 #include "DragonActionOwner.h"
-#include "Mathf.h"
-#include "ActorManager.h"
-#include "Collision.h"
+#include "Actor.h"
 #include "Enemy.h"
 #include "EnemyManager.h"
-#include "GameDatabase.h"
 #include "Charactor.h"
 
+// 汎用関数
+#include "Universal.h"
+//*****************************
+// 
+// 軸合わせアクション
+// 
+//*****************************
+// -----------------------------
+// 実行前処理
+// -----------------------------
+void AligningAction::Start()
+{
+	// アニメーション再生
+	owner->PlayAnimation("NightmareDragonDefend");
+}
 
+// -----------------------------
+// 実行処理
+// -----------------------------
+ActionBase::State AligningAction::Run(float elapsed_time)
+{
+	return ActionBase::State();
+}
 //*****************************
 // 
 // ガードアクション
@@ -16,12 +38,10 @@
 // -----------------------------
 // 実行前処理
 // -----------------------------
-void DefendAction::Start(std::string action_name)
+void DefendAction::Start()
 {
-	// ガードアクションのデータ取得
-	std::shared_ptr<AnimationData> animation = GameDataBase::Instance().GetAnimationData("NightmareDragonDefend");
 	// アニメーション再生
-	owner->PlayAnimation(animation);
+	owner->PlayAnimation("NightmareDragonDefend");
 }
 
 // -----------------------------
@@ -53,12 +73,13 @@ ActionBase::State DefendAction::Run(float elapsed_time)
 // -----------------------------
 // 実行前処理
 // -----------------------------
-void BasicAttackAction::Start(std::string action_name)
+void BasicAttackAction::Start()
 {
-	// ガードアクションのデータ取得
-	std::shared_ptr<AnimationData> animation = GameDataBase::Instance().GetAnimationData("NightmareDragonBasicAttack");
 	// アニメーション再生
-	owner->PlayAnimation(animation);
+	owner->PlayAnimation("NightmareDragonBasicAttack");
+
+	// 当たり判定を行う時間のデータを取得
+	collision_time_data = GameDataBase::Instance().GetAttackCollitionTimeData(AttackCategory::BitingAttack, EnemyCategory::NightmareDragon);
 }
 
 // -----------------------------
@@ -66,25 +87,11 @@ void BasicAttackAction::Start(std::string action_name)
 // -----------------------------
 ActionBase::State BasicAttackAction::Run(float elapsed_time)
 {
-	CollisionManager& collision_manager = CollisionManager::Instance();
+	// アクター取得
 	std::shared_ptr<Actor> actor = owner->GetActor();
-	// 現在のコリジョンフラグと1フレーム前のコリジョンフラグを取得
-	bool old_collision_time_flag = owner->GetCharactor()->GetOldCollisionTimeFlag();
 
-	// 任意のアニメーション再生区間でのみ衝突判定処理をする
-	bool collision_time_flag = owner->GetCharactor()->SearchAnimationTime(actor, 0.2f, 0.6f);
-
-	// 1フレーム前からコリジョンフラグが変化していたら
-	if (old_collision_time_flag != collision_time_flag)
-	{
-		// コリジョンのあたり判定のオンオフを切り替える
-		std::shared_ptr<CollisionSphere> collision = collision_manager.GetCollisionSphereFromName("NightmareDragonJaw02");
-
-		// 当たり判定を行うフラグを変化させる
-		collision->SetCollisionFlag(collision_time_flag);
-	}
-	// 前フレームのコリジョンフラグを代入。コリジョンフラグが変化したタイミングを調べる用
-	owner->GetCharactor()->SetOldCollisionTimeFlag(collision_time_flag);
+	// 攻撃の当たり判定処理
+	AttackCollision(actor, "NightmareDragonJaw02", collision_time_data);
 
 	// アニメーション再生が終了したら完了を返す
 	if (!owner->GetActor()->GetModel()->IsPlayAnimation())
@@ -104,12 +111,12 @@ ActionBase::State BasicAttackAction::Run(float elapsed_time)
 // -----------------------------
 // 実行前処理
 // -----------------------------
-void ClawAttackAction::Start(std::string action_name)
+void ClawAttackAction::Start()
 {
-	// ガードアクションのデータ取得
-	std::shared_ptr<AnimationData> animation = GameDataBase::Instance().GetAnimationData("NightmareDragonClawAttack");
 	// アニメーション再生
-	owner->PlayAnimation(animation);
+	owner->PlayAnimation("NightmareDragonClawAttack");
+	// 当たり判定を行う時間のデータを取得
+	collision_time_data = GameDataBase::Instance().GetAttackCollitionTimeData(AttackCategory::ClawAttack, EnemyCategory::NightmareDragon);
 }
 
 // -----------------------------
@@ -117,25 +124,11 @@ void ClawAttackAction::Start(std::string action_name)
 // -----------------------------
 ActionBase::State ClawAttackAction::Run(float elapsed_time)
 {
-	CollisionManager& collision_manager = CollisionManager::Instance();
+	// アクター取得
 	std::shared_ptr<Actor> actor = owner->GetActor();
-	// 現在のコリジョンフラグと1フレーム前のコリジョンフラグを取得
-	bool old_collision_time_flag = owner->GetCharactor()->GetOldCollisionTimeFlag();
-
-	// 任意のアニメーション再生区間でのみ衝突判定処理をする
-	bool collision_time_flag = owner->GetCharactor()->SearchAnimationTime(actor, 0.2f, 0.6f);
-
-	// 1フレーム前からコリジョンフラグが変化していたら
-	if (old_collision_time_flag != collision_time_flag)
-	{
-		// コリジョンのあたり判定のオンオフを切り替える
-		std::shared_ptr<CollisionSphere> collision = collision_manager.GetCollisionSphereFromName("NightmareDragonRightWrist");
-
-		// 当たり判定を行うフラグを変化させる
-		collision->SetCollisionFlag(collision_time_flag);
-	}
-	// 前フレームのコリジョンフラグを代入。コリジョンフラグが変化したタイミングを調べる用
-	owner->GetCharactor()->SetOldCollisionTimeFlag(collision_time_flag);
+	
+	// 攻撃の当たり判定処理
+	AttackCollision(actor, "NightmareDragonRightWrist", collision_time_data);
 
 	// アニメーション再生が終了したら完了を返す
 	if (!owner->GetActor()->GetModel()->IsPlayAnimation())
@@ -155,12 +148,13 @@ ActionBase::State ClawAttackAction::Run(float elapsed_time)
 // -----------------------------
 // 実行前処理
 // -----------------------------
-void HornAttackAction::Start(std::string action_name)
+void HornAttackAction::Start()
 {
-	// ガードアクションのデータ取得
-	std::shared_ptr<AnimationData> animation = GameDataBase::Instance().GetAnimationData("NightmareDragonHornAttack");
 	// アニメーション再生
-	owner->PlayAnimation(animation);
+	owner->PlayAnimation("NightmareDragonHornAttack");
+
+	// 当たり判定を行う時間のデータを取得
+	collision_time_data = GameDataBase::Instance().GetAttackCollitionTimeData(AttackCategory::HornAttack, EnemyCategory::NightmareDragon);
 }
 
 // -----------------------------
@@ -168,25 +162,11 @@ void HornAttackAction::Start(std::string action_name)
 // -----------------------------
 ActionBase::State HornAttackAction::Run(float elapsed_time)
 {
-	CollisionManager& collision_manager = CollisionManager::Instance();
+	// アクター取得
 	std::shared_ptr<Actor> actor = owner->GetActor();
-	// 現在のコリジョンフラグと1フレーム前のコリジョンフラグを取得
-	bool old_collision_time_flag = owner->GetCharactor()->GetOldCollisionTimeFlag();
 
-	// 任意のアニメーション再生区間でのみ衝突判定処理をする
-	bool collision_time_flag = owner->GetCharactor()->SearchAnimationTime(actor, 0.2f, 0.6f);
-
-	// 1フレーム前からコリジョンフラグが変化していたら
-	if (old_collision_time_flag != collision_time_flag)
-	{
-		// コリジョンのあたり判定のオンオフを切り替える
-		std::shared_ptr<CollisionSphere> collision = collision_manager.GetCollisionSphereFromName("NightmareDragonHead");
-
-		// 当たり判定を行うフラグを変化させる
-		collision->SetCollisionFlag(collision_time_flag);
-	}
-	// 前フレームのコリジョンフラグを代入。コリジョンフラグが変化したタイミングを調べる用
-	owner->GetCharactor()->SetOldCollisionTimeFlag(collision_time_flag);
+	// 攻撃の当たり判定処理
+	AttackCollision(actor, "NightmareDragonHead",collision_time_data);
 
 	// アニメーション再生が終了したら完了を返す
 	if (!owner->GetActor()->GetModel()->IsPlayAnimation())
@@ -206,12 +186,13 @@ ActionBase::State HornAttackAction::Run(float elapsed_time)
 // -----------------------------
 // 実行前処理
 // -----------------------------
-void BodyPressAttackAction::Start(std::string action_name)
+void BodyPressAttackAction::Start()
 {
-	// ガードアクションのデータ取得
-	std::shared_ptr<AnimationData> animation = GameDataBase::Instance().GetAnimationData("NightmareDragonDefend");
 	// アニメーション再生
-	owner->PlayAnimation(animation);
+	owner->PlayAnimation("NightmareDragonDefend");
+
+	// 当たり判定を行う時間のデータを取得
+	collision_time_data = GameDataBase::Instance().GetAttackCollitionTimeData(AttackCategory::BodyPressAttack, EnemyCategory::NightmareDragon);
 }
 
 // -----------------------------
@@ -219,25 +200,11 @@ void BodyPressAttackAction::Start(std::string action_name)
 // -----------------------------
 ActionBase::State BodyPressAttackAction::Run(float elapsed_time)
 {
-	CollisionManager& collision_manager = CollisionManager::Instance();
+	// アクター取得
 	std::shared_ptr<Actor> actor = owner->GetActor();
-	// 現在のコリジョンフラグと1フレーム前のコリジョンフラグを取得
-	bool old_collision_time_flag = owner->GetCharactor()->GetOldCollisionTimeFlag();
 
-	// 任意のアニメーション再生区間でのみ衝突判定処理をする
-	bool collision_time_flag = owner->GetCharactor()->SearchAnimationTime(actor, 0.2f, 0.6f);
-
-	// 1フレーム前からコリジョンフラグが変化していたら
-	if (old_collision_time_flag != collision_time_flag)
-	{
-		// コリジョンのあたり判定のオンオフを切り替える
-		std::shared_ptr<CollisionSphere> collision = collision_manager.GetCollisionSphereFromName("NightmareDragonBody");
-
-		// 当たり判定を行うフラグを変化させる
-		collision->SetCollisionFlag(collision_time_flag);
-	}
-	// 前フレームのコリジョンフラグを代入。コリジョンフラグが変化したタイミングを調べる用
-	owner->GetCharactor()->SetOldCollisionTimeFlag(collision_time_flag);
+	// 攻撃の当たり判定処理
+	AttackCollision(actor, "NightmareDragonBody", collision_time_data, CollisionMeshType::Cylinder);
 
 	// アニメーション再生が終了したら完了を返す
 	if (!owner->GetActor()->GetModel()->IsPlayAnimation())

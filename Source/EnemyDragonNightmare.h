@@ -15,9 +15,6 @@ public:
 	// デストラクタ
 	~EnemyDragonNightmare() override;
 
-	// 敵の破棄処理
-	void Destroy() override;
-
 	// GUI描画
 	void OnGUI() override;
 
@@ -29,6 +26,9 @@ public:
 
 	// ビヘイビアのノード設定処理
 	void SetBehaviorNode() override;
+
+	// 敵の破棄処理
+	void Destroy() override;
 
 	// 更新処理
 	void Update(float elapsed_time) override;

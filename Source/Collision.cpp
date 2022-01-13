@@ -690,6 +690,21 @@ bool CollisionManager::IntersectRayVsModel(DirectX::XMFLOAT3 start, DirectX::XMF
 }
 
 //-----------------------------------------
+// 名前から立方体コリジョン取得
+//-----------------------------------------
+std::shared_ptr<CollisionBox> CollisionManager::GetCollisionBoxFromName(const char* name)
+{
+    for (std::shared_ptr<CollisionBox> box : boxes)
+    {
+        if (strcmp(box->GetName(), name) == 0)
+        {
+            return box;
+        }
+    }
+    return nullptr;
+}
+
+//-----------------------------------------
 // 名前から球コリジョン取得
 //-----------------------------------------
 std::shared_ptr<CollisionSphere> CollisionManager::GetCollisionSphereFromName(const char* name)

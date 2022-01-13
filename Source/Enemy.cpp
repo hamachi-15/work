@@ -1,3 +1,5 @@
+#include "GameDatabase.h"
+
 #include "Mathf.h"
 
 #include "Charactor.h"
@@ -18,7 +20,31 @@ Enemy::~Enemy()
 	delete ai_tree;
 	delete behavior_data;
 }
+
+//-----------------------------------------
+// ビヘイビア更新処理
+//-----------------------------------------
+void Enemy::BehaviorUpdate(float elapsed_time)
+{
+	// ビヘイビアツリー更新処理
+	if (active_node == nullptr)
+	{
+		active_node = ai_tree->ActiveNodeInference(this, behavior_data);
+	}
+	if (active_node != nullptr && active_node != old_active_node)
+	{
+		ai_tree->Start(active_node);
+	}
+	if (active_node != nullptr)
+	{
+		active_node = ai_tree->Run(this, active_node, behavior_data, elapsed_time);
+	}
+	old_active_node = active_node;
+}
+
+//-----------------------------------------
 // 範囲内にプレイヤーがいないか探す
+//-----------------------------------------
 bool Enemy::SearchPlayer()
 {
 	// プレイヤーとの高低差を考慮して3Dで距離判定をする
@@ -49,7 +75,10 @@ bool Enemy::SearchPlayer()
 	}
 	return false;
 }
+
+//-----------------------------------------
 // 目的地点へ移動
+//-----------------------------------------
 void Enemy::MoveToTarget(float elapsed_time, float speed_rate)
 {
 	// ターゲット方向への進行ベクトルを算出
@@ -80,8 +109,11 @@ void Enemy::SetRandomTargetPosition()
 //-----------------------------------------
 // アニメーション再生
 //-----------------------------------------
-void Enemy::PlayAnimation(std::shared_ptr<AnimationData> animation)
+void Enemy::PlayAnimation(const char* animation_name)
 {
+	// ガードアクションのデータ取得
+	std::shared_ptr<AnimationData> animation = GameDataBase::Instance().GetAnimationData(animation_name);
+
 	// モデル取得
 	Model* model = GetActor()->GetModel();
 	// アニメーション再生
