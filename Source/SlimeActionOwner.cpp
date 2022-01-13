@@ -36,7 +36,7 @@ HeavyBodyAttackAction::State HeavyBodyAttackAction::Run(float elapsed_time)
 		run_timer -= elapsed_time;
 	}
 	// 攻撃の当たり判定処理
-	AttackCollision(actor, owner->GetCharactor()->GetID() + owner->GetIdentity(), collision_time_data);
+	AttackCollision(actor,"SlimeHead", owner->GetCharactor()->GetID() + owner->GetIdentity(), collision_time_data);
 
 	// タイマー設定
 	owner->SetRunTimer(run_timer);
@@ -76,23 +76,9 @@ ActionBase::State BodyAttackAction::Run(float elapsed_time)
 {
 	CollisionManager& collision_manager = CollisionManager::Instance();
 	std::shared_ptr<Actor> actor = owner->GetActor();
-	// 現在のコリジョンフラグと1フレーム前のコリジョンフラグを取得
-	bool old_collision_time_flag = owner->GetCharactor()->GetOldCollisionTimeFlag();
-	// 任意のアニメーション再生区間でのみ衝突判定処理をする
-	bool collision_time_flag =owner->GetCharactor()->SearchAnimationTime(actor, 0.2f, 0.4f);
-	// 当たり判定を行う時間かの判定
-	//bool collision_time_flag = Universal::JudgementCollisionTime(actor);
 
-	// 1フレーム前からコリジョンフラグが変化していたら
-	if (old_collision_time_flag != collision_time_flag)
-	{
-		// コリジョンのあたり判定のオンオフを切り替える
-		std::string name = actor->GetName();
-		name += "Head";
-		collision_manager.GetCollisionSphereFromName(name.c_str())->SetCollisionFlag(collision_time_flag);
-	}
-	// 前フレームのコリジョンフラグを代入。コリジョンフラグが変化したタイミングを調べる用
-	owner->GetCharactor()->SetOldCollisionTimeFlag(collision_time_flag);
+	// 攻撃の当たり判定処理
+	AttackCollision(actor, "SlimeHead", owner->GetCharactor()->GetID() + owner->GetIdentity(), collision_time_data);
 
 	// アニメーション再生が終了したら完了を返す
 	if (!actor->GetModel()->IsPlayAnimation())

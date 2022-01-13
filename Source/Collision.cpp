@@ -720,6 +720,21 @@ std::shared_ptr<CollisionSphere> CollisionManager::GetCollisionSphereFromName(co
 }
 
 //-----------------------------------------
+// IDと名前から球コリジョン取得
+//-----------------------------------------
+std::shared_ptr<CollisionSphere> CollisionManager::GetCollisionSphereFromNameAndID(int id, const char* name)
+{
+    for (std::shared_ptr<CollisionSphere> sphere : spheres)
+    {
+        if (sphere->GetActorID() == id && strcmp(sphere->GetName(), name) == 0)
+        {
+            return sphere;
+        }
+    }
+    return nullptr;
+}
+
+//-----------------------------------------
 // IDから球コリジョンを取得
 //-----------------------------------------
 std::vector<std::shared_ptr<CollisionSphere>> CollisionManager::GetCollisionSphereFromID(int id)
@@ -743,6 +758,21 @@ std::shared_ptr<CollisionCylinder> CollisionManager::GetCollisionCylinderFromNam
     for (std::shared_ptr<CollisionCylinder> cylinder : cylinderes)
     {
         if (strcmp(cylinder->GetName(), name) == 0)
+        {
+            return cylinder;
+        }
+    }
+    return nullptr;
+}
+
+//-----------------------------------------
+// IDと名前から円柱コリジョンを取得
+//-----------------------------------------
+std::shared_ptr<CollisionCylinder> CollisionManager::GetCollisionCylinderFromNameAndID(int id, const char* name)
+{
+    for (std::shared_ptr<CollisionCylinder> cylinder : cylinderes)
+    {
+        if (cylinder->GetActorID() == id && strcmp(cylinder->GetName(), name) == 0)
         {
             return cylinder;
         }

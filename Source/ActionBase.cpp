@@ -48,6 +48,7 @@ void ActionBase::AttackCollision(std::shared_ptr<Actor> actor,
 }
 
 void ActionBase::AttackCollision(std::shared_ptr<Actor> actor,
+	const char* node_name,
 	int id,
 	std::shared_ptr<AttackCollitionTime> collision_time_data,
 	CollisionMeshType collision_type)
@@ -61,16 +62,17 @@ void ActionBase::AttackCollision(std::shared_ptr<Actor> actor,
 	// 1フレーム前からコリジョンフラグが変化していたら
 	if (collision_time_flag != NULL)
 	{
-		std::shared_ptr<CollisionSphere> collision;
+		std::shared_ptr<CollisionObject> collision;
+		// 対象になるコリジョンごとに
 		switch (collision_type)
 		{
 		case CollisionMeshType::Sphere:
-			// コリジョンのあたり判定のオンオフを切り替える
-			collision = collision_manager.GetCollisionSphereFromName(node_name);
+			// IDと名前から球コリジョンを取得
+			collision = collision_manager.GetCollisionSphereFromNameAndID(id, node_name);
 			break;
 		case CollisionMeshType::Cylinder:
-			// コリジョンのあたり判定のオンオフを切り替える
-			collision = collision_manager.GetCollisionSphereFromName(node_name);
+			// IDと名前から円柱コリジョンを取得
+			collision = collision_manager.GetCollisionCylinderFromNameAndID(id, node_name);
 			break;
 		}
 

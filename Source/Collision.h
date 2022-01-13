@@ -336,8 +336,14 @@ public:
 	// IDから球コリジョンを取得
 	std::vector<std::shared_ptr<CollisionSphere>> GetCollisionSphereFromID(int id);
 
+	// IDと名前から球コリジョンを取得
+	std::shared_ptr<CollisionSphere> GetCollisionSphereFromNameAndID(int id, const char* name);
+
 	// 名前から円柱コリジョン取得
 	std::shared_ptr<CollisionCylinder> GetCollisionCylinderFromName(const char* name);
+
+	// IDと名前から円柱コリジョンを取得
+	std::shared_ptr<CollisionCylinder> GetCollisionCylinderFromNameAndID(int id, const char* name);
 
 private:
 	// 球と球の交差判定

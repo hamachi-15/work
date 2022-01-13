@@ -37,6 +37,7 @@ protected:
 						 std::shared_ptr<AttackCollitionTime> collision_time_data,
 						 CollisionMeshType collision_type = CollisionMeshType::Sphere);
 	void AttackCollision(std::shared_ptr<Actor> actor,
+						 const char* node_name,
 						 int id,
 						 std::shared_ptr<AttackCollitionTime> collision_time_data,
 						 CollisionMeshType collision_type = CollisionMeshType::Sphere);
