@@ -30,6 +30,41 @@ ActionBase::State AligningAction::Run(float elapsed_time)
 {
 	return ActionBase::State();
 }
+
+//***************************************
+// 
+// 咆哮行動
+// 
+//***************************************
+// -----------------------------
+// 実行前処理
+//------------------------------
+void ScreamAction::Start()
+{
+	// アニメーション名設定
+	std::string animation_name = owner->GetName();
+	animation_name += "Scream";
+
+	// アニメーション再生
+	owner->PlayAnimation(animation_name.c_str());
+}
+
+//------------------------------
+// 実行処理
+//------------------------------
+ActionBase::State ScreamAction::Run(float elapsed_time)
+{
+	// アニメーション再生が終了したら完了を返す
+	if (!owner->GetActor()->GetModel()->IsPlayAnimation())
+	{
+		owner->SetRunTimer(0.0f);
+		return ActionBase::State::Complete;
+	}
+	
+	// 継続
+	return ActionBase::State::Run;
+}
+
 //*****************************
 // 
 // ガードアクション
@@ -91,7 +126,9 @@ ActionBase::State BasicAttackAction::Run(float elapsed_time)
 	std::shared_ptr<Actor> actor = owner->GetActor();
 
 	// 攻撃の当たり判定処理
-	AttackCollision(actor, "NightmareDragonJaw02", collision_time_data);
+	std::string collision_name = actor->GetName();
+	collision_name += "mouth";
+	AttackCollision(actor, collision_name.c_str(), collision_time_data);
 
 	// アニメーション再生が終了したら完了を返す
 	if (!owner->GetActor()->GetModel()->IsPlayAnimation())
@@ -128,7 +165,9 @@ ActionBase::State ClawAttackAction::Run(float elapsed_time)
 	std::shared_ptr<Actor> actor = owner->GetActor();
 	
 	// 攻撃の当たり判定処理
-	AttackCollision(actor, "NightmareDragonRightWrist", collision_time_data);
+	std::string collision_name = actor->GetName();
+	collision_name += "Claw";
+	AttackCollision(actor, collision_name.c_str(), collision_time_data);
 
 	// アニメーション再生が終了したら完了を返す
 	if (!owner->GetActor()->GetModel()->IsPlayAnimation())
@@ -166,7 +205,9 @@ ActionBase::State HornAttackAction::Run(float elapsed_time)
 	std::shared_ptr<Actor> actor = owner->GetActor();
 
 	// 攻撃の当たり判定処理
-	AttackCollision(actor, "NightmareDragonHead",collision_time_data);
+	std::string collision_name = actor->GetName();
+	collision_name += "Horn";
+	AttackCollision(actor, collision_name.c_str(), collision_time_data);
 
 	// アニメーション再生が終了したら完了を返す
 	if (!owner->GetActor()->GetModel()->IsPlayAnimation())
@@ -204,7 +245,8 @@ ActionBase::State BodyPressAttackAction::Run(float elapsed_time)
 	std::shared_ptr<Actor> actor = owner->GetActor();
 
 	// 攻撃の当たり判定処理
-	AttackCollision(actor, "NightmareDragonBody", collision_time_data, CollisionMeshType::Cylinder);
+	std::string collision_name = actor->GetName();
+	AttackCollision(actor, collision_name.c_str(), collision_time_data);
 
 	// アニメーション再生が終了したら完了を返す
 	if (!owner->GetActor()->GetModel()->IsPlayAnimation())
@@ -213,5 +255,44 @@ ActionBase::State BodyPressAttackAction::Run(float elapsed_time)
 		owner->SetAttackFlag(false);
 		return ActionBase::State::Complete;
 	}
+	return ActionBase::State::Run;
+}
+
+//*****************************
+// 
+// 突進攻撃
+// 
+//*****************************
+// -----------------------------
+// 実行前処理
+// -----------------------------
+void LungesAttackAction::Start()
+{
+	// アニメーション再生
+	owner->PlayAnimation("NightmareDragonRun");
+
+	// 当たり判定を行う時間のデータを取得
+	//collision_time_data = GameDataBase::Instance().GetAttackCollitionTimeData(AttackCategory::BodyPressAttack, EnemyCategory::NightmareDragon);
+	// 反対側にターゲットを設定
+
+}
+
+// -----------------------------
+// 実行処理
+// -----------------------------
+ActionBase::State LungesAttackAction::Run(float elapsed_time)
+{
+	// アクター取得
+	std::shared_ptr<Actor> owner_actor = owner->GetActor();
+
+	// 目的地へ着いたかの判定処理
+	if (JedgmentToTargetPosition(owner->GetTargetPosition(), owner_actor->GetPosition(), owner_actor->GetName()))
+	{
+		return ActionBase::State::Complete;
+	}
+
+	// 目的地点へ移動
+	owner->MoveToTarget(elapsed_time, 1.5f);
+
 	return ActionBase::State::Run;
 }

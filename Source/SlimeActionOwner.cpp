@@ -6,6 +6,11 @@
 
 #include "Universal.h"
 
+//***********************************
+// 
+// ジャンプ攻撃行動
+// 
+//***********************************
 //-------------------------------------
 // ジャンプ攻撃行動前処理
 //-------------------------------------
@@ -36,7 +41,9 @@ HeavyBodyAttackAction::State HeavyBodyAttackAction::Run(float elapsed_time)
 		run_timer -= elapsed_time;
 	}
 	// 攻撃の当たり判定処理
-	AttackCollision(actor,"SlimeHead", owner->GetCharactor()->GetID() + owner->GetIdentity(), collision_time_data);
+	std::string collision_name = actor->GetName();
+	collision_name += "Head";
+	AttackCollision(actor, collision_name.c_str(), owner->GetCharactor()->GetID() + owner->GetIdentity(), collision_time_data);
 
 	// タイマー設定
 	owner->SetRunTimer(run_timer);
@@ -57,6 +64,11 @@ HeavyBodyAttackAction::State HeavyBodyAttackAction::Run(float elapsed_time)
 	return ActionBase::State::Run;
 }
 
+//***********************************
+// 
+// 体当たり攻撃行動
+// 
+//***********************************
 //-------------------------------------
 // 体当たり攻撃行動前処理
 //-------------------------------------
@@ -78,7 +90,7 @@ ActionBase::State BodyAttackAction::Run(float elapsed_time)
 	std::shared_ptr<Actor> actor = owner->GetActor();
 
 	// 攻撃の当たり判定処理
-	AttackCollision(actor, "SlimeHead", owner->GetCharactor()->GetID() + owner->GetIdentity(), collision_time_data);
+	AttackCollision(actor, actor->GetName(), owner->GetCharactor()->GetID() + owner->GetIdentity(), collision_time_data);
 
 	// アニメーション再生が終了したら完了を返す
 	if (!actor->GetModel()->IsPlayAnimation())

@@ -33,16 +33,16 @@ public:
 	// 敵を生成
 	void CreateEnemies();
 	
+	// 敵データIDから敵を生成
 	void CreateEnemies(int id);
 	
-	// スクリプトから敵情報を取得して敵を生成する
-	bool CreateEnemyScriptData();
+	// エンカウントデータから敵情報を取得して敵を生成する
+	bool CreateEnemyEncountData();
 	
 	// 敵のステータスを設定
-	void SetEnemyStatus(std::shared_ptr<Actor> actor, std::shared_ptr<EnemyData> enemy_data, std::shared_ptr<EnemyAppearancePosition> appearance_data);
-	void SetEnemyStatus(std::shared_ptr<Actor> actor, std::shared_ptr<EnemyData> enemy_data, int& string_id, DirectX::XMFLOAT3& appearance_position);
+	void SetEnemyStatus(std::shared_ptr<Actor> actor, std::shared_ptr<EnemyData> enemy_data, std::shared_ptr<EnemyTerritoryPosition> teritory_datam, DirectX::XMFLOAT3 appearance_position = {0.0f, 0.0f, 0.0f});
 
-	// ゲームデータから得た出現位置を原点に出現位置をランダム算出
+	// ゲームデータから得たテリトリーを原点に出現位置をランダム算出
 	void GetAppearancePosition(std::shared_ptr<Actor> actor, DirectX::XMFLOAT3 appearance_origin, float appearance_range);
 
 	// 全ての敵を破棄
@@ -56,22 +56,21 @@ public:
 
 	// 敵を取得
 	std::shared_ptr<Enemy> GetEnemy(int index) { return enemies.at(index); }
+
 	// IDで敵を取得
 	std::shared_ptr<Enemy> GetEnemyFromID(int id);
 
 	// インデントリ取得
 	const int& GetIndentity() const { return identity; }
 
-	// 敵のカウント取得
+	// 敵の総数取得
 	int GetEnemyCount() const { return static_cast<int>(enemies.size()); }
-public:
-	// 一度に出現させる敵の上限と下限
-	enum EnemyCountLimit
-	{
-		Min_Limit = 1,
-		Max_Limit = 4,
-	};
+
+	// テリトリーの敵が撃破されているかのコンテナを取得
+	std::map<EnemyTerritoryTag, bool> GetDefeatTeritory() { return defeat_teritory; }
 private:
-	std::vector<std::shared_ptr<Enemy>> enemies;
-	int identity;
+	std::vector<std::shared_ptr<Enemy>>		enemies;						// 敵の配列
+	std::map<EnemyTerritoryTag, bool>		defeat_teritory;				// テリトリーの敵が撃破されているかのコンテナ
+	int										identity;
+	bool									appearance_ramdam_flag = true;	// ランダムな位置に出現させるかのフラグ
 };

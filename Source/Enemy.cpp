@@ -6,6 +6,8 @@
 #include "ActorManager.h"
 #include "Enemy.h"
 
+#include "EnemyTerritoryManager.h"
+
 #include "BehaviorTree.h"
 #include "BehaviorData.h"
 #include "NodeBase.h"
@@ -99,8 +101,17 @@ void Enemy::MoveToTarget(float elapsed_time, float speed_rate)
 //-----------------------------------------
 void Enemy::SetRandomTargetPosition()
 {
+	// テリトリーデータ取得
+	std::shared_ptr<EnemyTerritory> territory_data = EnemyTerritoryManager::Instance().GetTerritory(GetBelongingToTerritory());
+	// データからテリトリーの半径取得
+	float territory_range = territory_data->GetTerritoryRange();
+	// データからテリトリーの原点取得
+	DirectX::XMFLOAT3 territory_origin = territory_data->GetTerritoryOrigin();
+
+	// ターゲットポジションをテリトリー範囲内のランダムな位置に設定
 	float theta = Mathf::RandomRange(-DirectX::XM_PI, DirectX::XM_PI);
 	float range = Mathf::RandomRange(0.0f, territory_range);
+
 	target_position.x = territory_origin.x + sinf(theta) * range;
 	target_position.y = territory_origin.y;
 	target_position.z = territory_origin.z + cosf(theta) * range;

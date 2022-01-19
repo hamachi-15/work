@@ -2,6 +2,8 @@
 #include "Graphics.h"
 #include "ActorManager.h"
 #include "Charactor.h"
+#include "Enemy.h"
+
 #include "SceneManager.h"
 #include "Model.h"
 //#include "Scene.h"
@@ -231,7 +233,7 @@ void CollisionManager::Update()
 
     ObjectCollisionResult result;
 
-    // カメラの錐台内にいるかの判定
+    // コリジョンがカメラの錐台内にいるかの判定
     {
         Scene* scene = SceneManager::Instance().GetCurrentScene();
         size_t box_count = boxes.size();
@@ -357,7 +359,6 @@ void CollisionManager::Update()
         }
     }
     // 円柱vs円柱の交差判定
-   // ObjectCollisionResult result;
     {
         size_t cylinder_count = cylinderes.size();
         for (size_t i = 0; i < cylinder_count; i++)
@@ -395,10 +396,12 @@ void CollisionManager::Update()
                         if (isplayercolA == 0)
                         {
                             message.hit_position = cylinderA->GetActor()->GetPosition();
+                            message.territory_tag = cylinderB->GetActor()->GetComponent<Enemy>()->GetBelongingToTerritory();
                         }
                         else
                         {
                             message.hit_position = cylinderB->GetActor()->GetPosition();
+                            message.territory_tag = cylinderA->GetActor()->GetComponent<Enemy>()->GetBelongingToTerritory();
                         }
                         MetaAI::Instance().SendMessaging(
                             static_cast<int>(MetaAI::Identity::Collision),   // 送信元
@@ -445,15 +448,25 @@ bool CollisionManager::OnMessage(const Telegram& message)
 //-----------------------------------------
 void CollisionManager::Destroy()
 {
+    // 立方体コリジョンリストの破棄
+    std::vector<std::shared_ptr<CollisionBox>>::iterator iterate_box = boxes.begin();
+    for (; iterate_box != boxes.end(); iterate_box = boxes.begin())
+    {
+        boxes.erase(iterate_box);
+    }
+
+    // 球コリジョンリストの破棄
     std::vector<std::shared_ptr<CollisionSphere>>::iterator iterate_sphere = spheres.begin();
     for (; iterate_sphere != spheres.end(); iterate_sphere = spheres.begin())
     {
         spheres.erase(iterate_sphere);
     }
-    std::vector<std::shared_ptr<CollisionCylinder>>::iterator iterate_cylindere = cylinderes.begin();
-    for (; iterate_cylindere != cylinderes.end(); iterate_cylindere = cylinderes.begin())
+
+    // 円柱コリジョンリスト破棄
+    std::vector<std::shared_ptr<CollisionCylinder>>::iterator iterate_cylinder = cylinderes.begin();
+    for (; iterate_cylinder != cylinderes.end(); iterate_cylinder = cylinderes.begin())
     {
-        cylinderes.erase(iterate_cylindere);
+        cylinderes.erase(iterate_cylinder);
     }
 }
 

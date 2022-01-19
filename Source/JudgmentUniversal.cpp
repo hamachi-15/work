@@ -11,12 +11,14 @@ bool JudgmentUniversal::JudgementTargetInFront(const DirectX::XMFLOAT3& origine_
 
 	// 敵の角度から前方向を算出
 	DirectX::XMVECTOR front = Mathf::ReturnVectorFront(origine_angle);
+	// 正規化
+	front = DirectX::XMVector3Normalize(front);
 
 	// 敵の前方向とベクトルから内積算出
 	float dot = Mathf::ReturnFloatDot(front, vector);
 
 	// 内積の正負で前方にいるか判定
-	return (dot < 0);
+	return (dot > 0);
 }
 
 //-------------------------------------------

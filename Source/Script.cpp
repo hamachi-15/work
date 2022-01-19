@@ -171,29 +171,3 @@ WriteScript::WriteScript()
 WriteScript::~WriteScript()
 {
 }
-
-// battleシーンに送るスクリプト書き込み
-bool WriteScript::WriteSceneDataScript(const char* filename, const BattleSceneDataHeadder& data_headder)
-{
-	// シーンデータスクリプト書き込み処理
-	FILE* fp;
-	fopen_s(&fp, filename, "w");
-
-	//　ファイルオープンに失敗したらfalseを返す
-	if (!fp)	return false;
-
-	fprintf(fp, "// 敵データID\n");
-
-	int data_size = static_cast<int>(data_headder.search_enemy_id.size());
-	for (int i = 0; i < data_size; ++i)
-	{
-		fprintf(fp, "EnemyID %d\n", data_headder.search_enemy_id.at(i));
-	}
-
-	fprintf(fp, "END\n");
-
-	// ファイルを閉じる
-	fclose(fp);
-
-	return true;
-}

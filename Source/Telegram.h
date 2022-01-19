@@ -1,5 +1,8 @@
 #pragma once
 #include <DirectXMath.h>
+
+enum	class	EnemyTerritoryTag;
+
 enum class MessageType : int
 {
 	Message_Call_Help,				// 仲間を呼ぶ(Enemy、メタAIの両方で使用)
@@ -15,6 +18,7 @@ struct Message
 {
 	MessageType			message;	// メッセージID
 	DirectX::XMFLOAT3	hit_position = {0.0f, 0.0f, 0.0f}; // 
+	EnemyTerritoryTag territory_tag;
 };
 
 class Telegram

@@ -1,6 +1,22 @@
 #pragma once
 #include "JudgmentBase.h"
 
+//***********************************
+// 
+// ノードに遷移させるかランダムに判定
+// 
+//***********************************
+class RamdamNextStepJudgment :public JudgmentBase
+{
+public:
+	// コンストラクタ
+	RamdamNextStepJudgment(Enemy* enemy, int percent) : JudgmentBase(enemy), percent(percent) {};
+
+	// 判定
+	bool Judgment() override;
+private:
+	int percent = 0; // trueを返す確率
+};
 //*****************************
 // 
 // BattleNodeに遷移できるか判定

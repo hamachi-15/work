@@ -21,6 +21,24 @@ public:
 
 //*****************************
 // 
+// 咆哮行動
+// 
+//*****************************
+class ScreamAction : public ActionBase
+{
+public:
+	// コンストラクタ
+	ScreamAction(Enemy* enemy) : ActionBase(enemy) {}
+
+	// 実行前処理
+	void Start() override;
+
+	// 実行処理
+	ActionBase::State Run(float elapsed_time) override;
+};
+
+//*****************************
+// 
 // ガードアクション
 // 
 //*****************************
@@ -101,6 +119,24 @@ class BodyPressAttackAction : public ActionBase
 public:
 	// コンストラクタ
 	BodyPressAttackAction(Enemy* enemy) : ActionBase(enemy) {}
+
+	// 実行前処理
+	void Start() override;
+
+	// 実行処理
+	ActionBase::State Run(float elapsed_time) override;
+};
+
+//*****************************
+// 
+// 突進攻撃
+// 
+//*****************************
+class LungesAttackAction : public ActionBase
+{
+public:
+	// コンストラクタ
+	LungesAttackAction(Enemy* enemy) : ActionBase(enemy) {}
 
 	// 実行前処理
 	void Start() override;

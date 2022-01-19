@@ -2,6 +2,7 @@
 #include "Component.h"
 #include "Movement.h"
 
+enum class EnemyTerritoryTag;
 class BehaviorTree;
 class BehaviorData;
 class NodeBase;
@@ -40,6 +41,12 @@ public:
 	// 敵の破棄処理
 	virtual void Destroy() = 0;
 
+	// エネミーデータID設定
+	void SetEnemyDataID(int id) { this->id = id; }
+
+	// エネミーデータID取得
+	int GetEnemyDataID() const { return id; }
+
 	// アイデンティティ設定
 	void SetIdentity(int identity) { this->identity = identity; }
 	
@@ -76,24 +83,18 @@ public:
 	// ターゲット位置を取得
 	DirectX::XMFLOAT3 GetTargetPosition() const { return target_position; }
 	
-	// テリトリーの原点設定
-	void SetTerritoryOrigin(const DirectX::XMFLOAT3& territory_origin) { this->territory_origin = territory_origin; }
-	
-	// テリトリーの原点取得
-	DirectX::XMFLOAT3 GetTerritoryOrigin() const { return territory_origin; }
-	
 	// プレイヤーの攻撃コリジョンの位置設定
 	void SetHitPosition(const DirectX::XMFLOAT3& hit_position) { this->hit_position = hit_position; }
 
 	// プレイヤーの攻撃コリジョンの位置取得
 	const DirectX::XMFLOAT3& GetHitPosition() const { return hit_position; }
 
-	// テリトリー範囲設定
-	void SetTerritoryRange(float territory_range) { this->territory_range = territory_range; }
+	// テリトリータグ設定
+	void SetBelongingToTerritory(EnemyTerritoryTag teritory_tag) { this->teritory_tag = teritory_tag; }
 
-	// テリトリー範囲取得
-	float GetTerritoryRange() const { return territory_range; }
-
+	// テリトリータグ取得
+	const EnemyTerritoryTag& GetBelongingToTerritory() const { return teritory_tag; }
+	
 	// 攻撃範囲設定
 	void SetAttackRange(const float& attack_range) { this->attack_range = attack_range; }
 
@@ -133,15 +134,18 @@ public:
 
 	// ビヘイビアのGUI描画
 	void DrawBehaviorGUI();
+
+	// 
 private:
-	int					identity;			// 何番目の敵か
-	bool				attack_flag = false;		// 攻撃フラグ
-	bool				anger_flag = false;				 // 怒り状態フラグ
-	std::shared_ptr<Movement>  movement;
-	std::shared_ptr<Charactor> charactor;
+	int							id;
+	int							identity;			// 何番目の敵か
+	bool						attack_flag = false;		// 攻撃フラグ
+	bool						anger_flag = false;				 // 怒り状態フラグ
+	std::shared_ptr<Movement>	movement;
+	std::shared_ptr<Charactor>	charactor;
+	EnemyTerritoryTag			teritory_tag;
 protected:
 	DirectX::XMFLOAT3	target_position = { 0.0f,0.0f,0.0f };
-	DirectX::XMFLOAT3	territory_origin = { 0.0f,0.0f,0.0f };
 	DirectX::XMFLOAT3	hit_position = { 0.0f, 0.0f, 0.0f };	// プレイヤーの攻撃コリジョンの位置(自身と衝突したときに使う)
 	std::string			name;
 	BehaviorTree*		ai_tree = nullptr;
@@ -149,7 +153,8 @@ protected:
 	NodeBase*			active_node = nullptr;
 	NodeBase*			old_active_node = nullptr;
 	float				run_timer = 0.0f;
-	float				territory_range = 10.0f; // 縄張りの範囲
+	//float				territory_range = 10.0f; // 縄張りの範囲
+	//DirectX::XMFLOAT3	territory_origin = { 0.0f,0.0f,0.0f };
 	float				search_range = 5.0f;	 // 索敵範囲
 	float				attack_range = 1.5f;	 // 攻撃に移る範囲
 };

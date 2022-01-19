@@ -1,7 +1,26 @@
 #include "BehaviorData.h"
 #include "NodeBase.h"
 
+//**************************************
+// 
+// Behavior保存データクラス
+// 
+//**************************************
+//-------------------------------------
+// 初期化
+//-------------------------------------
+void BehaviorData::Init()
+{
+    run_sequence_step_map.clear();
+    while (sequence_stack.size() > 0)
+    {
+        sequence_stack.pop();
+    }
+}
+
+//-------------------------------------
 // シーケンスノードのポップ
+//-------------------------------------
 NodeBase* BehaviorData::PopSequenceNode()
 {
     // 空ならNULL
@@ -17,7 +36,10 @@ NodeBase* BehaviorData::PopSequenceNode()
     }
     return node;
 }
+
+//-------------------------------------
 // シーケンスステップのゲッター
+//-------------------------------------
 int BehaviorData::GetSequenceStep(std::string name)
 {
     if (run_sequence_step_map.count(name) == 0)
@@ -26,17 +48,12 @@ int BehaviorData::GetSequenceStep(std::string name)
     }
     return run_sequence_step_map.at(name);
 }
+
+//-------------------------------------
 // シーケンスステップのセッター
+//-------------------------------------
 void BehaviorData::SetSequenceStep(std::string name, int step)
 {
     run_sequence_step_map.at(name) = step;
 }
-// 初期化
-void BehaviorData::Init()
-{
-    run_sequence_step_map.clear();
-    while (sequence_stack.size() > 0)
-    {
-        sequence_stack.pop();
-    }
-}
+

@@ -369,9 +369,9 @@
     <ClInclude Include="Source\GameData\AnimationData.h" />
     <ClInclude Include="Source\GameData\AttackCategory.h" />
     <ClInclude Include="Source\GameData\AttackCollitionTime.h" />
-    <ClInclude Include="Source\GameData\EnemyAppearancePosition.h" />
     <ClInclude Include="Source\GameData\EnemyCategory.h" />
     <ClInclude Include="Source\GameData\EnemyData.h" />
+    <ClInclude Include="Source\GameData\EnemyTerritoryPosition.h" />
     <ClInclude Include="Source\GameData\EnemyTerritoryTag.h" />
     <ClInclude Include="Source\GameData\WorldMapData.h" />
     <ClInclude Include="Source\GamePad.h" />
@@ -436,7 +436,6 @@
     <ClInclude Include="Source\SceneTitle.h" />
     <ClInclude Include="Source\SceneTutorial.h" />
     <ClInclude Include="Source\Script.h" />
-    <ClInclude Include="Source\ScriptDataHeadder.h" />
     <ClInclude Include="Source\Shader.h" />
     <ClInclude Include="Source\ShaderManager.h" />
     <ClInclude Include="Source\SkyBoxShader.h" />

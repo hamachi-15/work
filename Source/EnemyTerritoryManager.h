@@ -25,7 +25,7 @@ public:
 	void RegisterTerritory(std::shared_ptr<EnemyTerritory> territory);
 
 	// “ê’£‚èƒ^ƒO‚©‚ç“ê’£‚è‚ğæ“¾
-	std::shared_ptr<EnemyTerritory> GetTerritory(EnemyTerritoryTag& tag);
+	std::shared_ptr<EnemyTerritory> GetTerritory(const EnemyTerritoryTag& tag);
 	
 	// ”jŠü
 	void Destroy();

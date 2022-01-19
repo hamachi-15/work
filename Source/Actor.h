@@ -43,12 +43,6 @@ public:
 	//Shader* GetShader() const { return shader.get(); }
 	ShaderManager::ShaderType GetShaderType() { return shader_type; }
 
-	// エネミーデータID設定
-	void SetEnemyDataID(int id) { this->id = id; }
-
-	// エネミーデータID取得
-	int GetEnemyDataID() const { return id; }
-	
 	// 名前の設定
 	void SetName(const char* name) { this->name = name; }
 
@@ -125,7 +119,6 @@ public:
 		return nullptr;
 	}
 private:
-	int						id;	// エネミーデータID
 	std::string				name;
 	DirectX::XMFLOAT3		position = { 0, 0, 0 };
 	DirectX::XMFLOAT4		rotation = { 0, 0, 0, 1 }; // クォータニオン用

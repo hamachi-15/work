@@ -57,8 +57,8 @@ void MetaAI::Discharge(std::shared_ptr<Enemy> receiver, const Telegram& telegram
 		// 受信できなかったときの処理
 		_RPT0(_CRT_WARN, "\n error:Meta Receive Failed");
 	}
-
 }
+
 //-----------------------------------
 // MetaAI用のレシーブ処理を指定
 //-----------------------------------

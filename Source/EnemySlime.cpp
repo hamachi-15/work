@@ -8,6 +8,7 @@
 #include "Charactor.h"
 #include "EnemySlime.h"
 #include "EnemyManager.h"
+#include "EnemyTerritoryManager.h"
 
 #include "NodeBase.h"
 #include "BehaviorTree.h"
@@ -36,8 +37,6 @@ EnemySlime::~EnemySlime()
 //-----------------------------------------
 void EnemySlime::OnGUI()
 {
-	DirectX::XMFLOAT3 origin = GetTerritoryOrigin();
-	ImGui::InputFloat3("territory_origin", &origin.x);
 	bool attack_flag = GetAttackFlag();
 	ImGui::Checkbox("AttackFlag", &attack_flag);
 
@@ -187,9 +186,11 @@ void EnemySlime::DrawDebugPrimitive()
 {
 	DebugRenderer* renderer = Graphics::Instance().GetDebugRenderer();
 	std::shared_ptr<Actor> actor = GetActor();
+	EnemyTerritoryTag teritory_tag = GetBelongingToTerritory();
+	std::shared_ptr<EnemyTerritory> enemy_territory = EnemyTerritoryManager::Instance().GetTerritory(teritory_tag);
 	DirectX::XMFLOAT3 position = actor->GetPosition();
-	float territory_range = GetTerritoryRange();
-	DirectX::XMFLOAT3 territory_origin = GetTerritoryOrigin();
+	float territory_range = enemy_territory->GetTerritoryRange();
+	DirectX::XMFLOAT3 territory_origin = enemy_territory->GetTerritoryOrigin();
 	territory_origin.y = actor->GetPosition().y;
 	// 縄張り範囲をデバッグ円柱描画
 	renderer->DrawCylinder(territory_origin, territory_range, 1.0f, DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f));
@@ -201,7 +202,7 @@ void EnemySlime::DrawDebugPrimitive()
 	renderer->DrawCylinder(position, GetAttackRange(), 1.0f, DirectX::XMFLOAT4(1.0f, 0.0f, 1.0f, 1.0f));
 
 	// ターゲット座標の球描画
-	renderer->DrawSphere(target_position, 0.5f, DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+	renderer->DrawSphere(target_position, 5.f, DirectX::XMFLOAT4(1.0f, 0.0f, 1.0f, 1.0f));
 }
 
 //-----------------------------------------

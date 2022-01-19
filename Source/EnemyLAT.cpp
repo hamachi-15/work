@@ -6,6 +6,7 @@
 #include "ActorManager.h"
 #include "EnemyManager.h"
 #include "EnemyLAT.h"
+#include "EnemyTerritoryManager.h"
 
 #include "BehaviorTree.h"
 #include "BehaviorData.h"
@@ -67,8 +68,6 @@ void EnemyLAT::Destroy()
 //-----------------------------------------
 void EnemyLAT::OnGUI()
 {
-	DirectX::XMFLOAT3 origin = GetTerritoryOrigin();
-	ImGui::InputFloat3("territory_origin", &origin.x);
 	bool attack_flag = GetAttackFlag();
 	ImGui::Checkbox("AttackFlag", &attack_flag);
 
@@ -251,10 +250,13 @@ void EnemyLAT::DrawDebugPrimitive()
 {
 	DebugRenderer* renderer = Graphics::Instance().GetDebugRenderer();
 	std::shared_ptr<Actor> actor = GetActor();
+	EnemyTerritoryTag teritory_tag = GetBelongingToTerritory();
+	std::shared_ptr<EnemyTerritory> enemy_territory = EnemyTerritoryManager::Instance().GetTerritory(teritory_tag);
 	DirectX::XMFLOAT3 position = actor->GetPosition();
-	float territory_range = GetTerritoryRange();
-	DirectX::XMFLOAT3 territory_origin = GetTerritoryOrigin();
+	float territory_range = enemy_territory->GetTerritoryRange();
+	DirectX::XMFLOAT3 territory_origin = enemy_territory->GetTerritoryOrigin();
 	territory_origin.y = actor->GetPosition().y;
+
 	// “ê’£‚è”ÍˆÍ‚ðƒfƒoƒbƒO‰~’Œ•`‰æ
 	renderer->DrawCylinder(territory_origin, territory_range, 1.0f, DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f));
 

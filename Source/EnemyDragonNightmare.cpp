@@ -12,6 +12,8 @@
 #include "ActorManager.h"
 #include "EnemyManager.h"
 
+#include "EnemyTerritoryManager.h"
+
 // AI関連インクルード
 #include "NodeBase.h"
 #include "BehaviorTree.h"
@@ -90,6 +92,12 @@ void EnemyDragonNightmare::Start()
 	// 名前設定
 	SetName("NightmareDragon");
 
+	// 索敵範囲の設定
+	SetSearchRange(80.0f);
+
+	// 攻撃範囲の設定
+	SetAttackRange(60.0f);
+
 	// ムーブメントコンポーネントの設定
 	SetMovement(actor->GetComponent<Movement>());
 
@@ -114,7 +122,7 @@ void EnemyDragonNightmare::Start()
 		charactor->SetCollision(actor, parameter, CollisionMeshType::AABB);
 
 		// 右腕コリジョン
-		std::string name = parameter.name;
+		std::string name = actor->GetName();
 		name += "RightWrist";
 		parameter.name = name.c_str();
 		parameter.node_name = "R_Wrist";
@@ -190,10 +198,17 @@ void EnemyDragonNightmare::SetBehaviorNode()
 		ai_tree->AddNode("Battle", "Attack",		 1,	BehaviorTree::SelectRule::Priority,	 new AttackJudgment(this),			NULL);
 		ai_tree->AddNode("Battle", "Pursuit",		 2,	BehaviorTree::SelectRule::Non,		 NULL,								new PursuitAction(this));
 		ai_tree->AddNode("Scount", "Idle",			 1,	BehaviorTree::SelectRule::Non,		 NULL,								new IdleAction(this));
+		ai_tree->AddNode("Scount", "Scream",		 2, BehaviorTree::SelectRule::Non,		 NULL, new ScreamAction(this));
 		ai_tree->AddNode("Attack", "BasicAttack",	 1,	BehaviorTree::SelectRule::Non,		 new BasicAttackJudgment(this),		new BasicAttackAction(this));
 		ai_tree->AddNode("Attack", "ClawAttack",	 2,	BehaviorTree::SelectRule::Non,		 new ClawAttackJudgment(this),		new ClawAttackAction(this));
 		ai_tree->AddNode("Attack", "HornAttack",	 3,	BehaviorTree::SelectRule::Non,		 new ClawAttackJudgment(this),		new HornAttackAction(this));
-		ai_tree->AddNode("Attack", "BodyPressAttack",3,	BehaviorTree::SelectRule::Non,		 new BodyPressAttackJudgment(this),	new BodyPressAttackAction(this));
+		ai_tree->AddNode("Attack", "BodyPressAttack", 4, BehaviorTree::SelectRule::Sequence, new BodyPressAttackJudgment(this), NULL);
+		ai_tree->AddNode("Attack", "LungesAttack", 5,	BehaviorTree::SelectRule::Sequence,		 NULL/*new (this)*/, new LungesAttackAction(this));
+		ai_tree->AddNode("LungesAttack", "MoveToTargetSequence", 0, BehaviorTree::SelectRule::Non, new BodyPressAttackJudgment(this), new BodyPressAttackAction(this));
+		ai_tree->AddNode("LungesAttack", "LungesAttackSequence", 0, BehaviorTree::SelectRule::Non, new BodyPressAttackJudgment(this), new LungesAttackAction(this));
+		ai_tree->AddNode("BodyPressAttack", "FarstBodyPressAttack", 0, BehaviorTree::SelectRule::Non, NULL, new BodyPressAttackAction(this));
+		ai_tree->AddNode("BodyPressAttack", "SecondBodyPressAttack", 0, BehaviorTree::SelectRule::Sequence, new RamdamNextStepJudgment(this, 50), new BodyPressAttackAction(this));
+		ai_tree->AddNode("SecondBodyPressAttack", "Scream", 0, BehaviorTree::SelectRule::Non, NULL, new ScreamAction(this));
 	}
 }
 
@@ -246,23 +261,25 @@ void EnemyDragonNightmare::Update(float elapsed_time)
 //--------------------------------------
 void EnemyDragonNightmare::DrawDebugPrimitive()
 {
-	//DebugRenderer* renderer = Graphics::Instance().GetDebugRenderer();
-	//std::shared_ptr<Actor> actor = GetActor();
-	//DirectX::XMFLOAT3 position = actor->GetPosition();
-	//float territory_range = GetTerritoryRange();
-	//DirectX::XMFLOAT3 territory_origin = GetTerritoryOrigin();
-	//territory_origin.y = actor->GetPosition().y;
-	//// 縄張り範囲をデバッグ円柱描画
-	//renderer->DrawCylinder(territory_origin, territory_range, 1.0f, DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f));
+	DebugRenderer* renderer = Graphics::Instance().GetDebugRenderer();
+	std::shared_ptr<Actor> actor = GetActor();
+	DirectX::XMFLOAT3 position = actor->GetPosition();
+	EnemyTerritoryTag teritory_tag = GetBelongingToTerritory();
+	std::shared_ptr<EnemyTerritory> enemy_territory = EnemyTerritoryManager::Instance().GetTerritory(teritory_tag);
+	float territory_range = enemy_territory->GetTerritoryRange();
+	DirectX::XMFLOAT3 territory_origin = enemy_territory->GetTerritoryOrigin();
+	territory_origin.y = actor->GetPosition().y;
+	// 縄張り範囲をデバッグ円柱描画
+	renderer->DrawCylinder(territory_origin, territory_range, 1.0f, DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f));
 
-	//// 索敵範囲をデバッグ円柱描画
-	//renderer->DrawCylinder(position, search_range, 1.0f, DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f));
+	// 索敵範囲をデバッグ円柱描画
+	renderer->DrawCylinder(position, search_range, 1.0f, DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f));
 
-	//// 攻撃範囲をデバッグ円柱描画
-	//renderer->DrawCylinder(position, GetAttackRange(), 1.0f, DirectX::XMFLOAT4(1.0f, 0.0f, 1.0f, 1.0f));
+	// 攻撃範囲をデバッグ円柱描画
+	renderer->DrawCylinder(position, GetAttackRange(), 1.0f, DirectX::XMFLOAT4(1.0f, 0.0f, 1.0f, 1.0f));
 
-	//// ターゲット座標の球描画
-	//renderer->DrawSphere(target_position, 0.5f, DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+	// ターゲット座標の球描画
+	renderer->DrawSphere(target_position, 0.5f, DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
 }
 
 

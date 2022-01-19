@@ -1,6 +1,8 @@
 #include "GameDatabase.h"
 #include <iostream>
 #include <fstream>
+#include "EnemyManager.h"
+#include "Actor.h"
 
 //-----------------------------------
 // ファイル読み込み
@@ -24,7 +26,7 @@ GameDataBase::GameDataBase()
 	// ファイル読み込み
 	char* world_map_data_buffer = LoadBuffer("Data/GameData/WorldMapData.dat");
 	char* enemy_data_buffer = LoadBuffer("Data/GameData/EnemyData.dat");
-	char* enemy_appearance_data_buffer = LoadBuffer("Data/GameData/EnemyAppearancePosition.dat");
+	char* enemy_territory_data_buffer = LoadBuffer("Data/GameData/EnemyTerritoryPosition.dat");
 	char* collision_time_buffer = LoadBuffer("Data/GameData/AttackCollitionTime.dat");
 	char* animation_data_buffer = LoadBuffer("Data/GameData/AnimationData.dat");
 
@@ -33,8 +35,8 @@ GameDataBase::GameDataBase()
 	memcpy_s(&world_map_data_headder, sizeof(world_map_data_headder), world_map_data_buffer, sizeof(world_map_data_headder));
 	DataHeadder	enemy_data_headder;
 	memcpy_s(&enemy_data_headder, sizeof(enemy_data_headder), enemy_data_buffer, sizeof(enemy_data_headder));
-	DataHeadder	enemy_appearance_data_headder;
-	memcpy_s(&enemy_appearance_data_headder, sizeof(enemy_appearance_data_headder), enemy_appearance_data_buffer, sizeof(enemy_appearance_data_buffer));
+	DataHeadder	enemy_territory_data_headder;
+	memcpy_s(&enemy_territory_data_headder, sizeof(enemy_territory_data_headder), enemy_territory_data_buffer, sizeof(enemy_territory_data_buffer));
 	DataHeadder	collision_time_data_headder;
 	memcpy_s(&collision_time_data_headder, sizeof(collision_time_data_headder), collision_time_buffer, sizeof(collision_time_buffer));
 	DataHeadder aniamtion_data_headder;
@@ -44,7 +46,7 @@ GameDataBase::GameDataBase()
 	// データ数設定
 	world_map_data_count = world_map_data_headder.data_count;
 	enemy_data_count = enemy_data_headder.data_count;
-	enemy_appearance_data_count = enemy_appearance_data_headder.data_count;
+	enemy_territory_data_count = enemy_territory_data_headder.data_count;
 	collision_time_data_count = collision_time_data_headder.data_count;
 	animation_data_count = aniamtion_data_headder.data_count;
 
@@ -61,9 +63,9 @@ GameDataBase::GameDataBase()
 		enemy_data.emplace_back(std::make_unique<EnemyData>());
 	}
 	// 敵の出現ポイント
-	for (int i = 0; i < enemy_appearance_data_count; ++i)
+	for (int i = 0; i < enemy_territory_data_count; ++i)
 	{
-		enemy_appearance_data.emplace_back(std::make_unique<EnemyAppearancePosition>());
+		enemy_territory_data.emplace_back(std::make_unique<EnemyTerritoryPosition>());
 	}
 	// プレイヤーの任意のアニメーション区間開始時間と終了時間(当たり判定に使う)
 	for (int i = 0; i < collision_time_data_count; ++i)
@@ -77,12 +79,12 @@ GameDataBase::GameDataBase()
 	//}
 	// テキストバッファ生成
 	enemy_data_text_buffer = new char[enemy_data_headder.string_length];
-	enemy_appearance_data_text_buffer = new char[enemy_appearance_data_headder.string_length];
+	enemy_territory_data_text_buffer = new char[enemy_territory_data_headder.string_length];
 	animation_data_text_buffer = new char[aniamtion_data_headder.string_length];
 
 	// テキストバッファ読み込み
 	memcpy_s(enemy_data_text_buffer, enemy_data_headder.string_length, &enemy_data_buffer[sizeof(enemy_data_headder)], enemy_data_headder.string_length);
-	memcpy_s(enemy_appearance_data_text_buffer, enemy_appearance_data_headder.string_length, &enemy_appearance_data_buffer[sizeof(enemy_appearance_data_headder)], enemy_appearance_data_headder.string_length);
+	memcpy_s(enemy_territory_data_text_buffer, enemy_territory_data_headder.string_length, &enemy_territory_data_buffer[sizeof(enemy_territory_data_headder)], enemy_territory_data_headder.string_length);
 	memcpy_s(animation_data_text_buffer, aniamtion_data_headder.string_length, &animation_data_buffer[sizeof(aniamtion_data_headder)], aniamtion_data_headder.string_length);
 
 	// データ構築
@@ -96,15 +98,15 @@ GameDataBase::GameDataBase()
 	}
 
 	// 敵の出現ポイント
-	for (int i = 0; i < enemy_appearance_data_count; ++i)
+	for (int i = 0; i < enemy_territory_data_count; ++i)
 	{
-		EnemyAppearancePositionReader* data = &((EnemyAppearancePositionReader*)&enemy_appearance_data_buffer[sizeof(enemy_appearance_data_headder) + enemy_appearance_data_headder.string_length])[i];
-		enemy_appearance_data[i]->id = data->id;
-		enemy_appearance_data[i]->tag = data->tag;
-		enemy_appearance_data[i]->position_x = data->position_x;
-		enemy_appearance_data[i]->position_y = data->position_y;
-		enemy_appearance_data[i]->position_z = data->position_z;
-		enemy_appearance_data[i]->radius = data->radius;
+		EnemyAppearancePositionReader* data = &((EnemyAppearancePositionReader*)&enemy_territory_data_buffer[sizeof(enemy_territory_data_headder) + enemy_territory_data_headder.string_length])[i];
+		enemy_territory_data[i]->id = data->id;
+		enemy_territory_data[i]->tag = data->tag;
+		enemy_territory_data[i]->position_x = data->position_x;
+		enemy_territory_data[i]->position_y = data->position_y;
+		enemy_territory_data[i]->position_z = data->position_z;
+		enemy_territory_data[i]->radius = data->radius;
 	}
 	
 	// 敵の基礎ステータス
@@ -156,7 +158,7 @@ GameDataBase::GameDataBase()
 	// ファイルの削除
 	delete[] world_map_data_buffer;
 	delete[] enemy_data_buffer;
-	delete[] enemy_appearance_data_buffer;
+	delete[] enemy_territory_data_buffer;
 	delete[] collision_time_buffer;
 	delete[] animation_data_buffer;
 }
@@ -167,8 +169,37 @@ GameDataBase::GameDataBase()
 GameDataBase::~GameDataBase()
 {
 	delete[] enemy_data_text_buffer;
-	delete[] enemy_appearance_data_text_buffer;
+	delete[] enemy_territory_data_text_buffer;
 	delete[] animation_data_text_buffer;
+}
+
+//---------------------------------------------------------------------------------
+// エンカウントした敵のテリトリー内の敵のデータを集める
+//---------------------------------------------------------------------------------
+void GameDataBase::EnemyFriendFromTerritory(EnemyTerritoryTag territory_tag)
+{
+	// 敵マネージャー取得
+	EnemyManager& enemy_manager = EnemyManager::Instance();
+	// すでに登録されていたら
+	if (encount_enemy.size() > 0)
+	{
+		// クリアする
+		encount_enemy.clear();
+	}
+	// 敵の数を取得
+	int enemy_count = enemy_manager.GetEnemyCount();
+
+	for (int i = 0; i < enemy_count; ++i)
+	{
+		std::shared_ptr<Enemy> enemy = enemy_manager.GetEnemy(i);
+		// 所属テリトリーがエンカウントした敵のテリトリーと同じなら
+		if (enemy->GetBelongingToTerritory() == territory_tag)
+		{
+			EncountEnemyTerritory enemy_data;
+			enemy_data.id = enemy->GetEnemyDataID();
+			encount_enemy.emplace_back(enemy_data);
+		}
+	}
 }
 
 //---------------------------------------------------------------------------------
@@ -219,10 +250,10 @@ std::shared_ptr<EnemyData> GameDataBase::GetEnemyDataFromID(int& enemy_id) const
 	return nullptr;
 }
 
-std::shared_ptr<EnemyAppearancePosition> GameDataBase::GetEnemyAppearanceData(EnemyTerritoryTag& tag) const
+std::shared_ptr<EnemyTerritoryPosition> GameDataBase::GetEnemyTerritoryData(EnemyTerritoryTag& tag) const
 {
 	// 同じタグを持つデータを返す
-	for (std::shared_ptr<EnemyAppearancePosition> data : enemy_appearance_data)
+	for (std::shared_ptr<EnemyTerritoryPosition> data : enemy_territory_data)
 	{
 		if (data->tag == tag)
 		{

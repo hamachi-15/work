@@ -41,6 +41,8 @@ protected:
 						 int id,
 						 std::shared_ptr<AttackCollitionTime> collision_time_data,
 						 CollisionMeshType collision_type = CollisionMeshType::Sphere);
+	// –Ú“I’n‚É“ž’…‚µ‚½‚©
+	bool JedgmentToTargetPosition(const DirectX::XMFLOAT3& target_position, const DirectX::XMFLOAT3& owner_position, const char* collsion_name);
 protected:
 	Enemy* owner;
 	std::shared_ptr<AttackCollitionTime> collision_time_data;

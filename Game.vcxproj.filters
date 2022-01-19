@@ -737,9 +737,6 @@
     <ClInclude Include="Source\PhongShader.h">
       <Filter>ソース ファイル\Graphics\Shader</Filter>
     </ClInclude>
-    <ClInclude Include="Source\ScriptDataHeadder.h">
-      <Filter>ソース ファイル\System</Filter>
-    </ClInclude>
     <ClInclude Include="Source\EnemyDragonNightmare.h">
       <Filter>ソース ファイル\Character</Filter>
     </ClInclude>
@@ -768,9 +765,6 @@
       <Filter>ソース ファイル\System</Filter>
     </ClInclude>
     <ClInclude Include="Source\GameData\EnemyTerritoryTag.h">
-      <Filter>ソース ファイル\GameData</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\GameData\EnemyAppearancePosition.h">
       <Filter>ソース ファイル\GameData</Filter>
     </ClInclude>
     <ClInclude Include="Source\GameData\WorldMapData.h">
@@ -805,6 +799,9 @@
     </ClInclude>
     <ClInclude Include="Source\Universal.h">
       <Filter>ソース ファイル\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GameData\EnemyTerritoryPosition.h">
+      <Filter>ソース ファイル\GameData</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

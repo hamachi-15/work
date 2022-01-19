@@ -36,7 +36,7 @@ bool Universal::JudgementCollisionTime(std::shared_ptr<Actor> actor, std::shared
 	bool old_collision_time_flag = charactor->GetOldCollisionTimeFlag();
 
 	// 任意のアニメーション再生区間でのみ衝突判定処理をする
-	bool collision_time_flag = charactor->SearchAnimationTime(actor, 0.2f, 0.6f);
+	bool collision_time_flag = charactor->SearchAnimationTime(actor, collision_time_data->start_time, collision_time_data->end_time);
 
 	// コリジョンフラグが変化したら
 	if (old_collision_time_flag != collision_time_flag)

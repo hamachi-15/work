@@ -25,7 +25,9 @@ ActionBase::State BlowAttackAction::Run(float elapsed_time)
 	std::shared_ptr<Actor> actor = owner->GetActor();
 
 	// 攻撃時の当たり判定
-	AttackCollision(actor,"PLTRightHand", collision_time_data);
+	std::string collision_name = actor->GetName();
+	collision_name += "RightHand";
+	AttackCollision(actor, collision_name.c_str(), collision_time_data);
 
 	// アニメーション再生が終了したら完了
 	if (!owner->GetActor()->GetModel()->IsPlayAnimation())

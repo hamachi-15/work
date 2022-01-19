@@ -4,7 +4,7 @@
 #include "Enemy.h"
 #include "BehaviorData.h"
 #include "ActionBase.h"
-
+// TODO コメント
 NodeBase::~NodeBase()
 {
 	delete judgment;
@@ -62,19 +62,24 @@ NodeBase* NodeBase::SelectPriority(std::vector<NodeBase*>* list)
 	return select_node;
 }
 
+//--------------------------
 // ランダム
+//--------------------------
 NodeBase* NodeBase::SelectRandom(std::vector<NodeBase*>* list)
 {
 	int select_no = rand() % list->size();
 	return (*list).at(select_no);
 }
 
+//--------------------------
+//--------------------------
 NodeBase* NodeBase::SelectSequence(std::vector<NodeBase*>* list, BehaviorData* data)
 {
 	int step = data->GetSequenceStep(name);
-
+	// 現在のステップが子ノードのサイズより大きければ
 	if (step >= children.size())
 	{
+		// シーケンスループに設定されていなければNULLを返す
 		if (select_rule != BehaviorTree::SelectRule::SequentialLooping)
 		{
 			return NULL;
@@ -85,15 +90,38 @@ NodeBase* NodeBase::SelectSequence(std::vector<NodeBase*>* list, BehaviorData* d
 		}
 	}
 
-	for(auto itr = list->begin(); itr != list->end(); itr++)
+	if (select_rule == BehaviorTree::SelectRule::SequentialSkipping)
 	{
-		if (children.at(step)->GetName() == (*itr)->GetName())
+		// 推論ではじかれたノードは飛ばす
+		for (auto itr = list->begin(); itr != list->end(); itr++)
 		{
-			data->PushSequenceNode(this);
-			data->SetSequenceStep(GetName(), step + 1);
-			return children.at(step);
+			int children_size = children.size();
+			// 子ノードをたどって選ばれたノードを探す
+			for (int i = 0; i < children_size; ++i)
+			{
+				// 見つかったらそこまでステップを飛ばす
+				if (children.at(i)->GetName() == (*itr)->GetName())
+				{
+					step = i;
+					data->PushSequenceNode(this);
+					data->SetSequenceStep(GetName(), step);
+					return children.at(step);
+				}
+			}
 		}
+	}
+	else
+	{
+		for (auto itr = list->begin(); itr != list->end(); itr++)
+		{
+			if (children.at(step)->GetName() == (*itr)->GetName())
+			{
+				data->PushSequenceNode(this);
+				data->SetSequenceStep(GetName(), step + 1);
+				return children.at(step);
+			}
 
+		}
 	}
 	return NULL;
 }
@@ -156,6 +184,7 @@ NodeBase* NodeBase::Inference(Enemy* enemy, BehaviorData* data)
 		// シーケンス
 	case BehaviorTree::SelectRule::Sequence:
 	case BehaviorTree::SelectRule::SequentialLooping:
+	case BehaviorTree::SelectRule::SequentialSkipping:
 		result = SelectSequence(&list, data);
 		break;
 	}

@@ -6,7 +6,6 @@
 
 // データ系
 #include "GameDataBase.h"
-#include "Script.h"
 
 #include "Graphics.h"
 #include "Camera.h"
@@ -73,8 +72,8 @@ void SceneGame::Initialize()
 	// カメラ初期設定
 	Camera& camera = Camera::Instance();
 	camera.SetLookAt(
-		DirectX::XMFLOAT3(-400, 16, -416),
-		DirectX::XMFLOAT3(0, 0, 0),
+		DirectX::XMFLOAT3(-100, 6, -136),
+		DirectX::XMFLOAT3(-100, 6, -116),
 		DirectX::XMFLOAT3(0, 1, 0)
 	);
 	camera.SetPerspectiveFov(Mathf::ConvartToRadian(45),
@@ -93,13 +92,16 @@ void SceneGame::Initialize()
 	// テクスチャ作成
 	bulr_texture = std::make_unique<Texture>();
 	bulr_texture->Create((u_int)graphics.GetScreenWidth(), (u_int)graphics.GetScreenHeight(), DXGI_FORMAT_R16G16B16A16_FLOAT);
+
 	depth_texture = std::make_unique<Texture>();
-	depth_texture->CreateDepthStencil((u_int)graphics.GetScreenWidth(), (u_int)graphics.GetScreenHeight());
+	depth_texture->CreateDepthStencil((u_int)2048, (u_int)1024);
 
 	// テクスチャの読み込み
 	sprite = std::make_unique<Sprite>();
 	sky = std::make_unique<Texture>();
 	sky->Load("Data/Sprite/SkyBox/FS002_Night.png");
+	sky_texture = std::make_unique<Texture>();
+	sky_texture->Create(static_cast<float>(sky->GetWidth()), static_cast<float>(sky->GetHeight()), DXGI_FORMAT_R16G16B16A16_FLOAT);
 
 	// ステージ読み込み
 	{
@@ -138,7 +140,7 @@ void SceneGame::Initialize()
 		actor->AddComponent<Player>();
 		actor->SetShaderType(ShaderManager::ShaderType::Lambert);
 	}
-	ActorManager::Instance().Update(0.01f);
+	//ActorManager::Instance().Update(0.01f);
 	ActorManager::Instance().UpdateTransform();
 
 	MetaAI::Instance();
@@ -181,22 +183,35 @@ void SceneGame::Update(float elapsed_time)
 			Messenger::Instance().SendData(MessageData::MENUOPENEVENT, &data);
 		}
 	}
-	// バトルシーンへの遷移フラグが立っているかつタイマーが一定以上なら
-	if (battle_flag && primitive_context.timer >= 40)
-	{
-		// バトルシーンへ遷移
-		SceneManager::Instance().ChangeScene(new SceneBattle());
-	}
+
 	// プリミティブコンテキストのコンストラクタ更新
-	if (primitive_context.timer < 40)
+	if (primitive_context.timer < Primitive_Max_Time)
 	{
 		primitive_context.timer++;
 	}
-	if (!battle_flag && primitive_context.timer >= 40)
+
+	// バトルシーンへの遷移フラグが立っている
+	if (battle_flag)
 	{
+		// タイマーが一定以上なら
+		if (primitive_context.timer >= Primitive_Max_Time)
+		{
+			// バトルシーンへ遷移
+			SceneManager::Instance().ChangeScene(new SceneBattle());
+			return;
+		}
+		else
+		{
+			return;
+		}
+	}
+
+	// プリミティブ用のタイマーが一定以上なら
+	if (primitive_context.timer >= Primitive_Max_Time)
+	{
+		// プリミティブプラグをfalseに
 		primitive_falg = false;
 	}
-	if (battle_flag) return;
 
 	//ライト
 	static float light_angle = DirectX::XM_PI;
@@ -210,16 +225,12 @@ void SceneGame::Update(float elapsed_time)
 	LightDir.z = cosf(light_angle);
 	Light::SetDirLight(LightDir, DirectX::XMFLOAT3(0.6f, 0.6f, 0.6f));
 	
-	// カメラ更新処理
-	std::shared_ptr<Actor> actor = ActorManager::Instance().GetActor("Player");
-	camera_controller->SetTarget({
-		actor->GetPosition().x,
-		actor->GetPosition().y + 1.0f,
-		actor->GetPosition().z });
-	camera_controller->Update(elapsed_time);
 
 	// メタAIの更新処理
 	MetaAI::Instance().Update(elapsed_time);
+
+	// 当たり判定更新処理
+	CollisionManager::Instance().Update();
 
 	// アクター更新処理
 	ActorManager::Instance().Update(elapsed_time);
@@ -228,8 +239,13 @@ void SceneGame::Update(float elapsed_time)
 	// UI更新処理
 	UIManager::Instance().Update(elapsed_time);
 
-	// 当たり判定更新処理
-	CollisionManager::Instance().Update();
+	// カメラ更新処理
+	std::shared_ptr<Actor> actor = ActorManager::Instance().GetActor("Player");
+	camera_controller->SetTarget({
+		actor->GetPosition().x,
+		actor->GetPosition().y + 1.0f,
+		actor->GetPosition().z });
+	camera_controller->Update(elapsed_time);
 }
 
 // 描画処理	
@@ -249,11 +265,11 @@ void SceneGame::Render()
 	render_context.view = camera.GetView();
 	render_context.projection = camera.GetProjection();
 
-	// スクリーンテクスチャに描画
-	ScreenRender(context, render_context, screen_size);
-
 	// ポストエフェクト用のテクスチャ描画
 	PostRender(context, render_context, screen_size);
+
+	// スクリーンテクスチャに描画
+	ScreenRender(context, render_context, screen_size);
 
 	// バックバッファに描画
 	BuckBufferRender(context, render_context, screen_size);
@@ -285,11 +301,11 @@ void SceneGame::ScreenRender(ID3D11DeviceContext* context, RenderContext& render
 		std::shared_ptr<Shader> skybox_shader = shader_manager.GetShader(ShaderManager::ShaderType::SkyBox);
 		skybox_shader->Begin(context, render_context);
 		sprite->Render(context,
-			sky.get(),
+			sky_texture.get(),
 			0, 0,
 			screen_size.x, screen_size.y,
 			0, 0,
-			static_cast<float>(sky->GetWidth()), static_cast<float>(sky->GetHeight()),
+			static_cast<float>(sky_texture->GetWidth()), static_cast<float>(sky_texture->GetHeight()),
 			0,
 			1, 1, 1, 1);
 		skybox_shader->End(context);
@@ -298,9 +314,9 @@ void SceneGame::ScreenRender(ID3D11DeviceContext* context, RenderContext& render
 	// デバッグプリミティブ描画
 	{
 		// 敵縄張りのデバッグプリミティブ描画
-	//	EnemyTerritoryManager::Instance().Render();
+		EnemyTerritoryManager::Instance().Render();
 		// 敵のデバッグプリミティブ描画
-	//	EnemyManager::Instance().DrawDebugPrimitive();
+		EnemyManager::Instance().DrawDebugPrimitive();
 		// 当たり判定ののデバッグプリミティブ描画
 		CollisionManager::Instance().Draw();
 		for (int i = 0; i < 4; ++i)
@@ -335,7 +351,40 @@ void SceneGame::PostRender(ID3D11DeviceContext* context, RenderContext& render_c
 	Graphics& graphics = Graphics::Instance();
 	ShaderManager& shader_manager = ShaderManager::Instance();
 	std::shared_ptr<Shader> bloom_shader = shader_manager.GetShader(ShaderManager::ShaderType::Bloom);
-	bloom_texture = dynamic_cast<Bloom*>(bloom_shader.get())->Render(context, render_context);
+
+	// 空のテクスチャのブルーム処理
+	bloom_texture = dynamic_cast<Bloom*>(bloom_shader.get())->Render(context, render_context, sky.get());
+
+	// レンダーターゲット設定
+	{
+		ID3D11RenderTargetView* render_target_view = sky_texture->GetRenderTargetView();
+		ID3D11DepthStencilView* depth_stencil_view = depth_texture->GetDepthStencilView();
+		graphics.SetRenderTargetView(&render_target_view, depth_stencil_view);
+		graphics.ScreenClear(&render_target_view, depth_stencil_view);
+	}
+	// ビューポート設定
+	graphics.SetViewport(sky_texture->GetWidth(), sky_texture->GetHeight());
+
+	// 空テクスチャと空テクスチャの輝度を抽出したテクスチャを加算合成
+	std::shared_ptr<Shader> sprite_shader = shader_manager.GetShader(ShaderManager::ShaderType::Sprite);
+	sprite_shader->Begin(context);
+	sprite->Render(context,
+			sky.get(),
+			0, 0,
+			static_cast<float>(sky_texture->GetWidth()), static_cast<float>(sky_texture->GetHeight()),
+			0, 0,
+			static_cast<float>(sky->GetWidth()), static_cast<float>(sky->GetHeight()),
+			0,
+			1, 1, 1, 1);
+	context->OMSetBlendState(graphics.GetBlendState((int)Graphics::BlendState::Add), nullptr, 0xFFFFFFFF);
+	sprite->AddRender(context,
+			bloom_texture,
+			0, 0,
+			static_cast<float>(sky_texture->GetWidth()), static_cast<float>(sky_texture->GetHeight()),
+			0, 0,
+			static_cast<float>(bloom_texture->GetWidth()), static_cast<float>(bloom_texture->GetHeight()));
+	sprite_shader->End(context);
+	context->OMSetBlendState(graphics.GetBlendState((int)Graphics::BlendState::Alpha), nullptr, 0xFFFFFFFF);
 
 	//std::shared_ptr<Shader> bloom_shader = shader_manager.GetShader(ShaderManager::ShaderType::Bulr);
 
@@ -387,16 +436,16 @@ void SceneGame::BuckBufferRender(ID3D11DeviceContext* context, RenderContext& re
 		0,
 		1, 1, 1, 1);
 	// 輝度抽出テクスチャを加算合成
-	context->OMSetBlendState(graphics.GetBlendState((int)Graphics::BlendState::Add), nullptr, 0xFFFFFFFF);
-	sprite->AddRender(context,
-		bloom_texture,
-		0, 0,
-		screen_size.x, screen_size.y,
-		0, 0,
-		(float)bloom_texture->GetWidth(), (float)bloom_texture->GetHeight());
+	//context->OMSetBlendState(graphics.GetBlendState((int)Graphics::BlendState::Add), nullptr, 0xFFFFFFFF);
+	//sprite->AddRender(context,
+	//	bloom_texture,
+	//	0, 0,
+	//	screen_size.x, screen_size.y,
+	//	0, 0,
+	//	(float)bloom_texture->GetWidth(), (float)bloom_texture->GetHeight());
 
-	// ブレンドステートをアルファ加算合成に設定
-	context->OMSetBlendState(graphics.GetBlendState((int)Graphics::BlendState::Alpha), nullptr, 0xFFFFFFFF);
+	//// ブレンドステートをアルファ加算合成に設定
+	//context->OMSetBlendState(graphics.GetBlendState((int)Graphics::BlendState::Alpha), nullptr, 0xFFFFFFFF);
 	
 	// メニュー描画
 	{
@@ -460,12 +509,8 @@ bool SceneGame::OnMessages(const Telegram& telegram)
 		primitive_context.number = 3;
 		primitive_context.timer = 0.0f;
 
-		BattleSceneDataHeadder headder;
-		// ある地点と敵座標との距離を計算して一定範囲内の距離ならIDを追加
-		DistanceBetweenEnemyAndPoint(headder, DirectX::XMLoadFloat3(&telegram.message_box.hit_position), enemy_search_range);
-		
-		// スクリプトにデータを書き込む
-		WriteScript::Instance().WriteSceneDataScript("./Data/Script/SendBattleSceneScript.txt", headder);
+		// TODO エンカウントした敵のテリトリーに属ずる敵を探す
+		GameDataBase::Instance().EnemyFriendFromTerritory(telegram.message_box.territory_tag);
 		
 		// プレイヤーコンポーネント取得
 		std::shared_ptr<Actor> player = ActorManager::Instance().GetActor("Player");
@@ -507,35 +552,7 @@ void SceneGame::OnGui()
 	ImGui::InputFloat("Timer", &primitive_context.timer);
 	ImGui::Checkbox("PrimitiveFlag", &primitive_falg);
 
-	ImGui::InputFloat3("box", &center.x);
 
 	ImGui::End();
 }
 
-//------------------------------------------------------------------
-// ある地点と敵座標との距離を計算して一定範囲内の距離ならIDを追加
-//------------------------------------------------------------------
-void SceneGame::DistanceBetweenEnemyAndPoint(BattleSceneDataHeadder& data_headder, const DirectX::XMVECTOR& origin, const float& range)
-{
-	int enemy_count = EnemyManager::Instance().GetEnemyCount();
-
-	for (int i = 0; i < enemy_count; ++i)
-	{
-		std::shared_ptr<Enemy> enemy = EnemyManager::Instance().GetEnemy(i);
-		DirectX::XMVECTOR enemy_position = DirectX::XMLoadFloat3(&enemy->GetActor()->GetPosition());
-		
-		// 原点から敵座標のベクトル算出
-		DirectX::XMVECTOR distance = DirectX::XMVectorSubtract(enemy_position, origin);
-
-		// ベクトルの大きさから距離を算出
-		DirectX::XMVECTOR length = DirectX::XMVector3Length(distance);
-		float float_length;
-		DirectX::XMStoreFloat(&float_length, distance);
-
-		// 範囲内に入っていれば敵データIDを追加
-		if(fabsf(float_length) <= range)
-		{ 
-			data_headder.search_enemy_id.emplace_back(enemy->GetActor()->GetEnemyDataID());
-		}
-	}
-}

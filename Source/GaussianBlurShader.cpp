@@ -17,8 +17,10 @@ GaussianBlur::GaussianBlur(ID3D11Device* device, DXGI_FORMAT format)
 	float screen_height = graphics.GetScreenHeight();
 
 	// 縦ブラーと横ブラー初期化
-	xblur = std::make_unique<GaussianXBlur>(device, static_cast<u_int>(screen_width * 0.5f), static_cast<u_int>(screen_height), format);
-	yblur = std::make_unique<GaussianYBlur>(device, static_cast<u_int>(screen_width * 0.5f), static_cast<u_int>(screen_height * 0.5f), format);
+	//xblur = std::make_unique<GaussianXBlur>(device, static_cast<u_int>(screen_width * 0.5f), static_cast<u_int>(screen_height), format);
+	//yblur = std::make_unique<GaussianYBlur>(device, static_cast<u_int>(screen_width * 0.5f), static_cast<u_int>(screen_height * 0.5f), format);
+	xblur = std::make_unique<GaussianXBlur>(device, static_cast<u_int>(2048 * 0.5f), static_cast<u_int>(1024), format);
+	yblur = std::make_unique<GaussianYBlur>(device, static_cast<u_int>(2048 * 0.5f), static_cast<u_int>(1024 * 0.5f), format);
 
 	// 定数バッファ
 	{

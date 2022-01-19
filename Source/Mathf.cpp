@@ -34,7 +34,7 @@ float Mathf::VectorLength(const DirectX::XMVECTOR& vector)
 //----------------------------------
 DirectX::XMVECTOR Mathf::ReturnVectorFront(const DirectX::XMFLOAT3& angle)
 {
-    DirectX::XMFLOAT3 front = DirectX::XMFLOAT3(sinf(angle.x), 0, cosf(angle.z));
+    DirectX::XMFLOAT3 front = DirectX::XMFLOAT3(sinf(angle.y), 0, cosf(angle.y));
     return DirectX::XMLoadFloat3(&front);
 }
 

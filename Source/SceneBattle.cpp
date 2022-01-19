@@ -22,6 +22,7 @@
 #include "EnemySlime.h"
 #include "Player.h"
 #include "Stage.h"
+#include "EnemyTerritoryManager.h"
 
 #include "MenuSystem.h"
 #include "UI.h"
@@ -103,8 +104,8 @@ void SceneBattle::Initialize()
 		std::shared_ptr<Actor> actor = ActorManager::Instance().Create();
 		actor->SetUpModel("Data/Model/RPG-Character/Swordman.mdl", "Motion");
 		actor->SetName("Player");
-		actor->SetPosition(DirectX::XMFLOAT3(-100, 4, -116));
-		actor->SetAngle(DirectX::XMFLOAT3(0, 0, 0));
+		actor->SetPosition(DirectX::XMFLOAT3(-170.0f, 5.5f, 0.0f));
+		actor->SetAngle(DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f));
 		actor->SetScale(DirectX::XMFLOAT3(0.04f, 0.04f, 0.04f));
 		actor->AddComponent<Movement>();
 		actor->AddComponent<Charactor>();
@@ -113,9 +114,9 @@ void SceneBattle::Initialize()
 	}
 	ActorManager::Instance().Update(0.01f);
 	ActorManager::Instance().UpdateTransform();
-
+	
 	// スクリプトから敵の生成
-	EnemyManager::Instance().CreateEnemyScriptData();
+	EnemyManager::Instance().CreateEnemyEncountData();
 }
 
 void SceneBattle::Finalize()
@@ -131,13 +132,11 @@ void SceneBattle::Finalize()
 
 	// メッセンジャーのクリア
 	Messenger::Instance().Clear();
-
-	// スクリプトを削除
-	DeleteFileA("./Data/Script/SendBattleSceneScript.txt");
 }
 
 void SceneBattle::Update(float elapsed_time)
 {
+	if(IsGameClearJudgment())
 	//	メニューオープン中はメニューを更新する
 	MenuSystem::Instance().Update(elapsed_time);
 
@@ -277,6 +276,8 @@ void SceneBattle::ScreenRender(ID3D11DeviceContext* context, RenderContext& rend
 
 	// デバッグプリミティブ描画
 	{
+		// 敵縄張りのデバッグプリミティブ描画
+		EnemyTerritoryManager::Instance().Render();
 		EnemyManager::Instance().DrawDebugPrimitive();
 		CollisionManager::Instance().Draw();
 		graphics.GetDebugRenderer()->Render(context, render_context.view, render_context.projection);
@@ -423,192 +424,17 @@ void SceneBattle::OnGui()
 
 	ImGui::End();
 
-	//const char* listbox_items[] = { "Apple", "Banana", "Cherry", "Kiwi", "Mango", "Orange", "Pineapple", "Strawberry", "Watermelon" };
-	//static int listbox_item_current = 1;
-	//ImGui::ListBox("listbox\n(single select)", &listbox_item_current, listbox_items, IM_ARRAYSIZE(listbox_items), 4);
+}
 
-	//static float f1 = 1.00f, f2 = 0.0067f;
-	//ImGui::DragFloat("drag float", &f1, 0.005f);
-	//static int e = 0;
-	//ImGui::RadioButton("radio a", &e, 0); ImGui::SameLine();
-	//ImGui::RadioButton("radio b", &e, 1); ImGui::SameLine();
-	//ImGui::RadioButton("radio c", &e, 2);
-
-	//static bool selected[4] = { false, true, false, false };
-	//ImGui::Selectable("1. I am selectable", &selected[0]);
-	//ImGui::Selectable("2. I am selectable", &selected[1]);
-	//ImGui::Text("3. I am not selectable");
-	//ImGui::Selectable("4. I am selectable", &selected[2]);
-	//if (ImGui::Selectable("5. I am double clickable", selected[3], ImGuiSelectableFlags_AllowDoubleClick))
-	//	if (ImGui::IsMouseDoubleClicked(0))
-	//		selected[3] = !selected[3];
-
-
-	////bool* p_open = (bool*)1;
-	////ImGui::SetNextWindowPos(ImVec2(10, 10));
-	////if (!ImGui::Begin("Example: Fixed Overlay", p_open, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings))
-	////{
-	////	ImGui::End();
-	////	return;
-	////}
-	////ImGui::Text("Simple overlay\non the top-left side of the screen.");
-	////ImGui::Separator();
-	////ImGui::Text("Mouse Position: (%.1f,%.1f)", ImGui::GetIO().MousePos.x, ImGui::GetIO().MousePos.y);
-	////ImGui::End();
-
-	////static int i1 = 0;
-	////ImGui::SliderInt("slider int", &i1, -1, 3);
-	////ImGui::SameLine();
-
-	//ImGui::SetNextWindowPos(ImVec2(550, 50), ImGuiCond_FirstUseEver);
-	//ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
-
-	//if (ImGui::TreeNode("Borders"))
-	//{
-	//	ImGui::Text("Width %.2f", ImGui::GetColumnWidth());
-	//	if (ImGui::TreeNode("Border"))
-	//		ImGui::TreePop();
-	//	// NB: Future columns API should allow automatic horizontal borders.
-	//	static bool h_borders = true;
-	//	static bool v_borders = true;
-	//	static int columns_count = 4;
-	//	const int lines_count = 3;
-	//	ImGui::SetNextItemWidth(ImGui::GetFontSize() * 8);
-	//	ImGui::DragInt("##columns_count", &columns_count, 0.1f, 2, 10, "%d columns");
-	//	if (columns_count < 2)
-	//		columns_count = 2;
-	//	ImGui::SameLine();
-	//	ImGui::Checkbox("horizontal", &h_borders);
-	//	ImGui::SameLine();
-	//	ImGui::Checkbox("vertical", &v_borders);
-	//	ImGui::Columns(columns_count, NULL, v_borders);
-	//	for (int i = 0; i < columns_count * lines_count; i++)
-	//	{
-	//		if (h_borders && ImGui::GetColumnIndex() == 0)
-	//			ImGui::Separator();
-	//		ImGui::Text("%c%c%c", 'a' + i, 'a' + i, 'a' + i);
-	//		ImGui::Text("Width %.2f", ImGui::GetColumnWidth());
-	//		ImGui::Text("Avail %.2f", ImGui::GetContentRegionAvail().x);
-	//		ImGui::Text("Offset %.2f", ImGui::GetColumnOffset());
-	//		ImGui::Text("Long text that is likely to clip");
-	//		ImGui::RadioButton("radio c", &e, 2);
-	//		ImGui::Checkbox("vertical", &v_borders);
-	//		ImGui::NextColumn();
-	//	}
-	//	ImGui::Columns(1);
-	//	if (h_borders)
-	//		ImGui::Separator();
-	//	ImGui::TreePop();
-	//}
-	//if (ImGui::TreeNode("Mixed items"))
-	//{
-	//	ImGui::Columns(3, "mixed");
-	//	ImGui::Separator();
-
-	//	ImGui::Text("Hello");
-	//	ImGui::Button("Banana");
-	//	ImGui::NextColumn();
-
-	//	ImGui::Text("ImGui");
-	//	ImGui::Button("Apple");
-	//	static float foo = 1.0f;
-	//	ImGui::InputFloat("red", &foo, 0.05f, 0, "%.3f");
-	//	ImGui::Text("An extra line here.");
-	//	ImGui::NextColumn();
-
-	//	ImGui::Text("Sailor");
-	//	ImGui::Button("Corniflower");
-	//	static float bar = 1.0f;
-	//	ImGui::InputFloat("blue", &bar, 0.05f, 0, "%.3f");
-	//	ImGui::NextColumn();
-
-	//	if (ImGui::CollapsingHeader("Category A")) { ImGui::Text("Blah blah blah"); } ImGui::NextColumn();
-	//	if (ImGui::CollapsingHeader("Category B")) { ImGui::Text("Blah blah blah"); } ImGui::NextColumn();
-	//	if (ImGui::CollapsingHeader("Category C")) { ImGui::Text("Blah blah blah"); } ImGui::NextColumn();
-	//	ImGui::Columns(1);
-	//	ImGui::Separator();
-	//	ImGui::TreePop();
-	//}
-	//if (ImGui::TreeNode("Word-wrapping"))
-	//{
-	//	ImGui::Columns(2, "word-wrapping");
-	//	ImGui::Separator();
-	//	ImGui::TextWrapped("The quick brown fox jumps over the lazy dog.");
-	//	ImGui::TextWrapped("Hello Left");
-	//	ImGui::NextColumn();
-	//	ImGui::TextWrapped("The quick brown fox jumps over the lazy dog.");
-	//	ImGui::TextWrapped("Hello Right");
-	//	ImGui::Columns(1);
-	//	ImGui::Separator();
-	//	ImGui::TreePop();
-	//}
-	//if (ImGui::CollapsingHeader("Filtering"))
-	//{
-	//	// Helper class to easy setup a text filter.
-	//	// You may want to implement a more feature-full filtering scheme in your own application.
-	//	static ImGuiTextFilter filter;
-	//	ImGui::Text("Filter usage:\n"
-	//		"  \"\"         display all lines\n"
-	//		"  \"xxx\"      display lines containing \"xxx\"\n"
-	//		"  \"xxx,yyy\"  display lines containing \"xxx\" or \"yyy\"\n"
-	//		"  \"-xxx\"     hide lines containing \"xxx\"");
-	//	filter.Draw();
-	//	const char* lines[] = { "aaa1.c", "bbb1.c", "ccc1.c", "aaa2.cpp", "bbb2.cpp", "ccc2.cpp", "abc.h", "hello, world" };
-	//	for (int i = 0; i < IM_ARRAYSIZE(lines); i++)
-	//		if (filter.PassFilter(lines[i]))
-	//			ImGui::BulletText("%s", lines[i]);
-	//}
-	//if (ImGui::TreeNode("Tabbing"))
-	//{
-	//	ImGui::Text("Use TAB/SHIFT+TAB to cycle through keyboard editable fields.");
-	//	static char buf[32] = "hello";
-	//	ImGui::InputText("1", buf, IM_ARRAYSIZE(buf));
-	//	ImGui::InputText("2", buf, IM_ARRAYSIZE(buf));
-	//	ImGui::InputText("3", buf, IM_ARRAYSIZE(buf));
-	//	ImGui::PushAllowKeyboardFocus(false);
-	//	ImGui::InputText("4 (tab skip)", buf, IM_ARRAYSIZE(buf));
-	//	//ImGui::SameLine(); HelpMarker("Use ImGui::PushAllowKeyboardFocus(bool) to disable tabbing through certain widgets.");
-	//	ImGui::PopAllowKeyboardFocus();
-	//	ImGui::InputText("5", buf, IM_ARRAYSIZE(buf));
-	//	ImGui::TreePop();
-	//}
-	//if (ImGui::TreeNode("Focus from code"))
-	//{
-	//	bool focus_1 = ImGui::Button("Focus on 1"); ImGui::SameLine();
-	//	bool focus_2 = ImGui::Button("Focus on 2"); ImGui::SameLine();
-	//	bool focus_3 = ImGui::Button("Focus on 3");
-	//	int has_focus = 0;
-	//	static char buf[128] = "click on a button to set focus";
-	//	if (focus_1) ImGui::SetKeyboardFocusHere();
-	//	ImGui::InputText("1", buf, IM_ARRAYSIZE(buf));
-	//	if (ImGui::IsItemActive()) has_focus = 1;
-	//	if (focus_2) ImGui::SetKeyboardFocusHere();
-	//	ImGui::InputText("2", buf, IM_ARRAYSIZE(buf));
-	//	if (ImGui::IsItemActive()) has_focus = 2;
-	//	ImGui::PushAllowKeyboardFocus(false);
-	//	if (focus_3) ImGui::SetKeyboardFocusHere();
-	//	ImGui::InputText("3 (tab skip)", buf, IM_ARRAYSIZE(buf));
-	//	if (ImGui::IsItemActive()) has_focus = 3;
-	//	ImGui::PopAllowKeyboardFocus();
-	//	if (has_focus)
-	//		ImGui::Text("Item with focus: %d", has_focus);
-	//	else
-	//		ImGui::Text("Item with focus: <none>");
-	//	// Use >= 0 parameter to SetKeyboardFocusHere() to focus an upcoming item
-	//	static float f3[3] = { 0.0f, 0.0f, 0.0f };
-	//	int focus_ahead = -1;
-	//	if (ImGui::Button("Focus on X")) { focus_ahead = 0; } ImGui::SameLine();
-	//	if (ImGui::Button("Focus on Y")) { focus_ahead = 1; } ImGui::SameLine();
-	//	if (ImGui::Button("Focus on Z")) { focus_ahead = 2; }
-	//	if (focus_ahead != -1) ImGui::SetKeyboardFocusHere(focus_ahead);
-	//	ImGui::SliderFloat3("Float3", &f3[0], 0.0f, 1.0f);
-
-	//	ImGui::TextWrapped("NB: Cursor & selection are preserved when refocusing last used item in code.");
-	//	ImGui::TreePop();
-	//}
-	//ImGui::GetStyle().Colors[ImGuiCol_WindowBg] = ImVec4(1.0f, 1.0f, 1.0f, 0.4f);
-	//ImGui::GetStyle().Colors[ImGuiCol_Border].x = 1.0f;
-	//ImGui::GetStyle().Colors[ImGuiCol_TitleBg] = ImVec4(0.0f, 1.0f, 1.0f, 0.7f);
-	//ImGui::GetStyle().Colors[ImGuiCol_TitleBgActive] = ImVec4(1.0f, 1.0f, 1.0f, 0.7f);
-	//ImGui::GetStyle().Colors[ImGuiCol_Text] = ImVec4(0.0f, 0.0f, 0.0f, 0.7f);
+//-------------------------------------
+// ゲームクリア判定処理
+//-------------------------------------
+bool SceneBattle::IsGameClearJudgment()
+{
+	// 撃破フラグを格納したコンテナ取得
+	std::map<EnemyTerritoryTag, bool> defeat_teritory = EnemyManager::Instance().GetDefeatTeritory();
+	
+	// ドラゴンを全て撃破したらクリア
+	return (defeat_teritory[EnemyTerritoryTag::ButtlePosition4] == true &&
+		defeat_teritory[EnemyTerritoryTag::ButtlePosition5] == true);
 }

@@ -19,7 +19,7 @@ PSInput main(VSInput input)
 
 	float3 N = normalize(n);
 	output.normal = N;
-	output.color = float4(1, 1, 1, 1);
+	output.color = input.color;
 	output.texcoord = input.texcoord;
 
 	return output;

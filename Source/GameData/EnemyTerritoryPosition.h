@@ -1,8 +1,8 @@
 /*!
-	@file	EnemyAppearancePosition.h
+	@file	EnemyTerritoryPosition.h
 	@brief	ツールにて自動生成しています。絶対に書き換えないでください。
 	@autor	DataBase.xlsm
-	@data	2022/01/13
+	@data	2022/01/15
 **/
 #pragma	once
 
@@ -10,10 +10,10 @@
 
 
 /*!
-	@struct	EnemyAppearancePosition
+	@struct	EnemyTerritoryPosition
 	@brief	データ構造体
 **/
-struct	EnemyAppearancePosition
+struct	EnemyTerritoryPosition
 {
 	int	id;	//!<	ID
 	EnemyTerritoryTag	tag;	//!<	テリトリータグ

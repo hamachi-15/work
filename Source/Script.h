@@ -1,6 +1,5 @@
 #pragma once
 #include <Windows.h>
-#include "ScriptDataHeadder.h"
 
 class Script
 {
@@ -48,8 +47,4 @@ public:
 		static WriteScript instance;
 		return instance;
 	}
-
-	// シーンデータスクリプト書き込み処理
-	bool WriteSceneDataScript(const char* filename, const BattleSceneDataHeadder& dataheadder);
-
 };

@@ -4,7 +4,6 @@
 #include "Shader.h"
 #include "Scene.h"
 #include "RenderContext.h"
-#include "ScriptDataHeadder.h"
 
 class Texture;
 class Sprite;
@@ -43,16 +42,13 @@ private:
 
 	// ImGui•`‰æ
 	void OnGui();
-
-	// ˆê’è”ÍˆÍ“à‚É‚¢‚é“G‚ð’T‚µ‚ÄID‚ð”z—ñ‚É’Ç‰Á‚·‚é
-	void DistanceBetweenEnemyAndPoint(BattleSceneDataHeadder& data_headder, const DirectX::XMVECTOR& origin, const float& range);
+private:
+	const int Primitive_Max_Time = 40;
 
 private:
 	RenderContext						render_context;
 	BlurRenderContext					blur_render_context;
 	PrimitiveContext					primitive_context;
-
-	//std::unique_ptr<CameraController>	camera_controller;
 
 	std::unique_ptr<Shader>				sprite_cube;
 	std::unique_ptr<Bloom>				bloom;
@@ -60,6 +56,7 @@ private:
 	std::unique_ptr<Sprite>				sprite;
 	std::unique_ptr<Texture>			sky;
 	std::unique_ptr<Texture>			bulr_texture;
+	std::unique_ptr<Texture>			sky_texture;
 	std::unique_ptr<Texture>			depth_texture;
 	Texture*							bloom_texture;
 
@@ -74,8 +71,6 @@ private:
 	bool								primitive_falg = false;
 	bool								isshadowmap = false;
 
-	DirectX::XMFLOAT3 radius = DirectX::XMFLOAT3(10, 10, 10);
-	DirectX::XMFLOAT3 center = DirectX::XMFLOAT3(-100, 8, -100);
-	DirectX::XMFLOAT4 color = DirectX::XMFLOAT4(1, 1, 1, 1);
-	bool iscull = false;
+	DirectX::XMFLOAT4					color = DirectX::XMFLOAT4(1, 1, 1, 1);
+	bool								iscull = false;
 };

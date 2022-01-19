@@ -4,6 +4,21 @@
 #include "Charactor.h"
 #include "Telegram.h"
 #include "MetaAI.h"
+#include "Mathf.h"
+
+//***********************************
+// 
+// ƒm[ƒh‚É‘JˆÚ‚³‚¹‚é‚©ƒ‰ƒ“ƒ_ƒ€‚É”»’è
+// 
+//***********************************
+//-----------------------------------------
+// ”»’è
+//-----------------------------------------
+bool RamdamNextStepJudgment::Judgment()
+{
+	return (Mathf::RandomRange(1, 100) <= percent);
+}
+
 //*****************************
 // 
 // BattleNode‚É‘JˆÚ‚Å‚«‚é‚©”»’è
@@ -128,4 +143,3 @@ bool EscapeJudgment::Judgment()
 	}
 	return false;
 }
-

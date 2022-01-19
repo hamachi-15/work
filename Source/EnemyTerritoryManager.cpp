@@ -16,7 +16,7 @@ void EnemyTerritoryManager::RegisterTerritory(std::shared_ptr<EnemyTerritory> te
 //----------------------------
 // “ê’£‚èƒ^ƒO‚©‚ç“ê’£‚è‚ðŽæ“¾
 //----------------------------
-std::shared_ptr<EnemyTerritory> EnemyTerritoryManager::GetTerritory(EnemyTerritoryTag& tag)
+std::shared_ptr<EnemyTerritory> EnemyTerritoryManager::GetTerritory(const EnemyTerritoryTag& tag)
 {
 	for (std::shared_ptr<EnemyTerritory> territory : enemy_territory_list)
 	{

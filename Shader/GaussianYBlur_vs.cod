@@ -70,93 +70,93 @@ mov r1.w, l(1.000000)  // r1.w <- output.position.w
 #line 9
 mov r2.xyzw, v2.xyxy  // r2.z <- tex.x; r2.w <- tex.y
 
-#line 15
-itof r3.x, l(360)  // r3.x <- height
+#line 16
+itof r3.x, l(512)  // r3.x <- height
 
-#line 18
+#line 19
 mov r3.x, r3.x  // r3.x <- tex_size.y
 
-#line 21
+#line 22
 div r4.y, l(1.000000), r3.x  // r4.y <- output.tex0.y
 mov r4.x, l(0)  // r4.x <- output.tex0.x
 
-#line 24
+#line 25
 div r5.y, l(3.000000), r3.x  // r5.y <- output.tex1.y
 mov r5.x, l(0)  // r5.x <- output.tex1.x
 
-#line 27
+#line 28
 div r6.y, l(5.000000), r3.x  // r6.y <- output.tex2.y
 mov r6.x, l(0)  // r6.x <- output.tex2.x
 
-#line 30
+#line 31
 div r7.y, l(7.000000), r3.x  // r7.y <- output.tex3.y
 mov r7.x, l(0)  // r7.x <- output.tex3.x
 
-#line 33
+#line 34
 div r8.y, l(9.000000), r3.x  // r8.y <- output.tex4.y
 mov r8.x, l(0)  // r8.x <- output.tex4.x
 
-#line 36
+#line 37
 div r9.y, l(11.000000), r3.x  // r9.y <- output.tex5.y
 mov r9.x, l(0)  // r9.x <- output.tex5.x
 
-#line 39
+#line 40
 div r10.y, l(13.000000), r3.x  // r10.y <- output.tex6.y
 mov r10.x, l(0)  // r10.x <- output.tex6.x
 
-#line 42
+#line 43
 div r3.y, l(15.000000), r3.x  // r3.y <- output.tex7.y
 mov r3.x, l(0)  // r3.x <- output.tex7.x
 
-#line 45
+#line 46
 mul r4.zw, r4.xxxy, l(0.000000, 0.000000, -1.000000, -1.000000)  // r4.z <- output.tex0.z; r4.w <- output.tex0.w
 
-#line 46
+#line 47
 mul r5.zw, r5.xxxy, l(0.000000, 0.000000, -1.000000, -1.000000)  // r5.z <- output.tex1.z; r5.w <- output.tex1.w
 
-#line 47
+#line 48
 mul r6.zw, r6.xxxy, l(0.000000, 0.000000, -1.000000, -1.000000)  // r6.z <- output.tex2.z; r6.w <- output.tex2.w
 
-#line 48
+#line 49
 mul r7.zw, r7.xxxy, l(0.000000, 0.000000, -1.000000, -1.000000)  // r7.z <- output.tex3.z; r7.w <- output.tex3.w
 
-#line 49
+#line 50
 mul r8.zw, r8.xxxy, l(0.000000, 0.000000, -1.000000, -1.000000)  // r8.z <- output.tex4.z; r8.w <- output.tex4.w
 
-#line 50
+#line 51
 mul r9.zw, r9.xxxy, l(0.000000, 0.000000, -1.000000, -1.000000)  // r9.z <- output.tex5.z; r9.w <- output.tex5.w
 
-#line 51
+#line 52
 mul r10.zw, r10.xxxy, l(0.000000, 0.000000, -1.000000, -1.000000)  // r10.z <- output.tex6.z; r10.w <- output.tex6.w
 
-#line 52
+#line 53
 mul r3.zw, r3.xxxy, l(0.000000, 0.000000, -1.000000, -1.000000)  // r3.z <- output.tex7.z; r3.w <- output.tex7.w
 
-#line 55
+#line 56
 add r4.xyzw, r2.xyzw, r4.xyzw
 
-#line 56
+#line 57
 add r5.xyzw, r2.xyzw, r5.xyzw
 
-#line 57
+#line 58
 add r6.xyzw, r2.xyzw, r6.xyzw
 
-#line 58
+#line 59
 add r7.xyzw, r2.xyzw, r7.xyzw
 
-#line 59
+#line 60
 add r8.xyzw, r2.xyzw, r8.xyzw
 
-#line 60
+#line 61
 add r9.xyzw, r2.xyzw, r9.xyzw
 
-#line 61
+#line 62
 add r10.xyzw, r2.xyzw, r10.xyzw
 
-#line 62
+#line 63
 add r2.xyzw, r2.xyzw, r3.xyzw  // r2.x <- output.tex7.x; r2.y <- output.tex7.y; r2.z <- output.tex7.z; r2.w <- output.tex7.w
 
-#line 65
+#line 66
 mov o0.xyzw, r1.xyzw
 mov o1.xyzw, r0.xyzw
 mov o2.xyzw, r4.xyzw

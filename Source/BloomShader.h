@@ -20,7 +20,7 @@ public:
 	void Begin(ID3D11DeviceContext* context)override;
 
 	// ‹P“x’Šoˆ—
-	Texture* Render(ID3D11DeviceContext* context, RenderContext& render_context);
+	Texture* Render(ID3D11DeviceContext* context, RenderContext& render_context, Texture* texture = nullptr);
 
 	// •`‰æI—¹ˆ—
 	void End(ID3D11DeviceContext* context)override;

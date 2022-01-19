@@ -7,7 +7,7 @@
 #include "PhongVarianceShadowMap.h"
 
 // データベース系インクルード
-#include "Script.h"
+#include "GameDatabase.h"
 #include "EnemyTerritoryManager.h"
 
 // アクター系インクルード
@@ -40,16 +40,19 @@ EnemyManager::~EnemyManager()
 //-----------------------------------------------
 void EnemyManager::CreateTerritory()
 {
-	int appearance_data_count = GameDataBase::Instance().GetEnemyOccurCount();
-	for (int appearance_position_index = 0; appearance_position_index < appearance_data_count; ++appearance_position_index)
+	int appearance_data_count = GameDataBase::Instance().GetEnemyTerritoryCount();
+	for (int appearance_position_index = 0; appearance_position_index <= GameDataBase::Buttle_Territory_index; ++appearance_position_index)
 	{
-		std::shared_ptr<EnemyAppearancePosition> appearance_data = GameDataBase::Instance().GetEnemyAppearanceData(appearance_position_index);
+		std::shared_ptr<EnemyTerritoryPosition> appearance_data = GameDataBase::Instance().GetEnemyTerritoryData(appearance_position_index);
 		DirectX::XMFLOAT3 appearance_position = { appearance_data->position_x,appearance_data->position_y, appearance_data->position_z };
 		std::shared_ptr<EnemyTerritory> territory = std::make_shared<EnemyTerritory>();
 		territory->SetTerritoryOrigin(appearance_position);
 		territory->SetTerritoryRange(appearance_data->radius);
 		territory->SetTerritoryTag(appearance_data->tag);
 		EnemyTerritoryManager::Instance().RegisterTerritory(territory);
+
+		// テリトリーの敵が撃破されたか管理するフラグを追加
+		defeat_teritory[appearance_data->tag] = false;
 	}
 }
 
@@ -113,25 +116,35 @@ void EnemyManager::CreateEnemies()
 		std::shared_ptr<WorldMapData> world_map_data = GameDataBase::Instance().GetWorldMapData(i);
 		// ワールドマップデータのIDから敵データを取得
 		std::shared_ptr<EnemyData> enemy_data = GameDataBase::Instance().GetEnemyDataFromID(world_map_data->enemy_id);
-		// ワールドマップデータのタグから敵の出現位置データを取得
-		std::shared_ptr<EnemyAppearancePosition> appearance_data = GameDataBase::Instance().GetEnemyAppearanceData(world_map_data->tag);
+		// ワールドマップデータのタグからテリトリーデータを取得
+		std::shared_ptr<EnemyTerritoryPosition> territory_data = GameDataBase::Instance().GetEnemyTerritoryData(world_map_data->tag);
 		// アクター作成
 		std::shared_ptr<Actor> actor = ActorManager::Instance().Create();
 		// 敵ステータス設定
-		SetEnemyStatus(actor, enemy_data, appearance_data);
+		SetEnemyStatus(actor, enemy_data, territory_data);
 	}
 }
 
 //-----------------------------------------------
-// スクリプトから敵を生成
+// エンカウントデータから敵を生成
 //-----------------------------------------------
 void EnemyManager::CreateEnemies(int id)
 {
 	// 敵データリストと敵の出現位置データリストを取得
-	std::vector<std::shared_ptr<EnemyData>> data_list = GameDataBase::Instance().GetEnemyDataList();
-	std::vector<std::shared_ptr<EnemyAppearancePosition>> appearance_potition_list = GameDataBase::Instance().GetEnemyAppearanceDataList();
-	int index = 0;
-	for (std::shared_ptr<EnemyData> data : data_list)
+	std::vector<std::shared_ptr<EnemyData>> enemy_data_list = GameDataBase::Instance().GetEnemyDataList();
+	std::vector<std::shared_ptr<EnemyTerritoryPosition>> territory_potition_list = GameDataBase::Instance().GetEnemyTerritoryDataList();
+	
+	// テリトリーデータのインデックスをバトルシーンのところに設定
+	int territory_index = GameDataBase::Buttle_Territory_index;
+
+	// テリトリーデータ取得
+	std::shared_ptr<EnemyTerritoryPosition> territory_data = territory_potition_list.at(territory_index);
+
+	// 出現位置データのインデックスをバトルシーンのところに設定
+	int appearance_index = GameDataBase::Buttle_Appearance_Position_Index;
+
+	// 敵データを参照していって
+	for (std::shared_ptr<EnemyData> data : enemy_data_list)
 	{
 		// データベースのIDと一致したら敵を生成する
 		if (data->id == id)
@@ -139,60 +152,39 @@ void EnemyManager::CreateEnemies(int id)
 			// アクター作成
 			std::shared_ptr<Actor> actor = ActorManager::Instance().Create();
 			// 出現位置のデータ取得
-			std::shared_ptr<EnemyAppearancePosition> appearance_data = appearance_potition_list.at(index);
+			std::shared_ptr<EnemyTerritoryPosition> appearance_data = territory_potition_list.at(appearance_index);
 			// ステータス設定
-			SetEnemyStatus(actor, data, appearance_data);
+			SetEnemyStatus(actor, data, territory_data, { appearance_data->position_x, appearance_data->position_y, appearance_data->position_z });
+			// インデックスのインデント
+			++appearance_index;
 		}
-		++index;
 	}
 }
 
 //-----------------------------------------
 // スクリプトから敵情報を取得して敵を生成する
 //-----------------------------------------
-bool EnemyManager::CreateEnemyScriptData()
+bool EnemyManager::CreateEnemyEncountData()
 {
-	Script* script = new Script("./Data/Script/SendBattleSceneScript.txt");
-	char	strwork[256] = {};
-
-	while (1)
+	appearance_ramdam_flag = false;
+	std::vector<EncountEnemyTerritory> encount_enemies = GameDataBase::Instance().GetEncountEnemyList();
+	for(EncountEnemyTerritory encount_enemy : encount_enemies)
 	{
-		if (!script->SearchTop())
-			break;
-		if (script == nullptr)
-		{
-			return false;
-		}
-		//	文字列をファイルから取り出す
-		script->GetParamString(strwork);
-
-		//	終了コマンド
-		if (lstrcmpA(strwork, "END") == 0)
-		{
-			break;
-		}
-
-		if (lstrcmpA(strwork, "EnemyID") == 0)
-		{
-			// スクリプトの敵IDから敵を生成
-			CreateEnemies(script->GetParamInt());
-		}
+		// スクリプトの敵IDから敵を生成
+		CreateEnemies(encount_enemy.id);
 	}
-	delete script;
+	appearance_ramdam_flag = true;
 	return true;
 }
 
 //-----------------------------------------
 // 敵のステータスを設定する処理
 //-----------------------------------------
-void EnemyManager::SetEnemyStatus(std::shared_ptr<Actor> actor, std::shared_ptr<EnemyData> enemy_data, std::shared_ptr<EnemyAppearancePosition> appearance_data)
+void EnemyManager::SetEnemyStatus(std::shared_ptr<Actor> actor, std::shared_ptr<EnemyData> enemy_data, std::shared_ptr<EnemyTerritoryPosition> teritory_data, DirectX::XMFLOAT3 appearance_position)
 {
 	// 名前の設定
-	std::string name = std::string(enemy_data->name) + std::to_string(appearance_data->id);
+	std::string name = std::string(enemy_data->name) + std::to_string(teritory_data->id);
 	actor->SetName(name.c_str());
-
-	// 敵データIDの設定
-	actor->SetEnemyDataID(enemy_data->id);
 	
 	// モデルのセットアップ
 	if (strcmp(enemy_data->animation_node_name, "NULL") == 0)
@@ -203,82 +195,93 @@ void EnemyManager::SetEnemyStatus(std::shared_ptr<Actor> actor, std::shared_ptr<
 	{
 		actor->SetUpModel(enemy_data->model_path, enemy_data->animation_node_name);
 	}
-	// 出現位置の設定
-	DirectX::XMFLOAT3 appearance_position = { appearance_data->position_x,appearance_data->position_y, appearance_data->position_z };
-	GetAppearancePosition(actor, { appearance_position.x, appearance_position.y, appearance_position.z }, appearance_data->radius);
-	
-	// スケールの設定
-	actor->SetScale({ enemy_data->scale_x, enemy_data->scale_y, enemy_data->scale_z });
-
-	// アングルの設定
-	actor->SetAngle({ enemy_data->angle_x, enemy_data->angle_y, enemy_data->angle_z });
-
-	// シェーダーの設定
-	actor->SetShaderType(ShaderManager::ShaderType::Lambert);
-
-	// 各敵のコンポーネント追加
-	AddComponent(actor, enemy_data, appearance_data->tag);
-}
-
-void EnemyManager::SetEnemyStatus(std::shared_ptr<Actor> actor, std::shared_ptr<EnemyData> enemy_data, int& string_id, DirectX::XMFLOAT3& appearance_position)
-{
-	// 名前の設定
-	std::string name = std::string(enemy_data->name) + std::to_string(string_id);
-	actor->SetName(name.c_str());
-
-	// 敵データIDの設定
-	actor->SetEnemyDataID(enemy_data->id);
-
-	// モデルのセットアップ
-	actor->SetUpModel(enemy_data->model_path, enemy_data->animation_node_name);
 
 	// 出現位置の設定
-	GetAppearancePosition(actor, { appearance_position.x, appearance_position.y, appearance_position.z }, 2);
-
-	// スケールの設定
-	actor->SetScale({ enemy_data->scale_x, enemy_data->scale_y, enemy_data->scale_z });
-
-	// アングルの設定
-	actor->SetAngle({ enemy_data->angle_x, enemy_data->angle_y, enemy_data->angle_z });
-
-	// シェーダーの設定
-	actor->SetShaderType(ShaderManager::ShaderType::Lambert);
-
-	// 各敵のコンポーネント追加
-	std::shared_ptr<Enemy> enemy;
-	actor->AddComponent<Movement>();
-	std::shared_ptr<Charactor> charactor = actor->AddComponent<Charactor>();
-	
-	// 最大HP設定
-	charactor->SetMaxHealth(enemy_data->hp);
-
-	// HP設定
-	charactor->SetHealth(enemy_data->hp);
-
-	// 敵の種類ごとのコンポーネントを追加
-	// TODO 敵を作り終えたら対応する
-	switch (enemy_data->category)
-	{
-	case EnemyCategory::LAT:
-		enemy = actor->AddComponent<EnemyLAT>();
-		break;
-	case EnemyCategory::Slime:
-		enemy = actor->AddComponent<EnemySlime>();
-		break;
-	case EnemyCategory::PLT:
-		enemy = actor->AddComponent<EnemyPLT>();
-		break;
-	case EnemyCategory::NightmareDragon:
-		enemy = actor->AddComponent<EnemyDragonNightmare>();
-		break;
-	case EnemyCategory::SoulEaterDragon:
-		enemy = actor->AddComponent<EnemyDragonSoulEater>();
-		break;
-	case EnemyCategory::DragonUsurper:
-		break;
+	DirectX::XMFLOAT3 teritory_position = { teritory_data->position_x, teritory_data->position_y, teritory_data->position_z };
+	// 出現位置のランダムフラグが立ったら
+	if (appearance_ramdam_flag)
+	{	// 出現位置を縄張り範囲内のランダムな位置に設定
+		GetAppearancePosition(actor, { teritory_position.x, teritory_position.y, teritory_position.z }, teritory_data->radius);
+	}
+	else
+	{	// 出現位置を指定の位置に設定
+		actor->SetPosition(appearance_position);
 	}
 
+	// スケールの設定
+	actor->SetScale({ enemy_data->scale_x, enemy_data->scale_y, enemy_data->scale_z });
+
+	// アングルの設定
+	actor->SetAngle({ enemy_data->angle_x, enemy_data->angle_y, enemy_data->angle_z });
+
+	// シェーダーの設定
+	actor->SetShaderType(ShaderManager::ShaderType::Lambert);
+
+	// 各敵のコンポーネント追加
+	AddComponent(actor, enemy_data, teritory_data->tag);
 }
+
+//void EnemyManager::SetEnemyStatus(std::shared_ptr<Actor> actor, std::shared_ptr<EnemyData> enemy_data, int& string_id, DirectX::XMFLOAT3& appearance_position)
+//{
+//	// 名前の設定
+//	std::string name = std::string(enemy_data->name) + std::to_string(string_id);
+//	actor->SetName(name.c_str());
+//
+//	// 敵データIDの設定
+//	//enemy->SetEnemyDataID(enemy_data->id);
+//
+//	// モデルのセットアップ
+//	actor->SetUpModel(enemy_data->model_path, enemy_data->animation_node_name);
+//
+//	// 出現位置の設定
+//	GetAppearancePosition(actor, { appearance_position.x, appearance_position.y, appearance_position.z }, 2);
+//
+//	// 所属テリトリー設定
+//
+//	// スケールの設定
+//	actor->SetScale({ enemy_data->scale_x, enemy_data->scale_y, enemy_data->scale_z });
+//
+//	// アングルの設定
+//	actor->SetAngle({ enemy_data->angle_x, enemy_data->angle_y, enemy_data->angle_z });
+//
+//	// シェーダーの設定
+//	actor->SetShaderType(ShaderManager::ShaderType::Lambert);
+//
+//	// 各敵のコンポーネント追加
+//	std::shared_ptr<Enemy> enemy;
+//	actor->AddComponent<Movement>();
+//	std::shared_ptr<Charactor> charactor = actor->AddComponent<Charactor>();
+//	
+//	// 最大HP設定
+//	charactor->SetMaxHealth(enemy_data->hp);
+//
+//	// HP設定
+//	charactor->SetHealth(enemy_data->hp);
+//
+//	// 敵の種類ごとのコンポーネントを追加
+//	// TODO 敵を作り終えたら対応する
+//	switch (enemy_data->category)
+//	{
+//	case EnemyCategory::LAT:
+//		enemy = actor->AddComponent<EnemyLAT>();
+//		break;
+//	case EnemyCategory::Slime:
+//		enemy = actor->AddComponent<EnemySlime>();
+//		break;
+//	case EnemyCategory::PLT:
+//		enemy = actor->AddComponent<EnemyPLT>();
+//		break;
+//	case EnemyCategory::NightmareDragon:
+//		enemy = actor->AddComponent<EnemyDragonNightmare>();
+//		break;
+//	case EnemyCategory::SoulEaterDragon:
+//		enemy = actor->AddComponent<EnemyDragonSoulEater>();
+//		break;
+//	case EnemyCategory::DragonUsurper:
+//		break;
+//	}
+//
+//}
 
 //-----------------------------------------------
 // 出現位置を決める処理
@@ -298,9 +301,10 @@ void EnemyManager::GetAppearancePosition(std::shared_ptr<Actor> actor, DirectX::
 //-----------------------------------------------
 // スライムのコンポーネントを追加する処理
 //-----------------------------------------------
-void EnemyManager::AddComponent(std::shared_ptr<Actor> actor, std::shared_ptr<EnemyData> enemy_data, EnemyTerritoryTag& tag)
+void EnemyManager::AddComponent(std::shared_ptr<Actor> actor, std::shared_ptr<EnemyData> enemy_data, EnemyTerritoryTag& territory_tag)
 {
 	std::shared_ptr<Enemy> enemy;
+	// ムーブメントコンポーネント追加
 	actor->AddComponent<Movement>();
 	std::shared_ptr<Charactor> charactor = actor->AddComponent<Charactor>();
 	charactor->SetMaxHealth(enemy_data->hp);
@@ -326,9 +330,12 @@ void EnemyManager::AddComponent(std::shared_ptr<Actor> actor, std::shared_ptr<En
 		enemy = actor->AddComponent<EnemyDragonNightmare>();
 		break;
 	}
-	std::shared_ptr<EnemyTerritory> territory = EnemyTerritoryManager::Instance().GetTerritory(tag);
-	enemy->SetTerritoryOrigin(territory->GetTerritoryOrigin());
-	enemy->SetTerritoryRange(territory->GetTerritoryRange());
+	// 所属テリトリー設定
+	enemy->SetBelongingToTerritory(territory_tag);
+
+	// 敵データIDの設定
+	enemy->SetEnemyDataID(enemy_data->id);
+
 }
 
 //-----------------------------------------------

@@ -4,6 +4,7 @@
 #include "Collision.h"
 #include "Enemy.h"
 #include "EnemyManager.h"
+
 #include "GameDatabase.h"
 #include "Charactor.h"
 
@@ -14,9 +15,9 @@
 // 待機行動
 // 
 //***********************************
-//-----------------------------------
-// 待機行動前処理
-//-----------------------------------
+//----------------------------------
+// 実行前処理
+//----------------------------------
 void IdleAction::Start()
 {
 	std::string owner_name = owner->GetName();
@@ -26,6 +27,9 @@ void IdleAction::Start()
 	owner->PlayAnimation(owner_name.c_str());
 }
 
+//----------------------------------
+// 実行処理
+//----------------------------------
 ActionBase::State IdleAction::Run(float elapsed_time)
 {
 	float run_timer = owner->GetRunTimer();
@@ -60,6 +64,9 @@ ActionBase::State IdleAction::Run(float elapsed_time)
 // ダメージ行動
 // 
 //***********************************
+//----------------------------------
+// 実行前処理
+//----------------------------------
 void DamageAction::Start()
 {
 	std::string animation_name = owner->GetName();
@@ -69,6 +76,9 @@ void DamageAction::Start()
 	owner->PlayAnimation(animation_name.c_str());
 }
 
+//----------------------------------
+// 実行処理
+//----------------------------------
 ActionBase::State DamageAction::Run(float elapsed_time)
 {
 	// ダメージを与え、死亡しなければ
@@ -118,6 +128,9 @@ ActionBase::State DamageAction::Run(float elapsed_time)
 // 死亡行動
 // 
 //***********************************
+//----------------------------------
+// 実行前処理
+//----------------------------------
 void DeathAction::Start()
 {
 	// 死亡アニメーション再生
@@ -128,6 +141,9 @@ void DeathAction::Start()
 	owner->PlayAnimation(animation_name.c_str());
 }
 
+//----------------------------------
+// 実行処理
+//----------------------------------
 ActionBase::State DeathAction::Run(float elapsed_time)
 {
 	// アニメーション再生が終わればアクターを破棄
@@ -144,6 +160,9 @@ ActionBase::State DeathAction::Run(float elapsed_time)
 // 徘徊行動
 // 
 //***********************************
+//----------------------------
+// 実行前処理
+//----------------------------
 void WanderAction::Start()
 {
 	std::string animation_name = owner->GetName();
@@ -153,22 +172,17 @@ void WanderAction::Start()
 	owner->PlayAnimation(animation_name.c_str());
 }
 
+//----------------------------
+// 実行処理
+//----------------------------
 ActionBase::State WanderAction::Run(float elapsed_time)
 {
+	// アクター取得
 	std::shared_ptr<Actor> owner_actor = owner->GetActor();
-	// 目的地点までのXZ平面での距離判定
-	DirectX::XMFLOAT3 position = owner_actor->GetPosition();
-	DirectX::XMFLOAT3 target_position = owner->GetTargetPosition();
-	float vx = target_position.x - position.x;
-	float vz = target_position.z - position.z;
-	float distSq = vx * vx + vz * vz;
 
-	// 目的地へ着いた
-	std::shared_ptr<CollisionCylinder> collision = CollisionManager::Instance().GetCollisionCylinderFromName(owner_actor->GetName());
-	float radius = collision->GetRadius();
-	if (distSq < radius * radius)
+	// 目的地へ着いたかの判定処理
+	if (JedgmentToTargetPosition(owner->GetTargetPosition(), owner_actor->GetPosition(), owner_actor->GetName()))
 	{
-		owner->SetRunTimer(0.0f);
 		return ActionBase::State::Complete;
 	}
 
@@ -191,69 +205,67 @@ ActionBase::State WanderAction::Run(float elapsed_time)
 // 逃走行動
 // 
 //***********************************
+//----------------------------------
+// 実行前処理
+//----------------------------------
 void LeaveAction::Start()
 {
+	// アクター取得
+	std::shared_ptr<Actor> owner_actor = owner->GetActor();
+	
+	// アニメーション名を設定して
 	std::string animation_name = owner->GetName();
 	animation_name += "Walk";
 
 	// アニメーション再生
 	owner->PlayAnimation(animation_name.c_str());
+
+	// 目標地点をプレイヤーと正反対のベクトル×5の位置に指定
+	DirectX::XMVECTOR start_position = DirectX::XMLoadFloat3(&ActorManager::Instance().GetActor("Player")->GetPosition());
+	DirectX::XMVECTOR end_position = DirectX::XMLoadFloat3(&owner_actor->GetPosition());
+
+	DirectX::XMVECTOR vec_target_position = DirectX::XMVectorSubtract(end_position, start_position);
+	vec_target_position = DirectX::XMVector3Normalize(vec_target_position);
+	vec_target_position = DirectX::XMVectorScale(vec_target_position, 5.0f);
+
+	DirectX::XMFLOAT3 target_position;
+	DirectX::XMStoreFloat3(&target_position, vec_target_position);
+	DirectX::XMFLOAT3 owner_position = owner_actor->GetPosition();
+	target_position.x += owner_position.x;
+	target_position.y += owner_position.y;
+	target_position.z += owner_position.z;
+	owner->SetTargetPosition(target_position);
 }
 
+//----------------------------------
+// 実行処理
+//----------------------------------
 ActionBase::State LeaveAction::Run(float elapsed_time)
 {
-	DirectX::XMFLOAT3 target_position;
 	std::shared_ptr<Actor> owner_actor = owner->GetActor();
-	static int i = 0;
-	switch (i)
-	{
-	case 0:
-
-		// 目標地点をプレイヤーと正反対のベクトル×5の位置に指定
-		DirectX::XMVECTOR start_position = DirectX::XMLoadFloat3(&ActorManager::Instance().GetActor("Player")->GetPosition());
-		DirectX::XMVECTOR end_position = DirectX::XMLoadFloat3(&owner_actor->GetPosition());
-
-		DirectX::XMVECTOR vec_target_position = DirectX::XMVectorSubtract(end_position, start_position);
-		vec_target_position = DirectX::XMVector3Normalize(vec_target_position);
-		vec_target_position = DirectX::XMVectorScale(vec_target_position, 5.0f);
-
-
-		DirectX::XMStoreFloat3(&target_position, vec_target_position);
-		DirectX::XMFLOAT3 owner_position = owner_actor->GetPosition();
-		target_position.x += owner_position.x;
-		target_position.y += owner_position.y;
-		target_position.z += owner_position.z;
-		owner->SetTargetPosition(target_position);
-		i++;
-		break;
-
-	case 1:
-
-		break;
-	}
 
 	// 目的地点へ移動
 	owner->MoveToTarget(elapsed_time, 1.0);
 
-	DirectX::XMFLOAT3 position = owner_actor->GetPosition();
-	target_position = owner->GetTargetPosition();
-
-	float vx = target_position.x - position.x;
-	float vz = target_position.z - position.z;
-	float distSq = vx * vx + vz * vz;
-
-	// 目的地へ着いた
-	std::shared_ptr<CollisionCylinder> collision = CollisionManager::Instance().GetCollisionCylinderFromName(owner_actor->GetName());
-	float radius = collision->GetRadius();
-	if (distSq < radius * radius)
+	// 目的地へ着いたら
+	if (JedgmentToTargetPosition(owner->GetTargetPosition(), owner_actor->GetPosition(), owner_actor->GetName()))
 	{
-		i = 0;
+		// コンプリート
 		return ActionBase::State::Complete;
 	}
 
+	// 継続
 	return ActionBase::State::Run;
 }
 
+//***********************************
+// 
+// 回復行動
+// 
+//***********************************
+//----------------------------------
+// 実行前処理
+//----------------------------------
 void RecoverAction::Start()
 {
 	std::string animation_name = owner->GetName();;
@@ -264,6 +276,9 @@ void RecoverAction::Start()
 
 }
 
+//----------------------------------
+// 実行処理
+//----------------------------------
 ActionBase::State RecoverAction::Run(float elapsed_time)
 {
 	float runTimer = owner->GetRunTimer();
@@ -295,6 +310,9 @@ ActionBase::State RecoverAction::Run(float elapsed_time)
 // 追跡行動
 // 
 //***********************************
+//----------------------------------
+// 実行前処理
+//----------------------------------
 void PursuitAction::Start()
 {
 	std::string animation_name = owner->GetName();;
@@ -304,6 +322,9 @@ void PursuitAction::Start()
 	owner->PlayAnimation(animation_name.c_str());
 }
 
+//----------------------------------
+// 実行処理
+//----------------------------------
 ActionBase::State PursuitAction::Run(float elapsed_time)
 {
 	float run_timer = owner->GetRunTimer();
@@ -398,16 +419,3 @@ ActionBase::State SleepAction::Run(float elapsed_time)
 
 	return ActionBase::State::Run;
 }
-
-//***************************************
-// 
-// 咆哮行動
-// 
-//***************************************
-// -----------------------------
-// 実行前処理
-//------------------------------
-
-//------------------------------
-// 実行処理
-//------------------------------

@@ -34,8 +34,6 @@ bool ClawAttackJudgment::Judgment()
 
 	// プレイヤーがドラゴンの前方にいるか判定
 	return JudgmentUniversal::JudgementTargetInFront(enemy_position, enemy_angle, player_position);
-
-	return true;
 }
 
 //*****************************************
@@ -62,8 +60,6 @@ bool BasicAttackJudgment::Judgment()
 
 	// プレイヤーがドラゴンの前方にいるか判定
 	return JudgmentUniversal::JudgementTargetInFront(enemy_position, enemy_angle, player_position);
-
-	return false;
 }
 
 //*****************************************
@@ -90,8 +86,6 @@ bool HornAttackJudgment::Judgment()
 
 	// プレイヤーがドラゴンの前方にいるか判定
 	return JudgmentUniversal::JudgementTargetInFront(enemy->GetPosition(), enemy->GetAngle(), player->GetPosition());
-
-	return false;
 }
 
 //*****************************************

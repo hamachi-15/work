@@ -347,7 +347,7 @@ void ActorManager::Render(RenderContext& render_context)
 			shader->Draw(context, model);
 		}
 	}
-	shader->End(context);
+	if(shader) shader->End(context);
 	
 	shader_type = static_cast<ShaderManager::ShaderType>(-1);
 
@@ -363,9 +363,11 @@ void ActorManager::Render(RenderContext& render_context)
 void ActorManager::BrightRender(RenderContext& render_context)
 {
 	Graphics& graphics = Graphics::Instance();
+	ShaderManager& shader_manager = ShaderManager::Instance();
 	ID3D11DeviceContext* context = graphics.GetDeviceContext();
 	// フォンシェーダー取得
-	std::shared_ptr<Shader> phong = ShaderManager::Instance().GetShader(ShaderManager::ShaderType::Phong);
+	std::shared_ptr<Shader> phong = shader_manager.GetShader(ShaderManager::ShaderType::Phong);
+	std::shared_ptr<Shader> Lambert = shader_manager.GetShader(ShaderManager::ShaderType::Lambert);
 	
 	// 描画
 	phong->Begin(context, render_context);
@@ -374,7 +376,8 @@ void ActorManager::BrightRender(RenderContext& render_context)
 		// カリングフラグが立っていれば描画しない
 		if (actor->GetCullingFlag()) continue;
 		
-		if (strcmp(actor->GetName(), "FildeObjects") != 0) continue;
+		if (strcmp(actor->GetName(), "Filde") == 0) continue;
+		//if (strcmp(actor->GetName(), "FildeObjects") != 0) continue;
 		// モデルがあれば描画
 		Model* model = actor->GetModel();
 		if (model != nullptr)
@@ -383,6 +386,22 @@ void ActorManager::BrightRender(RenderContext& render_context)
 		}
 	}
 	phong->End(context);
+	Lambert->Begin(context, render_context);
+	for (std::shared_ptr<Actor>& actor : update_actors)
+	{
+		// カリングフラグが立っていれば描画しない
+		if (actor->GetCullingFlag()) continue;
+
+		if (strcmp(actor->GetName(), "Filde") != 0) continue;
+		// モデルがあれば描画
+		Model* model = actor->GetModel();
+		if (model != nullptr)
+		{
+			Lambert->Draw(context, model);
+		}
+	}
+	Lambert->End(context);
+
 }
 
 //------------------------------
