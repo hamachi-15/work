@@ -150,6 +150,7 @@ void Model::UpdateAnimation(float elapsed_time, bool hitstop_flag)
 					DirectX::XMStoreFloat3(&node.scale, s);
 					DirectX::XMStoreFloat4(&node.rotate, r);
 					DirectX::XMStoreFloat3(&node.translate, t);
+					
 				}
 				// í èÌÇÃåvéZ
 				else

@@ -1,12 +1,14 @@
 #include "Model.h"
 #include "Graphics.h"
-#include "SceneManager.h"
 
 #include "Charactor.h"
+#include "EnemyLAT.h"
+
+#include "SceneManager.h"
 #include "ActorManager.h"
 #include "EnemyManager.h"
-#include "EnemyLAT.h"
 #include "EnemyTerritoryManager.h"
+#include "CollisionManager.h"
 
 #include "BehaviorTree.h"
 #include "BehaviorData.h"
@@ -167,7 +169,7 @@ void EnemyLAT::Start()
 
 		// K”ö‚ÌƒRƒŠƒWƒ‡ƒ“Ý’è
 		DirectX::XMFLOAT3 tail_position;
-		charactor->GetNodePosition("LAT:tai102_M_BK", tail_position, model);
+		Mathf::GetNodePosition("LAT:tai102_M_BK", tail_position, model);
 		std::string name = actor->GetName();
 		name += "Tail";
 		parameter.name = name.c_str();

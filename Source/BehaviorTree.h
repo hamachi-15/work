@@ -16,9 +16,10 @@ public:
 	{
 		Non,
 		Priority,				// 優先順位
+		On_Off,					// ONOFF法
+		On_Off_Ramdom,			// ONOFF法でランダム選択
 		Sequence,				// シーケンス
-		SequentialLooping,		// シーケンシャルルーピング
-		SequentialSkipping,		// シーケンシャルスキッピング
+		Sequential_Looping,		// シーケンシャルルーピング
 		Random					// ランダム
 	};
 public:

@@ -31,7 +31,7 @@
 #include "MessageData.h"
 #include "GameDataBase.h"
 
-#include "Collision.h"
+#include "CollisionManager.h"
 #include "Texture.h"
 #include "Sprite.h"
 #include "MetaAI.h"

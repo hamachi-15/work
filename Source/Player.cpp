@@ -3,6 +3,10 @@
 #include "Camera.h"
 #include "Model.h"
 
+#include "Mathf.h"
+
+#include "CollisionManager.h"
+
 #include "DebugRenderer.h"
 #include "ActorManager.h"
 #include "EnemyManager.h"
@@ -203,7 +207,7 @@ void Player::Start()
 
 		// 左足のコリジョン
 		DirectX::XMFLOAT3 foot_position;
-		charactor->GetNodePosition("B_L_Foot", foot_position, model);
+		Mathf::GetNodePosition("B_L_Foot", foot_position, model);
 		parameter.name = "PlayerLeftFoot";
 		parameter.node_name = "B_L_Foot";
 		parameter.position = foot_position;
@@ -212,7 +216,7 @@ void Player::Start()
 		charactor->SetCollision(actor, parameter, CollisionMeshType::Sphere);
 
 		// 右足のコリジョン
-		charactor->GetNodePosition("B_R_Foot", foot_position, model);
+		Mathf::GetNodePosition("B_R_Foot", foot_position, model);
 		parameter.name = "PlayerRightFoot";
 		parameter.node_name = "B_R_Foot";
 		parameter.position = foot_position;

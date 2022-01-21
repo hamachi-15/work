@@ -41,6 +41,9 @@ ActionBase::State AligningAction::Run(float elapsed_time)
 //------------------------------
 void ScreamAction::Start()
 {
+	// 継続するタイマー設定
+	owner->SetRunTimer(3.0f);
+
 	// アニメーション名設定
 	std::string animation_name = owner->GetName();
 	animation_name += "Scream";
@@ -54,13 +57,22 @@ void ScreamAction::Start()
 //------------------------------
 ActionBase::State ScreamAction::Run(float elapsed_time)
 {
+	// タイマー取得
+	float run_timer = owner->GetRunTimer();
+
+	// タイマー減少
+	run_timer -= elapsed_time;
+
 	// アニメーション再生が終了したら完了を返す
-	if (!owner->GetActor()->GetModel()->IsPlayAnimation())
+	if (!owner->GetActor()->GetModel()->IsPlayAnimation() && run_timer <= 0.0f)
 	{
 		owner->SetRunTimer(0.0f);
 		return ActionBase::State::Complete;
 	}
-	
+
+	// タイマー設定
+	owner->SetRunTimer(run_timer);
+
 	// 継続
 	return ActionBase::State::Run;
 }
@@ -166,7 +178,7 @@ ActionBase::State ClawAttackAction::Run(float elapsed_time)
 	
 	// 攻撃の当たり判定処理
 	std::string collision_name = actor->GetName();
-	collision_name += "Claw";
+	collision_name += "RightWrist";
 	AttackCollision(actor, collision_name.c_str(), collision_time_data);
 
 	// アニメーション再生が終了したら完了を返す
@@ -206,7 +218,7 @@ ActionBase::State HornAttackAction::Run(float elapsed_time)
 
 	// 攻撃の当たり判定処理
 	std::string collision_name = actor->GetName();
-	collision_name += "Horn";
+	collision_name += "Head";
 	AttackCollision(actor, collision_name.c_str(), collision_time_data);
 
 	// アニメーション再生が終了したら完了を返す
@@ -229,8 +241,11 @@ ActionBase::State HornAttackAction::Run(float elapsed_time)
 // -----------------------------
 void BodyPressAttackAction::Start()
 {
+	// 継続するタイマー設定
+	owner->SetRunTimer(2.0f);
+
 	// アニメーション再生
-	owner->PlayAnimation("NightmareDragonDefend");
+	owner->PlayAnimation("NightmareDragonJump");
 
 	// 当たり判定を行う時間のデータを取得
 	collision_time_data = GameDataBase::Instance().GetAttackCollitionTimeData(AttackCategory::BodyPressAttack, EnemyCategory::NightmareDragon);
@@ -246,15 +261,25 @@ ActionBase::State BodyPressAttackAction::Run(float elapsed_time)
 
 	// 攻撃の当たり判定処理
 	std::string collision_name = actor->GetName();
-	AttackCollision(actor, collision_name.c_str(), collision_time_data);
+	AttackCollision(actor, collision_name.c_str(), collision_time_data, CollisionMeshType::Cylinder);
+
+	// タイマー取得
+	float run_timer = owner->GetRunTimer();
+
+	// タイマー減少
+	run_timer -= elapsed_time;
 
 	// アニメーション再生が終了したら完了を返す
-	if (!owner->GetActor()->GetModel()->IsPlayAnimation())
+	if (!owner->GetActor()->GetModel()->IsPlayAnimation() && run_timer <= 0.0f)
 	{
 		owner->SetRunTimer(0.0f);
 		owner->SetAttackFlag(false);
 		return ActionBase::State::Complete;
 	}
+
+	// タイマー設定
+	owner->SetRunTimer(run_timer);
+
 	return ActionBase::State::Run;
 }
 

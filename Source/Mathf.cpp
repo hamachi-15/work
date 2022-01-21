@@ -1,6 +1,7 @@
 #include <stdlib.h>
-#include "Mathf.h"
 #include <DirectXMath.h>
+#include "Mathf.h"
+#include "Model.h"
 //----------------------------------
 // ベクトル算出,XMVECTOR型を返す
 //----------------------------------
@@ -152,5 +153,16 @@ void Mathf::PosiCalculate(DirectX::XMFLOAT3& anser, DirectX::XMFLOAT3& normal, D
     else
     {
         anser.z -= radius.z;
+    }
+}
+// モデルのノード座標取得
+void Mathf::GetNodePosition(const char* node_name, DirectX::XMFLOAT3& node_position, Model* model)
+{
+    Model::Node* node = model->FindNode(node_name);
+    if (node != nullptr)
+    {
+        node_position.x = node->world_transform._41;
+        node_position.y = node->world_transform._42;
+        node_position.z = node->world_transform._43;
     }
 }

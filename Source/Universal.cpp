@@ -43,8 +43,8 @@ bool Universal::JudgementCollisionTime(std::shared_ptr<Actor> actor, std::shared
 	{
 		// 前フレームのコリジョンフラグを代入。コリジョンフラグが変化したタイミングを調べる用
 		charactor->SetOldCollisionTimeFlag(collision_time_flag);
-		return collision_time_flag;
+		return true;
 	}
 
-	return NULL;
+	return false;
 }

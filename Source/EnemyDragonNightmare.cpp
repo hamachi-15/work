@@ -9,10 +9,12 @@
 
 // アクター関連インクルード
 #include "Charactor.h"
+
+// マネージャーインクルード
 #include "ActorManager.h"
 #include "EnemyManager.h"
-
 #include "EnemyTerritoryManager.h"
+#include "CollisionManager.h"
 
 // AI関連インクルード
 #include "NodeBase.h"
@@ -153,14 +155,21 @@ void EnemyDragonNightmare::Start()
 		charactor->SetCollision(actor, parameter, CollisionMeshType::Sphere);
 
 		// 体のコリジョン設定
+		Model::Node* node = model->FindNode("Root");
+		node->translate;
+		DirectX::XMMATRIX world_transform_matrix = DirectX::XMLoadFloat4x4(&node->world_transform);
+		DirectX::XMVECTOR position = DirectX::XMVector3TransformCoord(
+			DirectX::XMLoadFloat3(&parameter.local_position), world_transform_matrix);
+		DirectX::XMStoreFloat3(&parameter.position, position);
 		parameter.name = actor->GetName();
-		parameter.node_name = "";
+		parameter.node_name = "Root";
 		parameter.radius = 20.5f;
-		parameter.height = 26.5f;
+		parameter.height = 34.5f;
 		parameter.weight = 6.5f;
+		parameter.local_position = DirectX::XMFLOAT3(0, 14, 0);
 		parameter.collision_flg = true;
 		parameter.element = CollisionElement::Body;
-		parameter.position_mask = CollisionPositionMask::Collision_Mask_Actor_Position;
+		parameter.position_mask = CollisionPositionMask::Collision_Mask_Castam_poition;
 		charactor->SetCollision(actor, parameter, CollisionMeshType::Cylinder);
 
 	}
@@ -186,29 +195,30 @@ void EnemyDragonNightmare::SetBehaviorNode()
 	{
 		ai_tree->AddNode("",	 "Root",   0, BehaviorTree::SelectRule::Priority,	NULL, NULL);
 		ai_tree->AddNode("Root", "Sleep",  1, BehaviorTree::SelectRule::Non,		NULL, new SleepAction(this));
-
 	} // シーンがバトルシーンの時のノード設定
 	else
 	{
-		ai_tree->AddNode("",	   "Root",			 0,	BehaviorTree::SelectRule::Priority,	 NULL,								NULL);
-		ai_tree->AddNode("Root",   "Death",			 1,	BehaviorTree::SelectRule::Non,		 new DeathJudgment(this),			new DeathAction(this));
-		ai_tree->AddNode("Root",   "Damage",		 2,	BehaviorTree::SelectRule::Non,		 new DamageJudgment(this),			new DamageAction(this));
-		ai_tree->AddNode("Root",   "Battle",		 3,	BehaviorTree::SelectRule::Priority,	 new BattleJudgment(this),			NULL);
-		ai_tree->AddNode("Root",   "Scount",		 4,	BehaviorTree::SelectRule::Priority,	 NULL,								NULL);
-		ai_tree->AddNode("Battle", "Attack",		 1,	BehaviorTree::SelectRule::Priority,	 new AttackJudgment(this),			NULL);
-		ai_tree->AddNode("Battle", "Pursuit",		 2,	BehaviorTree::SelectRule::Non,		 NULL,								new PursuitAction(this));
-		ai_tree->AddNode("Scount", "Idle",			 1,	BehaviorTree::SelectRule::Non,		 NULL,								new IdleAction(this));
-		ai_tree->AddNode("Scount", "Scream",		 2, BehaviorTree::SelectRule::Non,		 NULL, new ScreamAction(this));
-		ai_tree->AddNode("Attack", "BasicAttack",	 1,	BehaviorTree::SelectRule::Non,		 new BasicAttackJudgment(this),		new BasicAttackAction(this));
-		ai_tree->AddNode("Attack", "ClawAttack",	 2,	BehaviorTree::SelectRule::Non,		 new ClawAttackJudgment(this),		new ClawAttackAction(this));
-		ai_tree->AddNode("Attack", "HornAttack",	 3,	BehaviorTree::SelectRule::Non,		 new ClawAttackJudgment(this),		new HornAttackAction(this));
-		ai_tree->AddNode("Attack", "BodyPressAttack", 4, BehaviorTree::SelectRule::Sequence, new BodyPressAttackJudgment(this), NULL);
-		ai_tree->AddNode("Attack", "LungesAttack", 5,	BehaviorTree::SelectRule::Sequence,		 NULL/*new (this)*/, new LungesAttackAction(this));
-		ai_tree->AddNode("LungesAttack", "MoveToTargetSequence", 0, BehaviorTree::SelectRule::Non, new BodyPressAttackJudgment(this), new BodyPressAttackAction(this));
-		ai_tree->AddNode("LungesAttack", "LungesAttackSequence", 0, BehaviorTree::SelectRule::Non, new BodyPressAttackJudgment(this), new LungesAttackAction(this));
-		ai_tree->AddNode("BodyPressAttack", "FarstBodyPressAttack", 0, BehaviorTree::SelectRule::Non, NULL, new BodyPressAttackAction(this));
-		ai_tree->AddNode("BodyPressAttack", "SecondBodyPressAttack", 0, BehaviorTree::SelectRule::Sequence, new RamdamNextStepJudgment(this, 50), new BodyPressAttackAction(this));
-		ai_tree->AddNode("SecondBodyPressAttack", "Scream", 0, BehaviorTree::SelectRule::Non, NULL, new ScreamAction(this));
+		ai_tree->AddNode("",						"Root",					 0,	BehaviorTree::SelectRule::Priority,	 NULL,								NULL);
+		ai_tree->AddNode("Root",					"Death",				 1,	BehaviorTree::SelectRule::Non,		 new DeathJudgment(this),			new DeathAction(this));
+		ai_tree->AddNode("Root",					"Damage",				 2,	BehaviorTree::SelectRule::Non,		 new DamageJudgment(this),			new DamageAction(this));
+		ai_tree->AddNode("Root",					"Battle",				 3,	BehaviorTree::SelectRule::Priority,	 new BattleJudgment(this),			NULL);
+		ai_tree->AddNode("Root",					"Scount",				 4,	BehaviorTree::SelectRule::Priority,	 NULL,								NULL);
+		ai_tree->AddNode("Battle",					"Attack",				 1,	BehaviorTree::SelectRule::On_Off_Ramdom,	 new AttackJudgment(this),			NULL);
+		ai_tree->AddNode("Battle",					"Pursuit",				 2,	BehaviorTree::SelectRule::Non,		 NULL,								new PursuitAction(this));
+		ai_tree->AddNode("Scount",					"Idle",					 1,	BehaviorTree::SelectRule::Non,		 NULL,								new IdleAction(this));
+		ai_tree->AddNode("Scount",					"Scream",				 2, BehaviorTree::SelectRule::Non,		 NULL, new ScreamAction(this));
+		ai_tree->AddNode("Attack",					"BasicAttack",			 1,	BehaviorTree::SelectRule::Non,		 new BasicAttackJudgment(this),		new BasicAttackAction(this));
+		ai_tree->AddNode("Attack",					"ClawAttack",			 2,	BehaviorTree::SelectRule::Non,		 new ClawAttackJudgment(this),		new ClawAttackAction(this));
+		ai_tree->AddNode("Attack",					"HornAttack",			 3,	BehaviorTree::SelectRule::Non,		 new ClawAttackJudgment(this),		new HornAttackAction(this));
+		ai_tree->AddNode("Attack",					"BodyPressAttack",		 4, BehaviorTree::SelectRule::Random, new BodyPressAttackJudgment(this), NULL);
+		//ai_tree->AddNode("Attack",				"LungesAttack",			 5,	BehaviorTree::SelectRule::Sequence,		 NULL/*new (this)*/, new LungesAttackAction(this));
+		ai_tree->AddNode("BodyPressAttack",			"OnceBodyPressAttack",	 1, BehaviorTree::SelectRule::Non, NULL, new BodyPressAttackAction(this));
+		ai_tree->AddNode("BodyPressAttack",			"DoubleBodyPressAttack", 1, BehaviorTree::SelectRule::Sequence, NULL, NULL);
+		ai_tree->AddNode("DoubleBodyPressAttack",	"FarstBodyPressAttack",	 0, BehaviorTree::SelectRule::Non, NULL, new BodyPressAttackAction(this));
+		ai_tree->AddNode("DoubleBodyPressAttack",	"SecondBodyPressAttack", 0, BehaviorTree::SelectRule::Non,NULL, new BodyPressAttackAction(this));
+		ai_tree->AddNode("DoubleBodyPressAttack",	"Scream",				 0, BehaviorTree::SelectRule::Non, NULL, new ScreamAction(this));
+		ai_tree->AddNode("LungesAttack",			"MoveToTargetSequence",	 0, BehaviorTree::SelectRule::Non, new BodyPressAttackJudgment(this), new BodyPressAttackAction(this));
+		ai_tree->AddNode("LungesAttack",			"LungesAttackSequence",	 0, BehaviorTree::SelectRule::Non, new BodyPressAttackJudgment(this), new LungesAttackAction(this));
 	}
 }
 

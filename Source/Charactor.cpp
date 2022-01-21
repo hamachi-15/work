@@ -1,8 +1,9 @@
-#include "Charactor.h"
-#include "Actor.h"
 #include "ImGuiRenderer.h"
+#include "Charactor.h"
 #include "Model.h"
-
+#include "Actor.h"
+#include "CollisionManager.h"
+#include "Telegram.h"
 //-----------------------------------------
 // ダメージを与える
 //-----------------------------------------
@@ -54,16 +55,16 @@ void Charactor::OnGUI()
 //-----------------------------------------
 // ノード座標を取得
 //-----------------------------------------
-void Charactor::GetNodePosition(const char* node_name, DirectX::XMFLOAT3& node_position, Model* model)
-{
-	Model::Node* node = model->FindNode(node_name);
-	if (node != nullptr)
-	{
-		node_position.x = node->world_transform._41;
-		node_position.y = node->world_transform._42;
-		node_position.z = node->world_transform._43;
-	}
-}
+//void Charactor::GetNodePosition(const char* node_name, DirectX::XMFLOAT3& node_position, Model* model)
+//{
+//	Model::Node* node = model->FindNode(node_name);
+//	if (node != nullptr)
+//	{
+//		node_position.x = node->world_transform._41;
+//		node_position.y = node->world_transform._42;
+//		node_position.z = node->world_transform._43;
+//	}
+//}
 
 //-----------------------------------------
 // コリジョンの登録
@@ -85,7 +86,7 @@ void Charactor::SetCollision(std::shared_ptr<Actor> actor, CollisionParameter& c
 			cylinder->SetHeight(collision_parameter.height);
 			cylinder->SetWeight(collision_parameter.weight);
 			cylinder->SetActorID(collision_parameter.actor_id);
-			cylinder->SetCollisionFlag(collision_parameter.collision_flg);			
+			cylinder->SetCollisionFlag(collision_parameter.collision_flg);
 			cylinder->SetCollisionElement(collision_parameter.element);
 			cylinder->SetPositionMask(collision_parameter.position_mask);
 			// マネージャーに追加

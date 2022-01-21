@@ -1,6 +1,9 @@
 #pragma once
 #include <DirectXMath.h>
 
+// 前方宣言
+class Model;
+
 /// <summary>
 /// 計算関数クラス
 /// </summary>
@@ -36,4 +39,7 @@ public:
 	
 	// 平面からの最遠値算出
 	static void PosiCalculate(DirectX::XMFLOAT3& anser, DirectX::XMFLOAT3& normal, DirectX::XMFLOAT3& radius);
+
+	// モデルのノード座標取得
+	static void GetNodePosition(const char* node_name, DirectX::XMFLOAT3& node_position, Model* model);
 };

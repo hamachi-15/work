@@ -99,7 +99,7 @@ bool HornAttackJudgment::Judgment()
 bool BodyPressAttackJudgment::Judgment()
 {
 	// 怒り状態じゃなければfalseを返す
-	if (!owner->GetAngerFlag()) return false;
+	//if (!owner->GetAngerFlag()) return false;
 
 	// プレイヤーとドラゴンのアクターを取得
 	std::shared_ptr<Actor> player = ActorManager::Instance().GetActor("Player");

@@ -17,6 +17,16 @@ void BehaviorData::Init()
         sequence_stack.pop();
     }
 }
+//-------------------------------------
+// 使用済みノードのリセット
+//-------------------------------------
+void BehaviorData::ResetNodeUsed(std::vector<NodeBase*>* reset_hierachy)
+{
+    for (auto itr = reset_hierachy->begin(); itr != reset_hierachy->end(); itr++)
+    {
+        used_node_map[(*itr)->GetName()] = false;
+    }
+}
 
 //-------------------------------------
 // シーケンスノードのポップ
@@ -35,6 +45,28 @@ NodeBase* BehaviorData::PopSequenceNode()
         sequence_stack.pop();
     }
     return node;
+}
+
+//--------------------------
+// ノード使用判定
+//--------------------------
+bool BehaviorData::IsNodeUsed(std::string name)
+{
+    // 使用してなかったらfalse
+    if (used_node_map.count(name) == 0)
+    {
+        return false;
+    }
+
+    return used_node_map[name];
+}
+
+//-------------------------------------
+// 使用済みノードに登録
+//-------------------------------------
+void BehaviorData::EntryUsedNode(std::string name)
+{
+    used_node_map[name] = true;
 }
 
 //-------------------------------------

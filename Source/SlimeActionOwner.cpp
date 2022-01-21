@@ -4,6 +4,8 @@
 #include "Charactor.h"
 #include "Model.h"
 
+#include "CollisionManager.h"
+
 #include "Universal.h"
 
 //***********************************

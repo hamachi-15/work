@@ -36,12 +36,12 @@ void Enemy::BehaviorUpdate(float elapsed_time)
 	if (active_node != nullptr && active_node != old_active_node)
 	{
 		ai_tree->Start(active_node);
+		old_active_node = active_node;
 	}
 	if (active_node != nullptr)
 	{
 		active_node = ai_tree->Run(this, active_node, behavior_data, elapsed_time);
 	}
-	old_active_node = active_node;
 }
 
 //-----------------------------------------

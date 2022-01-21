@@ -1,10 +1,12 @@
 #include "JudgmentOwner.h"
-#include "ActorManager.h"
 #include "Enemy.h"
 #include "Charactor.h"
 #include "Telegram.h"
 #include "MetaAI.h"
 #include "Mathf.h"
+
+#include "ActorManager.h"
+#include "CollisionManager.h"
 
 //***********************************
 // 

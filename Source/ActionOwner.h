@@ -1,6 +1,21 @@
 #pragma once
 #include "ActionBase.h"
+//*****************************
+// 
+// 特定位置へ移動
+// 
+//*****************************
+class MoveToTargetAction : public ActionBase
+{
+public:
+	MoveToTargetAction(Enemy* enemy) : ActionBase(enemy) {}
 
+	// 実行前処理
+	void Start() override;
+
+	// 実行処理
+	ActionBase::State Run(float elapsed_time) override;
+};
 //*****************************
 // 
 // 徘徊行動

@@ -1,5 +1,5 @@
 #include "ActionBase.h"
-#include "Collision.h"
+#include "CollisionManager.h"
 #include "Enemy.h"
 #include "EnemyManager.h"
 #include "GameDatabase.h"
@@ -23,13 +23,14 @@ void ActionBase::AttackCollision(std::shared_ptr<Actor> actor,
 	// コリジョンマネージャー取得
 	CollisionManager& collision_manager = CollisionManager::Instance();
 
+	std::shared_ptr<Charactor> charactor = actor->GetComponent<Charactor>();
+
 	// 当たり判定を行う時間かの判定
-	bool collision_time_flag = Universal::JudgementCollisionTime(actor, collision_time_data);
 
 	// 1フレーム前からコリジョンフラグが変化していたら
-	if (collision_time_flag != NULL)
+	if (Universal::JudgementCollisionTime(actor, collision_time_data))
 	{
-		std::shared_ptr<CollisionSphere> collision;
+		std::shared_ptr<CollisionObject> collision;
 		switch (collision_type)
 		{
 		case CollisionMeshType::Sphere:
@@ -38,12 +39,12 @@ void ActionBase::AttackCollision(std::shared_ptr<Actor> actor,
 			break;
 		case CollisionMeshType::Cylinder:
 			// コリジョンのあたり判定のオンオフを切り替える
-			collision = collision_manager.GetCollisionSphereFromName(collision_name);
+			collision = collision_manager.GetCollisionCylinderFromName(collision_name);
 			break;
 		}
 
 		// 当たり判定を行うフラグを変化させる
-		collision->SetCollisionFlag(collision_time_flag);
+		collision->SetCollisionFlag(charactor->GetOldCollisionTimeFlag());
 	}
 }
 

@@ -4,11 +4,13 @@
 #include "SceneManager.h"
 #include "Telegram.h"
 
-#include "ActorManager.h"
-#include "Charactor.h"
 #include "EnemySlime.h"
+#include "Charactor.h"
+
+#include "ActorManager.h"
 #include "EnemyManager.h"
 #include "EnemyTerritoryManager.h"
+#include "CollisionManager.h"
 
 #include "NodeBase.h"
 #include "BehaviorTree.h"
@@ -104,7 +106,7 @@ void EnemySlime::Start()
 		charactor->SetCollision(actor, parameter, CollisionMeshType::Cylinder);
 
 		// “ª“Ë‚«‚ÌƒRƒŠƒWƒ‡ƒ“Ý’è
-		charactor->GetNodePosition("BottomEyeCover", head_position, model);
+		Mathf::GetNodePosition("BottomEyeCover", head_position, model);
 		haed_collision_name = actor->GetName();
 		haed_collision_name += "Head";
 		parameter.name = haed_collision_name.c_str();

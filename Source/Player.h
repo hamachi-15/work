@@ -3,7 +3,6 @@
 #include "Input.h"
 #include "Component.h"
 #include "Charactor.h"
-#include "Collision.h"
 #include "Movement.h"
 
 class Player : public Component

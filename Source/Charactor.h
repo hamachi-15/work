@@ -1,6 +1,8 @@
 #pragma once
 #include "Component.h"
-#include "Collision.h"
+#include "CollisionDataHeader.h"
+
+class Telegram;
 
 //**************************************
 //
@@ -95,7 +97,7 @@ public:
 	float GetHitStopTimer() const { return hitstop_timer; }
 
 	// ƒm[ƒhÀ•W‚ğæ“¾
-	void GetNodePosition(const char* node_name, DirectX::XMFLOAT3& node_position, Model* model);
+	//void GetNodePosition(const char* node_name, DirectX::XMFLOAT3& node_position, Model* model);
 
 	// ¯•Ê”Ô†æ“¾
 	int GetID() const { return id; }

@@ -2,7 +2,6 @@
 #include "Model.h"
 
 #include "Graphics.h"
-#include "SceneManager.h"
 
 #include "NodeBase.h"
 #include "BehaviorData.h"
@@ -15,10 +14,13 @@
 #include "DebugRenderer.h"
 
 #include "Charactor.h"
+#include "EnemyPLT.h"
+
+#include "SceneManager.h"
 #include "ActorManager.h"
 #include "EnemyManager.h"
-#include "EnemyPLT.h"
 #include "EnemyTerritoryManager.h"
+#include "CollisionManager.h"
 
 //**********************************
 // 

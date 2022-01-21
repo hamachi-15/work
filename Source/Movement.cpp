@@ -2,9 +2,9 @@
 #include <imgui.h>
 #include "Mathf.h"
 #include "Movement.h"
-#include "ActorManager.h"
 #include "Player.h"
-
+#include "ActorManager.h"
+#include "CollisionManager.h"
 //----------------------------
 // コンストラクタ
 //----------------------------

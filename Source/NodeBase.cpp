@@ -4,13 +4,18 @@
 #include "Enemy.h"
 #include "BehaviorData.h"
 #include "ActionBase.h"
+#include "Mathf.h"
 // TODO コメント
+// デストラクタ
 NodeBase::~NodeBase()
 {
 	delete judgment;
 	delete action;
 }
 
+//--------------------------
+// 子ノード取得
+//--------------------------
 NodeBase* NodeBase::GetChild(int index)
 {
 	if (children.size() > index)
@@ -19,6 +24,9 @@ NodeBase* NodeBase::GetChild(int index)
 	return children.at(index);
 }
 
+//--------------------------
+// 子ノード取得(末尾)
+//--------------------------
 NodeBase* NodeBase::GetLastChild()
 {
 	if (children.size() == 0)
@@ -27,6 +35,9 @@ NodeBase* NodeBase::GetLastChild()
 	return children.at(children.size() - 1);
 }
 
+//--------------------------
+// 子ノード取得(先頭)
+//--------------------------
 NodeBase* NodeBase::GetTopChild()
 {
 	if (children.size() == 0)
@@ -35,6 +46,9 @@ NodeBase* NodeBase::GetTopChild()
 	return children.at(0);
 }
 
+//--------------------------
+// 実行可否処理
+//--------------------------
 bool NodeBase::Judgment()
 {
 	if (judgment != NULL)
@@ -45,6 +59,9 @@ bool NodeBase::Judgment()
 	return true;
 }
 
+//--------------------------
+// 優先順位選択
+//--------------------------
 NodeBase* NodeBase::SelectPriority(std::vector<NodeBase*>* list)
 {
 	NodeBase* select_node = NULL;
@@ -72,6 +89,52 @@ NodeBase* NodeBase::SelectRandom(std::vector<NodeBase*>* list)
 }
 
 //--------------------------
+// オン・オフ選択
+//--------------------------
+NodeBase* NodeBase::SelectOnOff(std::vector<NodeBase*>* list, BehaviorData* data)
+{
+	std::vector<NodeBase*> off_list;
+
+	// 使用済みノードリストをリストアップする
+	for (auto itr = list->begin(); itr != list->end(); itr++)
+	{
+		// 使用していないノードなら
+		if (data->IsNodeUsed((*itr)->GetName()) == false)
+		{	// リストに追加
+			off_list.push_back(*itr);
+		}
+	}
+
+	// リストアップした数をチェック
+	if (off_list.size() == 0)
+	{
+		// ノードを全てリセット
+		data->ResetNodeUsed(&children);
+		off_list = *list;
+	}
+
+	// セレクトルールがオン・オフランダムの時
+	if (select_rule == BehaviorTree::SelectRule::On_Off_Ramdom)
+	{
+		int index = static_cast<float>(Mathf::RandomRange(0, off_list.size()));
+		// 使用したノードを登録
+		data->EntryUsedNode(off_list[index]->GetName());
+
+		// ランダムに決めたインデックスのノードが決定ノード
+		return off_list[index];
+	}
+	else
+	{
+		// 使用したノードを登録
+		data->EntryUsedNode(off_list[0]->GetName());
+
+		// リストの先頭が決定ノード
+		return off_list[0];
+	}
+}
+
+//--------------------------
+// シーケンス選択
 //--------------------------
 NodeBase* NodeBase::SelectSequence(std::vector<NodeBase*>* list, BehaviorData* data)
 {
@@ -80,7 +143,7 @@ NodeBase* NodeBase::SelectSequence(std::vector<NodeBase*>* list, BehaviorData* d
 	if (step >= children.size())
 	{
 		// シーケンスループに設定されていなければNULLを返す
-		if (select_rule != BehaviorTree::SelectRule::SequentialLooping)
+		if (select_rule != BehaviorTree::SelectRule::Sequential_Looping)
 		{
 			return NULL;
 		}
@@ -90,42 +153,22 @@ NodeBase* NodeBase::SelectSequence(std::vector<NodeBase*>* list, BehaviorData* d
 		}
 	}
 
-	if (select_rule == BehaviorTree::SelectRule::SequentialSkipping)
+	for (auto itr = list->begin(); itr != list->end(); itr++)
 	{
-		// 推論ではじかれたノードは飛ばす
-		for (auto itr = list->begin(); itr != list->end(); itr++)
+		if (children.at(step)->GetName() == (*itr)->GetName())
 		{
-			int children_size = children.size();
-			// 子ノードをたどって選ばれたノードを探す
-			for (int i = 0; i < children_size; ++i)
-			{
-				// 見つかったらそこまでステップを飛ばす
-				if (children.at(i)->GetName() == (*itr)->GetName())
-				{
-					step = i;
-					data->PushSequenceNode(this);
-					data->SetSequenceStep(GetName(), step);
-					return children.at(step);
-				}
-			}
+			data->PushSequenceNode(this);
+			data->SetSequenceStep(GetName(), step + 1);
+			return children.at(step);
 		}
-	}
-	else
-	{
-		for (auto itr = list->begin(); itr != list->end(); itr++)
-		{
-			if (children.at(step)->GetName() == (*itr)->GetName())
-			{
-				data->PushSequenceNode(this);
-				data->SetSequenceStep(GetName(), step + 1);
-				return children.at(step);
-			}
 
-		}
 	}
 	return NULL;
 }
 
+//--------------------------
+// ノード検索
+//--------------------------
 NodeBase* NodeBase::SearchNode(std::string search_name)
 {
 	// 名前が一致
@@ -149,7 +192,9 @@ NodeBase* NodeBase::SearchNode(std::string search_name)
 	return NULL;
 }
 
-
+//--------------------------
+// ノード推論
+//--------------------------
 NodeBase* NodeBase::Inference(Enemy* enemy, BehaviorData* data)
 {
 	std::vector<NodeBase*> list;
@@ -181,10 +226,14 @@ NodeBase* NodeBase::Inference(Enemy* enemy, BehaviorData* data)
 	case BehaviorTree::SelectRule::Random:
 		result = SelectRandom(&list);
 		break;
+		// オン・オフ
+	case BehaviorTree::SelectRule::On_Off:
+	case BehaviorTree::SelectRule::On_Off_Ramdom:
+		result = SelectOnOff(&list, data);
+		break;
 		// シーケンス
 	case BehaviorTree::SelectRule::Sequence:
-	case BehaviorTree::SelectRule::SequentialLooping:
-	case BehaviorTree::SelectRule::SequentialSkipping:
+	case BehaviorTree::SelectRule::Sequential_Looping:
 		result = SelectSequence(&list, data);
 		break;
 	}
@@ -204,12 +253,18 @@ NodeBase* NodeBase::Inference(Enemy* enemy, BehaviorData* data)
 
 	return result;
 }
+
+//--------------------------
 // 実行前処理
+//--------------------------
 void NodeBase::Start()
 {
 	action->Start();
 }
 
+//--------------------------
+// 実行処理
+//--------------------------
 ActionBase::State NodeBase::Run(float elapsed_time)
 {
 	// アクションノードがあれば実行して結果を返す、なければ失敗扱い

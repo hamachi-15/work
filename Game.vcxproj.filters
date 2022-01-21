@@ -441,6 +441,9 @@
     <ClCompile Include="Source\ActionBase.cpp">
       <Filter>ソース ファイル\AI</Filter>
     </ClCompile>
+    <ClCompile Include="Source\CollisionManager.cpp">
+      <Filter>ソース ファイル\System</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\imgui\imconfig.h">
@@ -802,6 +805,12 @@
     </ClInclude>
     <ClInclude Include="Source\GameData\EnemyTerritoryPosition.h">
       <Filter>ソース ファイル\GameData</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\CollisionManager.h">
+      <Filter>ソース ファイル\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\CollisionDataHeader.h">
+      <Filter>ソース ファイル\System</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

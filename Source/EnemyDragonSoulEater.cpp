@@ -1,9 +1,11 @@
-#include "SceneManager.h"
 
 #include "Charactor.h"
+#include "EnemyDragonSoulEater.h"
+
+#include "SceneManager.h"
 #include "ActorManager.h"
 #include "EnemyManager.h"
-#include "EnemyDragonSoulEater.h"
+#include "CollisionManager.h"
 
 #include "BehaviorTree.h"
 #include "BehaviorData.h"

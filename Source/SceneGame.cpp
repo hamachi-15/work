@@ -21,7 +21,7 @@
 #include "EnemySlime.h"
 #include "Stage.h"
 #include "Movement.h"
-#include "Collision.h"
+#include "CollisionManager.h"
 
 
 #include "CascadeShadowMapShader.h"
