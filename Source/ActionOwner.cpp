@@ -20,6 +20,14 @@
 //----------------------------
 void MoveToTargetAction::Start()
 {
+	std::string owner_name = owner->GetName();
+	owner_name += "Run";
+
+	// アニメーション再生
+	owner->PlayAnimation(owner_name.c_str());
+
+	// 目標地点を設定
+	owner->SetTargetPosition(target_position);
 }
 
 //----------------------------
@@ -27,7 +35,21 @@ void MoveToTargetAction::Start()
 //----------------------------
 ActionBase::State MoveToTargetAction::Run(float elapsed_time)
 {
-	return ActionBase::State();
+	// アクター取得
+	std::shared_ptr<Actor> owner_actor = owner->GetActor();
+
+	// 目的地へ着いたかの判定処理
+	if (JedgmentToTargetPosition(owner->GetTargetPosition(), owner_actor->GetPosition(), owner_actor->GetName()))
+	{
+		// ついたら終了
+		return ActionBase::State::Complete;
+	}
+
+	// 目的地点へ移動
+	owner->MoveToTarget(elapsed_time, 1.5f);
+
+	// 実行中
+	return ActionBase::State::Run;
 }
 
 //***********************************

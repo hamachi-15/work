@@ -8,13 +8,15 @@
 class MoveToTargetAction : public ActionBase
 {
 public:
-	MoveToTargetAction(Enemy* enemy) : ActionBase(enemy) {}
+	MoveToTargetAction(Enemy* enemy, DirectX::XMFLOAT3& target_position) : ActionBase(enemy), target_position(target_position) {}
 
 	// Às‘Oˆ—
 	void Start() override;
 
 	// Àsˆ—
 	ActionBase::State Run(float elapsed_time) override;
+private:
+	DirectX::XMFLOAT3 target_position = {};
 };
 //*****************************
 // 

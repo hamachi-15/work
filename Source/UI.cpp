@@ -1,56 +1,39 @@
 #include "UI.h"
-#include "Graphics.h"
-#include "Sprite.h"
-#include "Texture.h"
-#include "ResourceManager.h"
-#include "ShaderManager.h"
+#include "UIActionBase.h"
+#include "UINodeTree.h"
 
 //-----------------------------------------------
 // コンストラクタ
 //-----------------------------------------------
-UI::UI(const UIParameter& parameter)
-{
-	// パラメータ設定
-	SetParameter(parameter);
-}
+//UI::UI(const UIParameter& parameter)
+//{
+//	// パラメータ設定
+//	SetParameter(parameter);
+//}
 
 //-----------------------------------------------
 // デストラクタ
 //-----------------------------------------------
 UI::~UI()
 {
+	delete ui_node_tree;
 }
 
 //-----------------------------------------------
-// パラメータ設定
+// 更新処理
 //-----------------------------------------------
-void UI::SetParameter(const UIParameter& parameter)
+void UI::Update(float elapsed_time)
 {
-	SetTexture(parameter.filename);
-	if (parameter.parent != nullptr)
-	{
-		DirectX::XMFLOAT2 position;
-		position.x = parameter.parent->position.x + parameter.position.x;
-		position.y = parameter.parent->position.y + parameter.position.y;
-		SetPosition(position);
-	}
-	else
-	{
-		SetPosition(parameter.position);
-	}
-	SetParent(parameter.parent);
-	SetName(parameter.name);
-	SetAngle(parameter.angle);
-	SetSize({(float)GetTexture()->GetWidth(), (float)GetTexture()->GetHeight()});
+	// 更新処理
+	ui_node_tree->Run(elapsed_time);
 }
 
 //-----------------------------------------------
-// テクスチャ設定
+// 更新処理
 //-----------------------------------------------
-void UI::SetTexture(const char* filename)
+void UI::Render(ID3D11DeviceContext* context)
 {
-	// テクスチャ読み込み
-	texture = ResourceManager::Instance().LoadTexture(filename);
+	ui_node_tree->Render(context);
 }
 
 //-----------------------------------------------
@@ -93,88 +76,3 @@ DirectX::XMFLOAT2 UI::ScreenPositionOfWorldPosition(ID3D11DeviceContext* context
 	//return screen_pos;
 	return { 0,0 };
 }
-
-//--------------------------------
-// コンストラクタ
-//--------------------------------
-UIManager::UIManager()
-{
-}
-
-//--------------------------------
-// デストラクタ
-//--------------------------------
-UIManager::~UIManager()
-{
-}
-
-//------------------------------
-// 更新処理
-//------------------------------
-void UIManager::Update(float elapsed_time)
-{
-	// 破棄行列に登録されていれば破棄させる
-	for (std::shared_ptr<UI> ui : remove)
-	{
-		std::vector<std::shared_ptr<UI>>::iterator remove = std::find(ui_list.begin(), ui_list.end(), ui);
-		ui_list.erase(remove);
-	}
-	std::vector<std::shared_ptr<UI>>::iterator iterate_remove = remove.begin();
-	for (; iterate_remove != remove.end(); iterate_remove = remove.begin())
-	{
-		remove.erase(iterate_remove);
-	}
-
-	// 更新処理
-	for (std::shared_ptr<UI> ui : ui_list)
-	{
-		ui->Update(elapsed_time);
-	}
-}
-
-//------------------------------
-// 描画処理
-//------------------------------
-void UIManager::Draw(ID3D11DeviceContext* context)
-{
-	ShaderManager& shader_manager = ShaderManager::Instance();
-	std::shared_ptr<Shader> sprite_shader = shader_manager.GetShader(ShaderManager::ShaderType::Sprite);
-	
-	sprite_shader->Begin(context);
-	Sprite sprite;
-	for (std::shared_ptr<UI> ui : ui_list)
-	{
-		DirectX::XMFLOAT2 position = ui->GetPosition();
-		DirectX::XMFLOAT2 size = ui->GetSize();
-		Texture* texture = ui->GetTexture();
-		sprite.Render(context, texture,
-			position.x,position.y,
-			size.x, size.y, 
-			0, 0,
-			size.x, size.y);
-	}
-	sprite_shader->End(context);
-}
-
-//------------------------------
-// UI登録
-//------------------------------
-void UIManager::RegisterUI(std::shared_ptr<UI> ui)
-{
-	ui_list.emplace_back(ui);
-}
-
-//------------------------------
-// UI削除
-//------------------------------
-void UIManager::UnRegisterUI(std::shared_ptr<UI> ui)
-{
-	remove.emplace_back(ui);
-
-	// 親が設定されていれば行列に設定
-	if (ui->GetParent()) 
-	{
-		remove.emplace_back(ui->GetParent());
-	}
-}
-

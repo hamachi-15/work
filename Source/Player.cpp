@@ -10,6 +10,7 @@
 #include "DebugRenderer.h"
 #include "ActorManager.h"
 #include "EnemyManager.h"
+#include "UIManager.h"
 
 #include "GameDatabase.h"
 #include "AttackCategory.h"
@@ -18,9 +19,7 @@
 #include "MessageData.h"
 #include "Messenger.h"
 
-#include "PlayerUIHealthFrame.h"
 #include "PlayerUIHealth.h"
-#include "PlayerUIRedHealth.h"
 // プレイヤーの攻撃が当たった時にヒットストップを掛けるo
 // TODO プレイヤーの攻撃時にすこし移動できるようにする？
 //-----------------------------------------
@@ -97,67 +96,70 @@ void Player::Start()
 
 	// 走った時のスピード倍率設定
 	charactor->SetRunSpeedScale(1.5f);
-	UIParameter parameter;
 
-	parameter.filename = "Data/Sprite/UIAseet/KP_clusterUI_v100/hp_gauge/gauge_frame.png";
-	parameter.name = "HealthGaugeFrame";
-	parameter.position = {10, 5};
-	std::shared_ptr<PlayerUIHealthFrame> health_gage_freame = std::make_shared<PlayerUIHealthFrame>(parameter);
-	
+	std::shared_ptr<PlayerHealthGage> health = std::make_shared<PlayerHealthGage>();
+
+	//UIParameter parameter;
+
+	//parameter.filename = "Data/Sprite/UIAseet/KP_clusterUI_v100/hp_gauge/gauge_frame.png";
+	//parameter.name = "HealthGaugeFrame";
+	//parameter.position = {10, 5};
+	//std::shared_ptr<PlayerUIHealthFrame> health_gage_freame = std::make_shared<PlayerUIHealthFrame>(parameter);
 	//
-	parameter.filename = "Data/Sprite/UIAseet/KP_clusterUI_v100/hp_gauge/gauge_base.png";
-	parameter.name = "HealthGaugeBase";
-	parameter.position = {12, 1};
-	parameter.parent = health_gage_freame;
-	std::shared_ptr<PlayerUIHealthFrame> health_gage_base = std::make_shared<PlayerUIHealthFrame>(parameter);
+	////
+	//parameter.filename = "Data/Sprite/UIAseet/KP_clusterUI_v100/hp_gauge/gauge_base.png";
+	//parameter.name = "HealthGaugeBase";
+	//parameter.position = {12, 1};
+	//parameter.parent = health_gage_freame;
+	//std::shared_ptr<PlayerUIHealthFrame> health_gage_base = std::make_shared<PlayerUIHealthFrame>(parameter);
 
-	// 
-	parameter.filename = "Data/Sprite/UIAseet/KP_clusterUI_v100/hp_gauge/gauge_bl.png";
-	parameter.name = "HealthGauge";
-	parameter.position = {1, 1};
-	parameter.parent = health_gage_base;
-	std::shared_ptr<PlayerHealth> health_gage = std::make_shared<PlayerHealth>(parameter);
-	health_gage->SetCharactor(charactor);
-	
-	// Hpゲージの減少幅を示すゲージ
-	parameter.filename = "Data/Sprite/UIAseet/KP_clusterUI_v100/hp_gauge/gauge_rd.png";
-	parameter.name = "HealthSubtructGauge";
-	parameter.position = { 0, 0 };
-	parameter.parent = health_gage;
-	std::shared_ptr<PlayerUIRedHealth> health_red_gage = std::make_shared<PlayerUIRedHealth>(parameter);
-	health_red_gage->SetCharactor(charactor);
-	
-	// UIマネージャーに登録
-	UIManager::Instance().RegisterUI(health_gage_base);
-	UIManager::Instance().RegisterUI(health_red_gage);
-	UIManager::Instance().RegisterUI(health_gage);
-	UIManager::Instance().RegisterUI(health_gage_freame);
-
-	// 特殊ゲージ設定
-	parameter.filename = "Data/Sprite/UIAseet/KP_clusterUI_v100/hp_gauge/gauge_frame.png";
-	parameter.name = "GaugeFrame";
-	parameter.position = { 10, 55 };
-	parameter.parent = nullptr;
-	std::shared_ptr<PlayerUIHealthFrame> gage_freame = std::make_shared<PlayerUIHealthFrame>(parameter);
-
+	//// 
+	//parameter.filename = "Data/Sprite/UIAseet/KP_clusterUI_v100/hp_gauge/gauge_bl.png";
+	//parameter.name = "HealthGauge";
+	//parameter.position = {1, 1};
+	//parameter.parent = health_gage_base;
+	//std::shared_ptr<PlayerHealth> health_gage = std::make_shared<PlayerHealth>(parameter);
+	//health_gage->SetCharactor(charactor);
 	//
-	parameter.filename = "Data/Sprite/UIAseet/KP_clusterUI_v100/hp_gauge/gauge_base.png";
-	parameter.name = "HealthGaugeBase";
-	parameter.position = { 12, 1 };
-	parameter.parent = gage_freame;
-	std::shared_ptr<PlayerUIHealthFrame> gage_base = std::make_shared<PlayerUIHealthFrame>(parameter);
-	
-	parameter.filename = "Data/Sprite/UIAseet/KP_clusterUI_v100/hp_gauge/gauge_yl.png";
-	parameter.name = "Gauge";
-	parameter.position = { 1, 1 };
-	parameter.parent = gage_base;
-	std::shared_ptr<PlayerHealth> gage = std::make_shared<PlayerHealth>(parameter);
-	gage->SetCharactor(charactor);
-
+	//// Hpゲージの減少幅を示すゲージ
+	//parameter.filename = "Data/Sprite/UIAseet/KP_clusterUI_v100/hp_gauge/gauge_rd.png";
+	//parameter.name = "HealthSubtructGauge";
+	//parameter.position = { 0, 0 };
+	//parameter.parent = health_gage;
+	//std::shared_ptr<PlayerUIRedHealth> health_red_gage = std::make_shared<PlayerUIRedHealth>(parameter);
+	//health_red_gage->SetCharactor(charactor);
+	//
 	// UIマネージャーに登録
-	UIManager::Instance().RegisterUI(gage_base);
-	UIManager::Instance().RegisterUI(gage);
-	UIManager::Instance().RegisterUI(gage_freame);
+	UIManager::Instance().RegisterUI(health);
+	//UIManager::Instance().RegisterUI(health_red_gage);
+	//UIManager::Instance().RegisterUI(health_gage);
+	//UIManager::Instance().RegisterUI(health_gage_freame);
+
+	//// 特殊ゲージ設定
+	//parameter.filename = "Data/Sprite/UIAseet/KP_clusterUI_v100/hp_gauge/gauge_frame.png";
+	//parameter.name = "GaugeFrame";
+	//parameter.position = { 10, 55 };
+	//parameter.parent = nullptr;
+	//std::shared_ptr<PlayerUIHealthFrame> gage_freame = std::make_shared<PlayerUIHealthFrame>(parameter);
+
+	////
+	//parameter.filename = "Data/Sprite/UIAseet/KP_clusterUI_v100/hp_gauge/gauge_base.png";
+	//parameter.name = "HealthGaugeBase";
+	//parameter.position = { 12, 1 };
+	//parameter.parent = gage_freame;
+	//std::shared_ptr<PlayerUIHealthFrame> gage_base = std::make_shared<PlayerUIHealthFrame>(parameter);
+	//
+	//parameter.filename = "Data/Sprite/UIAseet/KP_clusterUI_v100/hp_gauge/gauge_yl.png";
+	//parameter.name = "Gauge";
+	//parameter.position = { 1, 1 };
+	//parameter.parent = gage_base;
+	//std::shared_ptr<PlayerHealth> gage = std::make_shared<PlayerHealth>(parameter);
+	//gage->SetCharactor(charactor);
+
+	//// UIマネージャーに登録
+	//UIManager::Instance().RegisterUI(gage_base);
+	//UIManager::Instance().RegisterUI(gage);
+	//UIManager::Instance().RegisterUI(gage_freame);
 
 	// コリジョンの登録
 	{

@@ -15,13 +15,17 @@
 #include "Input.h"
 
 #include "ActorManager.h"
-#include "Actor.h"
 #include "EnemyManager.h"
+#include "CollisionManager.h"
+#include "ShaderManager.h"
+#include "UIManager.h"
+#include "EnemyTerritoryManager.h"
+
+#include "Actor.h"
 #include "Player.h"
 #include "EnemySlime.h"
 #include "Stage.h"
 #include "Movement.h"
-#include "CollisionManager.h"
 
 
 #include "CascadeShadowMapShader.h"
@@ -29,17 +33,14 @@
 #include "BloomShader.h"
 #include "PhongShader.h"
 #include "2DPrimitive.h"
-#include "ShaderManager.h"
 
 #include "MenuSystem.h"
 #include "Messenger.h"
 #include "MessageData.h"
-#include "UI.h"
 #include "MetaAI.h"
 #include "Texture.h"
 #include "Sprite.h"
 
-#include "EnemyTerritoryManager.h"
 SceneGame::SceneGame()
 {
 	

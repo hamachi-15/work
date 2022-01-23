@@ -227,20 +227,6 @@ void Movement::UpdateVerticalMove(float elapsed_time)
 		position.y += my;
 		actor->SetPosition(position);
 	}
-
-		// ’n–Ê‚ÌŒü‚«‚É‰ˆ‚¤‚æ‚¤‚ÉXZŽ²‰ñ“]
-	{
-		// YŽ²‚ª–@üƒxƒNƒgƒ‹•ûŒü‚ÉŒü‚­ƒIƒCƒ‰[Šp‰ñ“]‚ðŽZo‚·‚é
-		//float ax = atan2f(normal.z, normal.y);
-		//float az = -atan2f(normal.x, normal.y);
-
-		//// üŒ`•âŠ®‚ÅŠŠ‚ç‚©‚É‰ñ“]‚·‚é
-		//DirectX::XMFLOAT3 angle = actor->GetAngle();
-		//angle.x = Mathf::Lerp(angle.x, ax, 0.2f);
-		//angle.z = Mathf::Lerp(angle.z, az, 0.2f);
-		//actor->SetAngle(angle);
-	}
-
 }
 
 //----------------------------

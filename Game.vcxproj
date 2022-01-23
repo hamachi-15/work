@@ -276,9 +276,8 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Source\Player.cpp" />
+    <ClCompile Include="Source\PlayerUIAction.cpp" />
     <ClCompile Include="Source\PlayerUIHealth.cpp" />
-    <ClCompile Include="Source\PlayerUIHealthFrame.cpp" />
-    <ClCompile Include="Source\PlayerUIRedHealth.cpp" />
     <ClCompile Include="Source\PLTActionOwner.cpp" />
     <ClCompile Include="Source\PLTJudgmentOwner.cpp" />
     <ClCompile Include="Source\ResourceManager.cpp" />
@@ -309,6 +308,10 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Source\UI.cpp" />
+    <ClCompile Include="Source\UIData.cpp" />
+    <ClCompile Include="Source\UIManager.cpp" />
+    <ClCompile Include="Source\UINodeBase.cpp" />
+    <ClCompile Include="Source\UINodeTree.cpp" />
     <ClCompile Include="Source\Universal.cpp" />
     <ClCompile Include="Source\VarianceShadowMap.cpp" />
     <ClCompile Include="Source\WinMain.cpp" />
@@ -422,9 +425,8 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Source\Player.h" />
+    <ClInclude Include="Source\PlayerUIAction.h" />
     <ClInclude Include="Source\PlayerUIHealth.h" />
-    <ClInclude Include="Source\PlayerUIHealthFrame.h" />
-    <ClInclude Include="Source\PlayerUIRedHealth.h" />
     <ClInclude Include="Source\PLTActionOwner.h" />
     <ClInclude Include="Source\PLTJudgmentOwner.h" />
     <ClInclude Include="Source\RenderContext.h" />
@@ -457,6 +459,11 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Source\UI.h" />
+    <ClInclude Include="Source\UIActionBase.h" />
+    <ClInclude Include="Source\UIData.h" />
+    <ClInclude Include="Source\UIManager.h" />
+    <ClInclude Include="Source\UINodeBase.h" />
+    <ClInclude Include="Source\UINodeTree.h" />
     <ClInclude Include="Source\Universal.h" />
     <ClInclude Include="Source\VarianceShadowMap.h" />
   </ItemGroup>

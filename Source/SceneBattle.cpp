@@ -25,7 +25,7 @@
 #include "EnemyTerritoryManager.h"
 
 #include "MenuSystem.h"
-#include "UI.h"
+#include "UIManager.h"
 
 #include "Messenger.h"
 #include "MessageData.h"

@@ -1,24 +1,22 @@
 #pragma once
 #include "UI.h"
-#include "Charactor.h"
+
+class UINodeBase;
 
 //------------------------------
 // プレイヤーHPクラス
 //------------------------------
-class PlayerHealth : public UI
+class PlayerHealthGage : public UI
 {
 public:
 	// コンストラクタ
-	PlayerHealth(const UIParameter& parameter) : UI(parameter) {}
+	PlayerHealthGage(){}
 
 	// デストラクタ
-	~PlayerHealth() override;
+	~PlayerHealthGage();
+	
+	// 開始処理
+	void Start() override;
 
-	// 更新処理
-	void Update(float elapsed_time);
-
-	// キャラクタコンポーネント設定
-	void SetCharactor(std::shared_ptr<Charactor> charactor) { this->charactor = charactor; }
 private:
-	std::shared_ptr<Charactor> charactor;
 };

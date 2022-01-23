@@ -4,8 +4,12 @@
 #include "DragonActionOwner.h"
 #include "Actor.h"
 #include "Enemy.h"
-#include "EnemyManager.h"
 #include "Charactor.h"
+// マネージャー
+#include "ActorManager.h"
+#include "EnemyManager.h"
+
+#include "Mathf.h"
 
 // 汎用関数
 #include "Universal.h"
@@ -299,7 +303,17 @@ void LungesAttackAction::Start()
 	// 当たり判定を行う時間のデータを取得
 	//collision_time_data = GameDataBase::Instance().GetAttackCollitionTimeData(AttackCategory::BodyPressAttack, EnemyCategory::NightmareDragon);
 	// 反対側にターゲットを設定
-
+	// ターゲット座標に値が入っていない時
+	if (Mathf::VectorLength(target_position) == 0)
+	{
+		// 目標地点をプレイヤー位置に設定
+		owner->SetTargetPosition(ActorManager::Instance().GetActor("Player")->GetPosition());
+	}
+	else
+	{
+		// 目標地点を設定された位置に設定
+		owner->SetTargetPosition(target_position);
+	}
 }
 
 // -----------------------------

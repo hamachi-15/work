@@ -16,6 +16,7 @@ public:
 
 	// ベクトルの長さ算出
 	static float VectorLength(const DirectX::XMVECTOR& vector);
+	static float VectorLength(const DirectX::XMFLOAT3& vector);
 
 	// 角度から前方向を算出
 	static DirectX::XMVECTOR ReturnVectorFront(const DirectX::XMFLOAT3& angle);

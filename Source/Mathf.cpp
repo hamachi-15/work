@@ -30,6 +30,13 @@ float Mathf::VectorLength(const DirectX::XMVECTOR& vector)
     return anser;
 }
 
+float Mathf::VectorLength(const DirectX::XMFLOAT3& vector)
+{
+    float anser;
+    DirectX::XMStoreFloat(&anser, DirectX::XMVector3Length(DirectX::XMLoadFloat3(&vector)));
+    return anser;
+}
+
 //----------------------------------
 // Šp“x‚©‚ç‘O•ûŒü‚ğZo,XMVECTORŒ^‚ğ•Ô‚·
 //----------------------------------

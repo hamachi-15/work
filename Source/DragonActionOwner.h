@@ -136,13 +136,15 @@ class LungesAttackAction : public ActionBase
 {
 public:
 	// コンストラクタ
-	LungesAttackAction(Enemy* enemy) : ActionBase(enemy) {}
+	LungesAttackAction(Enemy* enemy, DirectX::XMFLOAT3 target_position = { 0.0f, 0.0f, 0.0f }) : ActionBase(enemy), target_position(target_position) {}
 
 	// 実行前処理
 	void Start() override;
 
 	// 実行処理
 	ActionBase::State Run(float elapsed_time) override;
+private:
+	DirectX::XMFLOAT3 target_position = {};
 };
 
 //*****************************

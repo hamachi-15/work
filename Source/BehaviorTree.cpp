@@ -78,7 +78,7 @@ void BehaviorTree::AddNode(
 		if (search_node != NULL)
 		{
 			NodeBase* sibling = search_node->GetLastChild();
-			NodeBase* add_node = new NodeBase(entry_name, search_node, sibling, priority, select_rule, judgment, action, search_node->GetHirerchyNo() + 1);
+			NodeBase* add_node = new NodeBase(entry_name, search_node, sibling, priority, select_rule, judgment, action, search_node->GetHiererchyNo() + 1);
 		
 			search_node->AddChild(add_node);
 		}

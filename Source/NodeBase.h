@@ -43,7 +43,7 @@ public:
 	NodeBase* GetSibling() { return sibling; }
 	
 	// ŠK‘w”Ô†æ“¾
-	int GetHirerchyNo() { return hierarchy_no; }
+	int GetHiererchyNo() { return hierarchy_no; }
 	
 	// —Dæ‡ˆÊæ“¾
 	int GetPriority() { return priority; }
