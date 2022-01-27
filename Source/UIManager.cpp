@@ -16,6 +16,8 @@ UIManager::UIManager()
 //--------------------------------
 UIManager::~UIManager()
 {
+	// ‘S”jŠü
+	AllDelete();
 }
 
 //------------------------------
@@ -80,4 +82,33 @@ void UIManager::RegisterUI(std::shared_ptr<UI> ui)
 void UIManager::UnRegisterUI(std::shared_ptr<UI> ui)
 {
 	ui_removes.emplace_back(ui);
+}
+
+//------------------------------
+// ‘Síœ
+//------------------------------
+void UIManager::AllDelete()
+{
+	std::vector<std::shared_ptr<UI>>::iterator iterate_update = ui_updates.begin();
+	for (; iterate_update != ui_updates.end(); iterate_update = ui_updates.begin())
+	{
+		ui_updates.erase(iterate_update);
+	}
+	ui_updates.clear();
+}
+
+//------------------------------
+// UIæ“¾
+//------------------------------
+std::shared_ptr<UI> UIManager::GetUI(std::string name)
+{
+	for (std::shared_ptr<UI> ui : ui_updates)
+	{
+		if (ui->GetName() == name)
+		{
+			return ui;
+		}
+	}
+
+	return nullptr;
 }

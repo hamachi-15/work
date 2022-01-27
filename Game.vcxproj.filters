@@ -127,6 +127,12 @@
     <Filter Include="ソース ファイル\AI\DragonAI">
       <UniqueIdentifier>{6d44e4ac-0956-4829-bb3d-722f29238093}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\HLSL\Mask">
+      <UniqueIdentifier>{9382119a-301d-4926-ac0d-7f027526beae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\HLSL\EnvMask">
+      <UniqueIdentifier>{c9aeedaf-faca-4fbf-9fda-7f027ffeb1e9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui\imgui.cpp">
@@ -451,6 +457,30 @@
       <Filter>ソース ファイル\UI</Filter>
     </ClCompile>
     <ClCompile Include="Source\UIData.cpp">
+      <Filter>ソース ファイル\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\BossHealthUI.cpp">
+      <Filter>ソース ファイル\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\NormalEnemyHelthUI.cpp">
+      <Filter>ソース ファイル\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\DissolveShader.cpp">
+      <Filter>ソース ファイル\Graphics\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\TitleButtonUI.cpp">
+      <Filter>ソース ファイル\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\ButtonUIAction.cpp">
+      <Filter>ソース ファイル\System</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\TitleButtonUIJudgment.cpp">
+      <Filter>ソース ファイル\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\TitleUIJudgment.cpp">
+      <Filter>ソース ファイル\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\TitleButtonUIAction.cpp">
       <Filter>ソース ファイル\UI</Filter>
     </ClCompile>
   </ItemGroup>
@@ -833,6 +863,33 @@
     <ClInclude Include="Source\UIData.h">
       <Filter>ソース ファイル\UI</Filter>
     </ClInclude>
+    <ClInclude Include="Source\BossHealthUI.h">
+      <Filter>ソース ファイル\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\NormalEnemyHelthUI.h">
+      <Filter>ソース ファイル\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\DissolveShader.h">
+      <Filter>ソース ファイル\Graphics\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\TitleButtonUI.h">
+      <Filter>ソース ファイル\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ButtonUIAction.h">
+      <Filter>ソース ファイル\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\TitleButtonUIJudgment.h">
+      <Filter>ソース ファイル\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UIJudgmentBase.h">
+      <Filter>ソース ファイル\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\TitleUIJudgment.h">
+      <Filter>ソース ファイル\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\TitleButtonUIAction.h">
+      <Filter>ソース ファイル\UI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="HLSL\Sprite.hlsli">
@@ -888,6 +945,12 @@
     </None>
     <None Include="HLSL\2DPrimitive.hlsli">
       <Filter>ソース ファイル\HLSL\2DPrimitive</Filter>
+    </None>
+    <None Include="HLSL\Mask.hlsli">
+      <Filter>ソース ファイル\HLSL\Mask</Filter>
+    </None>
+    <None Include="HLSL\EnvMask.hlsli">
+      <Filter>ソース ファイル\HLSL\EnvMask</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -1001,6 +1064,18 @@
     </FxCompile>
     <FxCompile Include="HLSL\2DPrimitive_ps.hlsl">
       <Filter>ソース ファイル\HLSL\2DPrimitive</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\Mask_vs.hlsl">
+      <Filter>ソース ファイル\HLSL\Mask</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\Mask_ps.hlsl">
+      <Filter>ソース ファイル\HLSL\Mask</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\EnvMask_ps.hlsl">
+      <Filter>ソース ファイル\HLSL\EnvMask</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\EnvMask_vs.hlsl">
+      <Filter>ソース ファイル\HLSL\EnvMask</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

@@ -35,9 +35,14 @@ public:
 	// 初期化完了
 	bool IsReady() const { return ready; }
 	void SetReady() { ready = true; }
+
+	// シーンチェンジフラグ
+	void SetSceneChangeFlag() { change_scene_flag = true; }
+	bool IsSceneChangeFlag() const { return change_scene_flag; }
 private:
 	bool ready = false;
 	std::string scene_name; // シーンの名前
 public: // TDDO
 	std::unique_ptr<CameraController>	camera_controller;
+	bool change_scene_flag = false;
 };

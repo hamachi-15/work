@@ -33,6 +33,7 @@ public:
 
 	// ï`âÊäJénèàóù
 	virtual void Begin(ID3D11DeviceContext* context) {}
+	virtual void Begin(ID3D11DeviceContext* context, float timer) {}
 	virtual void Begin(ID3D11DeviceContext* context, Texture* texture) {}
 	virtual void Begin(ID3D11DeviceContext* context, RenderContext& render_context) {}
 	virtual void Begin(ID3D11DeviceContext* context, RenderContext& render_context, CubeMapRenderContext& cubemap_render_context){}
@@ -84,5 +85,5 @@ protected:
 	Microsoft::WRL::ComPtr<ID3D11Buffer>			mesh_constant_buffer = nullptr;
 	Microsoft::WRL::ComPtr<ID3D11Buffer>			subset_constant_buffer = nullptr;
 
-	std::string subresource_texture_filename;
+	std::string										subresource_texture_filename;
 };

@@ -2,6 +2,7 @@
 #include <memory>
 #include <vector>
 #include <d3d11.h>
+#include <string>
 
 class UI;
 //******************************
@@ -35,6 +36,12 @@ public:
 
 	// UIíœ
 	void UnRegisterUI(std::shared_ptr<UI> ui);
+
+	// ‘Síœ
+	void AllDelete();
+
+	// UIæ“¾
+	std::shared_ptr<UI> GetUI(std::string name);
 private:
 	std::vector<std::shared_ptr<UI>> ui_starts;
 	std::vector<std::shared_ptr<UI>> ui_updates;

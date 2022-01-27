@@ -13,6 +13,8 @@
 #include "CascadeShadowMapShader.h"
 #include "PhongShader.h"
 #include "LambertShader.h"
+#include "DissolveShader.h"
+
 Graphics* Graphics::instance = nullptr;
 
 
@@ -165,6 +167,7 @@ Graphics::Graphics(HWND hwnd)
 		shader_manager.RegisterShader<SkyBoxShader>(device.Get());
 		//shader_manager.RegisterShader<GaussianBlur>(device.Get());
 		shader_manager.RegisterShader<Bloom>(device.Get());
+		shader_manager.RegisterShader<DissolveShader>(device.Get());
 		shader_manager.RegisterShader<Phong>(device.Get());
 		shader_manager.RegisterShader<LambertShader>(device.Get());
 		shader_manager.RegisterShader<CreateShadowMap>(device.Get());
@@ -216,6 +219,7 @@ void Graphics::SetRenderTargetView(ID3D11RenderTargetView* render_target_view[],
 {
 	// レンダーターゲット設定
 	context->OMSetRenderTargets(1, render_target_view, depth_stensil_view);
+
 }
 
 //-----------------------------

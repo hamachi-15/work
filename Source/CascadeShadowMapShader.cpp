@@ -102,13 +102,13 @@ void CascadeShadowMap::Begin(ID3D11DeviceContext* context, RenderContext& render
 	context->PSSetConstantBuffers(0, ARRAYSIZE(constant_buffers), constant_buffers);
 
 	//ブレンドステート設定
-	//context->OMSetBlendState(graphics.GetBlendState((int)Graphics::BlendState::Alpha), nullptr, 0xFFFFFFFF);
+	context->OMSetBlendState(graphics.GetBlendState((int)Graphics::BlendState::Alpha), nullptr, 0xFFFFFFFF);
 	//ラスタライザ―設定
 	context->RSSetState(graphics.GetRasterizerState(static_cast<int>(Graphics::RasterizerState::Cull_Back)));
 	//デプスステンシルステート設定
 	context->OMSetDepthStencilState(graphics.GetDepthStencilState(static_cast<int>(Graphics::DepthStencilState::True)), 1);
 
-	shadow_texture1->Set(3); 
+	shadow_texture1->Set(3);
 	shadow_texture2->Set(4);
 	shadow_texture3->Set(5);
 
@@ -142,4 +142,11 @@ void CascadeShadowMap::Begin(ID3D11DeviceContext* context, RenderContext& render
 void CascadeShadowMap::End(ID3D11DeviceContext* context)
 {
 	InActivate(context);
+
+	// シェーダーリソースをクリア
+	ID3D11ShaderResourceView* rtv[1] = { NULL };
+	ID3D11SamplerState* ss[1] = { NULL };
+	context->PSSetShaderResources(3, 1, rtv);
+	context->PSSetShaderResources(4, 1, rtv);
+	context->PSSetShaderResources(5, 1, rtv);
 }

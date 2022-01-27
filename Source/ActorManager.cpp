@@ -221,6 +221,7 @@ void ActorManager::ShadowRender(RenderContext& render_context, BlurRenderContext
 		ID3D11DepthStencilView* depth_stencil_view = depth_texture[i]->GetDepthStencilView();
 		graphics.SetRenderTargetView(render_target_view, depth_stencil_view);
 
+
 		// ‰æ–ÊƒNƒŠƒA
 		graphics.ScreenClear(render_target_view, depth_stencil_view);
 

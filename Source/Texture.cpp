@@ -7,7 +7,7 @@ Texture::Texture() :shader_resource_view(nullptr)
 {
 }
 
-   
+
 Texture::~Texture()
 {
 }

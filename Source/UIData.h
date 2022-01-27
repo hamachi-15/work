@@ -25,7 +25,9 @@ public:
 	// コンストラクタ
 	UIData(const UIParameter& parameter) :
 		name(parameter.name), position(parameter.position), angle(parameter.angle),charactor(parameter.charactor),
-		texture(ResourceManager::Instance().LoadTexture(parameter.filename)), size(DirectX::XMFLOAT2(static_cast<float>(texture->GetWidth()), static_cast<float>(texture->GetHeight()))) {}
+		texture(ResourceManager::Instance().LoadTexture(parameter.filename)), size(parameter.size) {}
+
+	~UIData(){}
 
 	// キャラクタコンポーネント設定
 	void SetCharactor(std::shared_ptr<Charactor> charactor) { this->charactor = charactor; }
@@ -62,5 +64,5 @@ private:
 	DirectX::XMFLOAT2			position;
 	DirectX::XMFLOAT2			size;
 	float						angle;
-	std::shared_ptr<Charactor> charactor;
+	std::shared_ptr<Charactor>	charactor;
 };

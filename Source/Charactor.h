@@ -19,7 +19,7 @@ public:
 	~Charactor() override {}
 
 	// –¼‘Oæ“¾
-	const char* GetName() const override { return "Charactor"; }
+	std::string GetName() const override { return "Charactor"; }
 
 	// ŠJnˆ—
 	void Start()override;

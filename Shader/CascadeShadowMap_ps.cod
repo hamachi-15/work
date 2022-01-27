@@ -49,7 +49,7 @@
 // SV_TARGET                0   xyzw        0   TARGET   float   xyzw
 //
 ps_5_0
-dcl_globalFlags refactoringAllowed | skipOptimization
+dcl_globalFlags refactoringAllowed
 dcl_constantbuffer CB0[19], immediateIndexed
 dcl_sampler s0, mode_default
 dcl_sampler s3, mode_default
@@ -62,525 +62,115 @@ dcl_input_ps linear v2.xyz
 dcl_input_ps linear v3.xyz
 dcl_input_ps linear v4.xy
 dcl_output o0.xyzw
-dcl_temps 10
-//
-// Initial variable locations:
-//   v0.x <- input.position.x; v0.y <- input.position.y; v0.z <- input.position.z; v0.w <- input.position.w; 
-//   v1.x <- input.color.x; v1.y <- input.color.y; v1.z <- input.color.z; v1.w <- input.color.w; 
-//   v2.x <- input.normal.x; v2.y <- input.normal.y; v2.z <- input.normal.z; 
-//   v3.x <- input.wposition.x; v3.y <- input.wposition.y; v3.z <- input.wposition.z; 
-//   v4.x <- input.texcoord.x; v4.y <- input.texcoord.y; 
-//   v5.x <- input.shadow.x; v5.y <- input.shadow.y; v5.z <- input.shadow.z; 
-//   o0.x <- <main return value>.x; o0.y <- <main return value>.y; o0.z <- <main return value>.z; o0.w <- <main return value>.w
-//
-#line 5 "E:\就職作品\ライブラリ\Game\HLSL\CascadeShadowMap_ps.hlsl"
-sample_indexable(texture2d)(float,float,float,float) r0.xyzw, v4.xyxx, t0.xyzw, s0  // r0.x <- color.x; r0.y <- color.y; r0.z <- color.z; r0.w <- color.w
-
-#line 6
+dcl_temps 4
+sample_indexable(texture2d)(float,float,float,float) r0.xyzw, v4.xyxx, t0.xyzw, s0
 dp3 r1.x, v2.xyzx, v2.xyzx
 rsq r1.x, r1.x
-mul r1.xyz, r1.xxxx, v2.xyzx  // r1.x <- N.x; r1.y <- N.y; r1.z <- N.z
-
-#line 7
-mov r2.xyz, -v3.xyzx
-add r2.xyz, r2.xyzx, cb0[17].xyzx
+mul r1.xyz, r1.xxxx, v2.xyzx
+add r2.xyz, -v3.xyzx, cb0[17].xyzx
 dp3 r1.w, r2.xyzx, r2.xyzx
-rsq r1.w, r1.w
-mul r2.xyz, r1.wwww, r2.xyzx  // r2.x <- E.x; r2.y <- E.y; r2.z <- E.z
-
-#line 8
-dp3 r1.w, cb0[16].xyzx, cb0[16].xyzx
-rsq r1.w, r1.w
-mul r3.xyz, r1.wwww, cb0[16].xyzx  // r3.x <- L.x; r3.y <- L.y; r3.z <- L.z
-
-#line 9
-mov r4.xyz, v3.xyzx  // r4.x <- P.x; r4.y <- P.y; r4.z <- P.z
-
-#line 12
-mov r5.xyz, l(1.000000,1.000000,1.000000,0)  // r5.x <- A.x; r5.y <- A.y; r5.z <- A.z
-
-#line 15
-mov r6.xyz, l(1.000000,1.000000,1.000000,0)  // r6.x <- C.x; r6.y <- C.y; r6.z <- C.z
-
-#line 16
-itof r7.xyz, l(1, 1, 1, 0)  // r7.x <- Kd.x; r7.y <- Kd.y; r7.z <- Kd.z
-
-#line 17
-nop 
-mov r1.xyz, r1.xyzx
-mov r3.xyz, r3.xyzx
-mov r6.xyz, r6.xyzx
-mov r7.xyz, r7.xyzx
-
-#line 10 "E:\就職作品\ライブラリ\Game\HLSL\Func.hlsli"
-mov r8.xyz, -r3.xyzx
-dp3 r1.w, r1.xyzx, r8.xyzx  // r1.w <- D
-
-#line 11
-itof r2.w, l(0)
-max r1.w, r1.w, r2.w
-
-#line 12
-mul r7.xyz, r6.xyzx, r7.xyzx
-mul r7.xyz, r1.wwww, r7.xyzx  // r7.x <- <Diffuse return value>.x; r7.y <- <Diffuse return value>.y; r7.z <- <Diffuse return value>.z
-
-#line 17 "E:\就職作品\ライブラリ\Game\HLSL\CascadeShadowMap_ps.hlsl"
-mov r7.xyz, r7.xyzx  // r7.x <- D.x; r7.y <- D.y; r7.z <- D.z
-
-#line 20
-itof r8.xyz, l(1, 1, 1, 0)  // r8.x <- Ks.x; r8.y <- Ks.y; r8.z <- Ks.z
-
-#line 21
-nop 
-mov r1.xyz, r1.xyzx
-mov r3.xyz, r3.xyzx
-mov r6.xyz, r6.xyzx
-mov r2.xyz, r2.xyzx
-mov r8.xyz, r8.xyzx
-
-#line 33 "E:\就職作品\ライブラリ\Game\HLSL\Func.hlsli"
-mov r3.xyz, -r3.xyzx
-add r2.xyz, r2.xyzx, r3.xyzx
-dp3 r1.w, r2.xyzx, r2.xyzx
-rsq r1.w, r1.w
-mul r2.xyz, r1.wwww, r2.xyzx  // r2.x <- H.x; r2.y <- H.y; r2.z <- H.z
-
-#line 35
-dp3 r1.z, r2.xyzx, r1.xyzx
-mov r1.xyz, r1.zzzz  // r1.x <- S.x; r1.y <- S.y; r1.z <- S.z
-
-#line 36
-itof r2.xyz, l(0, 0, 0, 0)
-max r1.xyz, r1.xyzx, r2.xyzx
-
-#line 37
-mov r2.xyz, l(1.000000,1.000000,1.000000,0)
-mul r1.xyz, r1.xyzx, r1.xyzx
-mul r1.xyz, r1.xyzx, r1.xyzx
-mul r2.xyz, r1.xyzx, r2.xyzx
-mul r1.xyz, r1.xyzx, r1.xyzx
-mul r1.xyz, r1.xyzx, r1.xyzx
-mul r1.xyz, r1.xyzx, r2.xyzx  // r1.x <- S.x; r1.y <- S.y; r1.z <- S.z
-
-#line 38
-mul r1.xyz, r8.xyzx, r1.xyzx
-mul r1.xyz, r6.xyzx, r1.xyzx  // r1.x <- S.x; r1.y <- S.y; r1.z <- S.z
-
-#line 40
-mov r1.xyz, r1.xyzx  // r1.x <- <BlinnPhongSpecular return value>.x; r1.y <- <BlinnPhongSpecular return value>.y; r1.z <- <BlinnPhongSpecular return value>.z
-
-#line 21 "E:\就職作品\ライブラリ\Game\HLSL\CascadeShadowMap_ps.hlsl"
-mov r1.xyz, r1.xyzx  // r1.x <- S.x; r1.y <- S.y; r1.z <- S.z
-
-#line 22
-add r2.xyz, r5.xyzx, r7.xyzx
-add r1.xyz, r1.xyzx, r2.xyzx
-mov r1.w, l(1.000000)
-mul r1.xyzw, r1.xyzw, v1.xyzw
-mul r0.xyzw, r0.xyzw, r1.xyzw
-
-#line 25
-mov r1.xyz, l(0,0,0.500000,0)  // r1.x <- fog_color.x; r1.y <- fog_color.y; r1.z <- fog_color.z
-
-#line 26
-nop 
-mov r0.xyz, r0.xyzx
-mov r2.xyz, cb0[17].xyzx
-mov r4.xyz, r4.xyzx
-mov r1.xyz, r1.xyzx
-mov r1.w, l(500.000000)
-mov r2.w, l(700.000000)
-
-#line 115 "E:\就職作品\ライブラリ\Game\HLSL\Func.hlsli"
-mov r3.xyz, -r4.xyzx
-add r2.xyz, r2.xyzx, r3.xyzx
-dp3 r2.x, r2.xyzx, r2.xyzx
-sqrt r2.x, r2.x  // r2.x <- len
-
-#line 116
-mov r2.y, -r1.w
-add r2.x, r2.y, r2.x
-mov r1.w, -r1.w
-add r1.w, r1.w, r2.w
-div r1.w, r2.x, r1.w
-max r1.w, r1.w, l(0.000000)
-min r1.w, r1.w, l(1.000000)  // r1.w <- fogalpha
-
-#line 117
-mov r2.x, -r1.w
-add r2.x, r2.x, l(1.000000)
-mul r0.xyz, r0.xyzx, r2.xxxx
-mul r1.xyz, r1.wwww, r1.xyzx
-add r0.xyz, r0.xyzx, r1.xyzx  // r0.x <- <Fog return value>.x; r0.y <- <Fog return value>.y; r0.z <- <Fog return value>.z
-
-#line 26 "E:\就職作品\ライブラリ\Game\HLSL\CascadeShadowMap_ps.hlsl"
-mov r0.xyz, r0.xyzx  // r0.x <- color.x; r0.y <- color.y; r0.z <- color.z
-
-#line 29
-nop 
-mov r4.xyz, r4.xyzx
-
-#line 80 "E:\就職作品\ライブラリ\Game\HLSL\CascadeShadowMap.hlsli"
-nop 
-mov r1.x, cb0[0].x
-mov r2.x, cb0[0].y
-mov r3.x, cb0[0].z
-mov r5.x, cb0[0].w
-mov r1.y, cb0[1].x
-mov r2.y, cb0[1].y
-mov r3.y, cb0[1].z
-mov r5.y, cb0[1].w
-mov r1.z, cb0[2].x
-mov r2.z, cb0[2].y
-mov r3.z, cb0[2].z
-mov r5.z, cb0[2].w
-mov r6.xyzw, cb0[3].xyzw
-mov r4.xyz, r4.xyzx
-
-#line 63 "E:\就職作品\ライブラリ\Game\HLSL\Func.hlsli"
-mov r4.xyz, r4.xyzx  // r4.x <- wvp_pos.x; r4.y <- wvp_pos.y; r4.z <- wvp_pos.z
-mov r4.w, l(1.000000)  // r4.w <- wvp_pos.w
-
-#line 64
-mov r1.w, r6.x
-dp4 r1.x, r4.xyzw, r1.xyzw  // r1.x <- wvp_pos.x
-mov r2.w, r6.y
-dp4 r1.y, r4.xyzw, r2.xyzw  // r1.y <- wvp_pos.y
-mov r3.w, r6.z
-dp4 r1.z, r4.xyzw, r3.xyzw  // r1.z <- wvp_pos.z
-mov r5.w, r6.w
-dp4 r1.w, r4.xyzw, r5.xyzw  // r1.w <- wvp_pos.w
-
-#line 65
+rsq r2.w, r1.w
+dp3 r3.x, cb0[16].xyzx, cb0[16].xyzx
+rsq r3.x, r3.x
+mul r3.xyz, r3.xxxx, cb0[16].xyzx
+dp3 r3.w, r1.xyzx, -r3.xyzx
+max r3.w, r3.w, l(0.000000)
+mad r2.xyz, r2.xyzx, r2.wwww, -r3.xyzx
+dp3 r2.w, r2.xyzx, r2.xyzx
+rsq r2.w, r2.w
+mul r2.xyz, r2.wwww, r2.xyzx
+dp3 r1.x, r2.xyzx, r1.xyzx
+max r1.x, r1.x, l(0.000000)
+mul r1.x, r1.x, r1.x
+mul r1.x, r1.x, r1.x
+mul r1.y, r1.x, r1.x
+mul r1.y, r1.y, r1.y
+mad r1.x, r1.x, r1.y, r3.w
+add r2.xyz, r1.xxxx, l(1.000000, 1.000000, 1.000000, 0.000000)
+mov r2.w, l(1.000000)
+mul r2.xyzw, r2.xyzw, v1.xyzw
+mul r0.xyzw, r0.xyzw, r2.xyzw
+sqrt r1.x, r1.w
+add r1.x, r1.x, l(-500.000000)
+mul_sat r1.x, r1.x, l(0.005000)
+add r1.y, -r1.x, l(1.000000)
+mul r1.xzw, r1.xxxx, l(0.000000, 0.000000, 0.000000, 0.500000)
+mad r0.xyz, r0.xyzx, r1.yyyy, r1.xzwx
+mul r1.xyzw, v3.yyyy, cb0[1].xyzw
+mad r1.xyzw, v3.xxxx, cb0[0].xyzw, r1.xyzw
+mad r1.xyzw, v3.zzzz, cb0[2].xyzw, r1.xyzw
+add r1.xyzw, r1.xyzw, cb0[3].xyzw
 div r1.xyz, r1.xyzx, r1.wwww
-
-#line 67
-mov r1.w, -r1.y  // r1.w <- wvp_pos.y
-
-#line 68
-mul r2.xy, r1.xwxx, l(0.500000, 0.500000, 0.000000, 0.000000)
-add r1.xy, r2.xyxx, l(0.500000, 0.500000, 0.000000, 0.000000)  // r1.y <- wvp_pos.y
-
-#line 69
-mov r1.xy, r1.xyxx  // r1.x <- <GetShadowTex return value>.x; r1.y <- <GetShadowTex return value>.y
-mov r1.z, r1.z  // r1.z <- <GetShadowTex return value>.z
-
-#line 80 "E:\就職作品\ライブラリ\Game\HLSL\CascadeShadowMap.hlsli"
-mov r1.xyz, r1.xyzx  // r1.x <- vshadow.x; r1.y <- vshadow.y; r1.z <- vshadow.z
-
-#line 81
-mov r1.xyz, r1.xyzx  // r1.x <- shadow_texcoord.x; r1.y <- shadow_texcoord.y; r1.z <- shadow_texcoord.z
-
-#line 82
-itof r1.w, l(0)
-ge r1.w, r1.z, r1.w
-itof r2.x, l(1)
-ge r2.x, r2.x, r1.z
+mad r1.xy, r1.xyxx, l(0.500000, -0.500000, 0.000000, 0.000000), l(0.500000, 0.500000, 0.000000, 0.000000)
+ge r1.w, r1.z, l(0.000000)
+ge r2.x, l(1.000000), r1.z
 and r1.w, r1.w, r2.x
-itof r2.x, l(0)
-ge r2.x, r1.x, r2.x
+ge r2.xy, r1.xyxx, l(0.000000, 0.000000, 0.000000, 0.000000)
 and r1.w, r1.w, r2.x
-itof r2.x, l(1)
-ge r2.x, r2.x, r1.x
+ge r2.xz, l(1.000000, 0.000000, 1.000000, 0.000000), r1.xxyx
 and r1.w, r1.w, r2.x
-itof r2.x, l(0)
-ge r2.x, r1.y, r2.x
-and r1.w, r1.w, r2.x
-itof r2.x, l(1)
-ge r2.x, r2.x, r1.y
-and r2.xy, r1.wwww, r2.xxxx
-if_nz r2.y
-
-#line 86
-  nop 
-  nop 
-  nop 
-  mov r1.xyz, r1.xyzx
-  mov r3.xyzw, cb0[18].xyzw
-
-#line 89 "E:\就職作品\ライブラリ\Game\HLSL\Func.hlsli"
-  sample_indexable(texture2d)(float,float,float,float) r1.x, r1.xyxx, t3.xyzw, s3  // r1.x <- d
-
-#line 92
-  mov r1.x, -r1.x
-  add r1.x, r1.x, r1.z
-  lt r1.x, r3.w, r1.x
-  itof r1.yzw, l(0, 1, 1, 1)
-  movc r1.xyz, r1.xxxx, r3.xyzx, r1.yzwy  // r1.x <- color.x; r1.y <- color.y; r1.z <- color.z
-
-#line 94
-  mov r1.xyz, r1.xyzx  // r1.x <- <GetShadow return value>.x; r1.y <- <GetShadow return value>.y; r1.z <- <GetShadow return value>.z
-
-#line 86 "E:\就職作品\ライブラリ\Game\HLSL\CascadeShadowMap.hlsli"
-  mov r1.xyz, r1.xyzx  // r1.x <- <GetCascadeShadow return value>.x; r1.y <- <GetCascadeShadow return value>.y; r1.z <- <GetCascadeShadow return value>.z
-
-#line 88
+and r1.w, r2.y, r1.w
+and r1.w, r2.z, r1.w
+if_nz r1.w
+  sample_indexable(texture2d)(float,float,float,float) r1.x, r1.xyxx, t3.xyzw, s3
+  add r1.x, -r1.x, r1.z
+  lt r1.x, cb0[18].w, r1.x
+  movc r1.xyz, r1.xxxx, cb0[18].xyzx, l(1.000000,1.000000,1.000000,0)
 endif 
-
-#line 78
-not r1.w, r2.y
-not r2.z, r2.x
-and r1.w, r1.w, r2.z
-not r2.zw, r1.wwww
-and r2.w, r1.w, r2.w
-or r2.y, r2.y, r2.w
-and r1.w, r1.w, r2.z
-or r1.w, r2.x, r1.w
-not r2.x, r2.y
-not r2.z, r1.w
-and r2.x, r2.z, r2.x
-if_nz r2.x
-
-#line 80
-  nop 
-  mov r3.x, cb0[4].x  // r3.x <- view_projection._m00
-  mov r5.x, cb0[4].y  // r5.x <- view_projection._m01
-  mov r6.x, cb0[4].z  // r6.x <- view_projection._m02
-  mov r7.x, cb0[4].w  // r7.x <- view_projection._m03
-  mov r3.y, cb0[5].x  // r3.y <- view_projection._m10
-  mov r5.y, cb0[5].y  // r5.y <- view_projection._m11
-  mov r6.y, cb0[5].z  // r6.y <- view_projection._m12
-  mov r7.y, cb0[5].w  // r7.y <- view_projection._m13
-  mov r3.z, cb0[6].x  // r3.z <- view_projection._m20
-  mov r5.z, cb0[6].y  // r5.z <- view_projection._m21
-  mov r6.z, cb0[6].z  // r6.z <- view_projection._m22
-  mov r7.z, cb0[6].w  // r7.z <- view_projection._m23
-  mov r8.xyzw, cb0[7].xyzw  // r8.x <- view_projection._m30; r8.y <- view_projection._m31; r8.z <- view_projection._m32; r8.w <- view_projection._m33
-  mov r9.xyz, r4.xyzx  // r9.x <- wpos.x; r9.y <- wpos.y; r9.z <- wpos.z
-
-#line 63 "E:\就職作品\ライブラリ\Game\HLSL\Func.hlsli"
-  mov r9.xyz, r9.xyzx  // r9.x <- wvp_pos.x; r9.y <- wvp_pos.y; r9.z <- wvp_pos.z
-  mov r9.w, l(1.000000)  // r9.w <- wvp_pos.w
-
-#line 64
-  mov r3.w, r8.x
-  dp4 r3.x, r9.xyzw, r3.xyzw  // r3.x <- wvp_pos.x
-  mov r5.w, r8.y
-  dp4 r3.y, r9.xyzw, r5.xyzw  // r3.y <- wvp_pos.y
-  mov r6.w, r8.z
-  dp4 r3.z, r9.xyzw, r6.xyzw  // r3.z <- wvp_pos.z
-  mov r7.w, r8.w
-  dp4 r2.x, r9.xyzw, r7.xyzw  // r2.x <- wvp_pos.w
-
-#line 65
-  div r3.xyz, r3.xyzx, r2.xxxx
-
-#line 67
-  mov r3.w, -r3.y  // r3.w <- wvp_pos.y
-
-#line 68
-  mul r2.xz, r3.xxwx, l(0.500000, 0.000000, 0.500000, 0.000000)
-  add r3.xy, r2.xzxx, l(0.500000, 0.500000, 0.000000, 0.000000)  // r3.y <- wvp_pos.y
-
-#line 69
-  mov r3.xy, r3.xyxx  // r3.x <- <GetShadowTex return value>.x; r3.y <- <GetShadowTex return value>.y
-  mov r3.z, r3.z  // r3.z <- <GetShadowTex return value>.z
-
-#line 80 "E:\就職作品\ライブラリ\Game\HLSL\CascadeShadowMap.hlsli"
-  mov r3.xyz, r3.xyzx  // r3.x <- vshadow.x; r3.y <- vshadow.y; r3.z <- vshadow.z
-
-#line 81
-  not r2.x, r2.y
-  not r2.z, r1.w
-  and r2.x, r2.x, r2.z
-  if_nz r2.x
-    mov r3.xyz, r3.xyzx  // r3.x <- shadow_texcoord.x; r3.y <- shadow_texcoord.y; r3.z <- shadow_texcoord.z
-
-#line 82
-    itof r2.z, l(0)
-    ge r2.z, r3.z, r2.z
-    itof r2.w, l(1)
-    ge r2.w, r2.w, r3.z
-    and r2.z, r2.w, r2.z
-    itof r2.w, l(0)
-    ge r2.w, r3.x, r2.w
-    and r2.z, r2.w, r2.z
-    itof r2.w, l(1)
-    ge r2.w, r2.w, r3.x
-    and r2.z, r2.w, r2.z
-    itof r2.w, l(0)
-    ge r2.w, r3.y, r2.w
-    and r2.z, r2.w, r2.z
-    itof r2.w, l(1)
-    ge r2.w, r2.w, r3.y
-    and r2.zw, r2.wwww, r2.zzzz
-    if_nz r2.w
-
-#line 86
-      nop 
-      nop 
-      nop 
-      mov r3.xyz, r3.xyzx  // r3.x <- tex.x; r3.y <- tex.y; r3.z <- tex.z
-      mov r5.xyzw, cb0[18].xyzw  // r5.x <- parameter.x; r5.y <- parameter.y; r5.z <- parameter.z; r5.w <- parameter.w
-
-#line 89 "E:\就職作品\ライブラリ\Game\HLSL\Func.hlsli"
-      sample_indexable(texture2d)(float,float,float,float) r3.x, r3.xyxx, t4.xyzw, s3  // r3.x <- d
-
-#line 92
-      mov r3.x, -r3.x
-      add r3.x, r3.x, r3.z
-      lt r3.x, r5.w, r3.x
-      itof r3.yzw, l(0, 1, 1, 1)
-      movc r1.xyz, r3.xxxx, r5.xyzx, r3.yzwy  // r1.x <- color.x; r1.y <- color.y; r1.z <- color.z
-
-#line 94
-      mov r1.xyz, r1.xyzx  // r1.x <- <GetShadow return value>.x; r1.y <- <GetShadow return value>.y; r1.z <- <GetShadow return value>.z
-
-#line 86 "E:\就職作品\ライブラリ\Game\HLSL\CascadeShadowMap.hlsli"
-      mov r1.xyz, r1.xyzx
-
-#line 88
-    endif 
-  else   // Prior locations: r3.x <- vshadow.x; r3.y <- vshadow.y; r3.z <- vshadow.z; r3.x <- <GetShadowTex return value>.x; r3.y <- <GetShadowTex return value>.y; r3.z <- <GetShadowTex return value>.z; r5.x <- view_projection._m01; r5.y <- view_projection._m11; r5.z <- view_projection._m21; r3.x <- wvp_pos.x; r3.y <- wvp_pos.y; r3.z <- wvp_pos.z
-    mov r2.z, l(-1)
-    mov r2.w, l(-1)
+if_z r1.w
+  mul r2.xyzw, v3.yyyy, cb0[5].xyzw
+  mad r2.xyzw, v3.xxxx, cb0[4].xyzw, r2.xyzw
+  mad r2.xyzw, v3.zzzz, cb0[6].xyzw, r2.xyzw
+  add r2.xyzw, r2.xyzw, cb0[7].xyzw
+  div r2.xyz, r2.xyzx, r2.wwww
+  mad r2.xy, r2.xyxx, l(0.500000, -0.500000, 0.000000, 0.000000), l(0.500000, 0.500000, 0.000000, 0.000000)
+  ge r2.w, r2.z, l(0.000000)
+  ge r3.x, l(1.000000), r2.z
+  and r2.w, r2.w, r3.x
+  ge r3.xy, r2.xyxx, l(0.000000, 0.000000, 0.000000, 0.000000)
+  and r2.w, r2.w, r3.x
+  ge r3.xz, l(1.000000, 0.000000, 1.000000, 0.000000), r2.xxyx
+  and r2.w, r2.w, r3.x
+  and r2.w, r3.y, r2.w
+  and r2.w, r3.z, r2.w
+  if_nz r2.w
+    sample_indexable(texture2d)(float,float,float,float) r2.x, r2.xyxx, t4.xyzw, s3
+    add r2.x, -r2.x, r2.z
+    lt r2.x, cb0[18].w, r2.x
+    movc r1.xyz, r2.xxxx, cb0[18].xyzx, l(1.000000,1.000000,1.000000,0)
   endif 
-  and r2.w, r2.w, r2.x
-  or r2.y, r2.y, r2.w
-  and r2.x, r2.z, r2.x
-  or r2.x, r1.w, r2.x
-
-#line 78
-  not r2.z, r2.y
-  not r2.w, r2.x
-  and r2.z, r2.z, r2.w
-  not r3.xy, r2.zzzz
-  and r2.w, r2.z, r3.y
-  or r2.y, r2.y, r2.w
-  and r2.z, r2.z, r3.x
-  or r1.w, r2.x, r2.z
-
-#line 89
-else   // Prior locations: r7.x <- D.x; r7.y <- D.y; r7.z <- D.z; r8.x <- Ks.x; r8.y <- Ks.y; r8.z <- Ks.z; r5.x <- view_projection._m03; r5.y <- view_projection._m13; r5.z <- view_projection._m23; r6.x <- view_projection._m30; r6.y <- view_projection._m31; r6.z <- view_projection._m32; r6.w <- view_projection._m33
-  mov r2.y, l(-1)
+  mov r1.w, r2.w
+else 
+  mov r2.w, l(-1)
 endif 
-
-#line 78
-not r2.x, r2.y
+not r2.x, r2.w
 not r2.y, r1.w
 and r2.x, r2.y, r2.x
 if_nz r2.x
-
-#line 80
-  nop 
-  mov r2.x, cb0[8].x  // r2.x <- view_projection._m00
-  mov r3.x, cb0[8].y  // r3.x <- view_projection._m01
-  mov r5.x, cb0[8].z  // r5.x <- view_projection._m02
-  mov r6.x, cb0[8].w  // r6.x <- view_projection._m03
-  mov r2.y, cb0[9].x  // r2.y <- view_projection._m10
-  mov r3.y, cb0[9].y  // r3.y <- view_projection._m11
-  mov r5.y, cb0[9].z  // r5.y <- view_projection._m12
-  mov r6.y, cb0[9].w  // r6.y <- view_projection._m13
-  mov r2.z, cb0[10].x  // r2.z <- view_projection._m20
-  mov r3.z, cb0[10].y  // r3.z <- view_projection._m21
-  mov r5.z, cb0[10].z  // r5.z <- view_projection._m22
-  mov r6.z, cb0[10].w  // r6.z <- view_projection._m23
-  mov r7.xyzw, cb0[11].xyzw  // r7.x <- view_projection._m30; r7.y <- view_projection._m31; r7.z <- view_projection._m32; r7.w <- view_projection._m33
-
-#line 63 "E:\就職作品\ライブラリ\Game\HLSL\Func.hlsli"
-  mov r4.xyz, r4.xyzx  // r4.x <- wvp_pos.x; r4.y <- wvp_pos.y; r4.z <- wvp_pos.z
-  mov r4.w, l(1.000000)  // r4.w <- wvp_pos.w
-
-#line 64
-  mov r2.w, r7.x
-  dp4 r2.x, r4.xyzw, r2.xyzw  // r2.x <- wvp_pos.x
-  mov r3.w, r7.y
-  dp4 r2.y, r4.xyzw, r3.xyzw  // r2.y <- wvp_pos.y
-  mov r5.w, r7.z
-  dp4 r2.z, r4.xyzw, r5.xyzw  // r2.z <- wvp_pos.z
-  mov r6.w, r7.w
-  dp4 r2.w, r4.xyzw, r6.xyzw  // r2.w <- wvp_pos.w
-
-#line 65
+  mul r2.xyzw, v3.yyyy, cb0[9].xyzw
+  mad r2.xyzw, v3.xxxx, cb0[8].xyzw, r2.xyzw
+  mad r2.xyzw, v3.zzzz, cb0[10].xyzw, r2.xyzw
+  add r2.xyzw, r2.xyzw, cb0[11].xyzw
   div r2.xyz, r2.xyzx, r2.wwww
-
-#line 67
-  mov r2.w, -r2.y  // r2.w <- wvp_pos.y
-
-#line 68
-  mul r3.xy, r2.xwxx, l(0.500000, 0.500000, 0.000000, 0.000000)
-  add r2.xy, r3.xyxx, l(0.500000, 0.500000, 0.000000, 0.000000)  // r2.y <- wvp_pos.y
-
-#line 69
-  mov r2.xy, r2.xyxx  // r2.x <- <GetShadowTex return value>.x; r2.y <- <GetShadowTex return value>.y
-  mov r2.z, r2.z  // r2.z <- <GetShadowTex return value>.z
-
-#line 80 "E:\就職作品\ライブラリ\Game\HLSL\CascadeShadowMap.hlsli"
-  mov r2.xyz, r2.xyzx  // r2.x <- vshadow.x; r2.y <- vshadow.y; r2.z <- vshadow.z
-
-#line 81
-  mov r2.xyz, r2.xyzx  // r2.x <- shadow_texcoord.x; r2.y <- shadow_texcoord.y; r2.z <- shadow_texcoord.z
-
-#line 82
-  itof r2.w, l(0)
-  ge r2.w, r2.z, r2.w
-  itof r3.x, l(1)
-  ge r3.x, r3.x, r2.z
+  mad r2.xy, r2.xyxx, l(0.500000, -0.500000, 0.000000, 0.000000), l(0.500000, 0.500000, 0.000000, 0.000000)
+  ge r2.w, r2.z, l(0.000000)
+  ge r3.x, l(1.000000), r2.z
   and r2.w, r2.w, r3.x
-  itof r3.x, l(0)
-  ge r3.x, r2.x, r3.x
+  ge r3.xy, r2.xyxx, l(0.000000, 0.000000, 0.000000, 0.000000)
   and r2.w, r2.w, r3.x
-  itof r3.x, l(1)
-  ge r3.x, r3.x, r2.x
+  ge r3.xz, l(1.000000, 0.000000, 1.000000, 0.000000), r2.xxyx
   and r2.w, r2.w, r3.x
-  itof r3.x, l(0)
-  ge r3.x, r2.y, r3.x
-  and r2.w, r2.w, r3.x
-  itof r3.x, l(1)
-  ge r3.x, r3.x, r2.y
-  and r3.xy, r2.wwww, r3.xxxx
-  if_nz r3.y
-
-#line 86
-    nop 
-    nop 
-    nop 
-    mov r2.xyz, r2.xyzx  // r2.x <- tex.x; r2.y <- tex.y; r2.z <- tex.z
-    mov r4.xyzw, cb0[18].xyzw  // r4.x <- parameter.x; r4.y <- parameter.y; r4.z <- parameter.z; r4.w <- parameter.w
-
-#line 89 "E:\就職作品\ライブラリ\Game\HLSL\Func.hlsli"
-    sample_indexable(texture2d)(float,float,float,float) r2.x, r2.xyxx, t5.xyzw, s3  // r2.x <- d
-
-#line 92
-    mov r2.x, -r2.x
-    add r2.x, r2.x, r2.z
-    lt r2.x, r4.w, r2.x
-    itof r2.yzw, l(0, 1, 1, 1)
-    movc r1.xyz, r2.xxxx, r4.xyzx, r2.yzwy  // r1.x <- color.x; r1.y <- color.y; r1.z <- color.z
-
-#line 94
-    mov r1.xyz, r1.xyzx  // r1.x <- <GetShadow return value>.x; r1.y <- <GetShadow return value>.y; r1.z <- <GetShadow return value>.z
-
-#line 86 "E:\就職作品\ライブラリ\Game\HLSL\CascadeShadowMap.hlsli"
-    mov r1.xyz, r1.xyzx
-
-#line 88
+  and r2.w, r3.y, r2.w
+  and r1.w, r3.z, r2.w
+  if_nz r1.w
+    sample_indexable(texture2d)(float,float,float,float) r2.x, r2.xyxx, t5.xyzw, s3
+    add r2.x, -r2.x, r2.z
+    lt r2.x, cb0[18].w, r2.x
+    movc r1.xyz, r2.xxxx, cb0[18].xyzx, l(1.000000,1.000000,1.000000,0)
   endif 
-
-#line 78
-  not r2.x, r3.y
-  not r2.y, r3.x
-  and r2.x, r2.x, r2.y
-  not r2.y, r2.x
-  and r2.x, r2.y, r2.x
-  or r1.w, r3.x, r2.x
-
-#line 89
 endif 
-
-#line 90
-if_z r1.w
-  itof r1.xyz, l(1, 1, 1, 0)
-endif 
-
-#line 29 "E:\就職作品\ライブラリ\Game\HLSL\CascadeShadowMap_ps.hlsl"
-mov r1.xyz, r1.xyzx  // r1.x <- CS.x; r1.y <- CS.y; r1.z <- CS.z
-
-#line 30
-mul r0.xyz, r0.xyzx, r1.xyzx
-
-#line 31
-mov o0.xyz, r0.xyzx
+movc r1.xyz, r1.wwww, r1.xyzx, l(1.000000,1.000000,1.000000,0)
+mul o0.xyz, r0.xyzx, r1.xyzx
 mov o0.w, r0.w
 ret 
-// Approximately 335 instruction slots used
+// Approximately 110 instruction slots used

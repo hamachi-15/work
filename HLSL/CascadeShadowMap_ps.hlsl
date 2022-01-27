@@ -28,5 +28,5 @@ float4 main(PSInput input) : SV_TARGET
 	float3 CS = (float3)1;
 	CS = GetCascadeShadow(P);
 	color.rgb *= CS;
-return color;
+	return color;
 }

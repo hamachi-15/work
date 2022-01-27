@@ -60,22 +60,22 @@ public:
 	bool IntersectRayVsModel(DirectX::XMFLOAT3 start, DirectX::XMFLOAT3 end, Model* model, HitResult& result);
 
 	// 名前から立方体コリジョン取得
-	std::shared_ptr<CollisionBox> GetCollisionBoxFromName(const char* name);
+	std::shared_ptr<CollisionBox> GetCollisionBoxFromName(std::string name);
 
 	// 名前から球コリジョン取得
-	std::shared_ptr<CollisionSphere> GetCollisionSphereFromName(const char* name);
+	std::shared_ptr<CollisionSphere> GetCollisionSphereFromName(std::string name);
 
 	// IDから球コリジョンを取得
 	std::vector<std::shared_ptr<CollisionSphere>> GetCollisionSphereFromID(int id);
 
 	// IDと名前から球コリジョンを取得
-	std::shared_ptr<CollisionSphere> GetCollisionSphereFromNameAndID(int id, const char* name);
+	std::shared_ptr<CollisionSphere> GetCollisionSphereFromNameAndID(int id, std::string name);
 
 	// 名前から円柱コリジョン取得
-	std::shared_ptr<CollisionCylinder> GetCollisionCylinderFromName(const char* name);
+	std::shared_ptr<CollisionCylinder> GetCollisionCylinderFromName(std::string name);
 
 	// IDと名前から円柱コリジョンを取得
-	std::shared_ptr<CollisionCylinder> GetCollisionCylinderFromNameAndID(int id, const char* name);
+	std::shared_ptr<CollisionCylinder> GetCollisionCylinderFromNameAndID(int id, std::string name);
 
 private:
 	// 球と球の交差判定

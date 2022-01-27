@@ -42,7 +42,7 @@
 // COLOR                    0   xyzw        3     NONE   float   xyzw
 //
 vs_5_0
-dcl_globalFlags refactoringAllowed | skipOptimization
+dcl_globalFlags refactoringAllowed
 dcl_constantbuffer CB0[8], immediateIndexed
 dcl_input v0.xyz
 dcl_input v1.xyzw
@@ -51,51 +51,19 @@ dcl_output_siv o0.xyzw, position
 dcl_output o1.xyz
 dcl_output o2.xy
 dcl_output o3.xyzw
-dcl_temps 4
-//
-// Initial variable locations:
-//   v0.x <- input.position.x; v0.y <- input.position.y; v0.z <- input.position.z; 
-//   v1.x <- input.color.x; v1.y <- input.color.y; v1.z <- input.color.z; v1.w <- input.color.w; 
-//   v2.x <- input.texcoord.x; v2.y <- input.texcoord.y; 
-//   v3.x <- input.normal.x; v3.y <- input.normal.y; v3.z <- input.normal.z; 
-//   o3.x <- <main return value>.color.x; o3.y <- <main return value>.color.y; o3.z <- <main return value>.color.z; o3.w <- <main return value>.color.w; 
-//   o2.x <- <main return value>.texcoord.x; o2.y <- <main return value>.texcoord.y; 
-//   o1.x <- <main return value>.world_pos.x; o1.y <- <main return value>.world_pos.y; o1.z <- <main return value>.world_pos.z; 
-//   o0.x <- <main return value>.position.x; o0.y <- <main return value>.position.y; o0.z <- <main return value>.position.z; o0.w <- <main return value>.position.w
-//
-#line 7 "E:\就職作品\ライブラリ\Game\HLSL\SkyBox_vs.hlsl"
-mov r0.xyz, v0.xyzx  // r0.x <- output.position.x; r0.y <- output.position.y; r0.z <- output.position.z
-mov r0.w, l(1.000000)  // r0.w <- output.position.w
-
-#line 9
-mul r1.xyzw, v0.xxxx, cb0[4].xyzw
-mul r2.xyzw, v0.yyyy, cb0[5].xyzw
-add r1.xyzw, r1.xyzw, r2.xyzw
-mul r2.xyzw, v0.zzzz, cb0[6].xyzw
-add r1.xyzw, r1.xyzw, r2.xyzw
-mul r2.xyzw, cb0[7].xyzw, l(1.000000, 1.000000, 1.000000, 1.000000)
-add r1.xyzw, r1.xyzw, r2.xyzw  // r1.x <- p.x; r1.y <- p.y; r1.z <- p.z; r1.w <- p.w
-
-#line 10
-div r1.xyzw, r1.xyzw, r1.wwww
-mul r2.xyz, r1.xxxx, cb0[0].xyzx
-mul r3.xyz, r1.yyyy, cb0[1].xyzx
-add r2.xyz, r2.xyzx, r3.xyzx
-mul r1.xyz, r1.zzzz, cb0[2].xyzx
-add r1.xyz, r1.xyzx, r2.xyzx
-mul r2.xyz, r1.wwww, cb0[3].xyzx
-add r1.xyz, r1.xyzx, r2.xyzx  // r1.x <- output.world_pos.x; r1.y <- output.world_pos.y; r1.z <- output.world_pos.z
-
-#line 11
-mov r2.xy, v2.xyxx  // r2.x <- output.texcoord.x; r2.y <- output.texcoord.y
-
-#line 12
-mov r3.xyzw, v1.xyzw  // r3.x <- output.color.x; r3.y <- output.color.y; r3.z <- output.color.z; r3.w <- output.color.w
-
-#line 14
-mov o0.xyzw, r0.xyzw
-mov o3.xyzw, r3.xyzw
-mov o1.xyz, r1.xyzx
-mov o2.xy, r2.xyxx
+dcl_temps 2
+mov o0.xyz, v0.xyzx
+mov o0.w, l(1.000000)
+mul r0.xyzw, v0.yyyy, cb0[5].xyzw
+mad r0.xyzw, cb0[4].xyzw, v0.xxxx, r0.xyzw
+mad r0.xyzw, cb0[6].xyzw, v0.zzzz, r0.xyzw
+add r0.xyzw, r0.xyzw, cb0[7].xyzw
+div r0.xyzw, r0.xyzw, r0.wwww
+mul r1.xyz, r0.yyyy, cb0[1].xyzx
+mad r1.xyz, cb0[0].xyzx, r0.xxxx, r1.xyzx
+mad r0.xyz, cb0[2].xyzx, r0.zzzz, r1.xyzx
+mad o1.xyz, cb0[3].xyzx, r0.wwww, r0.xyzx
+mov o2.xy, v2.xyxx
+mov o3.xyzw, v1.xyzw
 ret 
-// Approximately 24 instruction slots used
+// Approximately 14 instruction slots used

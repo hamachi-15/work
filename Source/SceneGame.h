@@ -52,6 +52,7 @@ private:
 
 	std::unique_ptr<Shader>				sprite_cube;
 	std::unique_ptr<Bloom>				bloom;
+	std::unique_ptr<Shader>				primitive;
 
 	std::unique_ptr<Sprite>				sprite;
 	std::unique_ptr<Texture>			sky;

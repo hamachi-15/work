@@ -185,11 +185,11 @@ void Model::UpdateAnimation(float elapsed_time, bool hitstop_flag)
 	// 経過時間
 	//current_animation_seconds += elapsed_time;
 	// ヒットストップ時間中なら時間の流れをゆっくりに
-	//if (hitstop_flag)
-	//{
-	//	current_animation_seconds += (elapsed_time * 0.1f);
-	//}
-	//else
+	if (hitstop_flag)
+	{
+		current_animation_seconds += (elapsed_time * 0.3f);
+	}
+	else
 	{
 		current_animation_seconds += elapsed_time;
 	}

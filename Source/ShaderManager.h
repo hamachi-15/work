@@ -13,6 +13,7 @@ public:
 		SkyBox,
 		//Bulr,
 		Bloom,
+		Dissolve,
 		Phong,
 		Lambert,
 		CreateShadowMap,

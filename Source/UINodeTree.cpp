@@ -11,7 +11,7 @@ UINodeTree::~UINodeTree()
 //--------------------------
 // UIノード登録
 //--------------------------
-void UINodeTree::AddNode(std::string search_name, std::string entry_name, UIData* ui_data, UIActionBase* ui_action)
+void UINodeTree::AddNode(std::string search_name, std::string entry_name, UIData* ui_data, UIJudgmentBase* judgment, UIActionBase* ui_action)
 {
 	// サーチする名前がなければ
 	if (search_name == "")
@@ -19,7 +19,7 @@ void UINodeTree::AddNode(std::string search_name, std::string entry_name, UIData
 		// そのままノードを追加
 		if (root == NULL)
 		{
-			root = new UINodeBase(entry_name, NULL, NULL, ui_data, ui_action, 1);
+			root = new UINodeBase(entry_name, NULL, NULL, ui_data, judgment, ui_action, 1);
 		}
 	}
 	else
@@ -32,7 +32,7 @@ void UINodeTree::AddNode(std::string search_name, std::string entry_name, UIData
 			// 兄弟になるノードを取得し
 			UINodeBase* sibling = search_node->GetLastChild();
 			// 追加するノードを作成し
-			UINodeBase* add_node = new UINodeBase(entry_name, search_node, sibling, ui_data, ui_action, search_node->GetHiererchyNo() + 1);
+			UINodeBase* add_node = new UINodeBase(entry_name, search_node, sibling, ui_data, judgment, ui_action, search_node->GetHiererchyNo() + 1);
 			// 検索にヒットしたノードの子ノードに追加
 			search_node->AddChild(add_node);
 		}

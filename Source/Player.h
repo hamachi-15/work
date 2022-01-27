@@ -16,7 +16,7 @@ public:
 	~Player()override{}
 
 	// –¼‘OŽæ“¾
-	const char* GetName() const override { return "Player"; }
+	std::string GetName() const override { return "Player"; }
 
 	// GUI•`‰æ
 	void OnGUI() override;

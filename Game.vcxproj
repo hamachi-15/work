@@ -203,9 +203,11 @@
     <ClCompile Include="Source\BehaviorData.cpp" />
     <ClCompile Include="Source\BehaviorTree.cpp" />
     <ClCompile Include="Source\BloomShader.cpp" />
+    <ClCompile Include="Source\BossHealthUI.cpp" />
     <ClCompile Include="Source\Button.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="Source\ButtonUIAction.cpp" />
     <ClCompile Include="Source\Camera.cpp" />
     <ClCompile Include="Source\CameraController.cpp" />
     <ClCompile Include="Source\CascadeShadowMapShader.cpp" />
@@ -216,6 +218,7 @@
     <ClCompile Include="Source\DebugRenderer.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="Source\DissolveShader.cpp" />
     <ClCompile Include="Source\DragonActionOwner.cpp" />
     <ClCompile Include="Source\DragonJudgmentOwner.cpp" />
     <ClCompile Include="Source\Effect.cpp">
@@ -268,6 +271,7 @@
     <ClCompile Include="Source\Mouse.cpp" />
     <ClCompile Include="Source\Movement.cpp" />
     <ClCompile Include="Source\NodeBase.cpp" />
+    <ClCompile Include="Source\NormalEnemyHelthUI.cpp" />
     <ClCompile Include="Source\OperateDictionaryMenu.cpp" />
     <ClCompile Include="Source\PhongShader.cpp" />
     <ClCompile Include="Source\PhongVarianceShadowMap.cpp" />
@@ -304,6 +308,10 @@
     <ClCompile Include="Source\Texture.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="Source\TitleButtonUI.cpp" />
+    <ClCompile Include="Source\TitleButtonUIAction.cpp" />
+    <ClCompile Include="Source\TitleButtonUIJudgment.cpp" />
+    <ClCompile Include="Source\TitleUIJudgment.cpp" />
     <ClCompile Include="Source\TopMenu.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
@@ -336,9 +344,11 @@
     <ClInclude Include="Source\BehaviorData.h" />
     <ClInclude Include="Source\BehaviorTree.h" />
     <ClInclude Include="Source\BloomShader.h" />
+    <ClInclude Include="Source\BossHealthUI.h" />
     <ClInclude Include="Source\Button.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="Source\ButtonUIAction.h" />
     <ClInclude Include="Source\Camera.h" />
     <ClInclude Include="Source\CameraController.h" />
     <ClInclude Include="Source\CascadeShadowMapShader.h" />
@@ -351,6 +361,7 @@
     <ClInclude Include="Source\DebugRenderer.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="Source\DissolveShader.h" />
     <ClInclude Include="Source\DragonActionOwner.h" />
     <ClInclude Include="Source\DragonJudgmentOwner.h" />
     <ClInclude Include="Source\Effect.h">
@@ -417,6 +428,7 @@
     <ClInclude Include="Source\Mouse.h" />
     <ClInclude Include="Source\Movement.h" />
     <ClInclude Include="Source\NodeBase.h" />
+    <ClInclude Include="Source\NormalEnemyHelthUI.h" />
     <ClInclude Include="Source\OperateDictionaryMenu.h" />
     <ClInclude Include="Source\PhongShader.h" />
     <ClInclude Include="Source\PhongVarianceShadowMap.h" />
@@ -455,12 +467,17 @@
     <ClInclude Include="Source\Texture.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="Source\TitleButtonUI.h" />
+    <ClInclude Include="Source\TitleButtonUIAction.h" />
+    <ClInclude Include="Source\TitleButtonUIJudgment.h" />
+    <ClInclude Include="Source\TitleUIJudgment.h" />
     <ClInclude Include="Source\TopMenu.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Source\UI.h" />
     <ClInclude Include="Source\UIActionBase.h" />
     <ClInclude Include="Source\UIData.h" />
+    <ClInclude Include="Source\UIJudgmentBase.h" />
     <ClInclude Include="Source\UIManager.h" />
     <ClInclude Include="Source\UINodeBase.h" />
     <ClInclude Include="Source\UINodeTree.h" />
@@ -475,11 +492,15 @@
     </None>
     <None Include="HLSL\CascadeShadowMap.hlsli" />
     <None Include="HLSL\Debug.hlsli" />
+    <None Include="HLSL\EnvMask.hlsli" />
     <None Include="HLSL\Font.hlsli" />
     <None Include="HLSL\Func.hlsli" />
     <None Include="HLSL\GaussianBlur.hlsli" />
     <None Include="HLSL\ImGui.hlsli" />
     <None Include="HLSL\LambertShader.hlsli" />
+    <None Include="HLSL\Mask.hlsli">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </None>
     <None Include="HLSL\MotionBlur.hlsli" />
     <None Include="HLSL\Phong.hlsli" />
     <None Include="HLSL\PhongVarianceShadowMap.hlsli" />
@@ -597,6 +618,16 @@
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Shader\%(Filename).cso</ObjectFileOutput>
       <AssemblerOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AssemblyCode</AssemblerOutput>
       <AssemblerOutputFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Shader\%(Filename).cod</AssemblerOutputFile>
+    </FxCompile>
+    <FxCompile Include="HLSL\EnvMask_ps.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="HLSL\EnvMask_vs.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
     </FxCompile>
     <FxCompile Include="HLSL\Font_ps.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
@@ -741,6 +772,20 @@
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="HLSL\Mask_ps.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="HLSL\Mask_vs.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="HLSL\MotionBlur_ps.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>

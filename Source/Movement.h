@@ -10,7 +10,7 @@ public:
 	virtual ~Movement();
 
 	// –¼‘OŽæ“¾
-	const char* GetName() const override { return "Movement"; }
+	std::string GetName() const override { return "Movement"; }
 
 	// GUI•`‰æ
 	void OnGUI() override;

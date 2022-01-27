@@ -89,6 +89,7 @@ void SceneGame::Initialize()
 
 	// シェーダー初期化
 	bloom = std::make_unique<Bloom>(device);
+	primitive = std::make_unique<Primitive>(device);
 
 	// テクスチャ作成
 	bulr_texture = std::make_unique<Texture>();
@@ -254,6 +255,7 @@ void SceneGame::Render()
 {
 	Graphics& graphics = Graphics::Instance();
 	ID3D11DeviceContext* context = graphics.GetDeviceContext();
+
 	// スクリーンサイズ取得
 	DirectX::XMFLOAT2 screen_size = { graphics.GetScreenWidth(), graphics.GetScreenHeight() };
 
@@ -266,11 +268,19 @@ void SceneGame::Render()
 	render_context.view = camera.GetView();
 	render_context.projection = camera.GetProjection();
 
-	// ポストエフェクト用のテクスチャ描画
-	PostRender(context, render_context, screen_size);
+	//// バックバッファのクリア処理
+	//{
+	//	ID3D11RenderTargetView* render_target_view = graphics.GetRenderTargetView();
+	//	ID3D11DepthStencilView* depth_stencil_view = graphics.GetDepthStencilView();
+	//	// 画面クリア
+	//	graphics.ScreenClear(&render_target_view, depth_stencil_view);
+	//}
 
 	// スクリーンテクスチャに描画
 	ScreenRender(context, render_context, screen_size);
+
+	// ポストテクスチャ描画
+	PostRender(context, render_context, screen_size);
 
 	// バックバッファに描画
 	BuckBufferRender(context, render_context, screen_size);
@@ -302,11 +312,11 @@ void SceneGame::ScreenRender(ID3D11DeviceContext* context, RenderContext& render
 		std::shared_ptr<Shader> skybox_shader = shader_manager.GetShader(ShaderManager::ShaderType::SkyBox);
 		skybox_shader->Begin(context, render_context);
 		sprite->Render(context,
-			sky_texture.get(),
+			sky.get(),
 			0, 0,
 			screen_size.x, screen_size.y,
 			0, 0,
-			static_cast<float>(sky_texture->GetWidth()), static_cast<float>(sky_texture->GetHeight()),
+			static_cast<float>(sky->GetWidth()), static_cast<float>(sky->GetHeight()),
 			0,
 			1, 1, 1, 1);
 		skybox_shader->End(context);
@@ -315,17 +325,12 @@ void SceneGame::ScreenRender(ID3D11DeviceContext* context, RenderContext& render
 	// デバッグプリミティブ描画
 	{
 		// 敵縄張りのデバッグプリミティブ描画
-		EnemyTerritoryManager::Instance().Render();
-		// 敵のデバッグプリミティブ描画
-		EnemyManager::Instance().DrawDebugPrimitive();
-		// 当たり判定ののデバッグプリミティブ描画
-		CollisionManager::Instance().Draw();
-		for (int i = 0; i < 4; ++i)
-		{
-			graphics.GetDebugRenderer()->DrawSphere(camera_controller->far_position[i], 0.4f, color);
-			graphics.GetDebugRenderer()->DrawSphere(camera_controller->near_position[i], 0.4f, color);
-		}
-		graphics.GetDebugRenderer()->Render(context, render_context.view, render_context.projection);
+		//EnemyTerritoryManager::Instance().Render();
+		//// 敵のデバッグプリミティブ描画
+		//EnemyManager::Instance().DrawDebugPrimitive();
+		//// 当たり判定ののデバッグプリミティブ描画
+		//CollisionManager::Instance().Draw();
+		//graphics.GetDebugRenderer()->Render(context, render_context.view, render_context.projection);
 	}
 
 	// アクター描画
@@ -357,35 +362,35 @@ void SceneGame::PostRender(ID3D11DeviceContext* context, RenderContext& render_c
 	bloom_texture = dynamic_cast<Bloom*>(bloom_shader.get())->Render(context, render_context, sky.get());
 
 	// レンダーターゲット設定
-	{
-		ID3D11RenderTargetView* render_target_view = sky_texture->GetRenderTargetView();
-		ID3D11DepthStencilView* depth_stencil_view = depth_texture->GetDepthStencilView();
-		graphics.SetRenderTargetView(&render_target_view, depth_stencil_view);
-		graphics.ScreenClear(&render_target_view, depth_stencil_view);
-	}
-	// ビューポート設定
-	graphics.SetViewport(sky_texture->GetWidth(), sky_texture->GetHeight());
+	//{
+	//	ID3D11RenderTargetView* render_target_view = sky_texture->GetRenderTargetView();
+	//	ID3D11DepthStencilView* depth_stencil_view = depth_texture->GetDepthStencilView();
+	//	graphics.SetRenderTargetView(&render_target_view, depth_stencil_view);
+	//	graphics.ScreenClear(&render_target_view, depth_stencil_view);
+	//}
+	//// ビューポート設定
+	//graphics.SetViewport(sky_texture->GetWidth(), sky_texture->GetHeight());
 
 	// 空テクスチャと空テクスチャの輝度を抽出したテクスチャを加算合成
-	std::shared_ptr<Shader> sprite_shader = shader_manager.GetShader(ShaderManager::ShaderType::Sprite);
-	sprite_shader->Begin(context);
-	sprite->Render(context,
-			sky.get(),
-			0, 0,
-			static_cast<float>(sky_texture->GetWidth()), static_cast<float>(sky_texture->GetHeight()),
-			0, 0,
-			static_cast<float>(sky->GetWidth()), static_cast<float>(sky->GetHeight()),
-			0,
-			1, 1, 1, 1);
-	context->OMSetBlendState(graphics.GetBlendState((int)Graphics::BlendState::Add), nullptr, 0xFFFFFFFF);
-	sprite->AddRender(context,
-			bloom_texture,
-			0, 0,
-			static_cast<float>(sky_texture->GetWidth()), static_cast<float>(sky_texture->GetHeight()),
-			0, 0,
-			static_cast<float>(bloom_texture->GetWidth()), static_cast<float>(bloom_texture->GetHeight()));
-	sprite_shader->End(context);
-	context->OMSetBlendState(graphics.GetBlendState((int)Graphics::BlendState::Alpha), nullptr, 0xFFFFFFFF);
+	//std::shared_ptr<Shader> sprite_shader = shader_manager.GetShader(ShaderManager::ShaderType::Sprite);
+	//sprite_shader->Begin(context);
+	//sprite->Render(context,
+	//		sky.get(),
+	//		0, 0,
+	//		static_cast<float>(sky_texture->GetWidth()), static_cast<float>(sky_texture->GetHeight()),
+	//		0, 0,
+	//		static_cast<float>(sky->GetWidth()), static_cast<float>(sky->GetHeight()),
+	//		0,
+	//		1, 1, 1, 1);
+	//context->OMSetBlendState(graphics.GetBlendState((int)Graphics::BlendState::Add), nullptr, 0xFFFFFFFF);
+	//sprite->AddRender(context,
+	//		bloom_texture,
+	//		0, 0,
+	//		static_cast<float>(sky_texture->GetWidth()), static_cast<float>(sky_texture->GetHeight()),
+	//		0, 0,
+	//		static_cast<float>(bloom_texture->GetWidth()), static_cast<float>(bloom_texture->GetHeight()));
+	//sprite_shader->End(context);
+	//context->OMSetBlendState(graphics.GetBlendState((int)Graphics::BlendState::Alpha), nullptr, 0xFFFFFFFF);
 
 	//std::shared_ptr<Shader> bloom_shader = shader_manager.GetShader(ShaderManager::ShaderType::Bulr);
 
@@ -457,35 +462,34 @@ void SceneGame::BuckBufferRender(ID3D11DeviceContext* context, RenderContext& re
 	}
 
 	// シャドウマップ
-	if (isshadowmap)
-	{
-		for (int i = 0; i < 3; ++i)
-		{
-			sprite->Render(context,
-				ActorManager::Instance().GetShadowTexture(i),
-				0 + 200 * (i), 0,
-				200, 200,
-				0, 0,
-				(float)ActorManager::Instance().GetShadowTexture(i)->GetWidth(), (float)ActorManager::Instance().GetShadowTexture(i)->GetHeight(),
-				0,
-				1, 1, 1, 1);
-		}
-	}
-	sprite->Render(context,
-		bloom_texture,
-		0, 200,
-		200, 200,
-		0, 0,
-		(float)bloom_texture->GetWidth(), (float)bloom_texture->GetHeight(),
-		0,
-		1, 1, 1, 1);
+	//if (isshadowmap)
+	//{
+	//	for (int i = 0; i < 3; ++i)
+	//	{
+	//		sprite->Render(context,
+	//			ActorManager::Instance().GetShadowTexture(i),
+	//			0 + 200 * (i), 0,
+	//			200, 200,
+	//			0, 0,
+	//			(float)ActorManager::Instance().GetShadowTexture(i)->GetWidth(), (float)ActorManager::Instance().GetShadowTexture(i)->GetHeight(),
+	//			0,
+	//			1, 1, 1, 1);
+	//	}
+	//}
+	//sprite->Render(context,
+	//	bloom_texture,
+	//	0, 200,
+	//	200, 200,
+	//	0, 0,
+	//	(float)bloom_texture->GetWidth(), (float)bloom_texture->GetHeight(),
+	//	0,
+	//	1, 1, 1, 1);
 	sprite_shader->End(context);
 
 	// 2Dプリミティブ描画
 	{
 		if (primitive_falg)
 		{
-			std::shared_ptr<Shader> primitive = shader_manager.GetShader(ShaderManager::ShaderType::Primitive);
 			primitive->Begin(context, primitive_context);
 			sprite->Render(context,
 				0, 0,

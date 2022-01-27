@@ -37,6 +37,7 @@
 #include "MetaAI.h"
 #include "ShaderManager.h"
 
+#include "PlayerUIHealth.h"
 SceneBattle::SceneBattle()
 {
 }
@@ -66,8 +67,7 @@ void SceneBattle::Initialize()
 	camera.SetLookAt(
 		DirectX::XMFLOAT3(-400, 16, -416),
 		DirectX::XMFLOAT3(0, 0, 0),
-		DirectX::XMFLOAT3(0, 1, 0)
-	);
+		DirectX::XMFLOAT3(0, 1, 0));
 	camera.SetPerspectiveFov(
 		Mathf::ConvartToRadian(45),
 		graphics.GetScreenWidth() / graphics.GetScreenHeight(),
@@ -109,7 +109,9 @@ void SceneBattle::Initialize()
 		actor->SetScale(DirectX::XMFLOAT3(0.04f, 0.04f, 0.04f));
 		actor->AddComponent<Movement>();
 		actor->AddComponent<Charactor>();
+		std::shared_ptr<PlayerHealthUI> ac = actor->AddComponent<PlayerHealthUI>();
 		actor->AddComponent<Player>();
+		UIManager::Instance().RegisterUI(ac);
 		actor->SetShaderType(ShaderManager::ShaderType::Lambert);
 	}
 	ActorManager::Instance().Update(0.01f);

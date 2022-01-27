@@ -515,7 +515,7 @@ void Sprite::Render(
 		if(texture) texture->Set(0);
 
 		//context->OMSetDepthStencilState(depth_stencil_state.Get(), 1); 
-		//context->PSSetSamplers(0, 1, sampler_state.GetAddressOf());
+		context->PSSetSamplers(0, 1, sampler_state.GetAddressOf());
 
 		// •`‰æ
 		context->Draw(4, 0);

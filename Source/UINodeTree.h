@@ -3,6 +3,7 @@
 #include <d3d11.h>
 
 class UIActionBase;
+class UIJudgmentBase;
 class UINodeBase;
 class UIData;
 
@@ -10,12 +11,13 @@ class UINodeTree
 {
 public:
 	// コンストラクタ
-	UINodeTree() {}
+	UINodeTree() : root(NULL) {}
+
 	// デストラクタ
 	~UINodeTree();
 
 	// UIノード登録
-	void AddNode(std::string entry_name, std::string search_name, UIData* ui_data, UIActionBase* ui_action);
+	void AddNode(std::string entry_name, std::string search_name, UIData* ui_data, UIJudgmentBase* ui_judgment, UIActionBase* ui_action);
 
 	// 実行
 	void Run(float elapsed_time);

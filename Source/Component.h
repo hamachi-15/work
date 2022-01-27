@@ -1,14 +1,23 @@
 #pragma once
+#include <string>
 #include "Actor.h"
 
+//**********************************
+// 
+// コンポーネント取得
+// 
+//**********************************
 class Component
 {
 public:
+	// コンストラクタ
 	Component() {}
+
+	// デストラクタ
 	virtual ~Component() {}
 
 	// 名前取得
-	virtual const char* GetName() const = 0;
+	virtual std::string GetName() const = 0;
 
 	// 開始処理
 	virtual void Start() {}

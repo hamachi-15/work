@@ -7,6 +7,7 @@
 
 class Texture;
 class UIActionBase;
+class UIJudgmentBase;
 class UI;
 class UIData;
 
@@ -19,9 +20,12 @@ class UINodeBase
 {
 public:
 	// コンストラクタ
-	UINodeBase(std::string name, UINodeBase* parent, UINodeBase* sibling, UIData* ui_data, UIActionBase* action, int hierarchy_no) :
-		name(name), parent(parent), sibling(sibling), ui_data(ui_data), action(action), hierarchy_no(hierarchy_no) {}
+	UINodeBase(std::string name, UINodeBase* parent, UINodeBase* sibling, UIData* ui_data, UIJudgmentBase* judgment, UIActionBase* action, int hierarchy_no) :
+		name(name), parent(parent), sibling(sibling), ui_data(ui_data), judgment(judgment), action(action), hierarchy_no(hierarchy_no) {}
 	
+	// デストラクタ
+	~UINodeBase();
+
 	// 実行処理
 	void Run(float elapsed_time);
 
@@ -65,6 +69,7 @@ public:
 private:
 	std::string					name;			// 名前取得
 	UIActionBase*				action;			// 実行クラス
+	UIJudgmentBase*				judgment;		// 判定クラス
 	UINodeBase*					parent;			// 親ノード
 	UIData*						ui_data;
 	std::vector<UINodeBase*>	children;		// 子ノード

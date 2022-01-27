@@ -3,20 +3,23 @@
 
 class UINodeBase;
 
-//------------------------------
+//*************************************
+// 
 // プレイヤーHPクラス
-//------------------------------
-class PlayerHealthGage : public UI
+// 
+//*************************************
+class PlayerHealthUI : public UI, public Component
 {
 public:
 	// コンストラクタ
-	PlayerHealthGage(){}
+	PlayerHealthUI(){}
 
 	// デストラクタ
-	~PlayerHealthGage();
+	~PlayerHealthUI() override {}
+	
+	// 名前取得
+	std::string GetName() const override { return "PlayerHealthUI"; }
 	
 	// 開始処理
 	void Start() override;
-
-private:
 };

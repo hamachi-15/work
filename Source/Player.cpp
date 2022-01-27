@@ -97,7 +97,7 @@ void Player::Start()
 	// 走った時のスピード倍率設定
 	charactor->SetRunSpeedScale(1.5f);
 
-	std::shared_ptr<PlayerHealthGage> health = std::make_shared<PlayerHealthGage>();
+	//std::shared_ptr<PlayerHealthGage> health = std::make_shared<PlayerHealthGage>();
 
 	//UIParameter parameter;
 
@@ -130,7 +130,7 @@ void Player::Start()
 	//health_red_gage->SetCharactor(charactor);
 	//
 	// UIマネージャーに登録
-	UIManager::Instance().RegisterUI(health);
+	//UIManager::Instance().RegisterUI(health);
 	//UIManager::Instance().RegisterUI(health_red_gage);
 	//UIManager::Instance().RegisterUI(health_gage);
 	//UIManager::Instance().RegisterUI(health_gage_freame);

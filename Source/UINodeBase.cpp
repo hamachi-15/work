@@ -1,7 +1,17 @@
 #include "UINodeBase.h"
 #include "UIActionBase.h"
+#include "UIJudgmentBase.h"
 #include "UIData.h"
 #include "Sprite.h"
+
+//------------------------
+// デストラクタ
+//------------------------
+UINodeBase::~UINodeBase()
+{
+	delete action;
+	//delete ui_data;
+}
 
 //------------------------
 // 実行処理
@@ -30,10 +40,21 @@ void UINodeBase::Render(ID3D11DeviceContext* context)
 {
 	for (int i = 0; i < children.size(); ++i)
 	{
-		if (children.at(i)->ui_data != NULL)
+		if (children.at(i)->judgment != NULL)
 		{
-			UIData* data = children.at(i)->ui_data;
-			Rebder(context, data->GetTexture(), data->GetPosition(), data->GetSize(), data->GetAngle());
+			if (children.at(i)->judgment->Judgment() == true)
+			{
+				UIData* data = children.at(i)->ui_data;
+				Rebder(context, data->GetTexture(), data->GetPosition(), data->GetSize(), data->GetAngle());
+			}
+		}
+		else
+		{// 判定クラスがなければ無条件に描画
+			if (children.at(i)->ui_data != NULL)
+			{
+				UIData* data = children.at(i)->ui_data;
+				Rebder(context, data->GetTexture(), data->GetPosition(), data->GetSize(), data->GetAngle());
+			}
 		}
 		// 子ノードにさらに子ノードがあれば
 		if (children.at(i)->GetChildren().size() > 0)
@@ -56,7 +77,7 @@ void UINodeBase::Rebder(ID3D11DeviceContext* context,
 		position.x, position.y,
 		size.x, size.y,
 		0, 0,
-		size.x, size.y);
+		static_cast<float>(texture->GetWidth()), static_cast<float>(texture->GetHeight()));
 }
 
 //------------------------

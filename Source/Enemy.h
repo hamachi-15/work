@@ -18,7 +18,7 @@ public:
 	~Enemy() override;
 
 	// –¼‘OŽæ“¾
-	const char* GetName() const override { return name.c_str(); }
+	std::string GetName() const override { return name.c_str(); }
 	
 	// –¼‘OÝ’è
 	void SetName(const char* name) { this->name = name; }

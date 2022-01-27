@@ -189,13 +189,7 @@ void EnemySlime::DrawDebugPrimitive()
 	DebugRenderer* renderer = Graphics::Instance().GetDebugRenderer();
 	std::shared_ptr<Actor> actor = GetActor();
 	EnemyTerritoryTag teritory_tag = GetBelongingToTerritory();
-	std::shared_ptr<EnemyTerritory> enemy_territory = EnemyTerritoryManager::Instance().GetTerritory(teritory_tag);
 	DirectX::XMFLOAT3 position = actor->GetPosition();
-	float territory_range = enemy_territory->GetTerritoryRange();
-	DirectX::XMFLOAT3 territory_origin = enemy_territory->GetTerritoryOrigin();
-	territory_origin.y = actor->GetPosition().y;
-	// “ê’£‚è”ÍˆÍ‚ðƒfƒoƒbƒO‰~’Œ•`‰æ
-	renderer->DrawCylinder(territory_origin, territory_range, 1.0f, DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f));
 
 	// õ“G”ÍˆÍ‚ðƒfƒoƒbƒO‰~’Œ•`‰æ
 	renderer->DrawCylinder(position, search_range, 1.0f, DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f));

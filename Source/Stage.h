@@ -8,9 +8,11 @@ public:
 	Stage() {}
 	~Stage()override {}
 	// 名前取得
-	const char* GetName() const override { return "Stage"; }
+	std::string GetName() const override { return "Stage"; }
+	
 	// 開始処理
 	void Start() override {}
+	
 	// 更新処理
 	void Update(float elapsed_time) override {}
 

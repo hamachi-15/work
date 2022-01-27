@@ -203,8 +203,8 @@ void CollisionManager::Update()
                     PushOutCollision(cylinderA, cylinderB, result);
                     // 現在のシーンがワールドマップならシーンへ敵とエンカウントをしたメッセージを送る
                     const char* scene_name = SceneManager::Instance().GetCurrentScene()->GetName();
-                    int isplayercolA = strcmp(cylinderA->GetName(), "Player");
-                    int isplayercolB = strcmp(cylinderB->GetName(), "Player");
+                    int isplayercolA = strcmp(cylinderA->GetName().c_str(), "Player");
+                    int isplayercolB = strcmp(cylinderB->GetName().c_str(), "Player");
                     int isworldmap = strcmp(scene_name, "SceneWorldMap");
                     if (isplayercolA == 0 && isworldmap == 0 ||
                         isplayercolB == 0 && isworldmap == 0)
@@ -524,11 +524,11 @@ bool CollisionManager::IntersectRayVsModel(DirectX::XMFLOAT3 start, DirectX::XMF
 //-----------------------------------------
 // 名前から立方体コリジョン取得
 //-----------------------------------------
-std::shared_ptr<CollisionBox> CollisionManager::GetCollisionBoxFromName(const char* name)
+std::shared_ptr<CollisionBox> CollisionManager::GetCollisionBoxFromName(std::string name)
 {
     for (std::shared_ptr<CollisionBox> box : boxes)
     {
-        if (strcmp(box->GetName(), name) == 0)
+        if (box->GetName() == name)
         {
             return box;
         }
@@ -539,11 +539,11 @@ std::shared_ptr<CollisionBox> CollisionManager::GetCollisionBoxFromName(const ch
 //-----------------------------------------
 // 名前から球コリジョン取得
 //-----------------------------------------
-std::shared_ptr<CollisionSphere> CollisionManager::GetCollisionSphereFromName(const char* name)
+std::shared_ptr<CollisionSphere> CollisionManager::GetCollisionSphereFromName(std::string name)
 {
     for (std::shared_ptr<CollisionSphere> sphere : spheres)
     {
-        if (strcmp(sphere->GetName(), name) == 0)
+        if (sphere->GetName() == name)
         {
             return sphere;
         }
@@ -554,11 +554,11 @@ std::shared_ptr<CollisionSphere> CollisionManager::GetCollisionSphereFromName(co
 //-----------------------------------------
 // IDと名前から球コリジョン取得
 //-----------------------------------------
-std::shared_ptr<CollisionSphere> CollisionManager::GetCollisionSphereFromNameAndID(int id, const char* name)
+std::shared_ptr<CollisionSphere> CollisionManager::GetCollisionSphereFromNameAndID(int id, std::string name)
 {
     for (std::shared_ptr<CollisionSphere> sphere : spheres)
     {
-        if (sphere->GetActorID() == id && strcmp(sphere->GetName(), name) == 0)
+        if (sphere->GetActorID() == id && sphere->GetName() == name)
         {
             return sphere;
         }
@@ -585,11 +585,11 @@ std::vector<std::shared_ptr<CollisionSphere>> CollisionManager::GetCollisionSphe
 //-----------------------------------------
 // 名前から円柱コリジョン取得
 //-----------------------------------------
-std::shared_ptr<CollisionCylinder> CollisionManager::GetCollisionCylinderFromName(const char* name)
+std::shared_ptr<CollisionCylinder> CollisionManager::GetCollisionCylinderFromName(std::string name)
 {
     for (std::shared_ptr<CollisionCylinder> cylinder : cylinderes)
     {
-        if (strcmp(cylinder->GetName(), name) == 0)
+        if (cylinder->GetName() == name)
         {
             return cylinder;
         }
@@ -600,11 +600,11 @@ std::shared_ptr<CollisionCylinder> CollisionManager::GetCollisionCylinderFromNam
 //-----------------------------------------
 // IDと名前から円柱コリジョンを取得
 //-----------------------------------------
-std::shared_ptr<CollisionCylinder> CollisionManager::GetCollisionCylinderFromNameAndID(int id, const char* name)
+std::shared_ptr<CollisionCylinder> CollisionManager::GetCollisionCylinderFromNameAndID(int id, std::string name)
 {
     for (std::shared_ptr<CollisionCylinder> cylinder : cylinderes)
     {
-        if (cylinder->GetActorID() == id && strcmp(cylinder->GetName(), name) == 0)
+        if (cylinder->GetActorID() == id && cylinder->GetName() == name)
         {
             return cylinder;
         }

@@ -21,6 +21,12 @@ public:
 	// 更新処理
 	void Update(float elapsed_time) override;
 
+	// スクリーンテクスチャ描画
+	void ScreenRender(ID3D11DeviceContext* context, RenderContext& render_context, const DirectX::XMFLOAT2& screen_size);
+
+	// バックバッファ描画
+	void BuckBufferRender(ID3D11DeviceContext* context, RenderContext& render_context, const DirectX::XMFLOAT2& screen_size);
+	
 	// 描画処理
 	void Render() override;
 
@@ -30,18 +36,11 @@ public:
 	// ImGui描画
 	void OnGui();
 private:
-	enum class SerectButton
-	{
-		Unserect_Game_Start,
-		Serect_Game_Start,
-	};
-private:
 	RenderContext render_context;
 	BlurRenderContext blur_render_context;
-	SerectButton serect_button[2]; // 今どのボタンが選択されているか
 	std::unique_ptr<Sprite> sprite;
 	std::unique_ptr<Texture> sky;
-	std::unique_ptr<Texture> tex;
+	std::unique_ptr<Texture> mask_texture;
 	std::vector<std::unique_ptr<Texture>> start_button;
 	std::unique_ptr<Texture> tex3;
 
@@ -55,5 +54,5 @@ private:
 	DirectX::XMFLOAT3 shadow_color = { 0.5f, 0.5f, 0.5f};
 
 
-
+	float timer = 0.0f; // ディソープに使う
 };

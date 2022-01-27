@@ -8,6 +8,7 @@
 #include "Player.h"
 #include "Movement.h"
 #include "LambertShader.h"
+#include "DissolveShader.h"
 #include "ShaderManager.h"
 
 #include "ActorManager.h"
@@ -16,6 +17,10 @@
 #include "SceneGame.h"
 #include "Messenger.h"
 #include "SceneBattle.h"
+
+#include "TitleButtonUI.h"
+#include "UIManager.h"
+
 //----------------------------------
 // 初期化処理
 //----------------------------------
@@ -45,14 +50,12 @@ void SceneTitle::Initialize()
 	// カメラコントローラー初期化
 	//camera_controller = std::make_unique<CameraController>();
 
-	// 選択されているボタンの初期設定
-	serect_button[0] = SerectButton::Serect_Game_Start;
-	//serect_button[1] = SerectButton::Serect_Game_Start;
-
 	// テクスチャ読込み
 	sprite = std::make_unique<Sprite>();
-	tex = std::make_unique<Texture>();
-	tex->Load("Data/Sprite/Title.png");
+	//tex = std::make_unique<Texture>();
+	//tex->Load("Data/Sprite/Title.png");
+	mask_texture = std::make_unique<Texture>();
+	mask_texture->Load("Data/Sprite/dissolve_animation2.png");
 	start_button.emplace_back(std::make_unique<Texture>());
 	start_button.emplace_back(std::make_unique<Texture>());
 	start_button.at(0)->Load("Data/Sprite/UIAseet/KP_clusterUI_v100/03 button_rectangle/btn_rectangle_bl.png");
@@ -78,6 +81,8 @@ void SceneTitle::Initialize()
 	//ActorManager::Instance().UpdateTransform();
 	
 	//Graphics::Instance().GetAudio()->Play();
+
+	UIManager::Instance().RegisterUI(std::make_shared<TitleButtonUI>());
 }
 
 //----------------------------------
@@ -88,6 +93,8 @@ void SceneTitle::Finalize()
 	// アクターの破棄
 	//ActorManager::Instance().AllDestroy();
 
+	UIManager::Instance().AllDelete();
+
 	// メッセンジャーのクリア
 	Messenger::Instance().Clear();
 }
@@ -97,46 +104,106 @@ void SceneTitle::Finalize()
 //----------------------------------
 void SceneTitle::Update(float elapsed_time)
 {
-	GamePad& gamepad = Input::Instance().GetGamePad();
-	//ライト
-	static float light_angle = DirectX::XM_PI;
-	Light::SetAmbient(DirectX::XMFLOAT3(0.2f, 0.2f, 0.2f));
-	//ライト方向
-	LightDir.x = sinf(light_angle);
-	LightDir.y = -1.0f;
-	LightDir.z = cosf(light_angle);
-	Light::SetDirLight(LightDir, DirectX::XMFLOAT3(0.6f, 0.6f, 0.6f));
+	//GamePad& gamepad = Input::Instance().GetGamePad();
+	////ライト
+	//static float light_angle = DirectX::XM_PI;
+	//Light::SetAmbient(DirectX::XMFLOAT3(0.2f, 0.2f, 0.2f));
+	////ライト方向
+	//LightDir.x = sinf(light_angle);
+	//LightDir.y = -1.0f;
+	//LightDir.z = cosf(light_angle);
+	//Light::SetDirLight(LightDir, DirectX::XMFLOAT3(0.6f, 0.6f, 0.6f));
 
-	// アクター更新処理
-	//std::shared_ptr<Actor> actor = ActorManager::Instance().GetActor("Player");
-	//if (actor->GetComponent<Charactor>()->SearchAnimationTime(actor, 0.4f, 0.55f))
-	//{
-	//	actor->GetModel()->AnimationStop();
-	//}
-	//ActorManager::Instance().Update(elapsed_time);
-	//ActorManager::Instance().UpdateTransform();
+	if (IsSceneChangeFlag())
+	{
+		timer += elapsed_time;
+		if (timer >= 1.2f)
+		{
+			SceneManager::Instance().ChangeScene(new SceneLoading(new SceneGame()));
+		}
+	}
 
-	const GamePadButton any_button =
-		GamePad::BTN_A
-		| GamePad::BTN_B
-		| GamePad::BTN_X
-		| GamePad::BTN_Y;
+	// UI更新処理
+	UIManager::Instance().Update(elapsed_time);
+}
 
-	// カメラ更新処理
-	//camera_controller->Update(elapsed_time);
-	if (gamepad.GetButtonDown() & GamePad::BTN_LEFT)
+//----------------------------------
+// スクリーンテクスチャ描画
+//----------------------------------
+void SceneTitle::ScreenRender(ID3D11DeviceContext* context, RenderContext& render_context, const DirectX::XMFLOAT2& screen_size)
+{
+	Graphics& graphics = Graphics::Instance();
+	ShaderManager& shader_manager = ShaderManager::Instance();
+	
+	// スクリーンテクスチャをレンダーターゲットに設定して画面クリア
+	ID3D11RenderTargetView* screen_texture = graphics.GetTexture()->GetRenderTargetView();
+	ID3D11DepthStencilView* depth_stencil_view = graphics.GetDepthStencilView();
 	{
-		serect_button[0] = SerectButton::Serect_Game_Start;
+		graphics.SetRenderTargetView(&screen_texture, depth_stencil_view);
+		graphics.ScreenClear(&screen_texture, depth_stencil_view);
 	}
-	if (gamepad.GetButtonDown() & GamePad::BTN_RIGHT)
+	// ビューポートを元に戻す
+	graphics.SetViewport(screen_size.x, screen_size.y);
+
+	std::shared_ptr<Shader> sprite_shader = shader_manager.GetShader(ShaderManager::ShaderType::Sprite);
+	
+	// スカイボックス描画
 	{
-		serect_button[0] = SerectButton::Unserect_Game_Start;
+		std::shared_ptr<Shader> skybox_shader = shader_manager.GetShader(ShaderManager::ShaderType::SkyBox);
+		skybox_shader->Begin(context, render_context);
+		sprite->Render(context,
+			sky.get(),
+			0, 0,
+			screen_size.x, screen_size.y,
+			0, 0,
+			static_cast<float>(sky->GetWidth()), static_cast<float>(sky->GetHeight()));
+		skybox_shader->End(context);
 	}
-	// A,B,X,Yのいずれかのボタンが押されたときにゲームシーンに遷移する
-	if (gamepad.GetButtonDown() & any_button)
+	// アクターの描画
 	{
-		SceneManager::Instance().ChangeScene(new SceneLoading(new SceneGame()));
+		//ActorManager::Instance().Render(render_context);
 	}
+	// ボタン描画
+	{
+		//sprite_shader->Begin(context);
+		//// カーソルがゲームスタートボタンにあったら
+		//if (serect_button[0] == SerectButton::Serect_Game_Start)
+		//{
+		//	RenderButton(context, start_button.at(static_cast<int>(SerectButton::Serect_Game_Start)).get(), static_cast<int>(SerectButton::Serect_Game_Start));
+		//}
+		//else
+		//{
+		//	RenderButton(context, start_button.at(static_cast<int>(SerectButton::Unserect_Game_Start)).get(), static_cast<int>(SerectButton::Unserect_Game_Start));
+		//}
+		//sprite_shader->End(context);
+		UIManager::Instance().Draw(context);
+	}
+
+}
+
+//----------------------------------
+// バックバッファ描画
+//----------------------------------
+void SceneTitle::BuckBufferRender(ID3D11DeviceContext* context, RenderContext& render_context, const DirectX::XMFLOAT2& screen_size)
+{
+	Graphics& graphics = Graphics::Instance();
+	ShaderManager& shader_manager = ShaderManager::Instance();
+	// スプライトシェーダー取得
+	std::shared_ptr<Shader> dissolve_shader = shader_manager.GetShader(ShaderManager::ShaderType::Dissolve);
+	// レンダーターゲット設定
+	{
+		ID3D11RenderTargetView* render_target_view = graphics.GetRenderTargetView();
+		ID3D11DepthStencilView* depth_stencil_view = graphics.GetDepthStencilView();
+		graphics.SetRenderTargetView(&render_target_view, depth_stencil_view);
+		graphics.ScreenClear(&render_target_view, depth_stencil_view, { 0.0f, 0.0f, 0.5f, 1.0f });
+	}
+	// ビューポート設定
+	graphics.SetViewport(screen_size.x, screen_size.y);
+
+	// バックバッファにスクリーンテクスチャを描画
+	dissolve_shader->Begin(context, timer);
+	dynamic_cast<DissolveShader*>(dissolve_shader.get())->Render(context, graphics.GetTexture(), mask_texture.get());
+	dissolve_shader->End(context);
 }
 
 //----------------------------------
@@ -170,39 +237,10 @@ void SceneTitle::Render()
 	float screen_width = graphics.GetScreenWidth();
 	float screen_height = graphics.GetScreenHeight();
 
-	// スカイボックス描画
-	{
-		std::shared_ptr<Shader> skybox_shader = shader_manager.GetShader(ShaderManager::ShaderType::SkyBox);
-		skybox_shader->Begin(context, render_context);
-		sprite->Render(context,
-			sky.get(),
-			0, 0,
-			screen_width, screen_height,
-			0, 0,
-			(float)sky->GetWidth(), (float)sky->GetHeight(),
-			0,
-			1, 1, 1, 1);
-		skybox_shader->End(context);
-	}
-	// アクターの描画
-	{
-		//ActorManager::Instance().Render(render_context);
-	}
-	// ボタン描画
-	{
-		sprite_shader->Begin(context);
-		// カーソルがゲームスタートボタンにあったら
-		if (serect_button[0] == SerectButton::Serect_Game_Start)
-		{
-			RenderButton(context, start_button.at(static_cast<int>(SerectButton::Serect_Game_Start)).get(), static_cast<int>(SerectButton::Serect_Game_Start));
-		}
-		else
-		{
-			RenderButton(context, start_button.at(static_cast<int>(SerectButton::Unserect_Game_Start)).get(), static_cast<int>(SerectButton::Unserect_Game_Start));
-		}
-		sprite_shader->End(context);
-	}
-	//OnGui();
+	ScreenRender(context, render_context, { screen_width, screen_height });
+
+	BuckBufferRender(context, render_context, { screen_width, screen_height });
+	OnGui();
 }
 
 //----------------------------
@@ -233,10 +271,10 @@ void SceneTitle::OnGui()
 	ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
 
 	ImGui::Begin("Shader", nullptr, ImGuiWindowFlags_None);
-	ImGui::TextColored(ImVec4(1, 1, 0, 1), u8"-------シャドウマップ用ブラー-------");
-	ImGui::SliderInt("KarnelSize", &blur_render_context.karnel_size, 1, 15);
+	ImGui::SliderFloat("Timer", &timer, 0.0f, 1.5f);
 
 	ImGui::TextColored(ImVec4(1, 1, 0, 1), u8"-------シャドウマップ-------");
 	ImGui::ColorEdit3("ShadowColor", (float*)&shadow_color);
+
 	ImGui::End();
 }
