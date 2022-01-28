@@ -48,7 +48,6 @@ Phong::Phong(ID3D11Device* device)
 	}
 }
 
-//void Phong::Begin(ID3D11DeviceContext* context, RenderContext& render_context, DirectX::XMFLOAT4 light_color)
 void Phong::Begin(ID3D11DeviceContext* context, RenderContext& render_context)
 {
 	Activate(context);
@@ -63,9 +62,6 @@ void Phong::Begin(ID3D11DeviceContext* context, RenderContext& render_context)
 	context->PSSetConstantBuffers(0, ARRAYSIZE(constantBuffers), constantBuffers);
 
 	const float blend_factor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-	//context->OMSetBlendState(blend_state.Get(), blend_factor, 0xFFFFFFFF);
-	//context->OMSetDepthStencilState(depth_stencil_state.Get(), 0);
-	//context->RSSetState(rasterizer_state.Get());
 
 	// シーン用定数バッファ更新
 	CbScene cbscene;

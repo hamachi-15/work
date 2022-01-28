@@ -64,17 +64,11 @@ void SceneGame::Initialize()
 	// シーン名設定
 	SetName("SceneWorldMap");
 
-	// データベース初期化
-	GameDataBase::Instance();
-	
-	// ライト初期化
-	Light::Initialize();
-
 	// カメラ初期設定
 	Camera& camera = Camera::Instance();
 	camera.SetLookAt(
-		DirectX::XMFLOAT3(-100, 6, -136),
-		DirectX::XMFLOAT3(-100, 6, -116),
+		DirectX::XMFLOAT3(-100, 1, -136),
+		DirectX::XMFLOAT3(-100, 0, -116),
 		DirectX::XMFLOAT3(0, 1, 0)
 	);
 	camera.SetPerspectiveFov(Mathf::ConvartToRadian(45),
@@ -103,7 +97,7 @@ void SceneGame::Initialize()
 	sky = std::make_unique<Texture>();
 	sky->Load("Data/Sprite/SkyBox/FS002_Night.png");
 	sky_texture = std::make_unique<Texture>();
-	sky_texture->Create(static_cast<float>(sky->GetWidth()), static_cast<float>(sky->GetHeight()), DXGI_FORMAT_R16G16B16A16_FLOAT);
+	sky_texture->Create(sky->GetWidth(), sky->GetHeight(), DXGI_FORMAT_R16G16B16A16_FLOAT);
 
 	// ステージ読み込み
 	{
@@ -113,7 +107,6 @@ void SceneGame::Initialize()
 		actor->SetPosition(DirectX::XMFLOAT3(0, 0, 0));
 		actor->SetAngle(DirectX::XMFLOAT3( 0, Mathf::ConvartToRadian(-90), 0));
 		actor->SetScale(DirectX::XMFLOAT3(0.1f, 0.1f, 0.1f));
-		//actor->SetScale(DirectX::XMFLOAT3(1.f, 1.f, 1.f));
 		actor->AddComponent<Stage>();
 		actor->SetShaderType(ShaderManager::ShaderType::CascadeShadowMap);
 	}
@@ -124,7 +117,6 @@ void SceneGame::Initialize()
 		actor->SetPosition(DirectX::XMFLOAT3(0, 0, 0));
 		actor->SetAngle(DirectX::XMFLOAT3(0, Mathf::ConvartToRadian(-90), 0));
 		actor->SetScale(DirectX::XMFLOAT3(0.1f, 0.1f, 0.1f));
-		//actor->SetScale(DirectX::XMFLOAT3(1.f, 1.f, 1.f));
 		actor->AddComponent<Stage>();
 		actor->SetShaderType(ShaderManager::ShaderType::Lambert);
 	}
@@ -136,22 +128,25 @@ void SceneGame::Initialize()
 		actor->SetPosition(DirectX::XMFLOAT3(-100, 6, -116));
 		actor->SetAngle(DirectX::XMFLOAT3(0, 0, 0));
 		actor->SetScale(DirectX::XMFLOAT3(0.04f, 0.04f, 0.04f));
-		//actor->SetScale(DirectX::XMFLOAT3(0.8f, 0.8f, 0.8f));
 		actor->AddComponent<Movement>();
 		actor->AddComponent<Charactor>();
 		actor->AddComponent<Player>();
 		actor->SetShaderType(ShaderManager::ShaderType::Lambert);
 	}
-	//ActorManager::Instance().Update(0.01f);
-	ActorManager::Instance().UpdateTransform();
+	// 敵の生成
+	MetaAI::Instance().AppearanceEnemy();
 
-	MetaAI::Instance();
+	ActorManager::Instance().Update(0.01f);
+	ActorManager::Instance().UpdateTransform();
 }
 
 void SceneGame::Finalize()
 {
 	// 敵マネージャーのクリア
 	EnemyManager::Instance().AllRemove();
+
+	// UIの全破棄
+	UIManager::Instance().AllDelete();
 
 	// アクターの破棄
 	ActorManager::Instance().AllDestroy();
@@ -227,10 +222,6 @@ void SceneGame::Update(float elapsed_time)
 	LightDir.z = cosf(light_angle);
 	Light::SetDirLight(LightDir, DirectX::XMFLOAT3(0.6f, 0.6f, 0.6f));
 	
-
-	// メタAIの更新処理
-	MetaAI::Instance().Update(elapsed_time);
-
 	// 当たり判定更新処理
 	CollisionManager::Instance().Update();
 
@@ -268,14 +259,6 @@ void SceneGame::Render()
 	render_context.view = camera.GetView();
 	render_context.projection = camera.GetProjection();
 
-	//// バックバッファのクリア処理
-	//{
-	//	ID3D11RenderTargetView* render_target_view = graphics.GetRenderTargetView();
-	//	ID3D11DepthStencilView* depth_stencil_view = graphics.GetDepthStencilView();
-	//	// 画面クリア
-	//	graphics.ScreenClear(&render_target_view, depth_stencil_view);
-	//}
-
 	// スクリーンテクスチャに描画
 	ScreenRender(context, render_context, screen_size);
 
@@ -284,9 +267,6 @@ void SceneGame::Render()
 
 	// バックバッファに描画
 	BuckBufferRender(context, render_context, screen_size);
-
-	// GUI描画
-	OnGui();
 }
 
 //-------------------------------------
@@ -322,17 +302,6 @@ void SceneGame::ScreenRender(ID3D11DeviceContext* context, RenderContext& render
 		skybox_shader->End(context);
 	}
 
-	// デバッグプリミティブ描画
-	{
-		// 敵縄張りのデバッグプリミティブ描画
-		//EnemyTerritoryManager::Instance().Render();
-		//// 敵のデバッグプリミティブ描画
-		//EnemyManager::Instance().DrawDebugPrimitive();
-		//// 当たり判定ののデバッグプリミティブ描画
-		//CollisionManager::Instance().Draw();
-		//graphics.GetDebugRenderer()->Render(context, render_context.view, render_context.projection);
-	}
-
 	// アクター描画
 	{
 		// シャドウマップ作成
@@ -361,54 +330,6 @@ void SceneGame::PostRender(ID3D11DeviceContext* context, RenderContext& render_c
 	// 空のテクスチャのブルーム処理
 	bloom_texture = dynamic_cast<Bloom*>(bloom_shader.get())->Render(context, render_context, sky.get());
 
-	// レンダーターゲット設定
-	//{
-	//	ID3D11RenderTargetView* render_target_view = sky_texture->GetRenderTargetView();
-	//	ID3D11DepthStencilView* depth_stencil_view = depth_texture->GetDepthStencilView();
-	//	graphics.SetRenderTargetView(&render_target_view, depth_stencil_view);
-	//	graphics.ScreenClear(&render_target_view, depth_stencil_view);
-	//}
-	//// ビューポート設定
-	//graphics.SetViewport(sky_texture->GetWidth(), sky_texture->GetHeight());
-
-	// 空テクスチャと空テクスチャの輝度を抽出したテクスチャを加算合成
-	//std::shared_ptr<Shader> sprite_shader = shader_manager.GetShader(ShaderManager::ShaderType::Sprite);
-	//sprite_shader->Begin(context);
-	//sprite->Render(context,
-	//		sky.get(),
-	//		0, 0,
-	//		static_cast<float>(sky_texture->GetWidth()), static_cast<float>(sky_texture->GetHeight()),
-	//		0, 0,
-	//		static_cast<float>(sky->GetWidth()), static_cast<float>(sky->GetHeight()),
-	//		0,
-	//		1, 1, 1, 1);
-	//context->OMSetBlendState(graphics.GetBlendState((int)Graphics::BlendState::Add), nullptr, 0xFFFFFFFF);
-	//sprite->AddRender(context,
-	//		bloom_texture,
-	//		0, 0,
-	//		static_cast<float>(sky_texture->GetWidth()), static_cast<float>(sky_texture->GetHeight()),
-	//		0, 0,
-	//		static_cast<float>(bloom_texture->GetWidth()), static_cast<float>(bloom_texture->GetHeight()));
-	//sprite_shader->End(context);
-	//context->OMSetBlendState(graphics.GetBlendState((int)Graphics::BlendState::Alpha), nullptr, 0xFFFFFFFF);
-
-	//std::shared_ptr<Shader> bloom_shader = shader_manager.GetShader(ShaderManager::ShaderType::Bulr);
-
-	//Texture* texture = bulr->Render(graphics.GetTexture());
-	//{
-	//	ID3D11RenderTargetView* render_target_view[1] = { bulr_texture->GetRenderTargetView() };
-	//	graphics.SetRenderTargetView(render_target_view, depth_stencil_view);
-	//}
-	//// ビューポートの設定
-	//graphics.SetViewport(screen_size.x, screen_size.y);
-	//graphics.GetSpriteShader()->Begin(context);
-	//sprite->Render(context,
-	//	texture,
-	//	0, 0,
-	//	screen_size.x, screen_size.y,
-	//	0, 0,
-	//	texture->GetWidth(), texture->GetHeight());
-	//graphics.GetSpriteShader()->End(context);
 }
 
 //-------------------------------------
@@ -441,17 +362,6 @@ void SceneGame::BuckBufferRender(ID3D11DeviceContext* context, RenderContext& re
 		(float)graphics.GetTexture()->GetWidth(), (float)graphics.GetTexture()->GetHeight(),
 		0,
 		1, 1, 1, 1);
-	// 輝度抽出テクスチャを加算合成
-	//context->OMSetBlendState(graphics.GetBlendState((int)Graphics::BlendState::Add), nullptr, 0xFFFFFFFF);
-	//sprite->AddRender(context,
-	//	bloom_texture,
-	//	0, 0,
-	//	screen_size.x, screen_size.y,
-	//	0, 0,
-	//	(float)bloom_texture->GetWidth(), (float)bloom_texture->GetHeight());
-
-	//// ブレンドステートをアルファ加算合成に設定
-	//context->OMSetBlendState(graphics.GetBlendState((int)Graphics::BlendState::Alpha), nullptr, 0xFFFFFFFF);
 	
 	// メニュー描画
 	{
@@ -460,30 +370,6 @@ void SceneGame::BuckBufferRender(ID3D11DeviceContext* context, RenderContext& re
 			MenuSystem::Instance().Render(context);
 		}
 	}
-
-	// シャドウマップ
-	//if (isshadowmap)
-	//{
-	//	for (int i = 0; i < 3; ++i)
-	//	{
-	//		sprite->Render(context,
-	//			ActorManager::Instance().GetShadowTexture(i),
-	//			0 + 200 * (i), 0,
-	//			200, 200,
-	//			0, 0,
-	//			(float)ActorManager::Instance().GetShadowTexture(i)->GetWidth(), (float)ActorManager::Instance().GetShadowTexture(i)->GetHeight(),
-	//			0,
-	//			1, 1, 1, 1);
-	//	}
-	//}
-	//sprite->Render(context,
-	//	bloom_texture,
-	//	0, 200,
-	//	200, 200,
-	//	0, 0,
-	//	(float)bloom_texture->GetWidth(), (float)bloom_texture->GetHeight(),
-	//	0,
-	//	1, 1, 1, 1);
 	sprite_shader->End(context);
 
 	// 2Dプリミティブ描画

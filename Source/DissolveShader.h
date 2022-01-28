@@ -38,5 +38,4 @@ private:
 	};
 	Microsoft::WRL::ComPtr<ID3D11Buffer>	constant_buffer;
 
-	//std::unique_ptr<Texture>				mask_texture;
 };

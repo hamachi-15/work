@@ -33,6 +33,4 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilState>	depth_stencil_state;
 	Microsoft::WRL::ComPtr<ID3D11SamplerState>		sampler_state;
 	Microsoft::WRL::ComPtr<ID3D11SamplerState>		sampler_shadow;
-
-	//std::unique_ptr<VarianceShadowMap> shadow;
 };

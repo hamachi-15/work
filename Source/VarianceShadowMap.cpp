@@ -88,12 +88,7 @@ void VarianceShadowMap::Begin(ID3D11DeviceContext* context, RenderContext& rende
 
 	// シーン用定数バッファ更新
 	CBScene cbscene;
-	// TODO 変更したカメラのビューとプロジェクションの設定
-	//DirectX::XMStoreFloat4x4(&cbScene.view_projection, matview * pm);
-	//render_context.light_view_projection = cbScene.view_projection;
-	//DirectX::XMMATRIX V = DirectX::XMLoadFloat4x4(&render_context.view);
-	//DirectX::XMMATRIX P = DirectX::XMLoadFloat4x4(&render_context.projection);
-	//DirectX::XMStoreFloat4x4(&cbscene.view_projection, V * P);
+	// 変更したカメラのビューとプロジェクションの設定
 	cbscene.view_projection = render_context.single_light_view_projection;
 	context->UpdateSubresource(scene_constant_buffer.Get(), 0, 0, &cbscene, 0, 0);
 }

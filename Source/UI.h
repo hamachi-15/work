@@ -35,9 +35,6 @@ public:
 	// 更新処理
 	void Render(ID3D11DeviceContext* context);
 
-	// ワールド座標からスクリーン座標に変換する
-	DirectX::XMFLOAT2 ScreenPositionOfWorldPosition(ID3D11DeviceContext* context,
-		const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection);
 public:
 	UINodeTree* ui_node_tree = nullptr;
 };

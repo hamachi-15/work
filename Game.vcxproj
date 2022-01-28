@@ -204,10 +204,10 @@
     <ClCompile Include="Source\BehaviorTree.cpp" />
     <ClCompile Include="Source\BloomShader.cpp" />
     <ClCompile Include="Source\BossHealthUI.cpp" />
+    <ClCompile Include="Source\BossHealthUIAction.cpp" />
     <ClCompile Include="Source\Button.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="Source\ButtonUIAction.cpp" />
     <ClCompile Include="Source\Camera.cpp" />
     <ClCompile Include="Source\CameraController.cpp" />
     <ClCompile Include="Source\CascadeShadowMapShader.cpp" />
@@ -267,7 +267,6 @@
     <ClCompile Include="Source\MetaAI.cpp" />
     <ClCompile Include="Source\Model.cpp" />
     <ClCompile Include="Source\ModelResource.cpp" />
-    <ClCompile Include="Source\ModelVarianceShadowMap.cpp" />
     <ClCompile Include="Source\Mouse.cpp" />
     <ClCompile Include="Source\Movement.cpp" />
     <ClCompile Include="Source\NodeBase.cpp" />
@@ -286,17 +285,13 @@
     <ClCompile Include="Source\PLTJudgmentOwner.cpp" />
     <ClCompile Include="Source\ResourceManager.cpp" />
     <ClCompile Include="Source\SceneBattle.cpp" />
-    <ClCompile Include="Source\SceneClear.cpp" />
     <ClCompile Include="Source\SceneGame.cpp" />
-    <ClCompile Include="Source\SceneGameOver.cpp" />
     <ClCompile Include="Source\SceneLoading.cpp" />
     <ClCompile Include="Source\SceneManager.cpp" />
-    <ClCompile Include="Source\SceneOver.cpp" />
     <ClCompile Include="Source\SceneTitle.cpp" />
     <ClCompile Include="Source\SceneTutorial.cpp" />
     <ClCompile Include="Source\Script.cpp" />
     <ClCompile Include="Source\Shader.cpp" />
-    <ClCompile Include="Source\ShaderManager.cpp" />
     <ClCompile Include="Source\SkyBoxShader.cpp" />
     <ClCompile Include="Source\SlimeActionOwner.cpp" />
     <ClCompile Include="Source\SlimeJudgmentOwner.cpp" />
@@ -310,13 +305,11 @@
     </ClCompile>
     <ClCompile Include="Source\TitleButtonUI.cpp" />
     <ClCompile Include="Source\TitleButtonUIAction.cpp" />
-    <ClCompile Include="Source\TitleButtonUIJudgment.cpp" />
     <ClCompile Include="Source\TitleUIJudgment.cpp" />
     <ClCompile Include="Source\TopMenu.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Source\UI.cpp" />
-    <ClCompile Include="Source\UIData.cpp" />
     <ClCompile Include="Source\UIManager.cpp" />
     <ClCompile Include="Source\UINodeBase.cpp" />
     <ClCompile Include="Source\UINodeTree.cpp" />
@@ -345,10 +338,10 @@
     <ClInclude Include="Source\BehaviorTree.h" />
     <ClInclude Include="Source\BloomShader.h" />
     <ClInclude Include="Source\BossHealthUI.h" />
+    <ClInclude Include="Source\BossHealthUIAction.h" />
     <ClInclude Include="Source\Button.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClInclude>
-    <ClInclude Include="Source\ButtonUIAction.h" />
     <ClInclude Include="Source\Camera.h" />
     <ClInclude Include="Source\CameraController.h" />
     <ClInclude Include="Source\CascadeShadowMapShader.h" />
@@ -424,7 +417,6 @@
     <ClInclude Include="Source\Misc.h" />
     <ClInclude Include="Source\Model.h" />
     <ClInclude Include="Source\ModelResource.h" />
-    <ClInclude Include="Source\ModelVarianceShadowMap.h" />
     <ClInclude Include="Source\Mouse.h" />
     <ClInclude Include="Source\Movement.h" />
     <ClInclude Include="Source\NodeBase.h" />
@@ -445,11 +437,9 @@
     <ClInclude Include="Source\ResourceManager.h" />
     <ClInclude Include="Source\Scene.h" />
     <ClInclude Include="Source\SceneBattle.h" />
-    <ClInclude Include="Source\SceneClear.h" />
     <ClInclude Include="Source\SceneGame.h" />
     <ClInclude Include="Source\SceneLoading.h" />
     <ClInclude Include="Source\SceneManager.h" />
-    <ClInclude Include="Source\SceneOver.h" />
     <ClInclude Include="Source\SceneTitle.h" />
     <ClInclude Include="Source\SceneTutorial.h" />
     <ClInclude Include="Source\Script.h" />
@@ -469,7 +459,6 @@
     </ClInclude>
     <ClInclude Include="Source\TitleButtonUI.h" />
     <ClInclude Include="Source\TitleButtonUIAction.h" />
-    <ClInclude Include="Source\TitleButtonUIJudgment.h" />
     <ClInclude Include="Source\TitleUIJudgment.h" />
     <ClInclude Include="Source\TopMenu.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>

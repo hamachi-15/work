@@ -351,11 +351,6 @@ void ActorManager::Render(RenderContext& render_context)
 	if(shader) shader->End(context);
 	
 	shader_type = static_cast<ShaderManager::ShaderType>(-1);
-
-	// ƒŠƒXƒ^[•`‰æ
-	DrawLister();
-	// Ú×•`‰æ
-	DrawDetail();
 }
 
 //------------------------------
@@ -378,7 +373,6 @@ void ActorManager::BrightRender(RenderContext& render_context)
 		if (actor->GetCullingFlag()) continue;
 		
 		if (strcmp(actor->GetName(), "Filde") == 0) continue;
-		//if (strcmp(actor->GetName(), "FildeObjects") != 0) continue;
 		// ƒ‚ƒfƒ‹‚ª‚ ‚ê‚Î•`‰æ
 		Model* model = actor->GetModel();
 		if (model != nullptr)

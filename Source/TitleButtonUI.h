@@ -7,17 +7,17 @@
 // タイトルのボタンUI
 // 
 //********************************
-class TitleButtonUI : public UI
+class TitleUI : public UI
 {
 public:
 	enum class SelectState;
 	enum class ButtonType;
 public:
 	// コンストラクタ
-	TitleButtonUI() {}
+	TitleUI() {}
 
 	// デストラクタ
-	~TitleButtonUI() override;
+	~TitleUI() override;
 
 	// 名前取得
 	std::string GetName() const override { return "TitleButtonUI"; }
@@ -52,4 +52,6 @@ private:
 	UIData* operate_button_data;
 	UIData* select_operate_button_data;
 	UIData* operate_data;
+
+	UIData* title_logo;
 };

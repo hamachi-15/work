@@ -97,70 +97,6 @@ void Player::Start()
 	// 走った時のスピード倍率設定
 	charactor->SetRunSpeedScale(1.5f);
 
-	//std::shared_ptr<PlayerHealthGage> health = std::make_shared<PlayerHealthGage>();
-
-	//UIParameter parameter;
-
-	//parameter.filename = "Data/Sprite/UIAseet/KP_clusterUI_v100/hp_gauge/gauge_frame.png";
-	//parameter.name = "HealthGaugeFrame";
-	//parameter.position = {10, 5};
-	//std::shared_ptr<PlayerUIHealthFrame> health_gage_freame = std::make_shared<PlayerUIHealthFrame>(parameter);
-	//
-	////
-	//parameter.filename = "Data/Sprite/UIAseet/KP_clusterUI_v100/hp_gauge/gauge_base.png";
-	//parameter.name = "HealthGaugeBase";
-	//parameter.position = {12, 1};
-	//parameter.parent = health_gage_freame;
-	//std::shared_ptr<PlayerUIHealthFrame> health_gage_base = std::make_shared<PlayerUIHealthFrame>(parameter);
-
-	//// 
-	//parameter.filename = "Data/Sprite/UIAseet/KP_clusterUI_v100/hp_gauge/gauge_bl.png";
-	//parameter.name = "HealthGauge";
-	//parameter.position = {1, 1};
-	//parameter.parent = health_gage_base;
-	//std::shared_ptr<PlayerHealth> health_gage = std::make_shared<PlayerHealth>(parameter);
-	//health_gage->SetCharactor(charactor);
-	//
-	//// Hpゲージの減少幅を示すゲージ
-	//parameter.filename = "Data/Sprite/UIAseet/KP_clusterUI_v100/hp_gauge/gauge_rd.png";
-	//parameter.name = "HealthSubtructGauge";
-	//parameter.position = { 0, 0 };
-	//parameter.parent = health_gage;
-	//std::shared_ptr<PlayerUIRedHealth> health_red_gage = std::make_shared<PlayerUIRedHealth>(parameter);
-	//health_red_gage->SetCharactor(charactor);
-	//
-	// UIマネージャーに登録
-	//UIManager::Instance().RegisterUI(health);
-	//UIManager::Instance().RegisterUI(health_red_gage);
-	//UIManager::Instance().RegisterUI(health_gage);
-	//UIManager::Instance().RegisterUI(health_gage_freame);
-
-	//// 特殊ゲージ設定
-	//parameter.filename = "Data/Sprite/UIAseet/KP_clusterUI_v100/hp_gauge/gauge_frame.png";
-	//parameter.name = "GaugeFrame";
-	//parameter.position = { 10, 55 };
-	//parameter.parent = nullptr;
-	//std::shared_ptr<PlayerUIHealthFrame> gage_freame = std::make_shared<PlayerUIHealthFrame>(parameter);
-
-	////
-	//parameter.filename = "Data/Sprite/UIAseet/KP_clusterUI_v100/hp_gauge/gauge_base.png";
-	//parameter.name = "HealthGaugeBase";
-	//parameter.position = { 12, 1 };
-	//parameter.parent = gage_freame;
-	//std::shared_ptr<PlayerUIHealthFrame> gage_base = std::make_shared<PlayerUIHealthFrame>(parameter);
-	//
-	//parameter.filename = "Data/Sprite/UIAseet/KP_clusterUI_v100/hp_gauge/gauge_yl.png";
-	//parameter.name = "Gauge";
-	//parameter.position = { 1, 1 };
-	//parameter.parent = gage_base;
-	//std::shared_ptr<PlayerHealth> gage = std::make_shared<PlayerHealth>(parameter);
-	//gage->SetCharactor(charactor);
-
-	//// UIマネージャーに登録
-	//UIManager::Instance().RegisterUI(gage_base);
-	//UIManager::Instance().RegisterUI(gage);
-	//UIManager::Instance().RegisterUI(gage_freame);
-
 	// コリジョンの登録
 	{
 		// モデル取得
@@ -273,8 +209,6 @@ bool Player::OnMessages(const Telegram& message)
 	switch (message.message_box.message)
 	{// プレイヤーの攻撃が敵に当たった
 	case MessageType::Message_Hit_Attack:
-		// ヒットストップフラグを立てる
-		charactor->SetHitStopFlag(true);
 
 		// 攻撃ヒットフラグを立てる
 		charactor->SetHitAttackFlag(true);
@@ -626,6 +560,12 @@ void Player::TransitionDeathState()
 		// アニメーション再生
 		model->PlayAnimation(animation->number, animation->roop_flag, animation->blend);
 	}
+	Message message;
+	message.message = MessageType::Message_GameOver;
+	MetaAI::Instance().SendMessaging(
+		static_cast<int>(MetaAI::Identity::Player),   // 送信元
+		static_cast<int>(MetaAI::Identity::WorldMap),    // 受信先
+		message);                                        // メッセージ
 }
 
 //-----------------------------------------
@@ -1122,15 +1062,16 @@ void Player::UpdateDeathState(float elapsed_time)
 {
 	std::shared_ptr<Actor> actor = GetActor();
 	Model* model = actor->GetModel();
-	if (!model->IsPlayAnimation())
-	{
-		// ボタンを押したら復活状態へ遷移
-		GamePad& gamePad = Input::Instance().GetGamePad();
-		if (gamePad.GetButtonDown() & GamePad::BTN_A)
-		{
-			TransitionReviveState();
-		}
-	}
+	//if (!model->IsPlayAnimation())
+	//{
+	//	// ボタンを押したら復活状態へ遷移
+	//	GamePad& gamePad = Input::Instance().GetGamePad();
+	//	if (gamePad.GetButtonDown() & GamePad::BTN_A)
+	//	{
+	//		TransitionReviveState();
+	//	}
+	//}
+
 }
 
 //-----------------------------------------
@@ -1532,10 +1473,10 @@ void Player::UpdateCameraState(float elapsed_time)
 		{
 			// 死亡時用のカメラモーション
 			MessageData::CameraChangeMotionModeData	motioncamera_data;
-			float vx = sinf(angle.y) * 6;
-			float vz = cosf(angle.y) * 6;
+			float vx = sinf(angle.y) * 10;
+			float vz = cosf(angle.y) * 10;
 			motioncamera_data.data.push_back({ 0, {position.x + vx, position.y + 50, position.z + vz }, position });
-			motioncamera_data.data.push_back({ 90, {position.x + vx, position.y, position.z + vz }, position });
+			motioncamera_data.data.push_back({ 90, {position.x + vx, position.y + 20, position.z + vz }, position });
 			Messenger::Instance().SendData(MessageData::CameraChangeMotionMode, &motioncamera_data);
 			break;
 		}

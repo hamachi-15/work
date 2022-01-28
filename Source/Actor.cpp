@@ -85,11 +85,6 @@ void Actor::OnGUI()
 		ImGui::InputFloat3("Scale", &scale.x);
 	}
 
-	//if (ImGui::CollapsingHeader("Shader", ImGuiTreeNodeFlags_DefaultOpen))
-	//{
-	//	ImGui::Text(shader->GetShaderName());
-	//	
-	//}
 	// コンポーネント
 	for (std::shared_ptr<Component>& component : components)
 	{

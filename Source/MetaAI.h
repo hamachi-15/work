@@ -16,9 +16,10 @@ public:
 	{
 		Meta = 0,
 		WorldMap = 1,	// ワールドマップのID
-		Collision = 2,	// コリジョンのIDは1
-		Player = 3,		// プレイヤーIDは2~4
-		Enemy = 4,		// エネミーIDは5以降を付与
+		BattleMap = 2,	// ワールドマップのID
+		Collision = 3,	// コリジョンのIDは1
+		Player = 4,		// プレイヤーIDは2~4
+		Enemy = 5,		// エネミーIDは5以降を付与
 		Slime,
 		PLT,
 		LAT,

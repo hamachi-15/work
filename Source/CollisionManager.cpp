@@ -202,17 +202,17 @@ void CollisionManager::Update()
                 {
                     PushOutCollision(cylinderA, cylinderB, result);
                     // 現在のシーンがワールドマップならシーンへ敵とエンカウントをしたメッセージを送る
-                    const char* scene_name = SceneManager::Instance().GetCurrentScene()->GetName();
-                    int isplayercolA = strcmp(cylinderA->GetName().c_str(), "Player");
-                    int isplayercolB = strcmp(cylinderB->GetName().c_str(), "Player");
-                    int isworldmap = strcmp(scene_name, "SceneWorldMap");
-                    if (isplayercolA == 0 && isworldmap == 0 ||
-                        isplayercolB == 0 && isworldmap == 0)
+                    std::string scene_name = SceneManager::Instance().GetCurrentScene()->GetName();
+                    bool isplayercolA = (cylinderA->GetName() == "Player");
+                    bool isplayercolB = (cylinderB->GetName() == "Player");
+                    bool isworldmap = (scene_name == "SceneWorldMap");
+                    if (isplayercolA && isworldmap ||
+                        isplayercolB && isworldmap)
                     {
                         Message message;
                         message.message = MessageType::Message_Hit_Boddy;
                         // 衝突した敵の座標を設定
-                        if (isplayercolA == 0)
+                        if (isplayercolA == true)
                         {
                             message.hit_position = cylinderA->GetActor()->GetPosition();
                             message.territory_tag = cylinderB->GetActor()->GetComponent<Enemy>()->GetBelongingToTerritory();
@@ -227,6 +227,32 @@ void CollisionManager::Update()
                             static_cast<int>(MetaAI::Identity::WorldMap),    // 受信先
                             message);                                        // メッセージ
                         return;
+                    }
+                    else if (scene_name == "SceneBattle" && isplayercolA ||
+                        scene_name == "SceneBattle" && isplayercolB)
+                    {
+                        bool iselementA = (cylinderA->GetCollisionElement() == CollisionElement::Weppon);
+                        bool iselementB = (cylinderB->GetCollisionElement() == CollisionElement::Weppon);
+                        if (iselementA || iselementB)
+                        {
+                            Message message;
+                            message.message = MessageType::Message_GetHit_Attack;
+                            // 衝突した敵の座標を設定
+                            if (isplayercolA == true)
+                            {
+                                message.hit_position = cylinderA->GetActor()->GetPosition();
+                                message.territory_tag = cylinderB->GetActor()->GetComponent<Enemy>()->GetBelongingToTerritory();
+                            }
+                            else
+                            {
+                                message.hit_position = cylinderB->GetActor()->GetPosition();
+                                message.territory_tag = cylinderA->GetActor()->GetComponent<Enemy>()->GetBelongingToTerritory();
+                            }
+                            MetaAI::Instance().SendMessaging(
+                                static_cast<int>(MetaAI::Identity::Collision),   // 送信元
+                                static_cast<int>(MetaAI::Identity::Player),    // 受信先
+                                message);                                        // メッセージ
+                        }
                     }
                 }
             }

@@ -3,7 +3,7 @@
 
 enum	class	EnemyTerritoryTag;
 
-enum class MessageType : int
+enum class MessageType
 {
 	Message_Call_Help,				// 仲間を呼ぶ(Enemy、メタAIの両方で使用)
 	Message_Change_Attack_Right,	// 攻撃権の移譲(EnemyからメタAIへのメッセージ用)
@@ -11,7 +11,9 @@ enum class MessageType : int
 	Message_Ask_Attack_Right,		// 攻撃権を要求(EnemyからメタAIへのメッセージ用)
 	Message_Hit_Boddy,				// 体コリジョン同士が当たった(Enemy,Playerで使用)
 	Message_Hit_Attack,				// 攻撃が当たった(Enemy,Playerで使用)
-	Message_GetHit_Attack			// 攻撃を受けた(Enemy,Playerで使用)
+	Message_GetHit_Attack,			// 攻撃を受けた(Enemy,Playerで使用)
+	Message_GameOver,				// ゲームクリア
+	Message_GameClear,				// ゲームオーバー
 };
 
 struct Message

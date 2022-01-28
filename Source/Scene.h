@@ -16,7 +16,7 @@ public:
 	void SetName(const char* scene_name) { this->scene_name = scene_name; }
 
 	// ƒV[ƒ“–¼æ“¾
-	const char* GetName() const { return scene_name.c_str(); }
+	std::string GetName() const { return scene_name.c_str(); }
 
 	// ‰Šú‰»ˆ—
 	virtual void Initialize() = 0;

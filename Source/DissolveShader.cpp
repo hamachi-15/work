@@ -16,10 +16,6 @@ DissolveShader::DissolveShader(ID3D11Device* device)
 	Graphics& graphics = Graphics::Instance();
 	HRESULT hr = S_OK;
 
-	// テクスチャ初期化
-	//mask_texture = std::make_unique<Texture>();
-	//mask_texture->Load("Data/Sprite/dissolve_animation2.png");
-
 	// シェーダー初期化
 	Create(device, "Shader\\EnvMask_vs.cso", "Shader\\EnvMask_ps.cso", true);
 
@@ -73,8 +69,8 @@ void DissolveShader::Render(ID3D11DeviceContext* context, Texture* texture, Text
 	// テクスチャを設定
 	mask_texture->Set(1);
 	Sprite sprite;
-	float texture_width = texture->GetWidth();
-	float texture_height = texture->GetHeight();
+	float texture_width = static_cast<float>(texture->GetWidth());
+	float texture_height = static_cast<float>(texture->GetHeight());
 	sprite.Render(context,
 		texture,
 		0, 0,

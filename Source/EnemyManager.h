@@ -5,7 +5,7 @@
 #include <DirectXMath.h>
 #include "Enemy.h"
 #include "GameDatabase.h"
-
+#include "SceneManager.h"
 // 前方宣言
 class Actor;
 
@@ -68,6 +68,9 @@ public:
 
 	// テリトリーの敵が撃破されているかのコンテナを取得
 	std::map<EnemyTerritoryTag, bool> GetDefeatTeritory() { return defeat_teritory; }
+
+	// バトルシーンか判定
+	bool IsBattleScene() const { return (SceneManager::Instance().GetCurrentScene()->GetName() == "SceneBattle"); }
 private:
 	std::vector<std::shared_ptr<Enemy>>		enemies;						// 敵の配列
 	std::map<EnemyTerritoryTag, bool>		defeat_teritory;				// テリトリーの敵が撃破されているかのコンテナ

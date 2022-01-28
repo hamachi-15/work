@@ -44,7 +44,6 @@ EnemyDragonNightmare::~EnemyDragonNightmare()
 {
 }
 
-
 //--------------------------------------
 // GUI描画
 //--------------------------------------
@@ -53,7 +52,6 @@ void EnemyDragonNightmare::OnGUI()
 	// ビヘイビア関連情報
 	DrawBehaviorGUI();
 }
-
 
 //--------------------------------------
 // メッセージを受信したときの処理
@@ -165,6 +163,20 @@ void EnemyDragonNightmare::Start()
 		parameter.element = CollisionElement::Body;
 		parameter.position_mask = CollisionPositionMask::Collision_Mask_Castam_poition;
 		charactor->SetCollision(actor, parameter, CollisionMeshType::Cylinder);
+		// 体のコリジョン設定
+		name.clear();
+		name = actor->GetName();
+		name += "Body";
+		parameter.name = name.c_str();
+		parameter.node_name = "Root";
+		parameter.radius = 20.5f;
+		parameter.height = 34.5f;
+		parameter.weight = 6.5f;
+		parameter.local_position = DirectX::XMFLOAT3(0, 14, 0);
+		parameter.collision_flg = false;
+		parameter.element = CollisionElement::Weppon;
+		parameter.position_mask = CollisionPositionMask::Collision_Mask_Castam_poition;
+		charactor->SetCollision(actor, parameter, CollisionMeshType::Cylinder);
 
 	}
 
@@ -182,15 +194,10 @@ void EnemyDragonNightmare::Start()
 void EnemyDragonNightmare::SetBehaviorNode()
 {
 	// 現在のシーン名取得
-	const char* name = SceneManager::Instance().GetCurrentScene()->GetName();
+	std::string scene_name = SceneManager::Instance().GetCurrentScene()->GetName();
 
 	// シーンがワールドマップ時のノード設定
-	if (strcmp(name, "SceneWorldMap") == 0)
-	{
-		ai_tree->AddNode("",	 "Root",   0, BehaviorTree::SelectRule::Priority,	NULL, NULL);
-		ai_tree->AddNode("Root", "Sleep",  1, BehaviorTree::SelectRule::Non,		NULL, new SleepAction(this));
-	}
-	else
+	if (scene_name == "SceneBattle") 
 	{	// シーンがバトルシーンの時のノード設定
 		ai_tree->AddNode("",					  "Root",						0,	BehaviorTree::SelectRule::Priority,	 NULL,								NULL);
 		ai_tree->AddNode("Root",				  "Death",						1,	BehaviorTree::SelectRule::Non,		 new DeathJudgment(this),			new DeathAction(this));
@@ -226,6 +233,11 @@ void EnemyDragonNightmare::SetBehaviorNode()
 		ai_tree->AddNode("SixTimesLungesAttack",  "ThirdLungesAttackSequence",	0, BehaviorTree::SelectRule::Non, NULL, new LungesAttackAction(this, lunges_target_position_data[3]));
 		ai_tree->AddNode("SixTimesLungesAttack",  "FourthLungesAttackSequence",	0, BehaviorTree::SelectRule::Non, NULL, new LungesAttackAction(this, lunges_target_position_data[4]));
 		ai_tree->AddNode("SixTimesLungesAttack",  "FifthLungesAttackSequence",	0, BehaviorTree::SelectRule::Non, NULL, new LungesAttackAction(this, lunges_target_position_data[0]));
+	}
+	else
+	{
+		ai_tree->AddNode("",	 "Root",   0, BehaviorTree::SelectRule::Priority,	NULL, NULL);
+		ai_tree->AddNode("Root", "Sleep",  1, BehaviorTree::SelectRule::Non,		NULL, new SleepAction(this));
 	}
 }
 

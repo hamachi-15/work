@@ -38,6 +38,7 @@ private:
 	// バックバッファに描画
 	void BuckBufferRender(ID3D11DeviceContext* context, RenderContext& render_context, const DirectX::XMFLOAT2& screen_size);
 
+	// メッセージ処理
 	bool OnMessages(const Telegram& telegram) override;
 
 	// ImGui描画

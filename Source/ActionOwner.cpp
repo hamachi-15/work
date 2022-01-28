@@ -111,6 +111,9 @@ ActionBase::State IdleAction::Run(float elapsed_time)
 //----------------------------------
 void DamageAction::Start()
 {
+	// ダメージ
+	owner->GetCharactor()->ApplyDamage(10, 0.7f);
+
 	std::string animation_name = owner->GetName();
 	animation_name += "Damage";
 
@@ -123,46 +126,19 @@ void DamageAction::Start()
 //----------------------------------
 ActionBase::State DamageAction::Run(float elapsed_time)
 {
-	// ダメージを与え、死亡しなければ
-	if (owner->GetCharactor()->ApplyDamage(1, 0.7f))
-	{// ノックバックする
-		float power = 10.0f;
-		DirectX::XMVECTOR position = DirectX::XMLoadFloat3(&owner->GetActor()->GetPosition());
-		DirectX::XMVECTOR vector_weppon_position = DirectX::XMLoadFloat3(&owner->GetHitPosition());
-		DirectX::XMVECTOR normalize_vector = DirectX::XMVector3Normalize(DirectX::XMVectorSubtract(position, vector_weppon_position));
-		DirectX::XMFLOAT3 float_normalize_vector;
-		DirectX::XMStoreFloat3(&float_normalize_vector, normalize_vector);
-		DirectX::XMFLOAT3 impulse;
-		impulse.x = float_normalize_vector.x * power;
-		impulse.y = power * 0.5f;
-		impulse.z = float_normalize_vector.z * power;
-		owner->GetMovement()->AddImpulse(impulse);
-	}
-	float run_timer = owner->GetRunTimer();
-	if (run_timer <= 0.0f)
-	{
-		owner->SetRunTimer(0.5f);
-		run_timer = owner->GetRunTimer();
-	}
-	else
-	{
-		// タイマー処理
-		run_timer = owner->GetRunTimer() - elapsed_time;
-	}
-
-	//// タイマー更新
-	owner->SetRunTimer(run_timer);
 	
-
-	if (run_timer <= 0.0f)
+	// アニメーション再生が終了か死亡したら完了を返す
+	if (!owner->GetActor()->GetModel()->IsPlayAnimation() || 
+		owner->GetCharactor()->GetDead())
 	{
 		owner->SetRandomTargetPosition();
 		owner->SetRunTimer(0.0f);
+		owner->SetAttackFlag(false);
 		owner->GetCharactor()->SetDamageFlag(false);
 		return ActionBase::State::Complete;
 	}
-
 	return ActionBase::State::Run;
+
 }
 
 //***********************************
@@ -191,6 +167,12 @@ ActionBase::State DeathAction::Run(float elapsed_time)
 	// アニメーション再生が終わればアクターを破棄
 	if (!owner->GetActor()->GetModel()->IsPlayAnimation())
 	{
+		Message message;
+		message.message = MessageType::Message_GameClear;
+		MetaAI::Instance().SendMessaging(
+			static_cast<int>(MetaAI::Identity::Enemy),   // 送信元
+			static_cast<int>(MetaAI::Identity::WorldMap),    // 受信先
+			message);                                        // メッセージ
 		owner->Destroy();
 		return ActionBase::State::Complete;
 	}

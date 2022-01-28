@@ -31,8 +31,7 @@ void SceneTitle::Initialize()
 	// シーン名設定
 	SetName("SceneTitle");
 
-	//GameDataBase::Instance();
-
+	// ライト初期化
 	Light::Initialize();
 
 	// カメラ初期設定
@@ -47,42 +46,16 @@ void SceneTitle::Initialize()
 		graphics.GetScreenWidth() / graphics.GetScreenHeight(),
 		0.1f,
 		1000.0f);
-	// カメラコントローラー初期化
-	//camera_controller = std::make_unique<CameraController>();
 
 	// テクスチャ読込み
 	sprite = std::make_unique<Sprite>();
-	//tex = std::make_unique<Texture>();
-	//tex->Load("Data/Sprite/Title.png");
 	mask_texture = std::make_unique<Texture>();
 	mask_texture->Load("Data/Sprite/dissolve_animation2.png");
-	start_button.emplace_back(std::make_unique<Texture>());
-	start_button.emplace_back(std::make_unique<Texture>());
-	start_button.at(0)->Load("Data/Sprite/UIAseet/KP_clusterUI_v100/03 button_rectangle/btn_rectangle_bl.png");
-	start_button.at(1)->Load("Data/Sprite/UIAseet/KP_clusterUI_v100/03 button_rectangle/btn_rectangle_bl_click.png");
 
 	sky = std::make_unique<Texture>();
 	sky->Load("Data/Sprite/SkyBox/FS002_Night.png");
 
-	// プレイヤー読み込み
-	{
-		//std::shared_ptr<Actor> actor = ActorManager::Instance().Create();
-		//actor->SetUpModel("Data/Model/RPG-Character/Swordman.mdl");
-		//actor->SetName("Player");
-		//actor->SetAnimationNodeName("Motion");
-		//actor->SetPosition(DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f));
-		//actor->SetAngle(DirectX::XMFLOAT3(0, DirectX::XMConvertToRadians(180), 0));
-		//actor->SetScale(DirectX::XMFLOAT3(0.07f, 0.07f, 0.07f));
-		//actor->AddComponent<Charactor>();
-		//actor->AddShader<LambertShader>(Graphics::Instance().GetDevice());
-		//actor->GetModel()->PlayAnimation(25, false, 0.6f);
-	}
-	//ActorManager::Instance().Update(0.01f);
-	//ActorManager::Instance().UpdateTransform();
-	
-	//Graphics::Instance().GetAudio()->Play();
-
-	UIManager::Instance().RegisterUI(std::make_shared<TitleButtonUI>());
+	UIManager::Instance().RegisterUI(std::make_shared<TitleUI>());
 }
 
 //----------------------------------
@@ -90,9 +63,7 @@ void SceneTitle::Initialize()
 //----------------------------------
 void SceneTitle::Finalize()
 {
-	// アクターの破棄
-	//ActorManager::Instance().AllDestroy();
-
+	// UIの全破棄
 	UIManager::Instance().AllDelete();
 
 	// メッセンジャーのクリア
@@ -104,16 +75,7 @@ void SceneTitle::Finalize()
 //----------------------------------
 void SceneTitle::Update(float elapsed_time)
 {
-	//GamePad& gamepad = Input::Instance().GetGamePad();
-	////ライト
-	//static float light_angle = DirectX::XM_PI;
-	//Light::SetAmbient(DirectX::XMFLOAT3(0.2f, 0.2f, 0.2f));
-	////ライト方向
-	//LightDir.x = sinf(light_angle);
-	//LightDir.y = -1.0f;
-	//LightDir.z = cosf(light_angle);
-	//Light::SetDirLight(LightDir, DirectX::XMFLOAT3(0.6f, 0.6f, 0.6f));
-
+	// シーン遷移フラグが立ったら
 	if (IsSceneChangeFlag())
 	{
 		timer += elapsed_time;
@@ -159,25 +121,9 @@ void SceneTitle::ScreenRender(ID3D11DeviceContext* context, RenderContext& rende
 			static_cast<float>(sky->GetWidth()), static_cast<float>(sky->GetHeight()));
 		skybox_shader->End(context);
 	}
-	// アクターの描画
-	{
-		//ActorManager::Instance().Render(render_context);
-	}
-	// ボタン描画
-	{
-		//sprite_shader->Begin(context);
-		//// カーソルがゲームスタートボタンにあったら
-		//if (serect_button[0] == SerectButton::Serect_Game_Start)
-		//{
-		//	RenderButton(context, start_button.at(static_cast<int>(SerectButton::Serect_Game_Start)).get(), static_cast<int>(SerectButton::Serect_Game_Start));
-		//}
-		//else
-		//{
-		//	RenderButton(context, start_button.at(static_cast<int>(SerectButton::Unserect_Game_Start)).get(), static_cast<int>(SerectButton::Unserect_Game_Start));
-		//}
-		//sprite_shader->End(context);
-		UIManager::Instance().Draw(context);
-	}
+
+	// タイトル画面のUI描画
+	UIManager::Instance().Draw(context);
 
 }
 
@@ -240,7 +186,8 @@ void SceneTitle::Render()
 	ScreenRender(context, render_context, { screen_width, screen_height });
 
 	BuckBufferRender(context, render_context, { screen_width, screen_height });
-	OnGui();
+	
+	//OnGui();
 }
 
 //----------------------------
@@ -272,9 +219,6 @@ void SceneTitle::OnGui()
 
 	ImGui::Begin("Shader", nullptr, ImGuiWindowFlags_None);
 	ImGui::SliderFloat("Timer", &timer, 0.0f, 1.5f);
-
-	ImGui::TextColored(ImVec4(1, 1, 0, 1), u8"-------シャドウマップ-------");
-	ImGui::ColorEdit3("ShadowColor", (float*)&shadow_color);
 
 	ImGui::End();
 }

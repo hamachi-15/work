@@ -17,8 +17,6 @@ GaussianBlur::GaussianBlur(ID3D11Device* device, DXGI_FORMAT format)
 	float screen_height = graphics.GetScreenHeight();
 
 	// 縦ブラーと横ブラー初期化
-	//xblur = std::make_unique<GaussianXBlur>(device, static_cast<u_int>(screen_width * 0.5f), static_cast<u_int>(screen_height), format);
-	//yblur = std::make_unique<GaussianYBlur>(device, static_cast<u_int>(screen_width * 0.5f), static_cast<u_int>(screen_height * 0.5f), format);
 	xblur = std::make_unique<GaussianXBlur>(device, static_cast<u_int>(2048 * 0.5f), static_cast<u_int>(1024), format);
 	yblur = std::make_unique<GaussianYBlur>(device, static_cast<u_int>(2048 * 0.5f), static_cast<u_int>(1024 * 0.5f), format);
 
@@ -66,7 +64,6 @@ void GaussianBlur::Begin(ID3D11DeviceContext* context,	BlurType type)
 
 		//　GPUに定数バッファを更新する
 		context->UpdateSubresource(blur_constant_buffer.Get(), 0, NULL, &constant_buffer, 0, 0);
-		//context->VSSetConstantBuffers(0, 1, blur_constant_buffer.GetAddressOf());
 		context->PSSetConstantBuffers(0, 1, blur_constant_buffer.GetAddressOf());
 	}
 	else if (BlurType::YBlur == type)

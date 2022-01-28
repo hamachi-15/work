@@ -1,12 +1,13 @@
 #pragma once
 #include "UI.h"
+#include "Component.h"
 
 //**********************************
 // 
 // ボスクラスの敵HPUIクラス
 // 
 //**********************************
-class BossHealthUI : public UI
+class BossHealthUI : public UI, public Component
 {
 public:
 	// コンストラクタ
@@ -16,7 +17,7 @@ public:
 	~BossHealthUI() override {}
 
 	// 名前取得
-	std::string GetName() const  { return "BossHealthUI"; }
+	std::string GetName() const override { return "BossHealthUI"; }
 	
 	// 開始処理
 	void Start() override;

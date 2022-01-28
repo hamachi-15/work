@@ -116,7 +116,7 @@ NodeBase* NodeBase::SelectOnOff(std::vector<NodeBase*>* list, BehaviorData* data
 	// セレクトルールがオン・オフランダムの時
 	if (select_rule == BehaviorTree::SelectRule::On_Off_Ramdom)
 	{
-		int index = static_cast<float>(Mathf::RandomRange(0, off_list.size()));
+		int index = static_cast<int>(Mathf::RandomRange(0, static_cast<float>(off_list.size())));
 		// 使用したノードを登録
 		data->EntryUsedNode(off_list[index]->GetName());
 

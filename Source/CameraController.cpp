@@ -295,7 +295,6 @@ void CameraController::UpdateFreeCamera(float elapsed_time)
 	DirectX::XMStoreFloat3(&front, vec_front);
 
 	// 注視点から後ろベクトル方向に一定距離を離れたカメラ視点
-	DirectX::XMFLOAT3 eye;
 	new_position.x = target.x - front.x * range;
 	new_position.y = target.y - front.y * range;
 	new_position.z = target.z - front.z * range;

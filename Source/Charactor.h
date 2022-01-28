@@ -137,6 +137,7 @@ public:
 
 	// 死亡した時に呼ばれる
 	void OnDead() { death_flag = true; }
+	bool GetDead() const { return death_flag; }
 private:
 	int		id = 0;							// アクターの識別番号
 	bool	hit_attack_flag = false;	// 攻撃がヒットしたかのフラグ

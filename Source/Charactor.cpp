@@ -28,6 +28,7 @@ bool Charactor::ApplyDamage(int damage, float invincible_time)
 	if (health <= 0)
 	{
 		OnDead();
+
 	}
 	// ダメージ通知
 	else
@@ -51,20 +52,6 @@ void Charactor::OnGUI()
 	ImGui::InputInt("Health", &health);
 	ImGui::InputInt("ID", &id);
 }
-
-//-----------------------------------------
-// ノード座標を取得
-//-----------------------------------------
-//void Charactor::GetNodePosition(const char* node_name, DirectX::XMFLOAT3& node_position, Model* model)
-//{
-//	Model::Node* node = model->FindNode(node_name);
-//	if (node != nullptr)
-//	{
-//		node_position.x = node->world_transform._41;
-//		node_position.y = node->world_transform._42;
-//		node_position.z = node->world_transform._43;
-//	}
-//}
 
 //-----------------------------------------
 // コリジョンの登録

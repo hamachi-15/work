@@ -8,7 +8,7 @@
 // マネージャー
 #include "ActorManager.h"
 #include "EnemyManager.h"
-
+#include "CollisionManager.h"
 #include "Mathf.h"
 
 // 汎用関数
@@ -265,6 +265,7 @@ ActionBase::State BodyPressAttackAction::Run(float elapsed_time)
 
 	// 攻撃の当たり判定処理
 	std::string collision_name = actor->GetName();
+	collision_name += "Body";
 	AttackCollision(actor, collision_name.c_str(), collision_time_data, CollisionMeshType::Cylinder);
 
 	// タイマー取得
@@ -297,11 +298,17 @@ ActionBase::State BodyPressAttackAction::Run(float elapsed_time)
 // -----------------------------
 void LungesAttackAction::Start()
 {
+	std::shared_ptr<Actor> owner_actor = owner->GetActor();
 	// アニメーション再生
 	owner->PlayAnimation("NightmareDragonRun");
 
-	// 当たり判定を行う時間のデータを取得
-	//collision_time_data = GameDataBase::Instance().GetAttackCollitionTimeData(AttackCategory::BodyPressAttack, EnemyCategory::NightmareDragon);
+	// 攻撃の当たり判定処理
+	std::string collision_name = owner_actor->GetName();
+	collision_name += "Body";
+	// コリジョンマネージャー取得
+	CollisionManager& collision_manager = CollisionManager::Instance();
+	std::shared_ptr<CollisionCylinder> collision = collision_manager.GetCollisionCylinderFromName(collision_name);
+	collision->SetCollisionFlag(true);
 	// 反対側にターゲットを設定
 	// ターゲット座標に値が入っていない時
 	if (Mathf::VectorLength(target_position) == 0)
@@ -327,6 +334,13 @@ ActionBase::State LungesAttackAction::Run(float elapsed_time)
 	// 目的地へ着いたかの判定処理
 	if (JedgmentToTargetPosition(owner->GetTargetPosition(), owner_actor->GetPosition(), owner_actor->GetName()))
 	{
+		// 攻撃の当たり判定処理
+		std::string collision_name = owner_actor->GetName();
+		collision_name += "Body";
+		// コリジョンマネージャー取得
+		CollisionManager& collision_manager = CollisionManager::Instance();
+		std::shared_ptr<CollisionCylinder> collision = collision_manager.GetCollisionCylinderFromName(collision_name);
+		collision->SetCollisionFlag(false);
 		return ActionBase::State::Complete;
 	}
 

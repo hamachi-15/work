@@ -521,10 +521,8 @@ void CollisionObject::OnGUI()
     bool flag = GetCollisionFlag();
     float radius = GetRadius();
     ImGui::Checkbox("CollisionFlag", &flag);
-    //ImGui::InputFloat3("Rotation", &rotation.x);
     ImGui::InputFloat("Angle", &radius);
     ImGui::InputFloat3("position", &position.x);
-    //ImGui::InputFloat3("Scale", &scale.x);
 }
 
 //-----------------------------------

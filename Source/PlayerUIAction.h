@@ -1,6 +1,11 @@
 #pragma once
 #include "UIActionBase.h"
-
+//TODO クラス名を何か使ってもいいように改名
+//***********************************
+// 
+// 緑ゲージアクション
+// 
+//***********************************
 class PlayerGreenHealthAction : public UIActionBase
 {
 public:
@@ -11,6 +16,11 @@ public:
 	void Action(float elapsed_time) override;
 };
 
+//***********************************
+// 
+// 赤ゲージアクション
+// 
+//***********************************
 class PlayerRedHealthAction : public UIActionBase
 {
 public:

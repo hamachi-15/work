@@ -32,7 +32,7 @@ public:
 	//ï`âÊèàóù
 	void Render(ID3D11DeviceContext* context);
 
-	void Rebder(ID3D11DeviceContext* context, Texture* texture, const DirectX::XMFLOAT2& position, const DirectX::XMFLOAT2& size, const float& angle);
+	void Rebder(ID3D11DeviceContext* context, Texture* texture, const DirectX::XMFLOAT2& position, const DirectX::XMFLOAT2& size, const DirectX::XMFLOAT2& scale, const float& angle);
 
 	// UIÉfÅ[É^åüçı
 	UINodeBase* SearchNode(std::string name);

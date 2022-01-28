@@ -10,7 +10,6 @@
 UINodeBase::~UINodeBase()
 {
 	delete action;
-	//delete ui_data;
 }
 
 //------------------------
@@ -45,7 +44,7 @@ void UINodeBase::Render(ID3D11DeviceContext* context)
 			if (children.at(i)->judgment->Judgment() == true)
 			{
 				UIData* data = children.at(i)->ui_data;
-				Rebder(context, data->GetTexture(), data->GetPosition(), data->GetSize(), data->GetAngle());
+				Rebder(context, data->GetTexture(), data->GetPosition(), data->GetSize(), data->GetScale(), data->GetAngle());
 			}
 		}
 		else
@@ -53,7 +52,7 @@ void UINodeBase::Render(ID3D11DeviceContext* context)
 			if (children.at(i)->ui_data != NULL)
 			{
 				UIData* data = children.at(i)->ui_data;
-				Rebder(context, data->GetTexture(), data->GetPosition(), data->GetSize(), data->GetAngle());
+				Rebder(context, data->GetTexture(), data->GetPosition(), data->GetSize(), data->GetScale(), data->GetAngle());
 			}
 		}
 		// 子ノードにさらに子ノードがあれば
@@ -69,15 +68,20 @@ void UINodeBase::Rebder(ID3D11DeviceContext* context,
 	Texture* texture,
 	const DirectX::XMFLOAT2& position, 
 	const DirectX::XMFLOAT2& size, 
+	const DirectX::XMFLOAT2& scale,
 	const float& angle)
 {
+	float texture_width = static_cast<float>(texture->GetWidth());
+	float texture_height = static_cast<float>(texture->GetHeight());
+
 	Sprite sprite;
 	sprite.Render(context,
 		texture,
 		position.x, position.y,
-		size.x, size.y,
+		size.x * scale.x, size.y * scale.y,
 		0, 0,
-		static_cast<float>(texture->GetWidth()), static_cast<float>(texture->GetHeight()));
+		texture_width, texture_height,
+		angle);
 }
 
 //------------------------

@@ -189,9 +189,6 @@
     <ClCompile Include="Source\LambertShader.cpp">
       <Filter>ソース ファイル\Graphics\Shader</Filter>
     </ClCompile>
-    <ClCompile Include="Source\ModelVarianceShadowMap.cpp">
-      <Filter>ソース ファイル\Graphics\Shader</Filter>
-    </ClCompile>
     <ClCompile Include="Source\PhongVarianceShadowMap.cpp">
       <Filter>ソース ファイル\Graphics\Shader</Filter>
     </ClCompile>
@@ -360,9 +357,6 @@
     <ClCompile Include="Source\EffectManager.cpp">
       <Filter>ソース ファイル\Effect</Filter>
     </ClCompile>
-    <ClCompile Include="Source\SceneGameOver.cpp">
-      <Filter>ソース ファイル\Scene</Filter>
-    </ClCompile>
     <ClCompile Include="Source\PlayerUIHealth.cpp">
       <Filter>ソース ファイル\UI</Filter>
     </ClCompile>
@@ -411,9 +405,6 @@
     <ClCompile Include="Source\2DPrimitive.cpp">
       <Filter>ソース ファイル\Graphics\Shader</Filter>
     </ClCompile>
-    <ClCompile Include="Source\ShaderManager.cpp">
-      <Filter>ソース ファイル\Graphics\Shader</Filter>
-    </ClCompile>
     <ClCompile Include="Source\EnemyDragonSoulEater.cpp">
       <Filter>ソース ファイル\Character</Filter>
     </ClCompile>
@@ -422,12 +413,6 @@
     </ClCompile>
     <ClCompile Include="Source\DragonJudgmentOwner.cpp">
       <Filter>ソース ファイル\AI\DragonAI</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\SceneOver.cpp">
-      <Filter>ソース ファイル\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\SceneClear.cpp">
-      <Filter>ソース ファイル\Scene</Filter>
     </ClCompile>
     <ClCompile Include="Source\JudgmentUniversal.cpp">
       <Filter>ソース ファイル\AI</Filter>
@@ -456,9 +441,6 @@
     <ClCompile Include="Source\UIManager.cpp">
       <Filter>ソース ファイル\UI</Filter>
     </ClCompile>
-    <ClCompile Include="Source\UIData.cpp">
-      <Filter>ソース ファイル\UI</Filter>
-    </ClCompile>
     <ClCompile Include="Source\BossHealthUI.cpp">
       <Filter>ソース ファイル\UI</Filter>
     </ClCompile>
@@ -471,16 +453,13 @@
     <ClCompile Include="Source\TitleButtonUI.cpp">
       <Filter>ソース ファイル\UI</Filter>
     </ClCompile>
-    <ClCompile Include="Source\ButtonUIAction.cpp">
-      <Filter>ソース ファイル\System</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\TitleButtonUIJudgment.cpp">
-      <Filter>ソース ファイル\UI</Filter>
-    </ClCompile>
     <ClCompile Include="Source\TitleUIJudgment.cpp">
       <Filter>ソース ファイル\UI</Filter>
     </ClCompile>
     <ClCompile Include="Source\TitleButtonUIAction.cpp">
+      <Filter>ソース ファイル\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\BossHealthUIAction.cpp">
       <Filter>ソース ファイル\UI</Filter>
     </ClCompile>
   </ItemGroup>
@@ -552,9 +531,6 @@
       <Filter>ソース ファイル\Graphics\Shader</Filter>
     </ClInclude>
     <ClInclude Include="Source\PhongVarianceShadowMap.h">
-      <Filter>ソース ファイル\Graphics\Shader</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\ModelVarianceShadowMap.h">
       <Filter>ソース ファイル\Graphics\Shader</Filter>
     </ClInclude>
     <ClInclude Include="Source\Actor.h">
@@ -821,12 +797,6 @@
     <ClInclude Include="Source\DragonJudgmentOwner.h">
       <Filter>ソース ファイル\AI\DragonAI</Filter>
     </ClInclude>
-    <ClInclude Include="Source\SceneOver.h">
-      <Filter>ソース ファイル\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\SceneClear.h">
-      <Filter>ソース ファイル\Scene</Filter>
-    </ClInclude>
     <ClInclude Include="Source\JudgmentUniversal.h">
       <Filter>ソース ファイル\AI</Filter>
     </ClInclude>
@@ -875,12 +845,6 @@
     <ClInclude Include="Source\TitleButtonUI.h">
       <Filter>ソース ファイル\UI</Filter>
     </ClInclude>
-    <ClInclude Include="Source\ButtonUIAction.h">
-      <Filter>ソース ファイル\System</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\TitleButtonUIJudgment.h">
-      <Filter>ソース ファイル\UI</Filter>
-    </ClInclude>
     <ClInclude Include="Source\UIJudgmentBase.h">
       <Filter>ソース ファイル\UI</Filter>
     </ClInclude>
@@ -888,6 +852,9 @@
       <Filter>ソース ファイル\UI</Filter>
     </ClInclude>
     <ClInclude Include="Source\TitleButtonUIAction.h">
+      <Filter>ソース ファイル\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\BossHealthUIAction.h">
       <Filter>ソース ファイル\UI</Filter>
     </ClInclude>
   </ItemGroup>

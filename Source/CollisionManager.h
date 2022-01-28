@@ -84,8 +84,6 @@ private:
 	bool IntersectSphereVsCylinder(CollisionSphere* sphere, CollisionCylinder* cylinder);
 	// ‰~’Œ‚Æ‰~’Œ‚ÌŒğ·”»’è
 	bool IntersectCylinderVsCylinder(CollisionCylinder* cylinderA, CollisionCylinder* cylinderB, ObjectCollisionResult& result);
-
-
 private:
 	CollisionRayCast raycast;
 

@@ -71,8 +71,6 @@ void LambertShader::Begin(ID3D11DeviceContext* context, RenderContext& rc)
 	context->VSSetConstantBuffers(0, ARRAYSIZE(constantBuffers), constantBuffers);
 	context->PSSetConstantBuffers(0, ARRAYSIZE(constantBuffers), constantBuffers);
 
-	//ブレンドステート設定
-	//context->OMSetBlendState(graphics.GetBlendState((int)Graphics::BlendState::Alpha), nullptr, 0xFFFFFFFF);
 	//ラスタライザ―設定
 	context->RSSetState(graphics.GetRasterizerState(static_cast<int>(Graphics::RasterizerState::Cull_Back)));
 	//デプスステンシルステート設定

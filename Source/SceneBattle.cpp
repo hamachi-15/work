@@ -32,12 +32,16 @@
 #include "GameDataBase.h"
 
 #include "CollisionManager.h"
+#include "ShaderManager.h"
+
 #include "Texture.h"
 #include "Sprite.h"
 #include "MetaAI.h"
-#include "ShaderManager.h"
 
 #include "PlayerUIHealth.h"
+//#include "SceneManager.h"
+#include "SceneTitle.h"
+
 SceneBattle::SceneBattle()
 {
 }
@@ -86,7 +90,12 @@ void SceneBattle::Initialize()
 	sprite = std::make_unique<Sprite>();
 	sky = std::make_unique<Texture>();
 	sky->Load("Data/Sprite/SkyBox/FS002_Night.png");
-
+	anybutton_texture = std::make_unique<Texture>();
+	anybutton_texture->Load("Data/Sprite/PushAnyButton.png");
+	clear_texture = std::make_unique<Texture>();
+	clear_texture->Load("Data/Sprite/GameClear.png");
+	over_texture = std::make_unique<Texture>();
+	over_texture->Load("Data/Sprite/YouDead.png");
 	// ステージ読み込み
 	{
 		std::shared_ptr<Actor> actor = ActorManager::Instance().Create();
@@ -104,7 +113,7 @@ void SceneBattle::Initialize()
 		std::shared_ptr<Actor> actor = ActorManager::Instance().Create();
 		actor->SetUpModel("Data/Model/RPG-Character/Swordman.mdl", "Motion");
 		actor->SetName("Player");
-		actor->SetPosition(DirectX::XMFLOAT3(-170.0f, 5.5f, 0.0f));
+		actor->SetPosition(DirectX::XMFLOAT3(-278.0f, 5.5f, 34.4f));
 		actor->SetAngle(DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f));
 		actor->SetScale(DirectX::XMFLOAT3(0.04f, 0.04f, 0.04f));
 		actor->AddComponent<Movement>();
@@ -123,6 +132,9 @@ void SceneBattle::Initialize()
 
 void SceneBattle::Finalize()
 {
+	// UIの全破棄
+	UIManager::Instance().AllDelete();
+	
 	// 敵マネージャーのクリア
 	EnemyManager::Instance().AllRemove();
 
@@ -138,7 +150,6 @@ void SceneBattle::Finalize()
 
 void SceneBattle::Update(float elapsed_time)
 {
-	if(IsGameClearJudgment())
 	//	メニューオープン中はメニューを更新する
 	MenuSystem::Instance().Update(elapsed_time);
 
@@ -157,6 +168,21 @@ void SceneBattle::Update(float elapsed_time)
 			data.menu_id = MenuId::TopMenu;
 			Messenger::Instance().SendData(MessageData::MENUOPENEVENT, &data);
 		}
+	}
+	// ゲームがクリアかゲームオーバーになっていれば
+	if (isgame_clear || isgame_over)
+	{
+		GamePad& gamePad = Input::Instance().GetGamePad();
+		const GamePadButton any_button =
+			GamePad::BTN_A
+			| GamePad::BTN_B
+			| GamePad::BTN_X
+			| GamePad::BTN_Y;
+		if (gamePad.GetButtonDown() & any_button)
+		{
+			SceneManager::Instance().ChangeScene(new SceneTitle());
+		}
+		return;
 	}
 
 	// プリミティブコンテキストのコンストラクタ更新
@@ -180,9 +206,6 @@ void SceneBattle::Update(float elapsed_time)
 	LightDir.z = cosf(light_angle);
 	Light::SetDirLight(LightDir, DirectX::XMFLOAT3(0.6f, 0.6f, 0.6f));
 	Light::SetAmbient(DirectX::XMFLOAT3(0.2f, 0.2f, 0.2f));
-
-	// メタAIの更新処理
-	MetaAI::Instance().Update(elapsed_time);
 
 	// アクター更新処理
 	ActorManager::Instance().Update(elapsed_time);
@@ -236,9 +259,6 @@ void SceneBattle::Render()
 
 	// バックバッファに描画
 	BuckBufferRender(context, render_context, screen_size);
-
-	// GUI描画
-	OnGui();
 }
 
 
@@ -276,15 +296,6 @@ void SceneBattle::ScreenRender(ID3D11DeviceContext* context, RenderContext& rend
 		shader->End(context);
 	}
 
-	// デバッグプリミティブ描画
-	{
-		// 敵縄張りのデバッグプリミティブ描画
-		EnemyTerritoryManager::Instance().Render();
-		EnemyManager::Instance().DrawDebugPrimitive();
-		CollisionManager::Instance().Draw();
-		graphics.GetDebugRenderer()->Render(context, render_context.view, render_context.projection);
-	}
-
 	// アクター描画
 	{
 		// シャドウマップ作成
@@ -307,22 +318,6 @@ void SceneBattle::ScreenRender(ID3D11DeviceContext* context, RenderContext& rend
 void SceneBattle::PostRender(ID3D11DeviceContext* context, RenderContext& render_context, const DirectX::XMFLOAT2& screen_size)
 {
 	bloom_texture = bloom->Render(context, render_context);
-
-	//Texture* texture = bulr->Render(graphics.GetTexture());
-	//{
-	//	ID3D11RenderTargetView* render_target_view[1] = { bulr_texture->GetRenderTargetView() };
-	//	graphics.SetRenderTargetView(render_target_view, depth_stencil_view);
-	//}
-	//// ビューポートの設定
-	//graphics.SetViewport(screen_width, screen_height);
-	//graphics.GetSpriteShader()->Begin(context);
-	//sprite->Render(context,
-	//	texture,
-	//	0, 0,
-	//	screen_size.x, screen_size.y,
-	//	0, 0,
-	//	texture->GetWidth(), texture->GetHeight());
-	//graphics.GetSpriteShader()->End(context);
 }
 
 //-------------------------------------
@@ -353,13 +348,6 @@ void SceneBattle::BuckBufferRender(ID3D11DeviceContext* context, RenderContext& 
 		(float)graphics.GetTexture()->GetWidth(), (float)graphics.GetTexture()->GetHeight(),
 		0,
 		1, 1, 1, 1);
-	// 輝度抽出テクスチャを加算合成
-	//sprite->AddRender(context,
-	//	bloom_texture,
-	//	0, 0,
-	//	screen_size.x, screen_size.y,
-	//	0, 0,
-	//	(float)bloom_texture->GetWidth(), (float)bloom_texture->GetHeight());
 	sprite_shader->End(context);
 
 	// メニュー描画
@@ -375,23 +363,6 @@ void SceneBattle::BuckBufferRender(ID3D11DeviceContext* context, RenderContext& 
 	// UI描画処理
 	UIManager::Instance().Draw(context);
 
-	// シャドウマップ
-	if (isshadowmap)
-	{
-		sprite_shader->Begin(context);
-		for (int i = 0; i < 3; ++i)
-		{
-			sprite->Render(context,
-				ActorManager::Instance().GetShadowTexture(i),
-				0 + 200 * (i), 0,
-				200, 200,
-				0, 0,
-				(float)ActorManager::Instance().GetShadowTexture(i)->GetWidth(), (float)ActorManager::Instance().GetShadowTexture(i)->GetHeight(),
-				0,
-				1, 1, 1, 1);
-		}
-		sprite_shader->End(context);
-	}
 	// 2Dプリミティブ描画
 	{
 		if (primitive_falg)
@@ -405,6 +376,26 @@ void SceneBattle::BuckBufferRender(ID3D11DeviceContext* context, RenderContext& 
 			primitive->End(context);
 		}
 	}
+
+	// 
+	ClearOrOverRender(context);
+}
+
+//-------------------------------------
+// メッセージ処理
+//-------------------------------------
+bool SceneBattle::OnMessages(const Telegram& telegram)
+{
+	switch (telegram.message_box.message)
+	{
+	case MessageType::Message_GameClear:
+		isgame_clear = true;
+		break;
+	case MessageType::Message_GameOver:
+		isgame_over = true;
+		break;
+	}
+	return false;
 }
 
 //-------------------------------------
@@ -425,6 +416,56 @@ void SceneBattle::OnGui()
 	ImGui::Checkbox("PrimitiveFlag", &primitive_falg);
 
 	ImGui::End();
+
+}
+
+//-------------------------------------
+// クリアかゲームオーバー描画
+//-------------------------------------
+void SceneBattle::ClearOrOverRender(ID3D11DeviceContext*context)
+{
+	ShaderManager& shader_manager = ShaderManager::Instance();
+	std::shared_ptr<Shader> sprite_shader = shader_manager.GetShader(ShaderManager::ShaderType::Sprite);
+	sprite_shader->Begin(context);
+	if (isgame_clear)
+	{
+		sprite->Render(context,
+			clear_texture.get(),
+			400, 100,
+			(float)clear_texture->GetWidth(), (float)clear_texture->GetHeight(),
+			0, 0,
+			(float)clear_texture->GetWidth(), (float)clear_texture->GetHeight(),
+			0,
+			1, 1, 1, 1);
+		sprite->Render(context,
+			anybutton_texture.get(),
+			400, 400,
+			(float)anybutton_texture->GetWidth(), (float)anybutton_texture->GetHeight(),
+			0, 0,
+			(float)anybutton_texture->GetWidth(), (float)anybutton_texture->GetHeight(),
+			0,
+			1, 1, 1, 1);
+	}
+	else if (isgame_over)
+	{
+		sprite->Render(context,
+			over_texture.get(),
+			400, 100,
+			(float)over_texture->GetWidth(), (float)over_texture->GetHeight(),
+			0, 0,
+			(float)over_texture->GetWidth(), (float)over_texture->GetHeight(),
+			0,
+			1, 1, 1, 1);
+		sprite->Render(context,
+			anybutton_texture.get(),
+			400, 400,
+			(float)anybutton_texture->GetWidth(), (float)anybutton_texture->GetHeight(),
+			0, 0,
+			(float)anybutton_texture->GetWidth(), (float)anybutton_texture->GetHeight(),
+			0,
+			1, 1, 1, 1);
+	}
+	sprite_shader->End(context);
 
 }
 

@@ -10,6 +10,9 @@
 #include "GameDatabase.h"
 #include "EnemyTerritoryManager.h"
 
+#include "SceneManager.h"
+#include "UIManager.h"
+
 // アクター系インクルード
 #include "Charactor.h"
 #include "Movement.h"
@@ -20,6 +23,8 @@
 #include "EnemyLAT.h"
 #include "EnemyDragonNightmare.h"
 #include "EnemyDragonSoulEater.h"
+
+#include "BossHealthUI.h"
 
 //-----------------------------------------------
 // コンストラクタ
@@ -109,7 +114,7 @@ void EnemyManager::DrawDebugPrimitive()
 void EnemyManager::CreateEnemies()
 {
 	std::vector<std::shared_ptr<WorldMapData>> world_map_data = GameDataBase::Instance().GetWorldMapDataList();
-	int world_map_data_max_count = GameDataBase::Instance().GetWorldMapDataCount();
+	int world_map_data_max_count = 3;
 	for (int i = 0; i < world_map_data_max_count; ++i)
 	{
 		// ワールドマップデータを取得
@@ -221,68 +226,6 @@ void EnemyManager::SetEnemyStatus(std::shared_ptr<Actor> actor, std::shared_ptr<
 	AddComponent(actor, enemy_data, teritory_data->tag);
 }
 
-//void EnemyManager::SetEnemyStatus(std::shared_ptr<Actor> actor, std::shared_ptr<EnemyData> enemy_data, int& string_id, DirectX::XMFLOAT3& appearance_position)
-//{
-//	// 名前の設定
-//	std::string name = std::string(enemy_data->name) + std::to_string(string_id);
-//	actor->SetName(name.c_str());
-//
-//	// 敵データIDの設定
-//	//enemy->SetEnemyDataID(enemy_data->id);
-//
-//	// モデルのセットアップ
-//	actor->SetUpModel(enemy_data->model_path, enemy_data->animation_node_name);
-//
-//	// 出現位置の設定
-//	GetAppearancePosition(actor, { appearance_position.x, appearance_position.y, appearance_position.z }, 2);
-//
-//	// 所属テリトリー設定
-//
-//	// スケールの設定
-//	actor->SetScale({ enemy_data->scale_x, enemy_data->scale_y, enemy_data->scale_z });
-//
-//	// アングルの設定
-//	actor->SetAngle({ enemy_data->angle_x, enemy_data->angle_y, enemy_data->angle_z });
-//
-//	// シェーダーの設定
-//	actor->SetShaderType(ShaderManager::ShaderType::Lambert);
-//
-//	// 各敵のコンポーネント追加
-//	std::shared_ptr<Enemy> enemy;
-//	actor->AddComponent<Movement>();
-//	std::shared_ptr<Charactor> charactor = actor->AddComponent<Charactor>();
-//	
-//	// 最大HP設定
-//	charactor->SetMaxHealth(enemy_data->hp);
-//
-//	// HP設定
-//	charactor->SetHealth(enemy_data->hp);
-//
-//	// 敵の種類ごとのコンポーネントを追加
-//	// TODO 敵を作り終えたら対応する
-//	switch (enemy_data->category)
-//	{
-//	case EnemyCategory::LAT:
-//		enemy = actor->AddComponent<EnemyLAT>();
-//		break;
-//	case EnemyCategory::Slime:
-//		enemy = actor->AddComponent<EnemySlime>();
-//		break;
-//	case EnemyCategory::PLT:
-//		enemy = actor->AddComponent<EnemyPLT>();
-//		break;
-//	case EnemyCategory::NightmareDragon:
-//		enemy = actor->AddComponent<EnemyDragonNightmare>();
-//		break;
-//	case EnemyCategory::SoulEaterDragon:
-//		enemy = actor->AddComponent<EnemyDragonSoulEater>();
-//		break;
-//	case EnemyCategory::DragonUsurper:
-//		break;
-//	}
-//
-//}
-
 //-----------------------------------------------
 // 出現位置を決める処理
 //-----------------------------------------------
@@ -318,15 +261,21 @@ void EnemyManager::AddComponent(std::shared_ptr<Actor> actor, std::shared_ptr<En
 		break;
 	case EnemyCategory::LAT:
 		enemy = actor->AddComponent<EnemyLAT>();
+
 		break;
 	case EnemyCategory::PLT:
 		enemy = actor->AddComponent<EnemyPLT>();
+
 		break;
 	case EnemyCategory::NightmareDragon:
 		//break;
 	case EnemyCategory::SoulEaterDragon:
 		//break;
 	case EnemyCategory::DragonUsurper:
+		if (IsBattleScene()) {
+			std::shared_ptr<BossHealthUI> ui = actor->AddComponent<BossHealthUI>();
+			UIManager::Instance().RegisterUI(ui);
+		}
 		enemy = actor->AddComponent<EnemyDragonNightmare>();
 		break;
 	}

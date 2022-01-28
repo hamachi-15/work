@@ -45,8 +45,14 @@ public:
 	//バックバッファ描画
 	void BuckBufferRender(ID3D11DeviceContext* context, RenderContext& render_context, const DirectX::XMFLOAT2& screen_size);
 
+	// メッセージ処理
+	bool OnMessages(const Telegram& telegram) override;
+	
 	// GUI描画
 	void OnGui();
+
+	// クリアかゲームオーバー描画
+	void ClearOrOverRender(ID3D11DeviceContext* context);
 
 	// ゲームクリア判定処理
 	bool IsGameClearJudgment();
@@ -60,6 +66,9 @@ private:
 
 	std::unique_ptr<Sprite>				sprite;
 	std::unique_ptr<Texture>			sky;
+	std::unique_ptr<Texture>			over_texture;
+	std::unique_ptr<Texture>			clear_texture;
+	std::unique_ptr<Texture>			anybutton_texture;
 	Texture*							bloom_texture;
 
 	//ライト
@@ -69,4 +78,6 @@ private:
 
 	bool								primitive_falg = false;
 	bool								isshadowmap = false;
+	bool								isgame_clear = false;
+	bool								isgame_over = false;
 };

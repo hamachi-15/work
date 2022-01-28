@@ -38,21 +38,13 @@ public:
 private:
 	RenderContext render_context;
 	BlurRenderContext blur_render_context;
+
 	std::unique_ptr<Sprite> sprite;
 	std::unique_ptr<Texture> sky;
 	std::unique_ptr<Texture> mask_texture;
-	std::vector<std::unique_ptr<Texture>> start_button;
-	std::unique_ptr<Texture> tex3;
 
-	std::unique_ptr<Texture> shadow;
-	std::unique_ptr<Texture> depth_shadow;
-
-	std::unique_ptr<CameraController>camera_controller;
 	//ライト
 	DirectX::XMFLOAT3 LightDir = { 0,0,0 };
-
-	DirectX::XMFLOAT3 shadow_color = { 0.5f, 0.5f, 0.5f};
-
 
 	float timer = 0.0f; // ディソープに使う
 };

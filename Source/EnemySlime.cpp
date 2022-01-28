@@ -135,10 +135,10 @@ void EnemySlime::Start()
 void EnemySlime::SetBehaviorNode()
 {
 	// 現在のシーン名取得
-	const char* name = SceneManager::Instance().GetCurrentScene()->GetName();
+	std::string name = SceneManager::Instance().GetCurrentScene()->GetName();
 
 	// シーンがワールドマップ時のノード設定
-	if (strcmp(name, "SceneWorldMap") == 0)
+	if (name, "SceneWorldMap")
 	{
 		ai_tree->AddNode("",	   "Root",	  0, BehaviorTree::SelectRule::Priority, NULL,					   NULL);
 		ai_tree->AddNode("Root",   "Battle",  4, BehaviorTree::SelectRule::Priority, new BattleJudgment(this), NULL);

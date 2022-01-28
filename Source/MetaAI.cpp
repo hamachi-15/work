@@ -16,14 +16,6 @@
 //-----------------------------------
 MetaAI::MetaAI()
 {	
-	// 最初から敵を出現させる
-	int count = 1;
-
-	// 敵の縄張り設定
-	EnemyManager::Instance().CreateTerritory();
-
-	// 敵の出現処理
-	AppearanceEnemy();
 }
 
 //-----------------------------------
@@ -136,6 +128,12 @@ void MetaAI::SendMessaging(int sender, int receiver, Message message, int enemy_
 		// ディレイ無しメッセージ（即時配送メッセージ）
 		Discharge(SceneManager::Instance().GetCurrentScene(), telegram);
 	}	
+	else if (receiver == static_cast<int>(MetaAI::Identity::BattleMap))
+	{
+		Telegram telegram(sender, receiver, message);
+		// ディレイ無しメッセージ（即時配送メッセージ）
+		Discharge(SceneManager::Instance().GetCurrentScene(), telegram);
+	}
 	else if(receiver == static_cast<int>(MetaAI::Identity::Player))
 	{// プレイヤーが受信者
 		// プレイヤーコンポーネントを取得
@@ -163,6 +161,8 @@ void MetaAI::SendMessaging(int sender, int receiver, Message message, int enemy_
 //-----------------------------------
 void MetaAI::AppearanceEnemy()
 {
+	// 敵の縄張り設定
+	EnemyManager::Instance().CreateTerritory();
 	// 敵を生成
 	EnemyManager::Instance().CreateEnemies();
 }

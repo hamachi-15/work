@@ -200,10 +200,10 @@ void EnemyLAT::Start()
 void EnemyLAT::SetBehaviorNode()
 {
 	// 現在のシーン名取得
-	const char* name = SceneManager::Instance().GetCurrentScene()->GetName();
+	std::string scene_name = SceneManager::Instance().GetCurrentScene()->GetName();
 
 	// シーンがワールドマップ時のノード設定
-	if (strcmp(name, "SceneWorldMap") == 0)
+	if(scene_name == "SceneWorldMap")
 	{
 		ai_tree->AddNode("", "Root", 0, BehaviorTree::SelectRule::Priority, NULL, NULL);
 		ai_tree->AddNode("Root", "Battle", 4, BehaviorTree::SelectRule::Priority, new BattleJudgment(this), NULL);
