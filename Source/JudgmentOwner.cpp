@@ -113,7 +113,9 @@ bool WanderJudgment::Judgment()
 //-----------------------------------------
 bool DamageJudgment::Judgment()
 {
-	return owner->GetCharactor()->GetDamageFlag();
+	std::shared_ptr<Charactor> charactor = owner->GetCharactor();
+	// ダメージフラグが立っている且つ無敵時間が設定されていなければtrue
+	return (charactor->GetDamageFlag() && charactor->GetInvincibleTimer() <= 0.0f);
 }
 
 //*****************************

@@ -296,6 +296,15 @@ void SceneBattle::ScreenRender(ID3D11DeviceContext* context, RenderContext& rend
 		shader->End(context);
 	}
 
+	// デバッグプリミティブ描画
+	{
+		// 敵縄張りのデバッグプリミティブ描画
+		EnemyTerritoryManager::Instance().Render();
+		EnemyManager::Instance().DrawDebugPrimitive();
+		CollisionManager::Instance().Draw();
+		graphics.GetDebugRenderer()->Render(context, render_context.view, render_context.projection);
+	}
+
 	// アクター描画
 	{
 		// シャドウマップ作成
@@ -362,6 +371,24 @@ void SceneBattle::BuckBufferRender(ID3D11DeviceContext* context, RenderContext& 
 
 	// UI描画処理
 	UIManager::Instance().Draw(context);
+
+	// シャドウマップ
+	if (isshadowmap)
+	{
+		sprite_shader->Begin(context);
+		for (int i = 0; i < 3; ++i)
+		{
+			sprite->Render(context,
+				ActorManager::Instance().GetShadowTexture(i),
+				0 + 200 * (i), 0,
+				200, 200,
+				0, 0,
+				(float)ActorManager::Instance().GetShadowTexture(i)->GetWidth(), (float)ActorManager::Instance().GetShadowTexture(i)->GetHeight(),
+				0,
+				1, 1, 1, 1);
+		}
+		sprite_shader->End(context);
+	}
 
 	// 2Dプリミティブ描画
 	{

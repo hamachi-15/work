@@ -164,19 +164,19 @@ void EnemyDragonNightmare::Start()
 		parameter.position_mask = CollisionPositionMask::Collision_Mask_Castam_poition;
 		charactor->SetCollision(actor, parameter, CollisionMeshType::Cylinder);
 		// ‘Ì‚ÌƒRƒŠƒWƒ‡ƒ“Ý’è
-		name.clear();
-		name = actor->GetName();
-		name += "Body";
-		parameter.name = name.c_str();
-		parameter.node_name = "Root";
-		parameter.radius = 20.5f;
-		parameter.height = 34.5f;
-		parameter.weight = 6.5f;
-		parameter.local_position = DirectX::XMFLOAT3(0, 14, 0);
-		parameter.collision_flg = false;
-		parameter.element = CollisionElement::Weppon;
-		parameter.position_mask = CollisionPositionMask::Collision_Mask_Castam_poition;
-		charactor->SetCollision(actor, parameter, CollisionMeshType::Cylinder);
+		//name.clear();
+		//name = actor->GetName();
+		//name += "Body";
+		//parameter.name = name.c_str();
+		//parameter.node_name = "Root";
+		//parameter.radius = 20.5f;
+		//parameter.height = 34.5f;
+		//parameter.weight = 6.5f;
+		//parameter.local_position = DirectX::XMFLOAT3(0, 14, 0);
+		//parameter.collision_flg = false;
+		//parameter.element = CollisionElement::Weppon;
+		//parameter.position_mask = CollisionPositionMask::Collision_Mask_Castam_poition;
+		//charactor->SetCollision(actor, parameter, CollisionMeshType::Cylinder);
 
 	}
 

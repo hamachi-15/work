@@ -18,18 +18,37 @@
 //
 gs_4_0
 dcl_input_siv v[3][0].xyzw, position
-dcl_temps 1
+dcl_temps 2
 dcl_inputprimitive triangle 
 dcl_outputtopology trianglestrip 
 dcl_output_siv o0.xyzw, position
 dcl_maxout 3
-mov r0.x, l(0)
+//
+// Initial variable locations:
+//   m0 <- output; 
+//   v[0][0].x <- input[0].x; v[0][0].y <- input[0].y; v[0][0].z <- input[0].z; v[0][0].w <- input[0].w; 
+//   v[1][0].x <- input[1].x; v[1][0].y <- input[1].y; v[1][0].z <- input[1].z; v[1][0].w <- input[1].w; 
+//   v[2][0].x <- input[2].x; v[2][0].y <- input[2].y; v[2][0].z <- input[2].z; v[2][0].w <- input[2].w
+//
+#line 12 "E:\就職作品\ライブラリ\DragonSlayer\HLSL\VelocityBuffer_gs.hlsl"
+mov r0.x, l(0)  // r0.x <- i
+mov r0.y, r0.x  // r0.y <- i
 loop 
-  uge r0.y, r0.x, l(3)
-  breakc_nz r0.y
-  mov o0.xyzw, v[r0.x + 0][0].xyzw
+  mov r0.z, l(3)
+  ult r0.z, r0.y, r0.z
+  breakc_z r0.z
+
+#line 15
+  mov r1.xyzw, v[r0.y + 0][0].xyzw  // r1.x <- element.pos.x; r1.y <- element.pos.y; r1.z <- element.pos.z; r1.w <- element.pos.w
+
+#line 16
+  mov o0.xyzw, r1.xyzw
   emit 
-  iadd r0.x, r0.x, l(1)
+
+#line 17
+  iadd r0.y, r0.y, l(1)
 endloop 
+
+#line 18
 ret 
-// Approximately 9 instruction slots used
+// Approximately 12 instruction slots used

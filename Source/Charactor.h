@@ -72,6 +72,12 @@ public:
 	// 最大体力を取得
 	int GetMaxHealth() const { return max_health; }
 
+	// 攻撃力設定
+	void SetAttack(int attck) { this->attack = attack; }
+
+	// 攻撃力取得
+	int GetAttack() const { return attack; }
+
 	// 移動速度設定
 	void SetMoveSpeed(float speed) { this->move_speed = speed; }
 
@@ -96,9 +102,9 @@ public:
 	// ヒットストップタイマー取得
 	float GetHitStopTimer() const { return hitstop_timer; }
 
-	// ノード座標を取得
-	//void GetNodePosition(const char* node_name, DirectX::XMFLOAT3& node_position, Model* model);
-
+	// 無敵時間取得
+	float GetInvincibleTimer() const { return invincible_timer; }
+	
 	// 識別番号取得
 	int GetID() const { return id; }
 
@@ -145,6 +151,7 @@ private:
 	
 	int		max_health = 5;
 	int		health = 5;
+	int		attack = 1;
 	float	invincible_timer = 0.0f;
 	float	move_speed = 30.0f;
 	float	run_speed_scale = 0.0f;

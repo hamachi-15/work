@@ -111,14 +111,9 @@ ActionBase::State IdleAction::Run(float elapsed_time)
 //----------------------------------
 void DamageAction::Start()
 {
+	std::shared_ptr<Charactor> player_charactor = ActorManager::Instance().GetActor("Player")->GetComponent<Charactor>();
 	// ダメージ
-	owner->GetCharactor()->ApplyDamage(10, 0.7f);
-
-	std::string animation_name = owner->GetName();
-	animation_name += "Damage";
-
-	// アニメーション再生
-	owner->PlayAnimation(animation_name.c_str());
+	owner->GetCharactor()->ApplyDamage(player_charactor->GetAttack(), 0.7f);
 }
 
 //----------------------------------
@@ -126,19 +121,11 @@ void DamageAction::Start()
 //----------------------------------
 ActionBase::State DamageAction::Run(float elapsed_time)
 {
-	
-	// アニメーション再生が終了か死亡したら完了を返す
-	if (!owner->GetActor()->GetModel()->IsPlayAnimation() || 
-		owner->GetCharactor()->GetDead())
-	{
-		owner->SetRandomTargetPosition();
-		owner->SetRunTimer(0.0f);
-		owner->SetAttackFlag(false);
-		owner->GetCharactor()->SetDamageFlag(false);
-		return ActionBase::State::Complete;
-	}
-	return ActionBase::State::Run;
-
+	owner->SetRandomTargetPosition();
+	owner->SetRunTimer(0.0f);
+	owner->SetAttackFlag(false);
+	owner->GetCharactor()->SetDamageFlag(false);
+	return ActionBase::State::Complete;
 }
 
 //***********************************
