@@ -39,6 +39,9 @@ public:
 	// シーンチェンジフラグ
 	void SetSceneChangeFlag() { change_scene_flag = true; }
 	bool IsSceneChangeFlag() const { return change_scene_flag; }
+
+	// カメラコントローラー取得
+	CameraController* GetCameraController() const { return camera_controller.get(); }
 private:
 	bool ready = false;
 	std::string scene_name; // シーンの名前

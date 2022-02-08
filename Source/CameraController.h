@@ -26,10 +26,13 @@ public:
 
 	// カメラアングル設定
 	void SetCameraAngle(DirectX::XMFLOAT3 angle) { this->angle = angle; }
-		// カメラの四錐台
-	DirectX::XMFLOAT3	near_position[4] = {};	// Nearの四角形の４頂点の座標
-	DirectX::XMFLOAT3	far_position[4] = {}; 	// Farの四角形の４頂点の座標
-Plane				frustum[6];
+	
+	// カメラの四錐台の平面取得
+	std::vector<Plane> GetFrustum() const { return frustum; }
+	// カメラの四錐台
+	DirectX::XMFLOAT3				near_position[4] = {};	// Nearの四角形の４頂点の座標
+	DirectX::XMFLOAT3				far_position[4] = {}; 	// Farの四角形の４頂点の座標
+	
 private:
 	// 錐台計算
 	void CalculateFrustum();
@@ -78,9 +81,11 @@ private:
 	DirectX::XMFLOAT3				target = { 0.0f, 0.0f, 0.0f };
 	DirectX::XMFLOAT3				angle = { 0.0f, 0.0f, 0.0f };
 	float							roll_speed = Mathf::ConvartToRadian(90);
-	float							range = 50.0f;
+	float							range = 75.0f;
 	float							max_angleX = Mathf::ConvartToRadian(45);
 	float							min_angleX = Mathf::ConvartToRadian(-45);
+
+	std::vector<Plane>				frustum;
 
 	// モーションカメラ
 	float							motion_timer = 0;

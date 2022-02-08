@@ -32,12 +32,6 @@ void GaussianYBlur::Begin(ID3D11DeviceContext* context, Texture* texture)
 
 void GaussianYBlur::End(ID3D11DeviceContext* context)
 {
-	Graphics& graphics = Graphics::Instance();
-
 	// シェーダーの設定
 	InActivate(context);
-
-	// レンダーターゲットの回復
-	ID3D11RenderTargetView* backbuffer = graphics.GetRenderTargetView();
-	graphics.SetRenderTargetView(&backbuffer, graphics.GetDepthStencilView());
 }

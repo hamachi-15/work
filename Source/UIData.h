@@ -72,5 +72,5 @@ private:
 	DirectX::XMFLOAT2			size;
 	DirectX::XMFLOAT2			scale;
 	float						angle;
-	std::shared_ptr<Charactor>	charactor;
+	std::shared_ptr<Charactor>	charactor = nullptr;
 };

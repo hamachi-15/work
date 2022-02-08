@@ -20,6 +20,8 @@
 #include "ActionOwner.h"
 #include "SlimeActionOwner.h"
 
+#include "EnemyCollision.h"
+
 //-----------------------------------------
 // コンストラクタ
 //-----------------------------------------
@@ -79,47 +81,51 @@ void EnemySlime::Start()
 	SetTargetPosition(actor->GetPosition());
 
 	// コリジョンの設定
-	{
-		Model* model = GetActor()->GetModel();
-		CollisionParameter parameter;
+	//{
+	//	Model* model = GetActor()->GetModel();
+	//	CollisionParameter parameter;
+	//	std::vector<CollisionParameter> sphere_parameter;
+	//	std::vector<CollisionParameter> cylinder_parameter;
 
-		// カリング用のコリジョン
-		parameter.name = "SlimeAABB";
-		parameter.node_name = "Spine01";
-		parameter.float3_radius = DirectX::XMFLOAT3(5.5f, 5.5f, 5.5f);
-		parameter.collision_flg = true;
-		parameter.actor_id = charactor->GetID();
-		parameter.actor_type = CollisionActorType::Enemy;
-		parameter.element = CollisionElement::Body;
-		parameter.position_mask = CollisionPositionMask::Collision_Mask_Member_Position;
-		charactor->SetCollision(actor, parameter, CollisionMeshType::AABB);
+	//	 カリング用のコリジョン
+	//	parameter.name = "SlimeAABB";
+	//	parameter.node_name = "Spine01";
+	//	parameter.xmfloat_radius = DirectX::XMFLOAT3(5.5f, 5.5f, 5.5f);
+	//	parameter.collision_flg = true;
+	//	parameter.actor_id = charactor->GetID();
+	//	parameter.actor_type = CollisionActorType::Enemy;
+	//	parameter.update_type = CollisionUpdateType::Update_Node_Position;
 
-		// 体のコリジョン設定
-		parameter.name = actor->GetName();
-		parameter.node_name = "";
-		parameter.actor_id = charactor->GetID() + GetIdentity();
-		parameter.radius = 3.5f;
-		parameter.height = 6.5f;
-		parameter.weight = 6.5f;
-		parameter.collision_flg = true;
-		parameter.position_mask = CollisionPositionMask::Collision_Mask_Actor_Position;
-		charactor->SetCollision(actor, parameter, CollisionMeshType::Cylinder);
+	//	 体のコリジョン設定
+	//	parameter.name = actor->GetName();
+	//	parameter.actor_name = actor->GetName();
+	//	parameter.node_name = "";
+	//	parameter.actor_id = charactor->GetID() + GetIdentity();
+	//	parameter.radius = 3.5f;
+	//	parameter.height = 6.5f;
+	//	parameter.weight = 6.5f;
+	//	parameter.collision_flg = true;
+	//	parameter.actor_type = CollisionActorType::Enemy;
+	//	parameter.update_type = CollisionUpdateType::Update_Actor;
+	//	cylinder_parameter.emplace_back(parameter);
 
-		// 頭突きのコリジョン設定
-		Mathf::GetNodePosition("BottomEyeCover", head_position, model);
-		haed_collision_name = actor->GetName();
-		haed_collision_name += "Head";
-		parameter.name = haed_collision_name.c_str();
-		parameter.node_name = "BottomEyeCover";
-		parameter.position = head_position;
-		parameter.radius = 4.0f;
-		parameter.weight = 1.0f;
-		parameter.height = 0.0f;
-		parameter.collision_flg = false;
-		parameter.element = CollisionElement::Weppon;
-		parameter.position_mask = CollisionPositionMask::Collision_Mask_Member_Position;
-		charactor->SetCollision(actor, parameter, CollisionMeshType::Sphere);
-	}
+	//	 頭突きのコリジョン設定
+	//	Mathf::GetNodePosition("BottomEyeCover", head_position, model);
+	//	haed_collision_name = actor->GetName();
+	//	haed_collision_name += "Head";
+	//	parameter.name = haed_collision_name.c_str();
+	//	parameter.node_name = "BottomEyeCover";
+	//	parameter.position = head_position;
+	//	parameter.radius = 4.0f;
+	//	parameter.weight = 1.0f;
+	//	parameter.height = 0.0f;
+	//	parameter.collision_flg = false;
+	//	parameter.actor_type = CollisionActorType::Enemy;
+	//	parameter.update_type = CollisionUpdateType::Update_Node_Position;
+	//	sphere_parameter.emplace_back(parameter);
+
+	//	actor->AddComponent<EnemyCollision>(sphere_parameter, cylinder_parameter);
+	//}
 
 	// ビヘイビアツリー設定
 	behavior_data = new BehaviorData();
@@ -211,17 +217,17 @@ void EnemySlime::Destroy()
 	
 	// コリジョン削除
 	// 球コリジョン削除
-	std::vector<std::shared_ptr<CollisionSphere>> list = CollisionManager::Instance().GetCollisionSphereFromID(GetCharactor()->GetID() + GetIdentity());
-	for (std::shared_ptr<CollisionSphere> sphere : list)
-	{
-		CollisionManager::Instance().UnregisterSphere(sphere);
-	}
-	
-	// 円柱コリジョン削除
-	CollisionManager::Instance().UnregisterCylinder(CollisionManager::Instance().GetCollisionCylinderFromName(actor->GetName()));
-	
-	// 立方体コリジョン削除
-	CollisionManager::Instance().UnregisterBox(CollisionManager::Instance().GetCollisionBoxFromName("SlimeAABB"));
+	//std::vector<std::shared_ptr<CollisionSphere>> list = CollisionManager::Instance().GetCollisionSphereFromID(GetCharactor()->GetID() + GetIdentity());
+	//for (std::shared_ptr<CollisionSphere> sphere : list)
+	//{
+	//	CollisionManager::Instance().UnregisterSphere(sphere);
+	//}
+	//
+	//// 円柱コリジョン削除
+	//CollisionManager::Instance().UnregisterCylinder(CollisionManager::Instance().GetCollisionCylinderFromName(actor->GetName()));
+	//
+	//// 立方体コリジョン削除
+	//CollisionManager::Instance().UnregisterBox(CollisionManager::Instance().GetCollisionBoxFromName("SlimeAABB"));
 	
 	// 敵マネージャーから削除
 	EnemyManager::Instance().EnemyRemove(GetActor()->GetComponent<EnemySlime>());

@@ -24,24 +24,24 @@ void BossHealthUI::Start()
 	parameter.position = { 175, 20 };
 	parameter.charactor = charactor;
 	parameter.scale = { 0.5f, 0.25f };
-	UIData* health_gage_freame_data = new UIData(parameter);
+	health_gage_freame_data = new UIData(parameter);
 
 	// ゲージの下地
 	parameter.filename = "Data/Sprite/UIAseet/DragonHealthGauge/GaugeBase.png";
 	parameter.name = "HealthGaugeBase";
 	parameter.position = { 90, 25 };
-	UIData* health_base_data = new UIData(parameter);
+	health_base_data = new UIData(parameter);
 
 	// HPのゲージ
 	parameter.filename = "Data/Sprite/UIAseet/DragonHealthGauge/GoldGauge.png";
 	parameter.name = "HealthGauge";
 	parameter.position = { 220, 30 };
-	UIData* health_gold_gage_data = new UIData(parameter);
+	health_gold_gage_data = new UIData(parameter);
 
 	// Hpゲージの減少幅を示すゲージ
 	parameter.filename = "Data/Sprite/UIAseet/DragonHealthGauge/RedGauge.png";
 	parameter.name = "HealthSubtructGauge";
-	UIData* health_red_gage_data = new UIData(parameter);
+	health_red_gage_data = new UIData(parameter);
 
 	ui_node_tree = new UINodeTree();
 

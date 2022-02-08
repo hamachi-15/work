@@ -79,17 +79,15 @@ void Movement::MoveLocal(const DirectX::XMFLOAT3& direction, float elapsed_time)
 //----------------------------
 // 旋回
 //----------------------------
-void Movement::Turn(DirectX::XMFLOAT3& direction, float elapsed_time)
+float Movement::Turn(DirectX::XMFLOAT3& direction)
 {
 	std::shared_ptr<Actor> actor = GetActor();
-
-	float speed = turn_speed * elapsed_time;
 
 	// 進行ベクトルがゼロベクトルの場合は処理する必要なし
 	float length = sqrtf(direction.x * direction.x + direction.z * direction.z);
 	if (length <= 0.001f)
 	{
-		return;
+		return 0;
 	}
 	// 進行ベクトルを単位ベクトル化
 	direction.x /= length;
@@ -120,7 +118,7 @@ void Movement::Turn(DirectX::XMFLOAT3& direction, float elapsed_time)
 	{
 		actor->SubtractAngle({ 0, rot, 0 });
 	}
-
+	return dot;
 }
 
 //----------------------------

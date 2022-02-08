@@ -70,7 +70,7 @@ private:
 	//シャドーマップサイズ
 	const DirectX::XMFLOAT2				 shadow_size[3]{ { 1024,1024 },{ 512,512 },{ 256,256 } };
 	//シャドークリップエリア
-	const float							 shadow_area[3] = { 50, 150, 300 };
+	const float							 shadow_area[3] = { 80, 150, 300 };
 	//ライトビュープロジェクションクロップ行列の配列を定義する
 	DirectX::XMFLOAT4X4					 lvpc_matrix[3];
 

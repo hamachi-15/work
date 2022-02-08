@@ -10,8 +10,8 @@
 UINodeBase::~UINodeBase()
 {
 	delete action;
+	delete judgment;
 }
-
 //------------------------
 // é¿çsèàóù
 //------------------------
@@ -73,7 +73,6 @@ void UINodeBase::Rebder(ID3D11DeviceContext* context,
 {
 	float texture_width = static_cast<float>(texture->GetWidth());
 	float texture_height = static_cast<float>(texture->GetHeight());
-
 	Sprite sprite;
 	sprite.Render(context,
 		texture,

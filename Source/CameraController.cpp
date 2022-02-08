@@ -32,6 +32,7 @@ CameraController::~CameraController()
 	//Messenger::Instance().RemoveReceiver(Camera_Change_FreeMode_key);
 	//Messenger::Instance().RemoveReceiver(Camera_Change_LockonMode_key);
 	//Messenger::Instance().RemoveReceiver(Camera_Change_MotionMode_key);
+	frustum.clear();
 }
 
 //-----------------------------
@@ -74,6 +75,7 @@ void CameraController::Update(float elapsed_time)
 void CameraController::CalculateFrustum()
 {
 	Camera& camera = Camera::Instance();
+	frustum.clear();
 	//DirectX::XMMATRIX view = DirectX::XMMatrixLookAtLH(DirectX::XMLoadFloat3(&camera.GetEye()), DirectX::XMLoadFloat3(&camera.GetFocus()), DirectX::XMLoadFloat3(&camera.GetUp()));
 	//DirectX::XMMATRIX projection = DirectX::XMMatrixPerspectiveFovLH(DirectX::XMConvertToRadians(45),
 	//	1280.0f / 720.0f,
@@ -132,54 +134,73 @@ void CameraController::CalculateFrustum()
 
 	// ç∂ë§ñ 
 	{
+		Plane plane;
 		DirectX::XMVECTOR vector1 = DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&near_position[3]), DirectX::XMLoadFloat3(&near_position[0]));
 		DirectX::XMVECTOR vector2 = DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&far_position[3]), DirectX::XMLoadFloat3(&near_position[3]));
-		DirectX::XMStoreFloat3(&frustum[0].normal, DirectX::XMVector3Cross(vector1, vector2));
-		DirectX::XMStoreFloat3(&frustum[0].normal, DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&frustum[0].normal)));
-		DirectX::XMStoreFloat(&frustum[0].direction, DirectX::XMVector3Dot(DirectX::XMLoadFloat3(&near_position[0]), DirectX::XMLoadFloat3(&frustum[0].normal)));
-
+		DirectX::XMStoreFloat3(&plane.normal, DirectX::XMVector3Cross(vector1, vector2));
+		DirectX::XMStoreFloat3(&plane.normal, DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&plane.normal)));
+		DirectX::XMStoreFloat(&plane.direction, DirectX::XMVector3Dot(DirectX::XMLoadFloat3(&near_position[0]), DirectX::XMLoadFloat3(&plane.normal)));
+		frustum.emplace_back(plane);
 	}
 	// âEë§ñ 
 	{
+		Plane plane;
 		DirectX::XMVECTOR vector2 = DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&near_position[2]), DirectX::XMLoadFloat3(&near_position[1]));
 		DirectX::XMVECTOR vector1 = DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&far_position[2]), DirectX::XMLoadFloat3(&near_position[2]));
-		DirectX::XMStoreFloat3(&frustum[1].normal, DirectX::XMVector3Cross(vector1, vector2));
-		DirectX::XMStoreFloat3(&frustum[1].normal, DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&frustum[1].normal)));
-
-		DirectX::XMStoreFloat(&frustum[1].direction, DirectX::XMVector3Dot(DirectX::XMLoadFloat3(&far_position[2]), DirectX::XMLoadFloat3(&frustum[1].normal)));
+		
+		DirectX::XMStoreFloat3(&plane.normal, DirectX::XMVector3Cross(vector1, vector2));
+		DirectX::XMStoreFloat3(&plane.normal, DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&plane.normal)));
+		DirectX::XMStoreFloat(&plane.direction, DirectX::XMVector3Dot(DirectX::XMLoadFloat3(&far_position[2]), DirectX::XMLoadFloat3(&plane.normal)));
+		
+		frustum.emplace_back(plane);
 	}
 	// â∫ë§ñ 
 	{
+		Plane plane;
 		DirectX::XMVECTOR vector2 = DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&far_position[1]), DirectX::XMLoadFloat3(&near_position[1]));
 		DirectX::XMVECTOR vector1 = DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&near_position[0]), DirectX::XMLoadFloat3(&near_position[1]));
-		DirectX::XMStoreFloat3(&frustum[2].normal, DirectX::XMVector3Cross(vector1, vector2));
-		DirectX::XMStoreFloat3(&frustum[2].normal, DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&frustum[2].normal)));
-		DirectX::XMStoreFloat(&frustum[2].direction, DirectX::XMVector3Dot(DirectX::XMLoadFloat3(&far_position[1]), DirectX::XMLoadFloat3(&frustum[2].normal)));
+		
+		DirectX::XMStoreFloat3(&plane.normal, DirectX::XMVector3Cross(vector1, vector2));
+		DirectX::XMStoreFloat3(&plane.normal, DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&plane.normal)));
+		DirectX::XMStoreFloat(&plane.direction, DirectX::XMVector3Dot(DirectX::XMLoadFloat3(&far_position[1]), DirectX::XMLoadFloat3(&plane.normal)));
+		
+		frustum.emplace_back(plane);
 	}
 	// è„ë§ñ 
 	{
+		Plane plane;
 		DirectX::XMVECTOR vector2 = DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&near_position[3]), DirectX::XMLoadFloat3(&near_position[2]));
 		DirectX::XMVECTOR vector1 = DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&far_position[3]), DirectX::XMLoadFloat3(&near_position[3]));
-		DirectX::XMStoreFloat3(&frustum[3].normal, DirectX::XMVector3Cross(vector1, vector2));
-		DirectX::XMStoreFloat3(&frustum[3].normal, DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&frustum[3].normal)));
-		DirectX::XMStoreFloat(&frustum[3].direction, DirectX::XMVector3Dot(DirectX::XMLoadFloat3(&far_position[3]), DirectX::XMLoadFloat3(&frustum[3].normal)));
+		
+		DirectX::XMStoreFloat3(&plane.normal, DirectX::XMVector3Cross(vector1, vector2));
+		DirectX::XMStoreFloat3(&plane.normal, DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&plane.normal)));
+		DirectX::XMStoreFloat(&plane.direction, DirectX::XMVector3Dot(DirectX::XMLoadFloat3(&far_position[3]), DirectX::XMLoadFloat3(&plane.normal)));
+		
+		frustum.emplace_back(plane);
 	}
 	// âúë§ñ 
 	{
+		Plane plane;
 		DirectX::XMVECTOR vector2 = DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&near_position[2]), DirectX::XMLoadFloat3(&near_position[3]));
 		DirectX::XMVECTOR vector1 = DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&near_position[3]), DirectX::XMLoadFloat3(&near_position[0]));
-		DirectX::XMStoreFloat3(&frustum[4].normal, DirectX::XMVector3Cross(vector1, vector2));
-		DirectX::XMStoreFloat3(&frustum[4].normal, DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&frustum[4].normal)));
-		DirectX::XMStoreFloat(&frustum[4].direction, DirectX::XMVector3Dot(DirectX::XMLoadFloat3(&far_position[3]), DirectX::XMLoadFloat3(&frustum[4].normal)));
+		
+		DirectX::XMStoreFloat3(&plane.normal, DirectX::XMVector3Cross(vector1, vector2));
+		DirectX::XMStoreFloat3(&plane.normal, DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&plane.normal)));
+		DirectX::XMStoreFloat(&plane.direction, DirectX::XMVector3Dot(DirectX::XMLoadFloat3(&far_position[3]), DirectX::XMLoadFloat3(&plane.normal)));
+		
+		frustum.emplace_back(plane);
 	}
 	// éËëOë§ñ 
 	{
+		Plane plane;
 		DirectX::XMVECTOR vector2 = DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&far_position[2]), DirectX::XMLoadFloat3(&far_position[1]));
 		DirectX::XMVECTOR vector1 = DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&far_position[1]), DirectX::XMLoadFloat3(&far_position[0]));
 
-		DirectX::XMStoreFloat3(&frustum[5].normal, DirectX::XMVector3Cross(vector1, vector2));
-		DirectX::XMStoreFloat3(&frustum[5].normal, DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&frustum[5].normal)));
-		DirectX::XMStoreFloat(&frustum[5].direction, DirectX::XMVector3Dot(DirectX::XMLoadFloat3(&near_position[3]), DirectX::XMLoadFloat3(&frustum[5].normal)));
+		DirectX::XMStoreFloat3(&plane.normal, DirectX::XMVector3Cross(vector1, vector2));
+		DirectX::XMStoreFloat3(&plane.normal, DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&plane.normal)));
+		DirectX::XMStoreFloat(&plane.direction, DirectX::XMVector3Dot(DirectX::XMLoadFloat3(&near_position[3]), DirectX::XMLoadFloat3(&plane.normal)));
+		
+		frustum.emplace_back(plane);
 	}
 }
 

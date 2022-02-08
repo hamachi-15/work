@@ -25,6 +25,17 @@ Primitive::Primitive(ID3D11Device* device)
 		hr = device->CreateBuffer(&desc, 0, constant_buffer.GetAddressOf());
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 	}
+	// 深度ステンシルステート
+	{
+		D3D11_DEPTH_STENCIL_DESC desc;
+		::memset(&desc, 0, sizeof(desc));
+		desc.DepthEnable = true;
+		desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+		desc.DepthFunc = D3D11_COMPARISON_ALWAYS;
+
+		HRESULT hr = device->CreateDepthStencilState(&desc, depth_stencil_state.GetAddressOf());
+		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+	}
 }
 
 //------------------------------
@@ -42,7 +53,7 @@ void Primitive::Begin(ID3D11DeviceContext* context, PrimitiveContext& cprimitive
 	context->RSSetState(graphics.GetRasterizerState(static_cast<int>(Graphics::RasterizerState::Cull_Back)));
 
 	//デプスステンシルステート設定
-	context->OMSetDepthStencilState(graphics.GetDepthStencilState(static_cast<int>(Graphics::DepthStencilState::True)), 1);
+	context->OMSetDepthStencilState(depth_stencil_state.Get(), 1);
 	
 	// コンスタントバッファ更新
 	ConstantBuffer cbscene;

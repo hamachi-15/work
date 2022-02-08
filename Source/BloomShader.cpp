@@ -53,15 +53,15 @@ void Bloom::Begin(ID3D11DeviceContext* context)
 	context->OMSetBlendState(graphics.GetBlendState(static_cast<int>(Graphics::BlendState::Alpha)), nullptr, 0xFFFFFFFF);
 
 	//ラスタライザ―設定
-	context->RSSetState(graphics.GetRasterizerState(static_cast<int>(Graphics::RasterizerState::Cull_None)));
+	context->RSSetState(graphics.GetRasterizerState(static_cast<int>(Graphics::RasterizerState::Cull_Back)));
 
 	//デプスステンシルステート設定
-	context->OMSetDepthStencilState(graphics.GetDepthStencilState(static_cast<int>(Graphics::DepthStencilState::False)), 1);
+	context->OMSetDepthStencilState(graphics.GetDepthStencilState(static_cast<int>(Graphics::DepthStencilState::True)), 1);
 
 	ConstantBufferForBloom cbscene;
 	cbscene.threshold = 0.3f;
 
-	context->VSSetConstantBuffers(0, 1, constant_buffer.GetAddressOf());
+//	context->VSSetConstantBuffers(0, 1, constant_buffer.GetAddressOf());
 	context->PSSetConstantBuffers(0, 1, constant_buffer.GetAddressOf());
 	context->UpdateSubresource(constant_buffer.Get(), 0, 0, &cbscene, 0, 0);
 }
@@ -79,7 +79,10 @@ Texture* Bloom::Render(ID3D11DeviceContext* context, RenderContext& render_conte
 	graphics.ScreenClear(&render_terget_view, depth_stencil_view, {0, 0, 0, 1.0f});
 	Sprite sprite;
 	// 輝度抽出
-	if(texture == nullptr) ActorManager::Instance().BrightRender(render_context);
+	if (texture == nullptr)
+	{	// アクターの輝度算出
+		ActorManager::Instance().BrightRender(render_context);
+	}
 	else
 	{
 		std::shared_ptr<Shader> print = ShaderManager::Instance().GetShader(ShaderManager::ShaderType::Sprite);

@@ -114,9 +114,6 @@ public:
 	// ダメージを与える
 	bool ApplyDamage(int damage, float invincible_time);
 
-	// コリジョンの登録
-	void SetCollision(std::shared_ptr<Actor> actor, CollisionParameter& collision_status, CollisionMeshType type);
-
 	// メッセージを受信したときの処理
 	virtual bool OnMessages(const Telegram& message) { return false; }
 
@@ -151,7 +148,7 @@ private:
 	
 	int		max_health = 5;
 	int		health = 5;
-	int		attack = 1;
+	int		attack = 10;
 	float	invincible_timer = 0.0f;
 	float	move_speed = 30.0f;
 	float	run_speed_scale = 0.0f;

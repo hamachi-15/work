@@ -9,6 +9,8 @@
 #include "ActorManager.h"
 #include "EnemyManager.h"
 #include "CollisionManager.h"
+#include "EnemyTerritoryManager.h"
+
 #include "Mathf.h"
 
 // 汎用関数
@@ -21,18 +23,57 @@
 // -----------------------------
 // 実行前処理
 // -----------------------------
-void AligningAction::Start()
+void TurnToTargetAction::Start()
 {
 	// アニメーション再生
-	owner->PlayAnimation("NightmareDragonDefend");
+	owner->PlayAnimation("NightmareDragonWalkRight");
+
+	larp_timer = 0.0f;
+	// プレイヤーへの方向ベクトル算出
+	// プレイヤー座標取得
+	DirectX::XMFLOAT3 player_position = ActorManager::Instance().GetActor("Player")->GetPosition();
+	turn_direction = Mathf::ReturnNormalizeFloatSubtract(player_position, owner->GetActor()->GetPosition());
+	// Y軸は考慮しない
+	turn_direction.y = 0.0f;
 }
 
 // -----------------------------
 // 実行処理
 // -----------------------------
-ActionBase::State AligningAction::Run(float elapsed_time)
+ActionBase::State TurnToTargetAction::Run(float elapsed_time)
 {
-	return ActionBase::State();
+
+	float run_timer = owner->GetRunTimer();
+	if (run_timer <= 0.0f)
+	{
+		owner->SetRunTimer(1.0f);
+		run_timer = owner->GetRunTimer();
+	}
+	else
+	{
+		// タイマー処理
+		larp_timer += elapsed_time;
+		run_timer = owner->GetRunTimer() - elapsed_time;
+	}
+
+	// 振り向き処理
+	DirectX::XMFLOAT3 angle = owner->GetActor()->GetAngle();
+	front_direction.x = sinf(angle.y);
+	front_direction.z = cosf(angle.y);
+	front_direction.x= Mathf::Lerp(front_direction.x, turn_direction.x, larp_timer);
+	front_direction.z= Mathf::Lerp(front_direction.z, turn_direction.z, larp_timer);
+	float rot = owner->TurnToTarget(front_direction);
+	// タイマー更新
+	owner->SetRunTimer(run_timer);
+
+	// ランタイマーが0以下になれば
+	if (run_timer <= 0)
+	{
+		// ランタイマーがリセットして完了する
+		owner->SetRunTimer(0.0f);
+		return ActionBase::State::Complete;
+	}
+	return ActionBase::State::Run;
 }
 
 //***************************************
@@ -265,7 +306,7 @@ ActionBase::State BodyPressAttackAction::Run(float elapsed_time)
 
 	// 攻撃の当たり判定処理
 	std::string collision_name = actor->GetName();
-	collision_name += "Body";
+	//collision_name += "Body";
 	AttackCollision(actor, collision_name.c_str(), collision_time_data, CollisionMeshType::Cylinder);
 
 	// タイマー取得
@@ -304,23 +345,18 @@ void LungesAttackAction::Start()
 
 	// 攻撃の当たり判定処理
 	std::string collision_name = owner_actor->GetName();
-	collision_name += "Body";
+
 	// コリジョンマネージャー取得
 	CollisionManager& collision_manager = CollisionManager::Instance();
 	std::shared_ptr<CollisionCylinder> collision = collision_manager.GetCollisionCylinderFromName(collision_name);
-	collision->SetCollisionFlag(true);
-	// 反対側にターゲットを設定
-	// ターゲット座標に値が入っていない時
-	if (Mathf::VectorLength(target_position) == 0)
-	{
-		// 目標地点をプレイヤー位置に設定
-		owner->SetTargetPosition(ActorManager::Instance().GetActor("Player")->GetPosition());
-	}
-	else
-	{
-		// 目標地点を設定された位置に設定
-		owner->SetTargetPosition(target_position);
-	}
+	collision->SetAttackFlag(true);
+
+	// プレイヤーへの方向ベクトル算出
+	// プレイヤー座標取得
+	DirectX::XMFLOAT3 player_position = ActorManager::Instance().GetActor("Player")->GetPosition();
+	target_direction = Mathf::ReturnNormalizeFloatSubtract(player_position, owner->GetActor()->GetPosition());
+	// Y軸は考慮しない
+	target_direction.y = 0.0f;
 }
 
 // -----------------------------
@@ -331,21 +367,47 @@ ActionBase::State LungesAttackAction::Run(float elapsed_time)
 	// アクター取得
 	std::shared_ptr<Actor> owner_actor = owner->GetActor();
 
+	float run_timer = owner->GetRunTimer();
+	if (run_timer <= 0.0f)
+	{
+		owner->SetRunTimer(Mathf::RandomRange(2.0f, 3.0f));
+		run_timer = owner->GetRunTimer();
+	}
+	else
+	{
+		// タイマー処理
+		run_timer = owner->GetRunTimer() - elapsed_time;
+	}
+
+	// タイマー更新
+	owner->SetRunTimer(run_timer);
+
 	// 目的地へ着いたかの判定処理
 	if (JedgmentToTargetPosition(owner->GetTargetPosition(), owner_actor->GetPosition(), owner_actor->GetName()))
 	{
 		// 攻撃の当たり判定処理
 		std::string collision_name = owner_actor->GetName();
-		collision_name += "Body";
 		// コリジョンマネージャー取得
 		CollisionManager& collision_manager = CollisionManager::Instance();
 		std::shared_ptr<CollisionCylinder> collision = collision_manager.GetCollisionCylinderFromName(collision_name);
-		collision->SetCollisionFlag(false);
+		collision->SetAttackFlag(false);
+		return ActionBase::State::Complete;
+	}
+	std::shared_ptr<EnemyTerritory> territory = EnemyTerritoryManager::Instance().GetTerritory(owner->GetBelongingToTerritory());
+	DirectX::XMFLOAT3 territory_origine = territory->GetTerritoryOrigin();
+	float territory_range = territory->GetTerritoryRange();
+	float length;
+	DirectX::XMStoreFloat(&length, DirectX::XMVector3Length(Mathf::ReturnVectorSubtract(owner->GetActor()->GetPosition(), territory_origine)));
+	// タイムが終了したら
+	if (run_timer <= 0.0f || length >= territory_range)
+	{
+		// タイマー設定
+		owner->SetRunTimer(0.0f);
 		return ActionBase::State::Complete;
 	}
 
 	// 目的地点へ移動
-	owner->MoveToTarget(elapsed_time, 1.5f);
+	owner->MoveToDirection(target_direction, 2.5f);
 
 	return ActionBase::State::Run;
 }

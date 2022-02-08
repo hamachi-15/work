@@ -21,6 +21,7 @@
 #include "EnemyManager.h"
 #include "EnemyTerritoryManager.h"
 #include "CollisionManager.h"
+#include "EnemyCollision.h"
 
 //**********************************
 // 
@@ -51,13 +52,13 @@ void EnemyPLT::Destroy()
 
 	// コリジョン削除
 	// 球コリジョン削除
-	CollisionManager::Instance().UnregisterSphere(CollisionManager::Instance().GetCollisionSphereFromName(right_hand_collision_name.c_str()));
-	
-	// 円柱コリジョン削除
-	CollisionManager::Instance().UnregisterCylinder(CollisionManager::Instance().GetCollisionCylinderFromName(actor->GetName()));
-	
-	// 立方体コリジョン削除
-	CollisionManager::Instance().UnregisterBox(CollisionManager::Instance().GetCollisionBoxFromName(actor->GetName()));
+	//CollisionManager::Instance().UnregisterSphere(CollisionManager::Instance().GetCollisionSphereFromName(right_hand_collision_name.c_str()));
+	//
+	//// 円柱コリジョン削除
+	//CollisionManager::Instance().UnregisterCylinder(CollisionManager::Instance().GetCollisionCylinderFromName(actor->GetName()));
+	//
+	//// 立方体コリジョン削除
+	//CollisionManager::Instance().UnregisterBox(CollisionManager::Instance().GetCollisionBoxFromName(actor->GetName()));
 
 	// 敵マネージャーから削除
 	EnemyManager::Instance().EnemyRemove(GetActor()->GetComponent<EnemyPLT>());
@@ -137,48 +138,50 @@ void EnemyPLT::Start()
 	SetTargetPosition(actor->GetPosition());
 
 	// コリジョン設定
-	{
-		// モデル取得
-		Model* model = GetActor()->GetModel();
+	//{
+	//	// モデル取得
+	//	Model* model = GetActor()->GetModel();
 
-		CollisionParameter parameter;
-		// カリング用のコリジョン
-		parameter.name = "PLTAABB";
-		parameter.node_name = "PLT:Chest_M_BK";
-		parameter.position = {};
-		parameter.float3_radius = DirectX::XMFLOAT3(5.5f, 13.0f, 5.5f);
-		parameter.height = 9.0f;
-		parameter.collision_flg = true;
-		parameter.actor_id = charactor->GetID() + GetIdentity();
-		parameter.element = CollisionElement::Body;
-		parameter.position_mask = CollisionPositionMask::Collision_Mask_Member_Position;
-		charactor->SetCollision(actor, parameter, CollisionMeshType::AABB);
+	//	CollisionParameter parameter;
+	//	std::vector<CollisionParameter> sphere_parameter;
+	//	std::vector<CollisionParameter> cylinder_parameter;
+	//	// カリング用のコリジョン
+	//	parameter.name = "PLTAABB";
+	//	parameter.actor_name = actor->GetName();
+	//	parameter.node_name = "PLT:Chest_M_BK";
+	//	parameter.position = {};
+	//	parameter.xmfloat_radius = DirectX::XMFLOAT3(5.5f, 13.0f, 5.5f);
+	//	parameter.height = 9.0f;
+	//	parameter.collision_flg = true;
+	//	parameter.actor_id = charactor->GetID() + GetIdentity();
+	//	parameter.actor_type = CollisionActorType::Enemy;
+	//	parameter.update_type = CollisionUpdateType::Update_Node_Position;
 
-		// 体のコリジョン設定
-		parameter.name = actor->GetName();
-		parameter.node_name = "";
-		parameter.radius = 5.0f;
-		parameter.height = 15.0f;
-		parameter.weight = 10.0f;
-		parameter.collision_flg = true;
-		parameter.actor_type = CollisionActorType::Enemy;
-		parameter.element = CollisionElement::Body;
-		parameter.position_mask = CollisionPositionMask::Collision_Mask_Actor_Position;
-		charactor->SetCollision(actor, parameter, CollisionMeshType::Cylinder);
+	//	// 体のコリジョン設定
+	//	parameter.name = actor->GetName();
+	//	parameter.node_name = "";
+	//	parameter.radius = 5.0f;
+	//	parameter.height = 15.0f;
+	//	parameter.weight = 10.0f;
+	//	parameter.collision_flg = true;
+	//	parameter.actor_type = CollisionActorType::Enemy;
+	//	parameter.update_type = CollisionUpdateType::Update_Actor;
+	//	cylinder_parameter.emplace_back(parameter);
 
-		// 右手のコリジョン設定
-		right_hand_collision_name = actor->GetName();
-		right_hand_collision_name += "RightHand";
-		parameter.name = right_hand_collision_name.c_str();
-		parameter.node_name = "PLT:MiddleFinger2_R_BK";
-		parameter.radius = 6.0f;
-		parameter.weight = 1.0f;
-		parameter.collision_flg = false;
-		parameter.element = CollisionElement::Weppon;
-		parameter.position_mask = CollisionPositionMask::Collision_Mask_Member_Position;
-		charactor->SetCollision(actor, parameter, CollisionMeshType::Sphere);
+	//	// 右手のコリジョン設定
+	//	right_hand_collision_name = actor->GetName();
+	//	right_hand_collision_name += "RightHand";
+	//	parameter.name = right_hand_collision_name.c_str();
+	//	parameter.node_name = "PLT:MiddleFinger2_R_BK";
+	//	parameter.radius = 6.0f;
+	//	parameter.weight = 1.0f;
+	//	parameter.collision_flg = false;
+	//	parameter.actor_type = CollisionActorType::Enemy;
+	//	parameter.update_type = CollisionUpdateType::Update_Node_Position;
+	//	sphere_parameter.emplace_back(parameter);
 
-	}
+	//	actor->AddComponent<EnemyCollision>(sphere_parameter, cylinder_parameter);
+	//}
 	// ビヘイビアツリー設定
 	behavior_data = new BehaviorData();
 	ai_tree = new BehaviorTree();

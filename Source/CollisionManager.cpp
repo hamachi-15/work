@@ -1,28 +1,32 @@
-#include "CollisionManager.h"
+#include "Graphics.h"
 
 #include "Mathf.h"
+#include "CollisionManager.h"
 #include "SceneManager.h"
 
 #include "Charactor.h"
 #include "Enemy.h"
 
+#include "CullingCollision.h"
+
+#include "ActorManager.h"
 //-----------------------------------------
 // 更新処理
 //-----------------------------------------
 void CollisionManager::Update()
 {
-    // ボックス破棄処理
-    for (std::shared_ptr<CollisionBox> box : remove_boxes)
+    // カリングコリジョン破棄処理
+    for (std::shared_ptr<CullingCollision> box : remove_cullings)
     {
-        std::vector<std::shared_ptr<CollisionBox>>::iterator remove = std::find(boxes.begin(), boxes.end(), box);
-        boxes.erase(remove);
+        std::vector<std::shared_ptr<CullingCollision>>::iterator remove = std::find(cullings.begin(), cullings.end(), box);
+        cullings.erase(remove);
     }
-    std::vector<std::shared_ptr<CollisionBox>>::iterator iterate_box_remove = remove_boxes.begin();
-    for (; iterate_box_remove != remove_boxes.end(); iterate_box_remove = remove_boxes.begin())
+    std::vector<std::shared_ptr<CullingCollision>>::iterator iterate_culling_remove = remove_cullings.begin();
+    for (; iterate_culling_remove != remove_cullings.end(); iterate_culling_remove = remove_cullings.begin())
     {
-        remove_boxes.erase(iterate_box_remove);
+        remove_cullings.erase(iterate_culling_remove);
     }
-    remove_boxes.clear();
+    remove_cullings.clear();
 
     // 球破棄処理
     for (std::shared_ptr<CollisionSphere> sphere : remove_spheres)
@@ -50,213 +54,11 @@ void CollisionManager::Update()
     }
     remove_cylinderes.clear();
 
-    ObjectCollisionResult result;
-
-    // コリジョンがカメラの錐台内にいるかの判定
+    // カリングコリジョン更新処理
+    std::vector<Plane> frustum = SceneManager::Instance().GetCurrentScene()->GetCameraController()->GetFrustum();
+    for (std::shared_ptr<CullingCollision> culling : cullings)
     {
-        Scene* scene = SceneManager::Instance().GetCurrentScene();
-        size_t box_count = boxes.size();
-        for (std::shared_ptr<CollisionBox> aabb : boxes)
-        {
-            // カリングを行うかのフラグ
-            bool culling_flag = true;
-            int index = 0;
-            for (; index < 6; ++index)
-            {
-                //各平面の法線の成分を用いてAABBの８頂点の中から最近点と最遠点を求める
-                DirectX::XMFLOAT3 NegaPos = aabb->GetActor()->GetPosition();	// 最近点
-                DirectX::XMFLOAT3 PosiPos = aabb->GetActor()->GetPosition();	// 最遠点
-                // 半径取得
-                DirectX::XMFLOAT3 radius = aabb->GetRadius();
-
-                // 錐台の平面取得
-                Plane frustum = scene->camera_controller->frustum[index];
-
-                // 最近点算出
-                Mathf::NegaCalculate(NegaPos, frustum.normal, radius);
-
-                // 最遠点算出
-                Mathf::PosiCalculate(PosiPos, frustum.normal, radius);
-
-                //  各平面との内積を計算し、交差・内外判定(表裏判定)を行う 
-                //  外部と分かれば処理をbreakし確定させる
-                //  交差状態であれば、ステータスを変更してから次の平面とのチェックに続ける
-                //  内部であれば、そのまま次の平面とのチェックに続ける
-                float PosiLength, NegaLength;
-                DirectX::XMStoreFloat(&PosiLength, DirectX::XMVector3Dot(DirectX::XMLoadFloat3(&frustum.normal), DirectX::XMLoadFloat3(&PosiPos)));
-                DirectX::XMStoreFloat(&NegaLength, DirectX::XMVector3Dot(DirectX::XMLoadFloat3(&frustum.normal), DirectX::XMLoadFloat3(&NegaPos)));
-                if (PosiLength < frustum.direction && NegaLength < frustum.direction)
-                {
-                    break;
-                }
-            }
-            // ボックスが錐台外にあればカリングを行う
-            if (index != 6)
-            {
-                aabb->GetActor()->SetCullingFlag(true);
-            }
-            else
-            {
-                aabb->GetActor()->SetCullingFlag(false);
-            }
-        }
-    }
-
-    // 球vs球の交差判定
-    {
-        size_t sphere_count = spheres.size();
-        for (size_t i = 0; i < sphere_count; i++)
-        {
-            CollisionSphere* sphereA = spheres.at(i).get();
-            // 当たり判定フラグが立っていなかったら飛ばす
-            if (!sphereA->GetCollisionFlag())
-            {
-                continue;
-            }
-            for (size_t j = i + 1; j < sphere_count; j++)
-            {
-                CollisionSphere* sphereB = spheres.at(j).get();
-                // 当たり判定フラグが立っていなかったら飛ばす
-                if (!sphereB->GetCollisionFlag())
-                {
-                    continue;
-                }
-
-                IntersectSphereVsSphere(sphereA, sphereB);
-
-            }
-        }
-    }
-    // 球vs円柱の交差判定
-    // TODO リザルトを考慮した当たり判定に変更
-    {
-        size_t sphere_count = spheres.size();
-        size_t cylinder_count = cylinderes.size();
-        for (size_t i = 0; i < sphere_count; i++)
-        {
-            CollisionSphere* sphere = spheres.at(i).get();
-            // 当たり判定フラグが立っていなかったら飛ばす
-            if (!sphere->GetCollisionFlag())
-            {
-                continue;
-            }
-            // 球コリジョンのキャラクタコンポーネント取得
-            std::shared_ptr<Charactor> sphere_charactor_component = sphere->GetActor()->GetComponent<Charactor>();
-
-            for (size_t j = 0; j < cylinder_count; j++)
-            {
-                CollisionCylinder* cylinder = cylinderes.at(j).get();
-                // 当たり判定フラグが立っていなかったら飛ばす
-                if (!cylinder->GetCollisionFlag() ||
-                    sphere_charactor_component->GetID() == cylinder->GetActor()->GetComponent<Charactor>()->GetID())
-                {
-                    continue;
-                }
-                if (IntersectSphereVsCylinder(sphere, cylinder))
-                {
-                    // コリジョンの属性が武器ならノックバック
-                    if (sphere->GetCollisionElement() == CollisionElement::Weppon)
-                    {
-                        // 武器と衝突したコリジョンの持ち主に衝突したことを送信する
-                        Message message;
-                        message.message = MessageType::Message_GetHit_Attack;
-                        message.hit_position = sphere->GetPosition();
-                        MetaAI::Instance().SendMessaging(
-                            static_cast<int>(MetaAI::Identity::Collision), // 送信元
-                            static_cast<int>(cylinder->GetActorID()),      // 受信先
-                            message);                                      // メッセージ
-                        // 攻撃か当たったことを武器のコリジョンの持ち主に送信する
-                        message.message = MessageType::Message_Hit_Attack;
-                        message.hit_position = { 0.0f, 0.0f, 0.0f };
-                        MetaAI::Instance().SendMessaging(
-                            static_cast<int>(MetaAI::Identity::Collision),   // 送信元
-                            static_cast<int>(sphere->GetActorID()),          // 受信先
-                            message);                                        // メッセージ
-                    }
-                }
-            }
-        }
-    }
-    // 円柱vs円柱の交差判定
-    {
-        size_t cylinder_count = cylinderes.size();
-        for (size_t i = 0; i < cylinder_count; i++)
-        {
-            CollisionCylinder* cylinderA = cylinderes.at(i).get();
-            // 当たり判定フラグが立っていなかったら飛ばす
-            if (!cylinderA->GetCollisionFlag())
-            {
-                continue;
-            }
-
-            for (size_t j = i + 1; j < cylinder_count; j++)
-            {
-                CollisionCylinder* cylinderB = cylinderes.at(j).get();
-                // 当たり判定フラグが立っていなかったら飛ばす
-                if (!cylinderB->GetCollisionFlag())
-                {
-                    continue;
-                }
-
-                if (IntersectCylinderVsCylinder(cylinderA, cylinderB, result))
-                {
-                    PushOutCollision(cylinderA, cylinderB, result);
-                    // 現在のシーンがワールドマップならシーンへ敵とエンカウントをしたメッセージを送る
-                    std::string scene_name = SceneManager::Instance().GetCurrentScene()->GetName();
-                    bool isplayercolA = (cylinderA->GetName() == "Player");
-                    bool isplayercolB = (cylinderB->GetName() == "Player");
-                    bool isworldmap = (scene_name == "SceneWorldMap");
-                    if (isplayercolA && isworldmap ||
-                        isplayercolB && isworldmap)
-                    {
-                        Message message;
-                        message.message = MessageType::Message_Hit_Boddy;
-                        // 衝突した敵の座標を設定
-                        if (isplayercolA == true)
-                        {
-                            message.hit_position = cylinderA->GetActor()->GetPosition();
-                            message.territory_tag = cylinderB->GetActor()->GetComponent<Enemy>()->GetBelongingToTerritory();
-                        }
-                        else
-                        {
-                            message.hit_position = cylinderB->GetActor()->GetPosition();
-                            message.territory_tag = cylinderA->GetActor()->GetComponent<Enemy>()->GetBelongingToTerritory();
-                        }
-                        MetaAI::Instance().SendMessaging(
-                            static_cast<int>(MetaAI::Identity::Collision),   // 送信元
-                            static_cast<int>(MetaAI::Identity::WorldMap),    // 受信先
-                            message);                                        // メッセージ
-                        return;
-                    }
-                    else if (scene_name == "SceneBattle" && isplayercolA ||
-                        scene_name == "SceneBattle" && isplayercolB)
-                    {
-                        bool iselementA = (cylinderA->GetCollisionElement() == CollisionElement::Weppon);
-                        bool iselementB = (cylinderB->GetCollisionElement() == CollisionElement::Weppon);
-                        if (iselementA || iselementB)
-                        {
-                            Message message;
-                            message.message = MessageType::Message_GetHit_Attack;
-                            // 衝突した敵の座標を設定
-                            if (isplayercolA == true)
-                            {
-                                message.hit_position = cylinderA->GetActor()->GetPosition();
-                                message.territory_tag = cylinderB->GetActor()->GetComponent<Enemy>()->GetBelongingToTerritory();
-                            }
-                            else
-                            {
-                                message.hit_position = cylinderB->GetActor()->GetPosition();
-                                message.territory_tag = cylinderA->GetActor()->GetComponent<Enemy>()->GetBelongingToTerritory();
-                            }
-                            MetaAI::Instance().SendMessaging(
-                                static_cast<int>(MetaAI::Identity::Collision),   // 送信元
-                                static_cast<int>(MetaAI::Identity::Player),    // 受信先
-                                message);                                        // メッセージ
-                        }
-                    }
-                }
-            }
-        }
+        culling->Update();
     }
 }
 
@@ -265,19 +67,26 @@ void CollisionManager::Update()
 //-----------------------------------------
 void CollisionManager::Draw()
 {
-    for (std::shared_ptr<CollisionBox> box : boxes)
+    DebugRenderer* renderer = Graphics::Instance().GetDebugRenderer();
+
+    // カリングコリジョン描画
+    for (std::shared_ptr<CullingCollision> culling : cullings)
     {
-        box->Draw();
-    }
-    for (std::shared_ptr<CollisionSphere> sphere : spheres)
-    {
-        sphere->Draw();
-    }
-    for (std::shared_ptr<CollisionCylinder> cylinder : cylinderes)
-    {
-        cylinder->Draw();
+        culling->Render(renderer);
     }
 
+    // 球コリジョン描画
+    for (std::shared_ptr<CollisionSphere> sphere : spheres)
+    {
+        if (!sphere->GetAttackFlag()) continue;
+        sphere->Render(renderer);
+    }
+
+    // 円柱コリジョン描画
+    for (std::shared_ptr<CollisionCylinder> cylinder : cylinderes)
+    {
+        cylinder->Render(renderer);
+    }
 }
 
 //-----------------------------------------
@@ -293,11 +102,18 @@ bool CollisionManager::OnMessage(const Telegram& message)
 //-----------------------------------------
 void CollisionManager::Destroy()
 {
-    // 立方体コリジョンリストの破棄
-    std::vector<std::shared_ptr<CollisionBox>>::iterator iterate_box = boxes.begin();
-    for (; iterate_box != boxes.end(); iterate_box = boxes.begin())
+    // カリングコリジョンリストの破棄
+    std::vector<std::shared_ptr<CullingCollision>>::iterator iterate_box = cullings.begin();
+    for (; iterate_box != cullings.end(); iterate_box = cullings.begin())
     {
-        boxes.erase(iterate_box);
+        cullings.erase(iterate_box);
+    }
+
+    // カリングコリジョン破棄リストの破棄
+    std::vector<std::shared_ptr<CullingCollision>>::iterator iterate_remove_box = remove_cullings.begin();
+    for (; iterate_remove_box != remove_cullings.end(); iterate_remove_box = remove_cullings.begin())
+    {
+        remove_cullings.erase(iterate_remove_box);
     }
 
     // 球コリジョンリストの破棄
@@ -307,30 +123,44 @@ void CollisionManager::Destroy()
         spheres.erase(iterate_sphere);
     }
 
+    // 球コリジョン破棄リストの破棄
+    std::vector<std::shared_ptr<CollisionSphere>>::iterator iterate_remove_sphere = remove_spheres.begin();
+    for (; iterate_remove_sphere != remove_spheres.end(); iterate_remove_sphere = remove_spheres.begin())
+    {
+        remove_spheres.erase(iterate_remove_sphere);
+    }
+
     // 円柱コリジョンリスト破棄
     std::vector<std::shared_ptr<CollisionCylinder>>::iterator iterate_cylinder = cylinderes.begin();
     for (; iterate_cylinder != cylinderes.end(); iterate_cylinder = cylinderes.begin())
     {
         cylinderes.erase(iterate_cylinder);
     }
+
+    // 円柱コリジョン破棄リスト破棄
+    std::vector<std::shared_ptr<CollisionCylinder>>::iterator iterate_remove_cylinder = remove_cylinderes.begin();
+    for (; iterate_remove_cylinder != remove_cylinderes.end(); iterate_remove_cylinder = remove_cylinderes.begin())
+    {
+        remove_cylinderes.erase(iterate_remove_cylinder);
+    }
 }
 
 //-----------------------------------------
-// AABBコリジョン登録
+// カリングコリジョン登録
 //-----------------------------------------
-void CollisionManager::RegisterBox(std::shared_ptr<CollisionBox> collision)
+void CollisionManager::RegisterCulling(std::shared_ptr<CullingCollision> collision)
 {
-    // AABB配列にコリジョンを追加
-    boxes.emplace_back(collision);
+    // カリングコリジョン配列にコリジョンを追加
+    cullings.emplace_back(collision);
 }
 
 //-----------------------------------------
-// AABBコリジョン解除
+// カリングコリジョン解除
 //-----------------------------------------
-void CollisionManager::UnregisterBox(std::shared_ptr<CollisionBox> collision)
+void CollisionManager::UnregisterCulling(std::shared_ptr<CullingCollision> collision)
 {
-    // 破棄用AABB配列にコリジョンを追加
-    remove_boxes.emplace_back(collision);
+    // 破棄用カリングコリジョン配列にコリジョンを追加
+    remove_cullings.emplace_back(collision);
 }
 
 //-----------------------------------------
@@ -372,7 +202,7 @@ void CollisionManager::UnregisterCylinder(std::shared_ptr<CollisionCylinder> col
 //-----------------------------------------
 // 押し出し処理
 //-----------------------------------------
-void CollisionManager::PushOutCollision(CollisionObject* collisionA, CollisionObject* collisionB, ObjectCollisionResult& result)
+void CollisionManager::PushOutCollision(CollisionObject* collisionA, std::shared_ptr<Actor> collisionA_actor, CollisionObject* collisionB, std::shared_ptr<Actor> collisionB_actor, ObjectCollisionResult& result)
 {
     DirectX::XMVECTOR vec_positionA = DirectX::XMLoadFloat3(&result.positionA);
     DirectX::XMVECTOR vec_positionB = DirectX::XMLoadFloat3(&result.positionB);
@@ -393,8 +223,52 @@ void CollisionManager::PushOutCollision(CollisionObject* collisionA, CollisionOb
     DirectX::XMStoreFloat3(&result.positionB, vec_positionB);
 
     // 座標更新
-    collisionA->GetActor()->SetPosition(result.positionA);
-    collisionB->GetActor()->SetPosition(result.positionB);
+    collisionA_actor->SetPosition(result.positionA);
+    collisionB_actor->SetPosition(result.positionB);
+}
+
+//-----------------------------------------
+// カメラの錐台とAABBの内外判定
+//-----------------------------------------
+bool CollisionManager::IntersectFrustumVsAABB(std::shared_ptr<CollisionBox> aabb, std::vector<Plane> frustum_list)
+{
+    // 錐台の平面の数分ループ
+    int index = 0;
+    for (; index < Frustum_Plan_Max; ++index)
+    {
+        //各平面の法線の成分を用いてAABBの８頂点の中から最近点と最遠点を求める
+        DirectX::XMFLOAT3 NegaPos = aabb->GetPosition();	// 最近点
+        DirectX::XMFLOAT3 PosiPos = aabb->GetPosition();	// 最遠点
+        // 半径取得
+        DirectX::XMFLOAT3 radius = aabb->GetXMFloatRadius();
+
+        // 錐台の平面取得
+        Plane frustum = frustum_list[index];
+
+        // 最近点算出
+        Mathf::NegaCalculate(NegaPos, frustum.normal, radius);
+
+        // 最遠点算出
+        Mathf::PosiCalculate(PosiPos, frustum.normal, radius);
+
+        //  各平面との内積を計算し、交差・内外判定(表裏判定)を行う 
+        //  外部と分かれば処理をbreakし確定させる
+        //  交差状態であれば、ステータスを変更してから次の平面とのチェックに続ける
+        //  内部であれば、そのまま次の平面とのチェックに続ける
+        float PosiLength, NegaLength;
+        DirectX::XMStoreFloat(&PosiLength, DirectX::XMVector3Dot(DirectX::XMLoadFloat3(&frustum.normal),
+            DirectX::XMLoadFloat3(&PosiPos)));
+        DirectX::XMStoreFloat(&NegaLength, DirectX::XMVector3Dot(DirectX::XMLoadFloat3(&frustum.normal),
+            DirectX::XMLoadFloat3(&NegaPos)));
+        
+        if (PosiLength < frustum.direction &&
+            NegaLength < frustum.direction) 
+        { 
+            break;
+        }
+    }
+    // ボックスが視錐台の外にあればカリングを行う
+    return (index != Frustum_Plan_Max);
 }
 
 //-----------------------------------------
@@ -402,24 +276,9 @@ void CollisionManager::PushOutCollision(CollisionObject* collisionA, CollisionOb
 //-----------------------------------------
 bool CollisionManager::IntersectSphereVsSphere(CollisionSphere* sphereA, CollisionSphere* sphereB)
 {
-    DirectX::XMFLOAT3 positionA;
-    DirectX::XMFLOAT3 positionB;
-    if (sphereA->GetPositionMask() == CollisionPositionMask::Collision_Mask_Actor_Position)
-    {
-        positionA = sphereA->GetActor()->GetPosition();
-    }
-    else
-    {
-        positionA = sphereA->GetPosition();
-    }
-    if (sphereB->GetPositionMask() == CollisionPositionMask::Collision_Mask_Actor_Position)
-    {
-        positionB = sphereB->GetActor()->GetPosition();
-    }
-    else
-    {
-        positionB = sphereB->GetPosition();
-    }
+    DirectX::XMFLOAT3 positionA = sphereA->GetPosition();
+    DirectX::XMFLOAT3 positionB = sphereB->GetPosition();
+
 
     DirectX::XMVECTOR vec_positionA = DirectX::XMLoadFloat3(&positionA);
     DirectX::XMVECTOR vec_positionB = DirectX::XMLoadFloat3(&positionB);
@@ -442,8 +301,6 @@ bool CollisionManager::IntersectSphereVsSphere(CollisionSphere* sphereA, Collisi
     float diff = renge - length;
     vector = DirectX::XMVectorScale(vector, diff);
 
-    //  PushOutCollision(sphereA, positionA, vec_positionA, sphereB, positionB, vec_positionB, vector, diff);
-
     return true;
 }
 
@@ -454,7 +311,7 @@ bool CollisionManager::IntersectSphereVsCylinder(CollisionSphere* sphere, Collis
 {
     // 座標取得
     DirectX::XMFLOAT3 sphere_position = sphere->GetPosition();
-    DirectX::XMFLOAT3 cylinder_position = cylinder->GetActor()->GetPosition();
+    DirectX::XMFLOAT3 cylinder_position = cylinder->GetPosition();
     float             sphere_radius = sphere->GetRadius();
     float             cylinder_radius = cylinder->GetRadius();
     float             cylinder_height = cylinder->GetHeight();
@@ -490,19 +347,17 @@ bool CollisionManager::IntersectSphereVsCylinder(CollisionSphere* sphere, Collis
     float diff = renge - length;
     vector = DirectX::XMVectorScale(vector, diff);
 
-    //PushOutCollision(sphere, cylinder, result);
-
     return true;
 }
 
 //-----------------------------------------
 // 円柱と円柱の交差判定
 //-----------------------------------------
-bool CollisionManager::IntersectCylinderVsCylinder(CollisionCylinder* cylinderA, CollisionCylinder* cylinderB, ObjectCollisionResult& result)
+bool CollisionManager::IntersectCylinderVsCylinder(CollisionCylinder* cylinderA, std::shared_ptr<Actor> collisionA_actor, CollisionCylinder* cylinderB, std::shared_ptr<Actor> collisionB_actor, ObjectCollisionResult& result)
 {
     // 座標取得
-    result.positionA = cylinderA->GetActor()->GetPosition();
-    result.positionB = cylinderB->GetActor()->GetPosition();
+    result.positionA = collisionA_actor->GetPosition();
+    result.positionB = collisionB_actor->GetPosition();
     //Aの足元がBの頭より上なら当たっていない
     if (result.positionA.y > result.positionB.y + cylinderB->GetHeight())
     {
@@ -534,8 +389,6 @@ bool CollisionManager::IntersectCylinderVsCylinder(CollisionCylinder* cylinderA,
     float diff = renge - length;
     result.vector = DirectX::XMVectorScale(result.vector, diff);
 
-    //PushOutCollision(cylinderA, cylinderB, result);
-
     return true;
 }
 
@@ -548,11 +401,11 @@ bool CollisionManager::IntersectRayVsModel(DirectX::XMFLOAT3 start, DirectX::XMF
 }
 
 //-----------------------------------------
-// 名前から立方体コリジョン取得
+// 名前からカリングコリジョン取得
 //-----------------------------------------
-std::shared_ptr<CollisionBox> CollisionManager::GetCollisionBoxFromName(std::string name)
+std::shared_ptr<CullingCollision> CollisionManager::GetCollisionCullingFromName(std::string name)
 {
-    for (std::shared_ptr<CollisionBox> box : boxes)
+    for (std::shared_ptr<CullingCollision> box : cullings)
     {
         if (box->GetName() == name)
         {

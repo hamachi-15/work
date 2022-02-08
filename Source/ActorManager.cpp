@@ -351,6 +351,9 @@ void ActorManager::Render(RenderContext& render_context)
 	if(shader) shader->End(context);
 	
 	shader_type = static_cast<ShaderManager::ShaderType>(-1);
+
+	//DrawLister();
+	//DrawDetail();
 }
 
 //------------------------------

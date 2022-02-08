@@ -3,6 +3,7 @@
 #include <DirectXMath.h>
 #include <memory>
 #include "Collision.h"
+#include "CollisionMeshType.h"
 
 class Actor;
 class Enemy;

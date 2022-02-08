@@ -60,12 +60,9 @@ private:
 	RenderContext						render_context;
 	BlurRenderContext					blur_render_context;
 	PrimitiveContext					primitive_context;
-	std::unique_ptr<Shader>				sprite_cube;
-	std::unique_ptr<Bloom>				bloom;
-	std::unique_ptr<Shader>				primitive;
 
 	std::unique_ptr<Sprite>				sprite;
-	std::unique_ptr<Texture>			sky;
+	std::shared_ptr<Texture>			sky;
 	std::unique_ptr<Texture>			over_texture;
 	std::unique_ptr<Texture>			clear_texture;
 	std::unique_ptr<Texture>			anybutton_texture;
@@ -76,6 +73,7 @@ private:
 
 	DirectX::XMFLOAT3					shadow_color = { 0.5f, 0.5f, 0.5f };
 
+	bool								sky_bloom_flag = false; // 空のブルームの描画フラグ
 	bool								primitive_falg = false;
 	bool								isshadowmap = false;
 	bool								isgame_clear = false;

@@ -67,11 +67,11 @@ public:
 // 軸合わせノードに移行できるか判定
 // 
 //*****************************************
-class AligningJudgment :public JudgmentBase
+class TurnToTargetJudgment :public JudgmentBase
 {
 public:
 	// コンストラクタ
-	AligningJudgment(Enemy* enemy) : JudgmentBase(enemy) {}
+	TurnToTargetJudgment(Enemy* enemy) : JudgmentBase(enemy) {}
 
 	//判定
 	bool Judgment() override;

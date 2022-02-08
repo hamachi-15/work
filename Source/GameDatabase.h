@@ -5,9 +5,14 @@
 #include <map>
 #include "EnemyData.h"
 #include "EnemyTerritoryPosition.h"
+#include "ActorType.h"
+#include "CollisionParameterData.h"
+#include "CullingCollisionParameterData.h"
+#include "CollisionMeshType.h"
 #include "AttackCollitionTime.h"
 #include "AnimationData.h"
 #include "WorldMapData.h"
+
 
 struct DataHeadder
 {
@@ -50,6 +55,37 @@ struct EnemyAppearancePositionReader
 	float position_y;
 	float position_z;
 	float radius;
+};
+
+struct CollitionParameterReader
+{
+	int	id;	//!<	ID
+	EnemyCategory	enemy_category;	//!<	アクター
+	CollisionMeshType	collision_type;	//!<	コリジョンの種類
+	int collision_name;	//!<	コリジョンの名前
+	int node_name;	//!<	ノードの名前
+	float	angle;	//!<	アングル
+	float	radius;	//!<	半径
+	float	height;	//!<	高さ
+	float	weight;	//!<	ウエイト
+	float	local_x;	//!<	ローカルX座標
+	float	local_y;	//!<	ローカルY座標
+	float	local_z;	//!<	ローカルZ座標
+	int	collision_flag;	//!<	コリジョンフラグ
+	ActorType	actor_type;	//!<	所持するアクターの種類
+	CollisionUpdateType	collision_update_type;	//!<	更新方法の種類
+};
+
+struct	CullingCollisionParameterDataReader
+{
+	int	id;	//!<	id
+	EnemyCategory	enemy_category;	//!<	アクターの種類
+	int collision_name;	//!<	名前
+	int node_name;	//!<	ノードの名前
+	float	angle;	//!<	アングル
+	float	radius_x;	//!<	半径X
+	float	radius_y;	//!<	半径Y
+	float	radius_z;	//!<	半径Z
 };
 
 struct AttackCollitionTimeReader
@@ -129,6 +165,18 @@ public:
 	// エンカウントした敵データリスト取得
 	std::vector<EncountEnemyTerritory> GetEncountEnemyList() { return encount_enemy; }
 
+	// コリジョンパラメータリスト取得
+	std::vector<std::shared_ptr<CollisionParameterData>> GetAttackCollitionParamterDataList() const { return collision_parameter_data; }
+	
+	// カテゴリーごとのパラメータデータを抽出したデータを渡す
+	std::vector<std::shared_ptr<CollisionParameterData>> GetAttackCollitionParamterDataList(EnemyCategory enemy_category) const;
+
+	// コリジョンパラメータリスト取得
+	std::vector<std::shared_ptr<CullingCollisionParameterData>> GetAttackCullingCollisionParameterDataList() const { return culling_parameter_data; }
+
+	// カテゴリーごとのパラメータデータを抽出したデータを渡す
+	std::vector<std::shared_ptr<CullingCollisionParameterData>> GetAttackCullingCollisionParameterDataList(EnemyCategory enemy_category) const;
+	
 	// 当たり判定を行うアニメーション区間リストを取得
 	std::vector<std::shared_ptr<AttackCollitionTime>> GetAttackCollitionTimeDataList() const { return collision_time_data; }
 	
@@ -155,6 +203,8 @@ private:
 	std::vector<std::shared_ptr<EnemyData>> enemy_data;
 	std::vector<std::shared_ptr<EnemyTerritoryPosition>> enemy_territory_data;
 	std::vector<std::shared_ptr<AttackCollitionTime>> collision_time_data;
+	std::vector<std::shared_ptr<CollisionParameterData>> collision_parameter_data;
+	std::vector<std::shared_ptr<CullingCollisionParameterData>> culling_parameter_data;
 	std::vector<EncountEnemyTerritory> encount_enemy;
 	using AnimationMap = std::map<std::string, std::shared_ptr<AnimationData>>;
 	AnimationMap animation_data;
@@ -167,6 +217,12 @@ private:
 
 	int enemy_territory_data_count;
 	char* enemy_territory_data_text_buffer;
+
+	int culling_parameter_data_count;
+	char* culling_parameter_data_text_buffer;
+	
+	int collision_parameter_data_count;
+	char* collision_parameter_data_text_buffer;
 
 	int collision_time_data_count;
 

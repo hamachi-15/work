@@ -16,8 +16,25 @@ DirectX::XMVECTOR Mathf::ReturnVectorSubtract(const DirectX::XMFLOAT3& subtract1
 DirectX::XMFLOAT3 Mathf::ReturnFloatSubtract(const DirectX::XMFLOAT3& subtract1, const DirectX::XMFLOAT3& subtract2)
 {
     DirectX::XMFLOAT3 subtract;
-    DirectX::XMStoreFloat3(&subtract, DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&subtract1), DirectX::XMLoadFloat3(&subtract2)));
+    DirectX::XMStoreFloat3(&subtract,
+        DirectX::XMVectorSubtract(
+            DirectX::XMLoadFloat3(&subtract1), DirectX::XMLoadFloat3(&subtract2)));
     return subtract;
+}
+
+//----------------------------------
+// ê≥ãKâªÇ≥ÇÍÇΩÉxÉNÉgÉãéZèo
+//----------------------------------
+DirectX::XMFLOAT3 Mathf::ReturnNormalizeFloatSubtract(const DirectX::XMFLOAT3& subtract1, const DirectX::XMFLOAT3& subtract2)
+{
+    DirectX::XMFLOAT3 normal_subtract;
+    DirectX::XMVECTOR subtract = DirectX::XMVector3Normalize(
+        DirectX::XMVectorSubtract(
+            DirectX::XMLoadFloat3(&subtract1), DirectX::XMLoadFloat3(&subtract2)));
+    // ê≥ãKâª
+    DirectX::XMStoreFloat3(&normal_subtract, subtract);
+
+    return normal_subtract;
 }
 
 //----------------------------------

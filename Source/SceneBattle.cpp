@@ -10,11 +10,7 @@
 #include "Input.h"
 #include "Movement.h"
 
-#include "2DPrimitive.h"
-#include "CascadeShadowMapShader.h"
-#include "LambertShader.h"
 #include "BloomShader.h"
-#include "GaussianBlurShader.h"
 
 #include "Actor.h"
 #include "ActorManager.h"
@@ -30,6 +26,7 @@
 #include "Messenger.h"
 #include "MessageData.h"
 #include "GameDataBase.h"
+#include "ResourceManager.h"
 
 #include "CollisionManager.h"
 #include "ShaderManager.h"
@@ -39,7 +36,7 @@
 #include "MetaAI.h"
 
 #include "PlayerUIHealth.h"
-//#include "SceneManager.h"
+#include "PlayerCollision.h"
 #include "SceneTitle.h"
 
 SceneBattle::SceneBattle()
@@ -82,14 +79,9 @@ void SceneBattle::Initialize()
 	camera_controller = std::make_unique<CameraController>();
 	camera_controller->SetCameraAngle({ Mathf::ConvartToRadian(25), 0.0f, 0.0f });
 
-	// シェーダー初期化
-	bloom = std::make_unique<Bloom>(device);
-	primitive = std::make_unique<Primitive>(device);
-
 	// テクスチャの読み込み
 	sprite = std::make_unique<Sprite>();
-	sky = std::make_unique<Texture>();
-	sky->Load("Data/Sprite/SkyBox/FS002_Night.png");
+	sky = ResourceManager::Instance().LoadTexture("Data/Sprite/SkyBox/FS002_Night.png");
 	anybutton_texture = std::make_unique<Texture>();
 	anybutton_texture->Load("Data/Sprite/PushAnyButton.png");
 	clear_texture = std::make_unique<Texture>();
@@ -118,25 +110,26 @@ void SceneBattle::Initialize()
 		actor->SetScale(DirectX::XMFLOAT3(0.04f, 0.04f, 0.04f));
 		actor->AddComponent<Movement>();
 		actor->AddComponent<Charactor>();
-		std::shared_ptr<PlayerHealthUI> ac = actor->AddComponent<PlayerHealthUI>();
+		std::shared_ptr<PlayerHealthUI> ui = actor->AddComponent<PlayerHealthUI>();
 		actor->AddComponent<Player>();
-		UIManager::Instance().RegisterUI(ac);
+		actor->AddComponent<PlayerCollision>();
+		UIManager::Instance().RegisterUI(ui);
 		actor->SetShaderType(ShaderManager::ShaderType::Lambert);
 	}
 	ActorManager::Instance().Update(0.01f);
 	ActorManager::Instance().UpdateTransform();
 	
-	// スクリプトから敵の生成
+	// エンカウントデータから敵の生成
 	EnemyManager::Instance().CreateEnemyEncountData();
 }
 
 void SceneBattle::Finalize()
 {
-	// UIの全破棄
-	UIManager::Instance().AllDelete();
-	
 	// 敵マネージャーのクリア
 	EnemyManager::Instance().AllRemove();
+
+	// UIの全破棄
+	UIManager::Instance().AllDelete();
 
 	// アクターの破棄
 	ActorManager::Instance().AllDestroy();
@@ -251,11 +244,11 @@ void SceneBattle::Render()
 		graphics.ScreenClear(&render_target_view, depth_stencil_view);
 	}
 
-	// スクリーンテクスチャに描画
-	ScreenRender(context, render_context, screen_size);
-
 	// ポストテクスチャ描画
 	PostRender(context, render_context, screen_size);
+
+	// スクリーンテクスチャに描画
+	ScreenRender(context, render_context, screen_size);
 
 	// バックバッファに描画
 	BuckBufferRender(context, render_context, screen_size);
@@ -285,24 +278,22 @@ void SceneBattle::ScreenRender(ID3D11DeviceContext* context, RenderContext& rend
 		std::shared_ptr<Shader> shader = shader_manager.GetShader(ShaderManager::ShaderType::SkyBox);
 		
 		shader->Begin(context, render_context);
-		sprite->Render(context,
-			sky.get(),
+		sprite->Render(context, sky.get(),
 			0, 0,
 			screen_size.x, screen_size.y,
 			0, 0,
-			static_cast<float>(sky->GetWidth()), static_cast<float>(sky->GetHeight()),
+			(float)sky->GetWidth(), (float)sky->GetHeight());
+		//ブレンドステート設定
+		context->OMSetBlendState(graphics.GetBlendState((int)Graphics::BlendState::Add), nullptr, 0xFFFFFFFF);
+		sprite->AddRender(context,
+			bloom_texture,
+			0, 0,
+			screen_size.x, screen_size.y,
+			0, 0,
+			static_cast<float>(bloom_texture->GetWidth()), static_cast<float>(bloom_texture->GetHeight()),
 			0,
 			1, 1, 1, 1);
 		shader->End(context);
-	}
-
-	// デバッグプリミティブ描画
-	{
-		// 敵縄張りのデバッグプリミティブ描画
-		EnemyTerritoryManager::Instance().Render();
-		EnemyManager::Instance().DrawDebugPrimitive();
-		CollisionManager::Instance().Draw();
-		graphics.GetDebugRenderer()->Render(context, render_context.view, render_context.projection);
 	}
 
 	// アクター描画
@@ -326,7 +317,16 @@ void SceneBattle::ScreenRender(ID3D11DeviceContext* context, RenderContext& rend
 //-------------------------------------
 void SceneBattle::PostRender(ID3D11DeviceContext* context, RenderContext& render_context, const DirectX::XMFLOAT2& screen_size)
 {
-	bloom_texture = bloom->Render(context, render_context);
+	ShaderManager& shader_manager = ShaderManager::Instance();
+	if (!sky_bloom_flag)
+	{
+		// ブルームシェーダー取得
+		std::shared_ptr<Shader> bloom_shader = shader_manager.GetShader(ShaderManager::ShaderType::Bloom);
+		// 空のテクスチャのブルーム処理
+		bloom_texture = dynamic_cast<Bloom*>(bloom_shader.get())->Render(context, render_context, sky.get());
+		// 空のブルームを作成したのでフラグを立てて描画しないようにする
+		sky_bloom_flag = true;
+	}
 }
 
 //-------------------------------------
@@ -372,39 +372,23 @@ void SceneBattle::BuckBufferRender(ID3D11DeviceContext* context, RenderContext& 
 	// UI描画処理
 	UIManager::Instance().Draw(context);
 
-	// シャドウマップ
-	if (isshadowmap)
-	{
-		sprite_shader->Begin(context);
-		for (int i = 0; i < 3; ++i)
-		{
-			sprite->Render(context,
-				ActorManager::Instance().GetShadowTexture(i),
-				0 + 200 * (i), 0,
-				200, 200,
-				0, 0,
-				(float)ActorManager::Instance().GetShadowTexture(i)->GetWidth(), (float)ActorManager::Instance().GetShadowTexture(i)->GetHeight(),
-				0,
-				1, 1, 1, 1);
-		}
-		sprite_shader->End(context);
-	}
-
 	// 2Dプリミティブ描画
 	{
 		if (primitive_falg)
 		{
-			primitive->Begin(context, primitive_context);
+			// ブルームシェーダー取得
+			std::shared_ptr<Shader> primitive_shader = shader_manager.GetShader(ShaderManager::ShaderType::Primitive);
+			primitive_shader->Begin(context, primitive_context);
 			sprite->Render(context,
 				0, 0,
 				screen_size.x, screen_size.y,
 				0, 0,
 				1, 1);
-			primitive->End(context);
+			primitive_shader->End(context);
 		}
 	}
 
-	// 
+	// ゲームオーバー、クリアの描画
 	ClearOrOverRender(context);
 }
 

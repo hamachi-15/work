@@ -2,6 +2,10 @@
 #include "Enemy.h"
 #include "Charactor.h"
 #include "Mathf.h"
+
+#include "Model.h"
+#include "Collision.h"
+
 //**********************************
 // 
 // 汎用関数クラス
@@ -47,4 +51,58 @@ bool Universal::JudgementCollisionTime(std::shared_ptr<Actor> actor, std::shared
 	}
 
 	return false;
+}
+
+//-------------------------------------------
+// コリジョン座標を指定のノード座標へ更新
+//-------------------------------------------
+void Universal::NodePositionUpdate(CollisionObject* collision_object, std::string node_name, Model* model)
+{
+	// ノード座標取得
+	DirectX::XMFLOAT3 position;
+	Mathf::GetNodePosition(node_name.c_str(), position, model);
+
+	// 座標設定
+	collision_object->SetPosition(position);
+}
+
+//-------------------------------------------
+// コリジョン座標を指定のローカル座標へ更新
+//-------------------------------------------
+void Universal::LocalPositionUpdate(CollisionObject* collision_object, Model::Node* node)
+{
+
+	DirectX::XMMATRIX world_transform_matrix = DirectX::XMLoadFloat4x4(&node->world_transform);
+	DirectX::XMFLOAT3 local_position = collision_object->GetLocalPosition();
+	
+	DirectX::XMVECTOR position = DirectX::XMVector3TransformCoord(
+		DirectX::XMLoadFloat3(&local_position), world_transform_matrix);
+
+	DirectX::XMFLOAT3 collision_position;
+	DirectX::XMStoreFloat3(&collision_position, position);
+	
+	// 座標設定
+	collision_object->SetPosition(collision_position);
+}
+
+//-------------------------------------------
+// コリジョン座標を指定のアクター座標へ更新
+//-------------------------------------------
+void Universal::ActorPositionUpdate(CollisionObject* collision_object, std::shared_ptr<Actor> actor)
+{
+	// 座標設定
+	collision_object->SetPosition(actor->GetPosition());
+}
+
+//-------------------------------------------
+// コリジョン座標を指定のアクター、
+// 指定のローカル座標ではない座標へ更新
+//-------------------------------------------
+void Universal::CastamPositionUpdate(CollisionObject* collision_object, std::shared_ptr<Actor> actor, std::string node_name, Model* model)
+{
+	DirectX::XMFLOAT3 position;
+	Mathf::GetNodePosition(node_name.c_str(), position, model);
+	DirectX::XMFLOAT3 actor_position = actor->GetPosition();
+	DirectX::XMFLOAT3 castam_poition = { actor_position.x, position.y - collision_object->GetLocalPosition().y, actor_position.z };
+	collision_object->SetPosition(castam_poition);
 }

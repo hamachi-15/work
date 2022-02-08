@@ -14,51 +14,25 @@
 //-----------------------------------
 // 描画処理
 //-----------------------------------
-void CollisionBox::Draw()
+void CollisionBox::Render(DebugRenderer* renderer)
 {
-    DebugRenderer* renderer = Graphics::Instance().GetDebugRenderer();
-    if (GetPositionMask() == CollisionPositionMask::Collision_Mask_Actor_Position)
-    {
-        renderer->DrawCube(GetActor()->GetPosition(), GetRadius(), { 1.0f, 1.0f, 0.0f, 1.0f });
-    }
-    else
-    {
-        renderer->DrawCube(GetPosition(), GetRadius(), { 1.0f, 1.0f, 0.0f, 1.0f });
-    }
+    renderer->DrawCube(GetPosition(), GetXMFloatRadius(), GetColor());
 }
 
 //-----------------------------------------
 // 描画処理
 //-----------------------------------------
-void CollisionSphere::Draw()
+void CollisionSphere::Render(DebugRenderer* renderer)
 {
-    DebugRenderer* renderer = Graphics::Instance().GetDebugRenderer();
-    // 座標更新マスクがアクター座標を参照になっているならアクター座標で更新
-    if (GetPositionMask() == CollisionPositionMask::Collision_Mask_Actor_Position && GetCollisionFlag())
-    {
-        renderer->DrawSphere(GetActor()->GetPosition(), GetRadius(), { 0.0f, 1.0f, 0.0f, 1.0f });
-    }else if (GetPositionMask() == CollisionPositionMask::Collision_Mask_Local_Member_Position && GetCollisionFlag()||
-        GetPositionMask() == CollisionPositionMask::Collision_Mask_Member_Position && GetCollisionFlag())
-    {
-        renderer->DrawSphere(GetPosition(), GetRadius(), { 0.0f, 1.0f, 0.0f, 1.0f });
-    }
+    renderer->DrawSphere(GetPosition(), GetRadius(), GetColor());
 }
 
 //-----------------------------------------
 // 描画処理
 //-----------------------------------------
-void CollisionCylinder::Draw()
+void CollisionCylinder::Render(DebugRenderer* renderer)
 {
-    DebugRenderer* renderer = Graphics::Instance().GetDebugRenderer();
-    if (GetPositionMask() == CollisionPositionMask::Collision_Mask_Actor_Position)
-    {
-        renderer->DrawCylinder(GetActor()->GetPosition(), GetRadius(), GetHeight(), { 1.0f, 0.0f, 0.0f, 1.0f });
-    }
-    else
-    {
-        DirectX::XMFLOAT3 p = GetPosition();
-        renderer->DrawCylinder(p, GetRadius(), GetHeight(), { 1.0f, 0.0f, 0.0f, 1.0f });
-    }
+    renderer->DrawCylinder(GetPosition(), GetRadius(), GetHeight(), GetColor());
 }
 
 
@@ -511,62 +485,4 @@ int CollisionRayCast::IntersectRayVsModelZ(const DirectX::XMVECTOR& start,
         }
     }
     return material_index;
-}
-
-//-----------------------------------
-// GUI描画
-//-----------------------------------
-void CollisionObject::OnGUI()
-{
-    bool flag = GetCollisionFlag();
-    float radius = GetRadius();
-    ImGui::Checkbox("CollisionFlag", &flag);
-    ImGui::InputFloat("Angle", &radius);
-    ImGui::InputFloat3("position", &position.x);
-}
-
-//-----------------------------------
-// 更新処理
-//-----------------------------------
-void CollisionObject::Update(float elapsed_time)
-{
-    Model* model = GetActor()->GetModel();
-
-    // コリジョンフラグが立っていなけれは更新しない
-    if (GetCollisionFlag() == false) return;
-
-    switch (GetPositionMask())
-    {
-        // クラスメンバの座標の更新
-    case CollisionPositionMask::Collision_Mask_Member_Position:
-    {
-        DirectX::XMFLOAT3 position;
-        Mathf::GetNodePosition(GetNodeName(), position, model);
-        SetPosition(position);
-    }
-    break;
-    // ローカル座標からの座標の更新
-    case CollisionPositionMask::Collision_Mask_Local_Member_Position:
-    {
-        DirectX::XMFLOAT3 collision_position;
-        Model::Node* node = model->FindNode(GetNodeName());
-        DirectX::XMMATRIX world_transform_matrix = DirectX::XMLoadFloat4x4(&node->world_transform);
-        DirectX::XMFLOAT3 local_position = GetLocalPosition();
-        DirectX::XMVECTOR position = DirectX::XMVector3TransformCoord(
-            DirectX::XMLoadFloat3(&local_position), world_transform_matrix);
-        DirectX::XMStoreFloat3(&collision_position, position);
-        SetPosition(collision_position);
-    }
-    break;
-    // クラスメンバの座標の更新
-    case CollisionPositionMask::Collision_Mask_Castam_poition:
-    {
-        DirectX::XMFLOAT3 position;
-        Mathf::GetNodePosition(GetNodeName(), position, model);
-        DirectX::XMFLOAT3 actor_position = GetActor()->GetPosition();
-        DirectX::XMFLOAT3 castam_poition = { actor_position.x, position.y - GetLocalPosition().y, actor_position.z };
-        SetPosition(castam_poition);
-    }
-    break;
-    }
 }

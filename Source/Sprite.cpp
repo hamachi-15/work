@@ -506,16 +506,13 @@ void Sprite::Render(
 		context->IASetVertexBuffers(0, 1, vertex_buffer.GetAddressOf(), &stride, &offset);
 		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 
-		context->RSSetState(rasterizer_state.Get());
-		const float blendFactor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-		//context->OMSetBlendState(blend_state.Get(), blendFactor, 0xFFFFFFFF);
+		//context->RSSetState(rasterizer_state.Get());
 		//context->OMSetDepthStencilState(depth_stencil_state.Get(), 0);
 
 		// シェーダーリソースビューの設定
 		if(texture) texture->Set(0);
 
-		//context->OMSetDepthStencilState(depth_stencil_state.Get(), 1); 
-		context->PSSetSamplers(0, 1, sampler_state.GetAddressOf());
+//		context->PSSetSamplers(0, 1, sampler_state.GetAddressOf());
 
 		// 描画
 		context->Draw(4, 0);

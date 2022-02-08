@@ -7,6 +7,9 @@
 
 #include "CollisionManager.h"
 
+#include "PlayerCollision.h"
+#include "CullingCollision.h"
+
 #include "DebugRenderer.h"
 #include "ActorManager.h"
 #include "EnemyManager.h"
@@ -96,72 +99,6 @@ void Player::Start()
 
 	// 走った時のスピード倍率設定
 	charactor->SetRunSpeedScale(1.5f);
-
-	// コリジョンの登録
-	{
-		// モデル取得
-		Model* model = actor->GetModel();
-		CollisionParameter parameter;
-		// カリング用のコリジョン
-		parameter.name = "PlayerAABB";
-		parameter.node_name = "B_Spine";
-		parameter.position = {};
-		parameter.float3_radius = DirectX::XMFLOAT3(4.0f, 9.0f, 4.0f);
-		parameter.collision_flg = true;
-		parameter.actor_id = charactor->GetID();
-		parameter.element = CollisionElement::Body;
-		parameter.position_mask = CollisionPositionMask::Collision_Mask_Member_Position;
-		charactor->SetCollision(actor, parameter, CollisionMeshType::AABB);
-
-		// 体のコリジョン設定
-		parameter.name = "Player";
-		parameter.node_name = "";
-		parameter.position = {};
-		parameter.radius = 1.5f;
-		parameter.weight = 5.0f;
-		parameter.height = 9.0f;
-		parameter.collision_flg = true;
-		parameter.position_mask = CollisionPositionMask::Collision_Mask_Actor_Position;
-		charactor->SetCollision(actor, parameter, CollisionMeshType::Cylinder);
-
-		// 武器のコリジョン設定
-		Model::Node* node = model->FindNode("B_R_Hand");
-		DirectX::XMMATRIX world_transform_matrix = DirectX::XMLoadFloat4x4(&node->world_transform);
-		for (int i = 0; i < Weppon_Collision_Max; ++i)
-		{
-			parameter.local_position = Weppon_Collison_List[i].Weppon_Local_Position;
-			DirectX::XMVECTOR position = DirectX::XMVector3TransformCoord(
-				DirectX::XMLoadFloat3(&parameter.node_position), world_transform_matrix);
-			DirectX::XMStoreFloat3(&parameter.position, position);
-			parameter.name = Weppon_Collison_List[i].collision_name;
-			parameter.node_name = "B_R_Hand";
-			parameter.radius = 1.0f;
-			parameter.weight = 1.0f;
-			parameter.collision_flg = false;
-			parameter.element = CollisionElement::Weppon;
-			parameter.position_mask = CollisionPositionMask::Collision_Mask_Local_Member_Position;
-			charactor->SetCollision(actor, parameter, CollisionMeshType::Sphere);
-		}
-
-		// 左足のコリジョン
-		DirectX::XMFLOAT3 foot_position;
-		Mathf::GetNodePosition("B_L_Foot", foot_position, model);
-		parameter.name = "PlayerLeftFoot";
-		parameter.node_name = "B_L_Foot";
-		parameter.position = foot_position;
-		parameter.element = CollisionElement::Weppon;
-		parameter.position_mask = CollisionPositionMask::Collision_Mask_Member_Position;
-		charactor->SetCollision(actor, parameter, CollisionMeshType::Sphere);
-
-		// 右足のコリジョン
-		Mathf::GetNodePosition("B_R_Foot", foot_position, model);
-		parameter.name = "PlayerRightFoot";
-		parameter.node_name = "B_R_Foot";
-		parameter.position = foot_position;
-		parameter.element = CollisionElement::Weppon;
-		parameter.position_mask = CollisionPositionMask::Collision_Mask_Member_Position;
-		charactor->SetCollision(actor, parameter, CollisionMeshType::Sphere);
-	}
 	
 	// 待機状態へ遷移
 	TransitionIdleState();
@@ -181,7 +118,7 @@ void Player::Update(float elapsed_time)
 	case State::Idle:	UpdateIdleState(elapsed_time);	 break;
 	case State::Move:	UpdateMoveState(elapsed_time);	 break;
 	case State::Attack:	UpdateAttackState(elapsed_time); break;
-	case State::Avoid:	UpdateAvoidState(elapsed_time);	 break;
+	//case State::Avoid:	UpdateAvoidState(elapsed_time);	 break;
 	case State::Damage:	UpdateDamageState(elapsed_time); break;
 	case State::Death:	UpdateDeathState(elapsed_time);	 break;
 	case State::Revive:	UpdateReviveState(elapsed_time); break;
@@ -217,7 +154,7 @@ bool Player::OnMessages(const Telegram& message)
 	// 敵の攻撃がプレイヤーに当たった
 	case MessageType::Message_GetHit_Attack:
 		// TODOダメージを受ける
-		charactor->ApplyDamage(1, 0.5f);
+		charactor->ApplyDamage(1, 0.9f);
 
 		// ダメージフラグが立っていれば
 		if (charactor->GetDamageFlag()) 
@@ -511,7 +448,7 @@ void Player::TransitionAvoidState()
 	DirectX::XMFLOAT3 angle = actor->GetAngle();
 	float frontX = sinf(angle.y);
 	float frontZ = cosf(angle.y);
-	movement->Move({ frontX, 0.0f, frontZ }, 40);
+	movement->Move({ frontX, 0.0f, frontZ }, 80);
 
 	// ダメージアニメーション再生
 	Model* model = GetActor()->GetModel();
@@ -549,8 +486,6 @@ void Player::TransitionDeathState()
 	state = State::Death;
 	std::shared_ptr<Actor> actor = GetActor();
 	Model* model = actor->GetModel();
-	std::shared_ptr<CollisionCylinder> collision = CollisionManager::Instance().GetCollisionCylinderFromName("Player");
-	CollisionManager::Instance().UnregisterCylinder(collision);
 
 	// 死亡アニメーション再生
 	if (model != nullptr)
@@ -612,11 +547,11 @@ void Player::UpdateIdleState(float elapsed_time)
 		TransitionAttackState(return_state);
 	}
 
-	if (InputAvoid())
-	{
-		// 回避状態へ遷移
-		TransitionAvoidState();
-	}
+	//if (InputAvoid())
+	//{
+	//	// 回避状態へ遷移
+	//	TransitionAvoidState();
+	//}
 }
 
 //-----------------------------------------
@@ -633,11 +568,11 @@ void Player::UpdateMoveState(float elapsed_time)
 		UpdateMoveRunState(elapsed_time);
 		break;
 	}
-	if (InputAvoid())
-	{
-		// 回避状態へ遷移
-		TransitionAvoidState();
-	}
+	//if (InputAvoid())
+	//{
+	//	// 回避状態へ遷移
+	//	TransitionAvoidState();
+	//}
 }
 
 //-----------------------------------------
@@ -1018,17 +953,17 @@ void Player::UpdateAvoidState(float elapsed_time)
 	if (old_collision_time_flag != collision_time_flag)
 	{
 		// コリジョンのあたり判定のオンオフを切り替える
-		actor->GetComponent<CollisionCylinder>()->SetCollisionFlag(collision_time_flag);
+		actor->GetComponent<PlayerCollision>()->GetPlayerBodyCollision()->SetCollisionFlag(collision_time_flag);
 	}
 	// 前フレームのコリジョンフラグを代入。コリジョンフラグが変化したタイミングを調べる用
 	charactor->SetOldCollisionTimeFlag(collision_time_flag);
 
 	// 任意のアニメーション再生区間でのみ移動入力処理を受け入れる
-	if (charactor->SearchAnimationTime(actor, 0.7f, 0.8f))
+	if (charactor->SearchAnimationTime(actor, 0.6f, 0.8f))
 	{
 		if (InputMove(elapsed_time, charactor->GetMoveSpeed()))
 		{
-			actor->GetComponent<CollisionCylinder>()->SetCollisionFlag(true);
+			actor->GetComponent<PlayerCollision>()->GetPlayerBodyCollision()->SetCollisionFlag(collision_time_flag);
 			TransitionMoveState();
 		}
 	}
@@ -1166,7 +1101,7 @@ void Player::SetOnOrOffWepponCollisionFlag(bool flag)
 	{
 		index = std::to_string(i + 1);
 		index = "PlayerWeppon" + index;
-		CollisionManager::Instance().GetCollisionSphereFromName(index.c_str())->SetCollisionFlag(flag);
+		CollisionManager::Instance().GetCollisionSphereFromName(index.c_str())->SetAttackFlag(flag);
 	}
 }
 
@@ -1179,7 +1114,7 @@ void Player::SetOnOrOffFootCollisionFlag(bool flag, const char* node_name)
 	std::shared_ptr<Actor> actor = GetActor();
 	Model* model = actor->GetModel();
 
-	collision_manager.GetCollisionSphereFromName(node_name)->SetCollisionFlag(flag);
+	collision_manager.GetCollisionSphereFromName(node_name)->SetAttackFlag(flag);
 }
 
 //-----------------------------------------
@@ -1194,7 +1129,7 @@ bool Player::InputMove(float elapsed_time, float move_speed)
 	movement->Move(move_vec, move_speed);
 
 	// 旋回処理
-	movement->Turn(move_vec, elapsed_time);
+	movement->Turn(move_vec);
 
 	return move_vec.x != 0.0f || move_vec.y != 0.0f || move_vec.z;
 }

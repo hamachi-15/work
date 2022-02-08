@@ -25,29 +25,55 @@ GameDataBase::GameDataBase()
 {
 	// ファイル読み込み
 	char* world_map_data_buffer = LoadBuffer("Data/GameData/WorldMapData.dat");
+
 	char* enemy_data_buffer = LoadBuffer("Data/GameData/EnemyData.dat");
+
 	char* enemy_territory_data_buffer = LoadBuffer("Data/GameData/EnemyTerritoryPosition.dat");
+
+	char* culling_parameter_data_buffer = LoadBuffer("Data/GameData/CullingCollisionParameter.dat");
+
+	char* collision_parameter_data_buffer = LoadBuffer("Data/GameData/CollisionParameterData.dat");
+
 	char* collision_time_buffer = LoadBuffer("Data/GameData/AttackCollitionTime.dat");
+
 	char* animation_data_buffer = LoadBuffer("Data/GameData/AnimationData.dat");
 
 	// データヘッダ読み込み
 	DataHeadder	world_map_data_headder;
 	memcpy_s(&world_map_data_headder, sizeof(world_map_data_headder), world_map_data_buffer, sizeof(world_map_data_headder));
+	
 	DataHeadder	enemy_data_headder;
 	memcpy_s(&enemy_data_headder, sizeof(enemy_data_headder), enemy_data_buffer, sizeof(enemy_data_headder));
+	
 	DataHeadder	enemy_territory_data_headder;
 	memcpy_s(&enemy_territory_data_headder, sizeof(enemy_territory_data_headder), enemy_territory_data_buffer, sizeof(enemy_territory_data_buffer));
+	
 	DataHeadder	collision_time_data_headder;
 	memcpy_s(&collision_time_data_headder, sizeof(collision_time_data_headder), collision_time_buffer, sizeof(collision_time_buffer));
+	
+	DataHeadder	collision_parameter_data_headder;
+	memcpy_s(&collision_parameter_data_headder, sizeof(collision_parameter_data_headder), collision_parameter_data_buffer, sizeof(collision_parameter_data_buffer));
+	
+	DataHeadder	culling_parameter_data_headder;
+	memcpy_s(&culling_parameter_data_headder, sizeof(culling_parameter_data_headder), culling_parameter_data_buffer, sizeof(culling_parameter_data_buffer));
+	
 	DataHeadder aniamtion_data_headder;
 	memcpy_s(&aniamtion_data_headder, sizeof(aniamtion_data_headder), animation_data_buffer, sizeof(animation_data_buffer));
 
 
 	// データ数設定
 	world_map_data_count = world_map_data_headder.data_count;
+
 	enemy_data_count = enemy_data_headder.data_count;
+
 	enemy_territory_data_count = enemy_territory_data_headder.data_count;
+
 	collision_time_data_count = collision_time_data_headder.data_count;
+
+	collision_parameter_data_count = collision_parameter_data_headder.data_count;
+	
+	culling_parameter_data_count = culling_parameter_data_headder.data_count;
+
 	animation_data_count = aniamtion_data_headder.data_count;
 
 	// データ生成
@@ -62,30 +88,50 @@ GameDataBase::GameDataBase()
 	{
 		enemy_data.emplace_back(std::make_unique<EnemyData>());
 	}
+
 	// 敵の出現ポイント
 	for (int i = 0; i < enemy_territory_data_count; ++i)
 	{
 		enemy_territory_data.emplace_back(std::make_unique<EnemyTerritoryPosition>());
 	}
+
+	// 当たり判定のパラメータ
+	for (int i = 0; i < collision_parameter_data_count; ++i)
+	{
+		collision_parameter_data.emplace_back(std::make_unique<CollisionParameterData>());
+	}
+
+	// 当たり判定のパラメータ
+	for (int i = 0; i < culling_parameter_data_count; ++i)
+	{
+		culling_parameter_data.emplace_back(std::make_unique<CullingCollisionParameterData>());
+	}
+	
 	// プレイヤーの任意のアニメーション区間開始時間と終了時間(当たり判定に使う)
 	for (int i = 0; i < collision_time_data_count; ++i)
 	{
 		collision_time_data.emplace_back(std::make_unique<AttackCollitionTime>());
 	}
+
 	// アニメーションデータ
 	//for (int i = 0; i < animation_data_count; ++i)
 	//{
 	//	animation_data.emplace_back(std::make_unique<AnimationData>());
 	//}
+
 	// テキストバッファ生成
 	enemy_data_text_buffer = new char[enemy_data_headder.string_length];
 	enemy_territory_data_text_buffer = new char[enemy_territory_data_headder.string_length];
 	animation_data_text_buffer = new char[aniamtion_data_headder.string_length];
-
+	collision_parameter_data_text_buffer = new char[collision_parameter_data_headder.string_length];
+	culling_parameter_data_text_buffer = new char[culling_parameter_data_headder.string_length];
+	
 	// テキストバッファ読み込み
 	memcpy_s(enemy_data_text_buffer, enemy_data_headder.string_length, &enemy_data_buffer[sizeof(enemy_data_headder)], enemy_data_headder.string_length);
 	memcpy_s(enemy_territory_data_text_buffer, enemy_territory_data_headder.string_length, &enemy_territory_data_buffer[sizeof(enemy_territory_data_headder)], enemy_territory_data_headder.string_length);
 	memcpy_s(animation_data_text_buffer, aniamtion_data_headder.string_length, &animation_data_buffer[sizeof(aniamtion_data_headder)], aniamtion_data_headder.string_length);
+	memcpy_s(collision_parameter_data_text_buffer, collision_parameter_data_headder.string_length, &collision_parameter_data_buffer[sizeof(collision_parameter_data_headder)], collision_parameter_data_headder.string_length);
+	memcpy_s(culling_parameter_data_text_buffer, culling_parameter_data_headder.string_length, &culling_parameter_data_buffer[sizeof(culling_parameter_data_headder)], culling_parameter_data_headder.string_length);
 
 	// データ構築
 	// ワールドマップの敵生成データ
@@ -142,6 +188,42 @@ GameDataBase::GameDataBase()
 		collision_time_data[i]->end_time = data->end_time;
 	}
 
+	// コリジョンパラメータ設定
+	for (int i = 0; i < collision_parameter_data_count; i++)
+	{
+		CollitionParameterReader* data = &((CollitionParameterReader*)&collision_parameter_data_buffer[sizeof(collision_parameter_data_headder) + collision_parameter_data_headder.string_length])[i];
+		collision_parameter_data[i]->id = data->id;
+		collision_parameter_data[i]->collision_name = &collision_parameter_data_text_buffer[data->collision_name];
+		collision_parameter_data[i]->node_name = &collision_parameter_data_text_buffer[data->node_name];
+		collision_parameter_data[i]->angle = data->angle;
+		collision_parameter_data[i]->radius = data->radius;
+		collision_parameter_data[i]->height = data->height;
+		collision_parameter_data[i]->weight = data->weight;
+		collision_parameter_data[i]->local_x = data->local_x;
+		collision_parameter_data[i]->local_y = data->local_y;
+		collision_parameter_data[i]->local_z = data->local_z;
+		collision_parameter_data[i]->collision_flag = data->collision_flag;
+		collision_parameter_data[i]->actor_type = data->actor_type;
+		collision_parameter_data[i]->collision_update_type = data->collision_update_type;
+		collision_parameter_data[i]->collision_type = data->collision_type;
+		collision_parameter_data[i]->enemy_category  = data->enemy_category;
+	}
+
+	// カリングコリジョンパラメータ設定
+	for (int i = 0; i < culling_parameter_data_count; i++)
+	{
+		CullingCollisionParameterDataReader* data = &((CullingCollisionParameterDataReader*)& culling_parameter_data_buffer[sizeof(culling_parameter_data_headder) + culling_parameter_data_headder.string_length])[i];
+		culling_parameter_data[i]->id = data->id;
+		culling_parameter_data[i]->collision_name = &culling_parameter_data_text_buffer[data->collision_name];
+		culling_parameter_data[i]->node_name = &culling_parameter_data_text_buffer[data->node_name];
+		culling_parameter_data[i]->angle = data->angle;
+		culling_parameter_data[i]->radius_x = data->radius_x;
+		culling_parameter_data[i]->radius_y = data->radius_y;
+		culling_parameter_data[i]->radius_z = data->radius_z;
+		culling_parameter_data[i]->enemy_category = data->enemy_category;
+	}
+
+	// アニメーションデータ設定
 	for (int i = 0; i < animation_data_count; ++i)
 	{
 		AnimationDataReader* data = &((AnimationDataReader*)&animation_data_buffer[sizeof(aniamtion_data_headder) + aniamtion_data_headder.string_length])[i];
@@ -161,6 +243,8 @@ GameDataBase::GameDataBase()
 	delete[] enemy_territory_data_buffer;
 	delete[] collision_time_buffer;
 	delete[] animation_data_buffer;
+	delete[] collision_parameter_data_buffer;
+	delete[] culling_parameter_data_buffer;
 }
 
 //-----------------------------------
@@ -171,6 +255,8 @@ GameDataBase::~GameDataBase()
 	delete[] enemy_data_text_buffer;
 	delete[] enemy_territory_data_text_buffer;
 	delete[] animation_data_text_buffer;
+	delete[] collision_parameter_data_text_buffer;
+	delete[] culling_parameter_data_text_buffer;
 }
 
 //---------------------------------------------------------------------------------
@@ -200,6 +286,40 @@ void GameDataBase::EnemyFriendFromTerritory(EnemyTerritoryTag territory_tag)
 			encount_enemy.emplace_back(enemy_data);
 		}
 	}
+}
+
+//---------------------------------------------------------------------------------
+// カテゴリーごとのパラメータデータを抽出したデータを渡す
+//---------------------------------------------------------------------------------
+std::vector<std::shared_ptr<CollisionParameterData>> GameDataBase::GetAttackCollitionParamterDataList(EnemyCategory enemy_category) const
+{
+	std::vector<std::shared_ptr<CollisionParameterData>> collision_arameter;
+	// 同じアクターテゴリーを持つデータを追加して配列を作成する
+	for (std::shared_ptr<CollisionParameterData> data : collision_parameter_data)
+	{
+		if (data->enemy_category == enemy_category)
+		{
+			collision_arameter.emplace_back(data);
+		}
+	}
+	return collision_arameter;
+}
+
+//---------------------------------------------------------------------------------
+// カテゴリーごとのパラメータデータを抽出したデータを渡す
+//---------------------------------------------------------------------------------
+std::vector<std::shared_ptr<CullingCollisionParameterData>> GameDataBase::GetAttackCullingCollisionParameterDataList(EnemyCategory enemy_category) const
+{
+	std::vector<std::shared_ptr<CullingCollisionParameterData>> culling_arameter;
+	// 同じアクターテゴリーを持つデータを追加して配列を作成する
+	for (std::shared_ptr<CullingCollisionParameterData> data : culling_parameter_data)
+	{
+		if (data->enemy_category == enemy_category)
+		{
+			culling_arameter.emplace_back(data);
+		}
+	}
+	return culling_arameter;
 }
 
 //---------------------------------------------------------------------------------

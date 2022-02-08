@@ -5,6 +5,7 @@
 #include "Charactor.h"
 #include "Graphics.h"
 #include "Model.h"
+#include "CullingCollision.h"
 
 //------------------------------
 // ŠJnˆ—

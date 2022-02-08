@@ -215,6 +215,7 @@
     <ClCompile Include="Source\Collision.cpp" />
     <ClCompile Include="Source\CollisionManager.cpp" />
     <ClCompile Include="Source\CreateShadowMapShader.cpp" />
+    <ClCompile Include="Source\CullingCollision.cpp" />
     <ClCompile Include="Source\DebugRenderer.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
@@ -228,6 +229,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Source\Enemy.cpp" />
+    <ClCompile Include="Source\EnemyCollision.cpp" />
     <ClCompile Include="Source\EnemyDragonNightmare.cpp" />
     <ClCompile Include="Source\EnemyDragonSoulEater.cpp" />
     <ClCompile Include="Source\EnemyLAT.cpp" />
@@ -279,6 +281,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Source\Player.cpp" />
+    <ClCompile Include="Source\PlayerCollision.cpp" />
     <ClCompile Include="Source\PlayerUIAction.cpp" />
     <ClCompile Include="Source\PlayerUIHealth.cpp" />
     <ClCompile Include="Source\PLTActionOwner.cpp" />
@@ -351,6 +354,7 @@
     <ClInclude Include="Source\CollisionManager.h" />
     <ClInclude Include="Source\Component.h" />
     <ClInclude Include="Source\CreateShadowMapShader.h" />
+    <ClInclude Include="Source\CullingCollision.h" />
     <ClInclude Include="Source\DebugRenderer.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClInclude>
@@ -364,6 +368,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Source\Enemy.h" />
+    <ClInclude Include="Source\EnemyCollision.h" />
     <ClInclude Include="Source\EnemyDragonNightmare.h" />
     <ClInclude Include="Source\EnemyDragonSoulEater.h" />
     <ClInclude Include="Source\EnemyLAT.h" />
@@ -376,9 +381,14 @@
     <ClInclude Include="Source\FontShader.h" />
     <ClInclude Include="Source\Framework.h" />
     <ClInclude Include="Source\GameDatabase.h" />
+    <ClInclude Include="Source\GameData\ActorType.h" />
     <ClInclude Include="Source\GameData\AnimationData.h" />
     <ClInclude Include="Source\GameData\AttackCategory.h" />
     <ClInclude Include="Source\GameData\AttackCollitionTime.h" />
+    <ClInclude Include="Source\GameData\CollisionMeshType.h" />
+    <ClInclude Include="Source\GameData\CollisionParameterData.h" />
+    <ClInclude Include="Source\GameData\CollisionUpdateType.h" />
+    <ClInclude Include="Source\GameData\CullingCollisionParameterData.h" />
     <ClInclude Include="Source\GameData\EnemyCategory.h" />
     <ClInclude Include="Source\GameData\EnemyData.h" />
     <ClInclude Include="Source\GameData\EnemyTerritoryPosition.h" />
@@ -429,6 +439,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Source\Player.h" />
+    <ClInclude Include="Source\PlayerCollision.h" />
     <ClInclude Include="Source\PlayerUIAction.h" />
     <ClInclude Include="Source\PlayerUIHealth.h" />
     <ClInclude Include="Source\PLTActionOwner.h" />

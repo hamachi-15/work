@@ -13,6 +13,8 @@ public:
 	// ベクトル算出
 	static DirectX::XMVECTOR ReturnVectorSubtract(const DirectX::XMFLOAT3& subtract1, const DirectX::XMFLOAT3& subtract2);
 	static DirectX::XMFLOAT3 ReturnFloatSubtract(const DirectX::XMFLOAT3& subtract1, const DirectX::XMFLOAT3& subtract2);
+	// 正規化されたベクトル算出
+	static DirectX::XMFLOAT3 ReturnNormalizeFloatSubtract(const DirectX::XMFLOAT3& subtract1, const DirectX::XMFLOAT3& subtract2);
 
 	// ベクトルの長さ算出
 	static float VectorLength(const DirectX::XMVECTOR& vector);

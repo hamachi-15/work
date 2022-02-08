@@ -40,7 +40,6 @@ public:
 	void SetShaderType(ShaderManager::ShaderType shader_type) { this->shader_type = shader_type; }
 
 	// シェーダーの取得
-	//Shader* GetShader() const { return shader.get(); }
 	ShaderManager::ShaderType GetShaderType() { return shader_type; }
 
 	// 名前の設定
@@ -132,7 +131,7 @@ private:
 	};
 	bool					culling_flag;
 
-	std::unique_ptr<Model>  model;
+	std::unique_ptr<Model>	model;
 	bool					animation_flag = true; // アニメーション更新を行うかのフラグ
 	ShaderManager::ShaderType		shader_type;
 	std::vector<std::shared_ptr<Component>>	components;

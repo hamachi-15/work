@@ -111,7 +111,7 @@ bool BodyPressAttackJudgment::Judgment()
 	DirectX::XMFLOAT3 enemy_angle = enemy->GetAngle();
 	
 	// プレイヤーがドラゴンの前方にいるか判定
-	return JudgmentUniversal::JudgementTargetInFront(enemy_position, enemy_angle, player_position);
+	return (!JudgmentUniversal::JudgementTargetInFront(enemy_position, enemy_angle, player_position));
 }
 
 //*****************************************
@@ -122,15 +122,19 @@ bool BodyPressAttackJudgment::Judgment()
 //-----------------------------------------
 //判定
 //-----------------------------------------
-bool AligningJudgment::Judgment()
+bool TurnToTargetJudgment::Judgment()
 {
 	// プレイヤーとドラゴンのアクターを取得
 	std::shared_ptr<Actor> player = ActorManager::Instance().GetActor("Player");
 	std::shared_ptr<Actor> enemy = owner->GetActor();
 
-	// プレイヤーがドラゴンの前方にいるか判定
+	// プレイヤーがドラゴンの後方にいるか判定
 	if (!JudgmentUniversal::JudgementTargetInFront(enemy->GetPosition(), enemy->GetAngle(), player->GetPosition()))
 	{
+		// プレイヤー座標取得
+		DirectX::XMFLOAT3 player_position = ActorManager::Instance().GetActor("Player")->GetPosition();
+		// プレイヤーの位置をターゲットに設定
+		owner->SetTargetPosition(player_position);
 		// 前方にいなければtrue
 		return true;
 	}

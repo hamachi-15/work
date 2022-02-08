@@ -16,6 +16,7 @@
 #include "JudgmentOwner.h"
 #include "ActionOwner.h"
 
+#include "EnemyCollision.h"
 //********************************
 // 
 // ラットクラス
@@ -43,19 +44,19 @@ void EnemyLAT::Destroy()
 	// アクターの取得
 	std::shared_ptr<Actor> actor = GetActor();
 
-	// コリジョン削除
-	// 球コリジョン削除
-	std::vector<std::shared_ptr<CollisionSphere>> list = CollisionManager::Instance().GetCollisionSphereFromID(GetCharactor()->GetID() + GetIdentity());
-	for (std::shared_ptr<CollisionSphere> sphere : list)
-	{
-		CollisionManager::Instance().UnregisterSphere(sphere);
-	}
-	
-	// 円柱コリジョン削除
-	CollisionManager::Instance().UnregisterCylinder(CollisionManager::Instance().GetCollisionCylinderFromName(actor->GetName()));
+	//// コリジョン削除
+	//// 球コリジョン削除
+	//std::vector<std::shared_ptr<CollisionSphere>> list = CollisionManager::Instance().GetCollisionSphereFromID(GetCharactor()->GetID() + GetIdentity());
+	//for (std::shared_ptr<CollisionSphere> sphere : list)
+	//{
+	//	CollisionManager::Instance().UnregisterSphere(sphere);
+	//}
+	//
+	//// 円柱コリジョン削除
+	//CollisionManager::Instance().UnregisterCylinder(CollisionManager::Instance().GetCollisionCylinderFromName(actor->GetName()));
 
-	// 立方体コリジョン削除
-	CollisionManager::Instance().UnregisterBox(CollisionManager::Instance().GetCollisionBoxFromName("LATAABB"));
+	//// 立方体コリジョン削除
+	//CollisionManager::Instance().UnregisterBox(CollisionManager::Instance().GetCollisionBoxFromName("LATAABB"));
 
 	// 敵マネージャーから削除
 	EnemyManager::Instance().EnemyRemove(GetActor()->GetComponent<EnemyLAT>());
@@ -137,54 +138,55 @@ void EnemyLAT::Start()
 	SetTargetPosition(actor->GetPosition());
 
 	// コリジョン設定
-	{
-		CollisionParameter parameter;
-		// モデル取得
-		Model* model = actor->GetModel();
+	//{
+	//	CollisionParameter parameter;
+	//	// モデル取得
+	//	Model* model = actor->GetModel();
+	//	std::vector<CollisionParameter> sphere_parameter;
+	//	std::vector<CollisionParameter> cylinder_parameter;
 
-		// カリング用のコリジョン
-		parameter.name = "LATAABB";
-		parameter.node_name = "";
-		parameter.position = {};
-		parameter.float3_radius = DirectX::XMFLOAT3(1.5f, 1.5f, 1.5f);
-		parameter.collision_flg = true;
-		parameter.actor_id = charactor->GetID();
-		parameter.actor_type = CollisionActorType::Enemy;
-		parameter.element = CollisionElement::Body;
-		parameter.position_mask = CollisionPositionMask::Collision_Mask_Actor_Position;
-		charactor->SetCollision(actor, parameter, CollisionMeshType::AABB);
+	//	// カリング用のコリジョン
+	//	parameter.name = "LATAABB";
+	//	parameter.actor_name = actor->GetName();
+	//	parameter.node_name = "";
+	//	parameter.position = {};
+	//	parameter.xmfloat_radius = DirectX::XMFLOAT3(1.5f, 1.5f, 1.5f);
+	//	parameter.collision_flg = true;
+	//	parameter.actor_id = charactor->GetID();
+	//	parameter.actor_type = CollisionActorType::Enemy;
+	//	parameter.update_type = CollisionUpdateType::Update_Actor;
 
-		// 体のコリジョン設定
-		parameter.name = actor->GetName();
-		parameter.actor_id = charactor->GetID() + GetIdentity();
-		parameter.position = { 0.0f, 0.0f, 0.0f };
-		parameter.radius = 3.0f;
-		parameter.weight = 1.0f;
-		parameter.height = 5.0f;
-		parameter.collision_flg = true;
-		parameter.actor_type = CollisionActorType::Enemy;
-		parameter.element = CollisionElement::Body;
-		parameter.position_mask = CollisionPositionMask::Collision_Mask_Actor_Position;
-		charactor->SetCollision(actor, parameter, CollisionMeshType::Cylinder);
+	//	// 体のコリジョン設定
+	//	parameter.name = actor->GetName();
+	//	parameter.actor_id = charactor->GetID() + GetIdentity();
+	//	parameter.position = { 0.0f, 0.0f, 0.0f };
+	//	parameter.radius = 3.0f;
+	//	parameter.weight = 1.0f;
+	//	parameter.height = 5.0f;
+	//	parameter.collision_flg = true;
+	//	parameter.actor_type = CollisionActorType::Enemy;
+	//	parameter.update_type = CollisionUpdateType::Update_Actor;
+	//	cylinder_parameter.emplace_back(parameter);
 
-		// 尻尾のコリジョン設定
-		DirectX::XMFLOAT3 tail_position;
-		Mathf::GetNodePosition("LAT:tai102_M_BK", tail_position, model);
-		std::string name = actor->GetName();
-		name += "Tail";
-		parameter.name = name.c_str();
-		parameter.node_name = "LAT:tai102_M_BK";
-		parameter.actor_id = charactor->GetID();
-		parameter.position = tail_position;
-		parameter.radius = 3.0f;
-		parameter.weight = 1.0f;
-		parameter.height = 0.0f;
-		parameter.collision_flg = false;
-		parameter.actor_type = CollisionActorType::Enemy;
-		parameter.element = CollisionElement::Weppon;
-		parameter.position_mask = CollisionPositionMask::Collision_Mask_Member_Position;
-		charactor->SetCollision(actor, parameter, CollisionMeshType::Sphere);
-	}
+	//	// 尻尾のコリジョン設定
+	//	DirectX::XMFLOAT3 tail_position;
+	//	Mathf::GetNodePosition("LAT:tai102_M_BK", tail_position, model);
+	//	std::string name = actor->GetName();
+	//	name += "Tail";
+	//	parameter.name = name.c_str();
+	//	parameter.node_name = "LAT:tai102_M_BK";
+	//	parameter.actor_id = charactor->GetID();
+	//	parameter.position = tail_position;
+	//	parameter.radius = 3.0f;
+	//	parameter.weight = 1.0f;
+	//	parameter.height = 0.0f;
+	//	parameter.collision_flg = false;
+	//	parameter.actor_type = CollisionActorType::Enemy;
+	//	parameter.update_type = CollisionUpdateType::Update_Node_Position;
+	//	sphere_parameter.emplace_back(parameter);
+
+	//	actor->AddComponent<EnemyCollision>(sphere_parameter, cylinder_parameter);
+	//}
 
 	// ビヘイビアツリーの設定
 	behavior_data = new BehaviorData();

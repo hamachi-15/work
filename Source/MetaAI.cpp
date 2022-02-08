@@ -127,7 +127,7 @@ void MetaAI::SendMessaging(int sender, int receiver, Message message, int enemy_
 		Telegram telegram(sender, receiver, message);
 		// ディレイ無しメッセージ（即時配送メッセージ）
 		Discharge(SceneManager::Instance().GetCurrentScene(), telegram);
-	}	
+	}
 	else if (receiver == static_cast<int>(MetaAI::Identity::BattleMap))
 	{
 		Telegram telegram(sender, receiver, message);

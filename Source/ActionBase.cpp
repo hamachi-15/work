@@ -44,7 +44,7 @@ void ActionBase::AttackCollision(std::shared_ptr<Actor> actor,
 		}
 
 		// “–‚½‚è”»’è‚ðs‚¤ƒtƒ‰ƒO‚ð•Ï‰»‚³‚¹‚é
-		collision->SetCollisionFlag(charactor->GetOldCollisionTimeFlag());
+		collision->SetAttackFlag(charactor->GetOldCollisionTimeFlag());
 	}
 }
 

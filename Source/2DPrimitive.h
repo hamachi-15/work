@@ -35,5 +35,6 @@ private:
 		int dummy2;
 	};
 	Microsoft::WRL::ComPtr<ID3D11Buffer> constant_buffer = nullptr;
+	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depth_stencil_state = nullptr;
 
 };

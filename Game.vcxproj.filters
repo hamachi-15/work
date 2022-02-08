@@ -133,6 +133,9 @@
     <Filter Include="ソース ファイル\HLSL\EnvMask">
       <UniqueIdentifier>{c9aeedaf-faca-4fbf-9fda-7f027ffeb1e9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\Collision">
+      <UniqueIdentifier>{9a33e08a-89d8-4756-ad0f-8a37b42e7f1f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui\imgui.cpp">
@@ -461,6 +464,15 @@
     </ClCompile>
     <ClCompile Include="Source\BossHealthUIAction.cpp">
       <Filter>ソース ファイル\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\PlayerCollision.cpp">
+      <Filter>ソース ファイル\Collision</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\EnemyCollision.cpp">
+      <Filter>ソース ファイル\Collision</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\CullingCollision.cpp">
+      <Filter>ソース ファイル\Collision</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -856,6 +868,30 @@
     </ClInclude>
     <ClInclude Include="Source\BossHealthUIAction.h">
       <Filter>ソース ファイル\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\PlayerCollision.h">
+      <Filter>ソース ファイル\Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\EnemyCollision.h">
+      <Filter>ソース ファイル\Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\CullingCollision.h">
+      <Filter>ソース ファイル\Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GameData\CollisionUpdateType.h">
+      <Filter>ソース ファイル\GameData</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GameData\ActorType.h">
+      <Filter>ソース ファイル\GameData</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GameData\CollisionParameterData.h">
+      <Filter>ソース ファイル\GameData</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GameData\CollisionMeshType.h">
+      <Filter>ソース ファイル\GameData</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GameData\CullingCollisionParameterData.h">
+      <Filter>ソース ファイル\GameData</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

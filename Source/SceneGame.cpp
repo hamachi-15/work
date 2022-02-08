@@ -6,6 +6,7 @@
 
 // データ系
 #include "GameDataBase.h"
+#include "ResourceManager.h"
 
 #include "Graphics.h"
 #include "Camera.h"
@@ -26,6 +27,9 @@
 #include "EnemySlime.h"
 #include "Stage.h"
 #include "Movement.h"
+
+#include "PlayerCollision.h"
+#include "CullingCollision.h"
 
 
 #include "CascadeShadowMapShader.h"
@@ -69,8 +73,7 @@ void SceneGame::Initialize()
 	camera.SetLookAt(
 		DirectX::XMFLOAT3(-100, 1, -136),
 		DirectX::XMFLOAT3(-100, 0, -116),
-		DirectX::XMFLOAT3(0, 1, 0)
-	);
+		DirectX::XMFLOAT3(0, 1, 0));
 	camera.SetPerspectiveFov(Mathf::ConvartToRadian(45),
 		graphics.GetScreenWidth() / graphics.GetScreenHeight(),
 		1,
@@ -81,23 +84,9 @@ void SceneGame::Initialize()
 	camera_controller->SetCameraAngle({ Mathf::ConvartToRadian(25), 0.0f, 0.0f });
 	camera_controller->SetTarget(DirectX::XMFLOAT3(-400, 16, -416));
 
-	// シェーダー初期化
-	bloom = std::make_unique<Bloom>(device);
-	primitive = std::make_unique<Primitive>(device);
-
-	// テクスチャ作成
-	bulr_texture = std::make_unique<Texture>();
-	bulr_texture->Create((u_int)graphics.GetScreenWidth(), (u_int)graphics.GetScreenHeight(), DXGI_FORMAT_R16G16B16A16_FLOAT);
-
-	depth_texture = std::make_unique<Texture>();
-	depth_texture->CreateDepthStencil((u_int)2048, (u_int)1024);
-
 	// テクスチャの読み込み
 	sprite = std::make_unique<Sprite>();
-	sky = std::make_unique<Texture>();
-	sky->Load("Data/Sprite/SkyBox/FS002_Night.png");
-	sky_texture = std::make_unique<Texture>();
-	sky_texture->Create(sky->GetWidth(), sky->GetHeight(), DXGI_FORMAT_R16G16B16A16_FLOAT);
+	sky = ResourceManager::Instance().LoadTexture("Data/Sprite/SkyBox/FS002_Night.png");
 
 	// ステージ読み込み
 	{
@@ -125,17 +114,21 @@ void SceneGame::Initialize()
 		std::shared_ptr<Actor> actor = ActorManager::Instance().Create();
 		actor->SetUpModel("Data/Model/RPG-Character/WorldMapPlayer.mdl", "Motion");
 		actor->SetName("Player");
-		actor->SetPosition(DirectX::XMFLOAT3(-100, 6, -116));
+		actor->SetPosition(DirectX::XMFLOAT3(-100, 6, 116));
 		actor->SetAngle(DirectX::XMFLOAT3(0, 0, 0));
 		actor->SetScale(DirectX::XMFLOAT3(0.04f, 0.04f, 0.04f));
 		actor->AddComponent<Movement>();
 		actor->AddComponent<Charactor>();
 		actor->AddComponent<Player>();
+		actor->AddComponent<PlayerCollision>();
+		// プレイヤーのカリングコリジョンを追加
+		CollisionManager::Instance().RegisterCulling(std::make_shared<CullingCollision>(EnemyCategory::None, actor));
 		actor->SetShaderType(ShaderManager::ShaderType::Lambert);
 	}
 	// 敵の生成
 	MetaAI::Instance().AppearanceEnemy();
 
+	// アクター更新処理
 	ActorManager::Instance().Update(0.01f);
 	ActorManager::Instance().UpdateTransform();
 }
@@ -155,7 +148,7 @@ void SceneGame::Finalize()
 	CollisionManager::Instance().Destroy();
 
 	// メッセンジャーのクリア
-	Messenger::Instance().Clear();	
+	Messenger::Instance().Clear();
 
 }
 
@@ -221,7 +214,7 @@ void SceneGame::Update(float elapsed_time)
 	LightDir.y = -1.0f;
 	LightDir.z = cosf(light_angle);
 	Light::SetDirLight(LightDir, DirectX::XMFLOAT3(0.6f, 0.6f, 0.6f));
-	
+
 	// 当たり判定更新処理
 	CollisionManager::Instance().Update();
 
@@ -259,11 +252,11 @@ void SceneGame::Render()
 	render_context.view = camera.GetView();
 	render_context.projection = camera.GetProjection();
 
-	// スクリーンテクスチャに描画
-	ScreenRender(context, render_context, screen_size);
-
 	// ポストテクスチャ描画
 	PostRender(context, render_context, screen_size);
+
+	// スクリーンテクスチャに描画
+	ScreenRender(context, render_context, screen_size);
 
 	// バックバッファに描画
 	BuckBufferRender(context, render_context, screen_size);
@@ -291,12 +284,19 @@ void SceneGame::ScreenRender(ID3D11DeviceContext* context, RenderContext& render
 	{
 		std::shared_ptr<Shader> skybox_shader = shader_manager.GetShader(ShaderManager::ShaderType::SkyBox);
 		skybox_shader->Begin(context, render_context);
-		sprite->Render(context,
-			sky.get(),
+		sprite->Render(context, sky.get(),
 			0, 0,
 			screen_size.x, screen_size.y,
 			0, 0,
-			static_cast<float>(sky->GetWidth()), static_cast<float>(sky->GetHeight()),
+			(float)sky->GetWidth(), (float)sky->GetHeight());
+		//ブレンドステート設定
+		context->OMSetBlendState(graphics.GetBlendState((int)Graphics::BlendState::Add), nullptr, 0xFFFFFFFF);
+		sprite->AddRender(context,
+			bloom_texture,
+			0, 0,
+			screen_size.x, screen_size.y,
+			0, 0,
+			static_cast<float>(bloom_texture->GetWidth()), static_cast<float>(bloom_texture->GetHeight()),
 			0,
 			1, 1, 1, 1);
 		skybox_shader->End(context);
@@ -323,13 +323,16 @@ void SceneGame::ScreenRender(ID3D11DeviceContext* context, RenderContext& render
 //-------------------------------------
 void SceneGame::PostRender(ID3D11DeviceContext* context, RenderContext& render_context, const DirectX::XMFLOAT2& screen_size)
 {
-	Graphics& graphics = Graphics::Instance();
 	ShaderManager& shader_manager = ShaderManager::Instance();
-	std::shared_ptr<Shader> bloom_shader = shader_manager.GetShader(ShaderManager::ShaderType::Bloom);
-
-	// 空のテクスチャのブルーム処理
-	bloom_texture = dynamic_cast<Bloom*>(bloom_shader.get())->Render(context, render_context, sky.get());
-
+	if(!sky_bloom_flag)
+	{
+		// ブルームシェーダー取得
+		std::shared_ptr<Shader> bloom_shader = shader_manager.GetShader(ShaderManager::ShaderType::Bloom);
+		// 空のテクスチャのブルーム処理
+		bloom_texture = dynamic_cast<Bloom*>(bloom_shader.get())->Render(context, render_context, sky.get());
+		// 空のブルームを作成したのでフラグを立てて描画しないようにする
+		sky_bloom_flag = true;
+	}
 }
 
 //-------------------------------------
@@ -376,13 +379,15 @@ void SceneGame::BuckBufferRender(ID3D11DeviceContext* context, RenderContext& re
 	{
 		if (primitive_falg)
 		{
-			primitive->Begin(context, primitive_context);
+			// ブルームシェーダー取得
+			std::shared_ptr<Shader> primitive_shader = shader_manager.GetShader(ShaderManager::ShaderType::Primitive);
+			primitive_shader->Begin(context, primitive_context);
 			sprite->Render(context,
 				0, 0,
 				screen_size.x, screen_size.y,
 				0, 0,
 				1, 1);
-			primitive->End(context);
+			primitive_shader->End(context);
 		}
 	}
 }

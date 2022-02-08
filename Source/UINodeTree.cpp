@@ -49,7 +49,9 @@ void UINodeTree::Run(float elapsed_time)
 	root->Run(elapsed_time);
 }
 
+//--------------------------
 // •`‰æˆ—
+//--------------------------
 void UINodeTree::Render(ID3D11DeviceContext* context)
 {
 	root->Render(context);

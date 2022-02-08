@@ -51,15 +51,8 @@ private:
 	BlurRenderContext					blur_render_context;
 	PrimitiveContext					primitive_context;
 
-	std::unique_ptr<Shader>				sprite_cube;
-	std::unique_ptr<Bloom>				bloom;
-	std::unique_ptr<Shader>				primitive;
-
 	std::unique_ptr<Sprite>				sprite;
-	std::unique_ptr<Texture>			sky;
-	std::unique_ptr<Texture>			bulr_texture;
-	std::unique_ptr<Texture>			sky_texture;
-	std::unique_ptr<Texture>			depth_texture;
+	std::shared_ptr<Texture>			sky;
 	Texture*							bloom_texture;
 
 	// バトルシーンに遷移するときに使うメンバ
@@ -74,5 +67,5 @@ private:
 	bool								isshadowmap = false;
 
 	DirectX::XMFLOAT4					color = DirectX::XMFLOAT4(1, 1, 1, 1);
-	bool								iscull = false;
+	bool								sky_bloom_flag = false; // 空のブルームの描画フラグ
 };

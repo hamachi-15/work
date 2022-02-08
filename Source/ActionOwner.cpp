@@ -46,7 +46,7 @@ ActionBase::State MoveToTargetAction::Run(float elapsed_time)
 	}
 
 	// 目的地点へ移動
-	owner->MoveToTarget(elapsed_time, 1.5f);
+	owner->MoveToTarget(1.5f);
 
 	// 実行中
 	return ActionBase::State::Run;
@@ -198,7 +198,7 @@ ActionBase::State WanderAction::Run(float elapsed_time)
 	}
 
 	// 目的地点へ移動
-	owner->MoveToTarget(elapsed_time, 0.5f);
+	owner->MoveToTarget(0.5f);
 
 	// プレイヤー索敵成功したら
 	if (owner->SearchPlayer())
@@ -256,7 +256,7 @@ ActionBase::State LeaveAction::Run(float elapsed_time)
 	std::shared_ptr<Actor> owner_actor = owner->GetActor();
 
 	// 目的地点へ移動
-	owner->MoveToTarget(elapsed_time, 1.0);
+	owner->MoveToTarget(1.0f);
 
 	// 目的地へ着いたら
 	if (JedgmentToTargetPosition(owner->GetTargetPosition(), owner_actor->GetPosition(), owner_actor->GetName()))
@@ -357,7 +357,7 @@ ActionBase::State PursuitAction::Run(float elapsed_time)
 	owner->SetTargetPosition(ActorManager::Instance().GetActor("Player")->GetPosition());
 
 	// 目的地点へ移動
-	owner->MoveToTarget(elapsed_time, 1.0f);
+	owner->MoveToTarget(1.0f);
 
 	DirectX::XMFLOAT3 position = owner->GetActor()->GetPosition();
 	DirectX::XMFLOAT3 target_position = owner->GetTargetPosition();

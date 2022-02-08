@@ -1,37 +1,32 @@
 #pragma once
 #include <DirectXMath.h>
 
-// アクターの座標で更新するかクラスメンバの座標で更新するか
-enum class CollisionPositionMask
-{
-	Collision_Mask_Actor_Position,
-	Collision_Mask_Member_Position,
-	Collision_Mask_Local_Member_Position,
-	Collision_Mask_Castam_poition,
-};
-
 // コリジョンメッシュの種類
-enum class CollisionMeshType
-{
-	Sphere,
-	Cylinder,
-	AABB
-};
+//enum class CollisionMeshType
+//{
+//	Sphere,
+//	Cylinder,
+//	AABB
+//};
 
-// コリジョンの属性
-enum class CollisionElement
-{
-	Weppon,
-	Body,
-};
+// コリジョン座標の更新方法
+//enum class CollisionUpdateType
+//{
+//	Update_Actor,			// アクター座標に更新
+//	Update_Node_Position,	// モデルの特定ノード座標に更新
+//	Update_Local_Position,	// 特定ノードのローカル位置をワールド座標に変換して更新
+//	Update_Castam_poition, // 上記のどれでもない方法で更新
+//};
 
 // コリジョンを持っているアクターのタイプ
-enum class CollisionActorType
-{
-	Enemy,
-	Player,
-	None		// その他
-};
+//enum class CollisionActorType
+//{
+//	Enemy,
+//	Player,
+//	None		// その他
+//};
+enum class ActorType;
+enum class CollisionUpdateType;
 
 //-----------------------------------
 // 判定結果
@@ -56,16 +51,16 @@ struct CollisionParameter
 	DirectX::XMFLOAT3		position = { 0, 0, 0 };
 	DirectX::XMFLOAT3		local_position = { 0, 0, 0 };
 	DirectX::XMFLOAT3		node_position = { 0, 0, 0 };
-	DirectX::XMFLOAT3		float3_radius = { 0, 0, 0 };
-	const char* name;
-	const char* node_name;
+	DirectX::XMFLOAT3		xmfloat_radius = { 0, 0, 0 };
+	std::string				actor_name;
+	std::string				name;
+	std::string				node_name;
 	int						actor_id = -1;		// コリジョンを持っているアクターのID
 	float					angle = 0.0f;
 	float					radius = 0.0f;
 	float					height = 0.0f;
-	float					weight = 0.0f;
+	float					weight = 1.0f;
 	bool					collision_flg = false;
-	CollisionActorType		actor_type;
-	CollisionElement		element;
-	CollisionPositionMask	position_mask;
+	ActorType				actor_type;
+	CollisionUpdateType		update_type;
 };

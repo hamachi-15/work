@@ -81,7 +81,7 @@ bool Enemy::SearchPlayer()
 //-----------------------------------------
 // 目的地点へ移動
 //-----------------------------------------
-void Enemy::MoveToTarget(float elapsed_time, float speed_rate)
+void Enemy::MoveToTarget(float speed_rate)
 {
 	// ターゲット方向への進行ベクトルを算出
 	DirectX::XMFLOAT3 position = GetActor()->GetPosition();
@@ -93,7 +93,25 @@ void Enemy::MoveToTarget(float elapsed_time, float speed_rate)
 	DirectX::XMFLOAT3 direction = { vx, 0, vz };
 	// 移動処理
 	movement->Move(direction, charactor->GetMoveSpeed() * speed_rate);
-	movement->Turn(direction, charactor->GetTurnSpeed() * speed_rate);
+	movement->Turn(direction);
+}
+
+//-----------------------------------------
+// 指定の方向へ移動
+//-----------------------------------------
+void Enemy::MoveToDirection(DirectX::XMFLOAT3& direction, float speed_rate)
+{
+	// 移動処理
+	movement->Move(direction, charactor->GetMoveSpeed() * speed_rate);
+	movement->Turn(direction);
+}
+
+//-----------------------------------------
+// 目標のベクトルへ向く
+//-----------------------------------------
+float Enemy::TurnToTarget(DirectX::XMFLOAT3& direction)
+{
+	return movement->Turn(direction);
 }
 
 //-----------------------------------------

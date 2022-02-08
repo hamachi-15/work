@@ -25,7 +25,7 @@ public:
 	void MoveLocal(const DirectX::XMFLOAT3& direction, float speed);
 
 	// ù‰ñˆ—
-	void Turn(DirectX::XMFLOAT3& direction, float elapsed_time);
+	float Turn(DirectX::XMFLOAT3& direction);
 
 	// ƒWƒƒƒ“ƒvˆ—
 	void Jump(float speed);

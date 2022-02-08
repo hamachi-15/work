@@ -93,6 +93,9 @@ NodeBase* NodeBase::SelectRandom(std::vector<NodeBase*>* list)
 //--------------------------
 NodeBase* NodeBase::SelectOnOff(std::vector<NodeBase*>* list, BehaviorData* data)
 {
+	// 判定の結果が何もなければ何もしない
+	if (list->size() == 0) return nullptr;
+
 	std::vector<NodeBase*> off_list;
 
 	// 使用済みノードリストをリストアップする

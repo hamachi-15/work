@@ -72,8 +72,14 @@ public:
 	bool SearchPlayer();
 	
 	// 目的地点へ移動
-	void MoveToTarget(float elapsed_time, float speed_rate);
-	
+	void MoveToTarget(float speed_rate);
+
+	// 指定の方向へ移動
+	void MoveToDirection(DirectX::XMFLOAT3& direction, float speed_rate);
+
+	// 目標のベクトルへ向く
+	float TurnToTarget(DirectX::XMFLOAT3& direction);
+
 	// ターゲット位置をランダム設定
 	void SetRandomTargetPosition();
 	

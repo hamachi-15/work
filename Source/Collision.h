@@ -5,9 +5,12 @@
 #include "MetaAI.h"
 #include "Component.h"
 #include "CollisionDataHeader.h"
+#include "ActorType.h"
 class Model;
 class Telegram;
-
+class DebugRenderer;
+enum class ActorType;
+enum class CollisionUpdateType;
 
 //-----------------------------------
 // レイキャスト
@@ -62,28 +65,25 @@ public:
 //-----------------------------------
 // コリジョンオブジェクトの基底クラス
 //-----------------------------------
-class CollisionObject : public Component
+class CollisionObject
 {
 public:
-	CollisionObject(){}
-	~CollisionObject() override{}
-
-	// GUI描画
-	void OnGUI() override;
-
-	// 更新処理
-	void Update(float elapsed_time) override;
+	// コンストラクタ
+	CollisionObject(const CollisionParameter& parameter) : collision_name(parameter.name), actor_name(parameter.actor_name), position(parameter.position), node_name(parameter.node_name),
+		local_position(parameter.local_position), weight(parameter.weight), height(parameter.height), 
+		radius(parameter.radius), xmfloat_radius(parameter.xmfloat_radius), actor_id(parameter.actor_id), actor_type(parameter.actor_type), update_type(parameter.update_type){}
+	
+	// デストラクタ
+	virtual ~CollisionObject() {}
 
 	// 名前取得
-	std::string GetName() const override { return name.c_str(); }
-
-	// 名前設定
-	void SetName(const char* name) { this->name = name; }
+	const char* GetName() const { return collision_name.c_str(); }
 
 	// ノードの名前取得
 	const char* GetNodeName() const { return node_name.c_str(); }
-	// ノードの名前設定
-	void SetNodeName(const char* node_name) { this->node_name = node_name; }
+
+	// コリジョンを持つアクターの名前取得
+	const char* GetActorName() const { return actor_name.c_str(); }
 
 	// 位置
 	DirectX::XMFLOAT3 GetPosition() const { return position; }
@@ -92,49 +92,76 @@ public:
 	DirectX::XMFLOAT3 GetLocalPosition() const { return local_position; }
 	void SetLocalPosition(const DirectX::XMFLOAT3& local_position) { this->local_position = local_position; }
 
-	// 重み
-	void SetWeight(float weight) { this->weight = weight; }
-	float GetWeight() const { return weight; }
+	// 色取得
+	DirectX::XMFLOAT4 GetColor() const { return color; }
 
-	// 半径
-	void SetRadius(float radius) { this->radius = radius; }
-	float GetRadius() const { return radius; }
+	// 色設定
+	void SetColor() { this->color = color; }
+
+	// 重み取得
+	float GetWeight() const { return weight; }
 	
+	// 重み設定
+	void SetWeight(float weight) { this->weight = weight; }
+
+	// 半径取得
+	float GetRadius() const { return radius; }
+	const DirectX::XMFLOAT3& GetXMFloatRadius() const { return xmfloat_radius; }
+	
+	// 半径設定
+	void SetRadius(float radius) { this->radius = radius; }
+	void SetXMFloatRadius(const DirectX::XMFLOAT3 radius) { this->xmfloat_radius = radius; }
+
+	// 高さ取得
+	float GetHeight() const { return height; }
+
+	// 高さ設定
+	void SetHeight() { this->height = height; }
+
 	// IDを取得
 	int GetActorID() const { return actor_id; }
-
-	// IDを設定
-	void SetActorID(int id) { actor_id = id; }
 	
-	// コリジョンの属性取得
-	CollisionElement GetCollisionElement() { return element; }
+	// アクターの種類取得
+	const ActorType& GetActorType() { return actor_type; }
 
-	// コリジョンの属性設定
-	void SetCollisionElement(CollisionElement element) { this->element = element; }
-	
-	// コリジョンメッシュの種類取得
-	CollisionPositionMask GetPositionMask() { return position_mask; }
-
-	// コリジョンメッシュの種類設定
-	void SetPositionMask(CollisionPositionMask mask) { this->position_mask = mask; }
+	// 更新方法取得
+	const CollisionUpdateType& GetUpdateType() const { return update_type; }
 
 	// コリジョンフラグ取得
 	bool GetCollisionFlag() { return collision_flag; }
 
 	// コリジョンフラグ設定
 	void SetCollisionFlag(bool flag) { this->collision_flag = flag; }
+
+	// 衝突フラグ取得
+	bool GetHitFlag() const { return hit_flag; }
+	
+	//衝突フラグ設定
+	bool SetHitFlag(bool hit_flag) { this->hit_flag = hit_flag; }
+
+	// 衝突フラグ取得
+	bool GetAttackFlag() const { return attack_falg; }
+
+	//衝突フラグ設定
+	void SetAttackFlag(bool attack_falg) { this->attack_falg = attack_falg; }
+
 private:
-	std::string				name;			// コリジョンの名前
-	std::string				node_name;		// モデルノード検索用。コリジョン座標がActorの座標ではない時に使う
-	DirectX::XMFLOAT3		position;
-	DirectX::XMFLOAT3		local_position; //　モデルノードのない座標にコリジョンを置くときに使う
+	std::string				collision_name = "";
+	std::string				node_name = "";		// モデルノード検索用。コリジョン座標がActorの座標ではない時に使う
+	std::string				actor_name = "";				// コリジョンを持つアクターの名前
+	DirectX::XMFLOAT3		position = {};
+	DirectX::XMFLOAT3		local_position = {}; //　モデルノードのない座標にコリジョンを置くときに使う
+	DirectX::XMFLOAT3		xmfloat_radius = {0.0f, 0.0f, 0.0f};
+	DirectX::XMFLOAT4		color = { 1.0f, 1.0f,0.0f, 1.0f };
 	float					radius = 0.5f;
+	float					height = 0.0f;
 	float					weight = 0.0f;
-	int						actor_id;		// コリジョンを持っているアクターのID
-	bool					collision_flag; // あたり判定を行うかのフラグ
-	CollisionActorType		actor_type;
-	CollisionElement		element;
-	CollisionPositionMask	position_mask;
+	int						actor_id = 0;		// コリジョンを持っているアクターのID
+	bool					collision_flag = true; // あたり判定を行うかのフラグ
+	bool					attack_falg = false; // 攻撃の当たり判定を行うか
+	bool					hit_flag = false;
+	ActorType				actor_type;
+	CollisionUpdateType		update_type;
 };
 
 //*************************************
@@ -145,22 +172,11 @@ private:
 class CollisionBox : public CollisionObject
 {
 public:
-	CollisionBox() {}
+	CollisionBox(CollisionParameter parameter) : CollisionObject(parameter) {}
 	~CollisionBox() override {}
 
-	// 更新処理
-	//void Update(float elapsed_time) override;
-
 	// 描画処理
-	void Draw();
-
-	// 半径設定
-	void SetRadius(const DirectX::XMFLOAT3 radius) { this->radius = radius; }
-
-	// 半径取得
-	const DirectX::XMFLOAT3& GetRadius() const { return radius; }
-private:
-	DirectX::XMFLOAT3 radius;
+	virtual void Render(DebugRenderer* renderer);
 };
 
 //*************************************
@@ -171,15 +187,11 @@ private:
 class CollisionSphere : public CollisionObject
 {
 public:
-	CollisionSphere() {}
+	CollisionSphere(CollisionParameter parameter) : CollisionObject(parameter) {}
 	~CollisionSphere()override {}
-
-	// 更新処理
-	//void Update(float elapsed_time) override;
 	
 	// 描画処理
-	void Draw();
-
+	virtual void Render(DebugRenderer* renderer);
 };
 
 //*************************************
@@ -190,19 +202,9 @@ public:
 class CollisionCylinder : public CollisionObject
 {
 public:
-	CollisionCylinder() {}
+	CollisionCylinder(CollisionParameter parameter) : CollisionObject(parameter) {}
 	~CollisionCylinder()override {}
 
-	// 高さ
-	void SetHeight(float height) { this->height = height; }
-	float GetHeight() const {return height; }
-
-	// 更新処理
-	//void Update(float elapsed_time) override;
-
 	// 描画処理
-	void Draw();
-
-private:
-	float				height = 0.5f;
+	virtual void Render(DebugRenderer* renderer);
 };

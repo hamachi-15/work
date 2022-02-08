@@ -94,9 +94,7 @@ Texture* GaussianBlur::Render(Texture* texture)
 		0, 0,
 		width_blur_texture_width, width_blur_texture_height,
 		0, 0,
-		static_cast<float>(texture->GetWidth()), static_cast<float>(texture->GetHeight()),
-		0,
-		1, 1, 1, 1);
+		static_cast<float>(texture->GetWidth()), static_cast<float>(texture->GetHeight()));
 	End(context, BlurType::XBlur);
 
 	// Y•ûŒü‚Éƒuƒ‰[‚ğŠ|‚¯‚é

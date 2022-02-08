@@ -3,6 +3,7 @@
 #include "Sprite.h"
 
 #include "UI.h"
+#include "Graphics.h"
 
 //--------------------------------
 // コンストラクタ
@@ -55,9 +56,12 @@ void UIManager::Update(float elapsed_time)
 //------------------------------
 void UIManager::Draw(ID3D11DeviceContext* context)
 {
+	Graphics& graphics = Graphics::Instance();
 	ShaderManager& shader_manager = ShaderManager::Instance();
 	std::shared_ptr<Shader> sprite_shader = shader_manager.GetShader(ShaderManager::ShaderType::Sprite);
 
+	//デプスステンシルステート設定
+	context->OMSetDepthStencilState(graphics.GetDepthStencilState(static_cast<int>(Graphics::DepthStencilState::False)), 1);
 	sprite_shader->Begin(context);
 	Sprite sprite;
 	for (std::shared_ptr<UI> ui : ui_updates)

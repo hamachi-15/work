@@ -41,14 +41,14 @@ void EnemyDragonSoulEater::Destroy()
 	std::shared_ptr<Actor> actor = GetActor();
 
 	// コリジョン削除
-	std::vector<std::shared_ptr<CollisionSphere>> list = CollisionManager::Instance().GetCollisionSphereFromID(GetCharactor()->GetID() + GetIdentity());
-	for (std::shared_ptr<CollisionSphere> sphere : list)
-	{
-		CollisionManager::Instance().UnregisterSphere(sphere);
-	}
-	CollisionManager::Instance().UnregisterCylinder(CollisionManager::Instance().GetCollisionCylinderFromName(actor->GetName()));
-	// 立方体コリジョン削除
-	CollisionManager::Instance().UnregisterBox(CollisionManager::Instance().GetCollisionBoxFromName(actor->GetName()));
+	//std::vector<std::shared_ptr<CollisionSphere>> list = CollisionManager::Instance().GetCollisionSphereFromID(GetCharactor()->GetID() + GetIdentity());
+	//for (std::shared_ptr<CollisionSphere> sphere : list)
+	//{
+	//	CollisionManager::Instance().UnregisterSphere(sphere);
+	//}
+	//CollisionManager::Instance().UnregisterCylinder(CollisionManager::Instance().GetCollisionCylinderFromName(actor->GetName()));
+	//// 立方体コリジョン削除
+	//CollisionManager::Instance().UnregisterBox(CollisionManager::Instance().GetCollisionBoxFromName(actor->GetName()));
 
 	// 敵マネージャーから削除
 	EnemyManager::Instance().EnemyRemove(GetActor()->GetComponent<EnemyDragonSoulEater>());
@@ -115,63 +115,63 @@ void EnemyDragonSoulEater::Start()
 	EnemyManager::Instance().EnemyRegister(actor->GetComponent<EnemyDragonSoulEater>());
 	
 	// コリジョンの設定
-	{
-		Model* model = GetActor()->GetModel();
-		CollisionParameter parameter;
-		// カリング用のコリジョン
-		parameter.name = "SoulEaterDragonAABB";
-		parameter.node_name = "";
-		parameter.position = {};
-		parameter.float3_radius = DirectX::XMFLOAT3(1.5f, 1.5f, 1.5f);
-		parameter.height = 9.0f;
-		parameter.collision_flg = true;
-		parameter.actor_id = charactor->GetID();
-		parameter.element = CollisionElement::Body;
-		parameter.position_mask = CollisionPositionMask::Collision_Mask_Actor_Position;
-		charactor->SetCollision(actor, parameter, CollisionMeshType::AABB);
-		
-		// 体のコリジョン設定
-		parameter.name = actor->GetName();
-		parameter.node_name = "";
-		parameter.actor_id = charactor->GetID() + GetIdentity();
-		parameter.position = { 0, 0, 0 };
-		parameter.radius = 20.5f;
-		parameter.height = 26.5f;
-		parameter.weight = 6.5f;
-		parameter.collision_flg = true;
-		parameter.actor_type = CollisionActorType::Enemy;
-		parameter.element = CollisionElement::Body;
-		parameter.position_mask = CollisionPositionMask::Collision_Mask_Actor_Position;
-		charactor->SetCollision(actor, parameter, CollisionMeshType::Cylinder);
+	//{
+	//	Model* model = GetActor()->GetModel();
+	//	CollisionParameter parameter;
+	//	// カリング用のコリジョン
+	//	parameter.name = "SoulEaterDragonAABB";
+	//	parameter.node_name = "";
+	//	parameter.position = {};
+	//	parameter.float3_radius = DirectX::XMFLOAT3(1.5f, 1.5f, 1.5f);
+	//	parameter.height = 9.0f;
+	//	parameter.collision_flg = true;
+	//	parameter.actor_id = charactor->GetID();
+	//	parameter.element = CollisionElement::Body;
+	//	parameter.position_mask = CollisionPositionMask::Collision_Mask_Actor_Position;
+	//	charactor->SetCollision(actor, parameter, CollisionMeshType::AABB);
+	//	
+	//	// 体のコリジョン設定
+	//	parameter.name = actor->GetName();
+	//	parameter.node_name = "";
+	//	parameter.actor_id = charactor->GetID() + GetIdentity();
+	//	parameter.position = { 0, 0, 0 };
+	//	parameter.radius = 20.5f;
+	//	parameter.height = 26.5f;
+	//	parameter.weight = 6.5f;
+	//	parameter.collision_flg = true;
+	//	parameter.actor_type = CollisionActorType::Enemy;
+	//	parameter.element = CollisionElement::Body;
+	//	parameter.position_mask = CollisionPositionMask::Collision_Mask_Actor_Position;
+	//	charactor->SetCollision(actor, parameter, CollisionMeshType::Cylinder);
 
-		// 頭コリジョン
-		name.clear();
-		name = actor->GetName();
-		name += "Head";
-		parameter.name = name.c_str();
-		parameter.node_name = "UpperHead02";
-		parameter.radius = 6.5f;
-		parameter.height = 0.0f;
-		parameter.weight = 1.0f;
-		parameter.collision_flg = false;
-		parameter.actor_type = CollisionActorType::Enemy;
-		parameter.element = CollisionElement::Weppon;
-		parameter.position_mask = CollisionPositionMask::Collision_Mask_Member_Position;
-		charactor->SetCollision(actor, parameter, CollisionMeshType::Sphere);
-	
-		// 尻尾コリジョン
-		name.clear();
-		name = actor->GetName();
-		name += "Tail";
-		parameter.name = name.c_str();
-		parameter.node_name = "TailEnd";
-		parameter.radius = 3.5f;
-		parameter.collision_flg = false;
-		parameter.actor_type = CollisionActorType::Enemy;
-		parameter.element = CollisionElement::Weppon;
-		parameter.position_mask = CollisionPositionMask::Collision_Mask_Member_Position;
-		charactor->SetCollision(actor, parameter, CollisionMeshType::Sphere);
-	}
+	//	// 頭コリジョン
+	//	name.clear();
+	//	name = actor->GetName();
+	//	name += "Head";
+	//	parameter.name = name.c_str();
+	//	parameter.node_name = "UpperHead02";
+	//	parameter.radius = 6.5f;
+	//	parameter.height = 0.0f;
+	//	parameter.weight = 1.0f;
+	//	parameter.collision_flg = false;
+	//	parameter.actor_type = CollisionActorType::Enemy;
+	//	parameter.element = CollisionElement::Weppon;
+	//	parameter.position_mask = CollisionPositionMask::Collision_Mask_Member_Position;
+	//	charactor->SetCollision(actor, parameter, CollisionMeshType::Sphere);
+	//
+	//	// 尻尾コリジョン
+	//	name.clear();
+	//	name = actor->GetName();
+	//	name += "Tail";
+	//	parameter.name = name.c_str();
+	//	parameter.node_name = "TailEnd";
+	//	parameter.radius = 3.5f;
+	//	parameter.collision_flg = false;
+	//	parameter.actor_type = CollisionActorType::Enemy;
+	//	parameter.element = CollisionElement::Weppon;
+	//	parameter.position_mask = CollisionPositionMask::Collision_Mask_Member_Position;
+	//	charactor->SetCollision(actor, parameter, CollisionMeshType::Sphere);
+	//}
 
 	// ビヘイビアツリー設定
 	behavior_data = new BehaviorData();

@@ -8,10 +8,13 @@
 
 // データベース系インクルード
 #include "GameDatabase.h"
-#include "EnemyTerritoryManager.h"
+#include "EnemyCategory.h"
 
+// マネージャーインクルード
+#include "EnemyTerritoryManager.h"
 #include "SceneManager.h"
 #include "UIManager.h"
+#include "CollisionManager.h"
 
 // アクター系インクルード
 #include "Charactor.h"
@@ -25,6 +28,11 @@
 #include "EnemyDragonSoulEater.h"
 
 #include "BossHealthUI.h"
+
+#include "ActorType.h"
+#include "CollisionMeshType.h"
+#include "EnemyCollision.h"
+#include "CullingCollision.h"
 
 //-----------------------------------------------
 // コンストラクタ
@@ -70,7 +78,7 @@ void EnemyManager::EnemyRegister(std::shared_ptr<Enemy> enemy)
 	enemy->GetCharactor()->SetID(static_cast<int>(MetaAI::Identity::Enemy));
 	enemy->SetIdentity(identity);
 	//設定したらインクリメントする
-	identity++;		
+	identity++;
 	// 敵リストに追加
 	enemies.emplace_back(enemy);
 }
@@ -114,8 +122,8 @@ void EnemyManager::DrawDebugPrimitive()
 void EnemyManager::CreateEnemies()
 {
 	std::vector<std::shared_ptr<WorldMapData>> world_map_data = GameDataBase::Instance().GetWorldMapDataList();
-	int world_map_data_max_count = 3;
-	for (int i = 0; i < world_map_data_max_count; ++i)
+	int world_map_data_max_count = world_map_data.size();
+	for (int i = 0; i < 1; ++i)
 	{
 		// ワールドマップデータを取得
 		std::shared_ptr<WorldMapData> world_map_data = GameDataBase::Instance().GetWorldMapData(i);
@@ -167,7 +175,7 @@ void EnemyManager::CreateEnemies(int id)
 }
 
 //-----------------------------------------
-// スクリプトから敵情報を取得して敵を生成する
+// エンカウントデータから敵情報を取得して敵を生成する
 //-----------------------------------------
 bool EnemyManager::CreateEnemyEncountData()
 {
@@ -187,8 +195,10 @@ bool EnemyManager::CreateEnemyEncountData()
 //-----------------------------------------
 void EnemyManager::SetEnemyStatus(std::shared_ptr<Actor> actor, std::shared_ptr<EnemyData> enemy_data, std::shared_ptr<EnemyTerritoryPosition> teritory_data, DirectX::XMFLOAT3 appearance_position)
 {
+	//設定したらインクリメントする
+	identity++;
 	// 名前の設定
-	std::string name = std::string(enemy_data->name) + std::to_string(teritory_data->id);
+	std::string name = std::string(enemy_data->name) + std::to_string(identity);
 	actor->SetName(name.c_str());
 	
 	// モデルのセットアップ
@@ -220,7 +230,7 @@ void EnemyManager::SetEnemyStatus(std::shared_ptr<Actor> actor, std::shared_ptr<
 	actor->SetAngle({ enemy_data->angle_x, enemy_data->angle_y, enemy_data->angle_z });
 
 	// シェーダーの設定
-	actor->SetShaderType(ShaderManager::ShaderType::Lambert);
+	actor->SetShaderType(ShaderManager::ShaderType::Phong);
 
 	// 各敵のコンポーネント追加
 	AddComponent(actor, enemy_data, teritory_data->tag);
@@ -246,25 +256,39 @@ void EnemyManager::GetAppearancePosition(std::shared_ptr<Actor> actor, DirectX::
 //-----------------------------------------------
 void EnemyManager::AddComponent(std::shared_ptr<Actor> actor, std::shared_ptr<EnemyData> enemy_data, EnemyTerritoryTag& territory_tag)
 {
+	std::shared_ptr<Charactor> charactor = actor->AddComponent<Charactor>();
+	charactor->SetID(static_cast<int>(MetaAI::Identity::Enemy));
+	charactor->SetMaxHealth(enemy_data->hp);
+	charactor->SetHealth(enemy_data->hp);
+
 	std::shared_ptr<Enemy> enemy;
 	// ムーブメントコンポーネント追加
 	actor->AddComponent<Movement>();
-	std::shared_ptr<Charactor> charactor = actor->AddComponent<Charactor>();
-	charactor->SetMaxHealth(enemy_data->hp);
-	charactor->SetHealth(enemy_data->hp);
 
 	// 敵の種類ごとのコンポーネントを追加
 	switch (enemy_data->category)
 	{
 	case EnemyCategory::Slime:
 		enemy = actor->AddComponent<EnemySlime>();
+		actor->AddComponent<EnemyCollision>(EnemyCategory::Slime, identity);
+		// カリング用コリジョンを追加
+		CollisionManager::Instance().RegisterCulling(
+			std::make_shared<CullingCollision>(EnemyCategory::Slime, actor));
 		break;
 	case EnemyCategory::LAT:
 		enemy = actor->AddComponent<EnemyLAT>();
+		actor->AddComponent<EnemyCollision>(EnemyCategory::LAT, identity);
+		// カリング用コリジョンを追加
+		CollisionManager::Instance().RegisterCulling(
+			std::make_shared<CullingCollision>(EnemyCategory::LAT, actor));
 
 		break;
 	case EnemyCategory::PLT:
 		enemy = actor->AddComponent<EnemyPLT>();
+		actor->AddComponent<EnemyCollision>(EnemyCategory::PLT, identity);
+		// カリング用コリジョンを追加
+		CollisionManager::Instance().RegisterCulling(
+			std::make_shared<CullingCollision>(EnemyCategory::PLT, actor));
 
 		break;
 	case EnemyCategory::NightmareDragon:
@@ -277,8 +301,14 @@ void EnemyManager::AddComponent(std::shared_ptr<Actor> actor, std::shared_ptr<En
 			UIManager::Instance().RegisterUI(ui);
 		}
 		enemy = actor->AddComponent<EnemyDragonNightmare>();
+		actor->AddComponent<EnemyCollision>(EnemyCategory::NightmareDragon, identity);
+		// カリング用コリジョンを追加
+		CollisionManager::Instance().RegisterCulling(
+			std::make_shared<CullingCollision>(EnemyCategory::NightmareDragon, actor));
 		break;
 	}
+	enemy->SetIdentity(identity);
+
 	// 所属テリトリー設定
 	enemy->SetBelongingToTerritory(territory_tag);
 

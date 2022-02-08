@@ -6,17 +6,21 @@
 // 軸合わせアクション
 // 
 //*****************************
-class AligningAction : public ActionBase
+class TurnToTargetAction : public ActionBase
 {
 public:
 	// コンストラクタ
-	AligningAction(Enemy* enemy) : ActionBase(enemy) {}
+	TurnToTargetAction(Enemy* enemy) : ActionBase(enemy) {}
 	
 	// 実行前処理
 	void Start() override;
 
 	// 実行処理
 	ActionBase::State Run(float elapsed_time) override;
+private:
+	DirectX::XMFLOAT3 turn_direction; // 向く方向ベクトル
+	DirectX::XMFLOAT3 front_direction;
+	float			larp_timer = 0.0f;
 };
 
 //*****************************
@@ -136,7 +140,7 @@ class LungesAttackAction : public ActionBase
 {
 public:
 	// コンストラクタ
-	LungesAttackAction(Enemy* enemy, DirectX::XMFLOAT3 target_position = { 0.0f, 0.0f, 0.0f }) : ActionBase(enemy), target_position(target_position) {}
+	LungesAttackAction(Enemy* enemy) : ActionBase(enemy) {}
 
 	// 実行前処理
 	void Start() override;
@@ -144,7 +148,7 @@ public:
 	// 実行処理
 	ActionBase::State Run(float elapsed_time) override;
 private:
-	DirectX::XMFLOAT3 target_position = {};
+	DirectX::XMFLOAT3 target_direction = {}; // ターゲットへの方向ベクトル
 };
 
 //*****************************
