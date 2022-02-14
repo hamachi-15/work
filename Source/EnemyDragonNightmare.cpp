@@ -65,15 +65,16 @@ bool EnemyDragonNightmare::OnMessages(const Telegram& message)
 	case MessageType::Message_Hit_Attack:
 		break;
 	case MessageType::Message_GetHit_Attack:
-		//ダメージフラグをオンに
-		OnDamaged();
 		// 衝突した位置を設定
 		SetHitPosition(message.message_box.hit_position);
 		break;
 	case MessageType::Message_Give_Attack_Right:
-		// 攻撃フラグをオンに
-		SetAttackFlag(true);
-		break;
+	{
+		std::shared_ptr<Charactor> charactor = GetActor()->GetComponent<Charactor>();
+		// 攻撃ヒットフラグを立てる
+		SetRightOfAttack(true);
+	}
+	break;
 	case MessageType::Message_Hit_Boddy:
 		break;
 	}
@@ -131,7 +132,7 @@ void EnemyDragonNightmare::SetBehaviorNode()
 	{	// シーンがバトルシーンの時のノード設定
 		ai_tree->AddNode("",					"Root",						0, BehaviorTree::SelectRule::Priority,	NULL,								NULL);
 		ai_tree->AddNode("Root",				"Death",					1, BehaviorTree::SelectRule::Non,		new DeathJudgment(this),			new DeathAction(this));
-		ai_tree->AddNode("Root",				"Damage",					2, BehaviorTree::SelectRule::Non,		new DamageJudgment(this),			new DamageAction(this));
+		//ai_tree->AddNode("Root",				"Damage",					2, BehaviorTree::SelectRule::Non,		new DamageJudgment(this),			new DamageAction(this));
 		ai_tree->AddNode("Root",				"Battle",					3, BehaviorTree::SelectRule::Priority,	NULL/*new BattleJudgment(this)*/,	NULL);
 		ai_tree->AddNode("Root",				"Scount",					4, BehaviorTree::SelectRule::Priority,	NULL,								NULL);
 		ai_tree->AddNode("Battle",				"Attack",					1, BehaviorTree::SelectRule::On_Off_Ramdom,	new AttackJudgment(this),			NULL);
@@ -188,12 +189,6 @@ void EnemyDragonNightmare::Update(float elapsed_time)
 {
 	// ビヘイビア更新処理
 	BehaviorUpdate(elapsed_time);
-
-	// 速力更新処理
-	GetMovement()->UpdateVelocity(elapsed_time);
-
-	// 無敵時間更新処理
-	GetCharactor()->UpdateInvincibleTimer(elapsed_time);
 }
 
 //--------------------------------------

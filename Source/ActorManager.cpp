@@ -128,9 +128,6 @@ void ActorManager::Update(float elapsed_time)
 
 	for (std::shared_ptr<Actor>& actor : update_actors)
 	{
-		// カリングフラグが立っていれば更新処理はしない
-		if (actor->GetCullingFlag()) continue;
-		
 		actor->Update(elapsed_time);
 	}
 
@@ -164,7 +161,7 @@ void ActorManager::UpdateTransform()
 //------------------------------
 // シャドウマップ描画処理
 //------------------------------
-void ActorManager::ShadowRender(RenderContext& render_context, BlurRenderContext& bulr_render_context)
+void ActorManager::ShadowRender( RenderContext* render_context, BlurRenderContext* bulr_render_context)
 {
 	Graphics& graphics = Graphics::Instance();
 	ID3D11DeviceContext* context = graphics.GetDeviceContext();
@@ -294,9 +291,9 @@ void ActorManager::ShadowRender(RenderContext& render_context, BlurRenderContext
 			clop_matrix = DirectX::XMLoadFloat4x4(&float_clop_matrix);
 		}
 		//ライトビュープロジェクション行列を計算
-		DirectX::XMStoreFloat4x4(&render_context.light_view_projection[i], light_view_projection * clop_matrix);
-		render_context.single_light_view_projection = render_context.light_view_projection[i];
-
+		DirectX::XMFLOAT4X4 plane_light_view_projection[3];
+		DirectX::XMStoreFloat4x4(&render_context->light_view_projection[i], light_view_projection * clop_matrix);
+		render_context->single_light_view_projection = render_context->light_view_projection[i];
 		create_chadowmap->Begin(context, render_context);
 		for (std::shared_ptr<Actor>& actor : update_actors)
 		{
@@ -320,7 +317,7 @@ void ActorManager::ShadowRender(RenderContext& render_context, BlurRenderContext
 //------------------------------
 // 描画処理
 //------------------------------
-void ActorManager::Render(RenderContext& render_context)
+void ActorManager::Render(RenderContext* render_context)
 {
 	Graphics& graphics = Graphics::Instance();
 	ID3D11DeviceContext* context = graphics.GetDeviceContext();
@@ -352,14 +349,14 @@ void ActorManager::Render(RenderContext& render_context)
 	
 	shader_type = static_cast<ShaderManager::ShaderType>(-1);
 
-	//DrawLister();
-	//DrawDetail();
+	DrawLister();
+	DrawDetail();
 }
 
 //------------------------------
 // 輝度を算出するモデルを描画する
 //------------------------------
-void ActorManager::BrightRender(RenderContext& render_context)
+void ActorManager::BrightRender(RenderContext* render_context)
 {
 	Graphics& graphics = Graphics::Instance();
 	ShaderManager& shader_manager = ShaderManager::Instance();

@@ -83,7 +83,7 @@ CascadeShadowMap::~CascadeShadowMap()
 //--------------------------------
 // 描画開始処理
 //--------------------------------
-void CascadeShadowMap::Begin(ID3D11DeviceContext* context, RenderContext& render_context)
+void CascadeShadowMap::Begin(ID3D11DeviceContext* context, RenderContext* render_context)
 {
 	Graphics& graphics = Graphics::Instance();
 	Texture* shadow_texture1 = ActorManager::Instance().GetShadowTexture(0);
@@ -119,20 +119,20 @@ void CascadeShadowMap::Begin(ID3D11DeviceContext* context, RenderContext& render
 
 	// シーン用定数バッファ更新
 	CBScene cbscene;
-	DirectX::XMMATRIX V = DirectX::XMLoadFloat4x4(&render_context.view);
-	DirectX::XMMATRIX P = DirectX::XMLoadFloat4x4(&render_context.projection);
+	DirectX::XMMATRIX V = DirectX::XMLoadFloat4x4(&render_context->view);
+	DirectX::XMMATRIX P = DirectX::XMLoadFloat4x4(&render_context->projection);
 	DirectX::XMStoreFloat4x4(&cbscene.view_projection, V * P);
 	V = DirectX::XMMatrixInverse(nullptr, V);
 	DirectX::XMFLOAT4 v;
 	DirectX::XMStoreFloat4(&v, V.r[3]);
 	cbscene.eye_position = v;
 
-	cbscene.light_view_projection[0] = render_context.light_view_projection[0];
-	cbscene.light_view_projection[1] = render_context.light_view_projection[1];
-	cbscene.light_view_projection[2] = render_context.light_view_projection[2];
+	cbscene.light_view_projection[0] = render_context->light_view_projection[0];
+	cbscene.light_view_projection[1] = render_context->light_view_projection[1];
+	cbscene.light_view_projection[2] = render_context->light_view_projection[2];
 
-	cbscene.light_direction = render_context.light_direction;
-	cbscene.shadow_parameter = render_context.ShadowParameter;
+	cbscene.light_direction = render_context->light_direction;
+	cbscene.shadow_parameter = render_context->ShadowParameter;
 	context->UpdateSubresource(scene_constant_buffer.Get(), 0, 0, &cbscene, 0, 0);
 }
 

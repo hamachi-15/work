@@ -48,7 +48,7 @@ Phong::Phong(ID3D11Device* device)
 	}
 }
 
-void Phong::Begin(ID3D11DeviceContext* context, RenderContext& render_context)
+void Phong::Begin(ID3D11DeviceContext* context, RenderContext* render_context)
 {
 	Activate(context);
 
@@ -65,15 +65,15 @@ void Phong::Begin(ID3D11DeviceContext* context, RenderContext& render_context)
 
 	// シーン用定数バッファ更新
 	CbScene cbscene;
-	DirectX::XMMATRIX V = DirectX::XMLoadFloat4x4(&render_context.view);
-	DirectX::XMMATRIX P = DirectX::XMLoadFloat4x4(&render_context.projection);
+	DirectX::XMMATRIX V = DirectX::XMLoadFloat4x4(&render_context->view);
+	DirectX::XMMATRIX P = DirectX::XMLoadFloat4x4(&render_context->projection);
 	DirectX::XMStoreFloat4x4(&cbscene.view_projection, V * P);
 	V = DirectX::XMMatrixInverse(nullptr, V);
 	DirectX::XMFLOAT4 view;
 	DirectX::XMStoreFloat4(&view, V.r[3]);
 	cbscene.eye_position = view;
 
-	cbscene.light_direction = render_context.light_direction;
+	cbscene.light_direction = render_context->light_direction;
 	cbscene.light_color = DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	context->UpdateSubresource(scene_constant_buffer.Get(), 0, 0, &cbscene, 0, 0);
 }

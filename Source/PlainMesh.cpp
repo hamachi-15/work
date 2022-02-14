@@ -1,5 +1,6 @@
 #include "Graphics.h"
 #include "PlainMesh.h"
+#include "Texture.h"
 
 
 //‰Šú‰»
@@ -361,15 +362,15 @@ void PlainMesh::Render(Shader* shader, DirectX::XMMATRIX* view, DirectX::XMMATRI
 
 }
 
-void PlainMesh::Render(Shader* shader, Texture* texture, RenderContext& render_context, D3D_PRIMITIVE_TOPOLOGY topology)
+void PlainMesh::Render(Shader* shader, Texture* texture, RenderContext* render_context, D3D_PRIMITIVE_TOPOLOGY topology)
 {
 	Graphics& graphics = Graphics::Instance();
 	ID3D11DeviceContext* context = graphics.GetDeviceContext();
 	
 	shader->Begin(context, render_context);
 
-	DirectX::XMMATRIX projection = DirectX::XMLoadFloat4x4(&render_context.projection);
-	DirectX::XMMATRIX view = DirectX::XMLoadFloat4x4(&render_context.view);
+	DirectX::XMMATRIX projection = DirectX::XMLoadFloat4x4(&render_context->projection);
+	DirectX::XMMATRIX view = DirectX::XMLoadFloat4x4(&render_context->view);
 	ConstantBufferForPerMesh cb;
 	cb.world = WorldMatrix;
 	XMStoreFloat4x4(&cb.matWVP, XMLoadFloat4x4(&WorldMatrix) * (view) * (projection));

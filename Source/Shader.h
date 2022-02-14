@@ -35,9 +35,9 @@ public:
 	virtual void Begin(ID3D11DeviceContext* context) {}
 	virtual void Begin(ID3D11DeviceContext* context, float timer) {}
 	virtual void Begin(ID3D11DeviceContext* context, Texture* texture) {}
-	virtual void Begin(ID3D11DeviceContext* context, RenderContext& render_context) {}
-	virtual void Begin(ID3D11DeviceContext* context, RenderContext& render_context, CubeMapRenderContext& cubemap_render_context){}
-	virtual void Begin(ID3D11DeviceContext* cotnext, PrimitiveContext& number) {}
+	virtual void Begin(ID3D11DeviceContext* context, RenderContext* render_context) {}
+	virtual void Begin(ID3D11DeviceContext* context, RenderContext* render_context, CubeMapRenderContext& cubemap_render_context){}
+	virtual void Begin(ID3D11DeviceContext* cotnext, PrimitiveContext* number) {}
 
 	// ï`âÊèàóù
 	void Draw(ID3D11DeviceContext* context, const Model* model);

@@ -65,7 +65,7 @@ bool AttackJudgment::Judgment()
 		Message message;
 		message.message = MessageType::Message_Ask_Attack_Right;
 		MetaAI::Instance().SendMessaging(owner->GetCharactor()->GetID() + owner->GetIdentity(), static_cast<int>(MetaAI::Identity::Meta), message);
-		if (owner->GetAttackFlag())
+		if (owner->GetRightOfAttack())
 		{
 			// AttackNode‚Ö‘JˆÚ‚Å‚«‚é
 			return true;

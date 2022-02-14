@@ -37,7 +37,10 @@
 
 #include "PlayerUIHealth.h"
 #include "PlayerCollision.h"
-#include "SceneTitle.h"
+
+#include "SceneGame.h"
+#include "SceneOver.h"
+#include "SceneClear.h"
 
 SceneBattle::SceneBattle()
 {
@@ -52,13 +55,14 @@ void SceneBattle::Initialize()
 	Graphics& graphics = Graphics::Instance();
 	ID3D11Device* device = graphics.GetDevice();
 
-	// シーン名設定
-	SetName("SceneBattle");
-
+	render_context = std::make_unique<RenderContext>();
+	blur_render_context = std::make_unique<BlurRenderContext>();
+	primitive_context = std::make_unique<PrimitiveContext>();
+	
 	// プリミティブのコンスタントバッファの初期設定
 	primitive_falg = true;
-	primitive_context.number = 2;
-	primitive_context.timer = 0.0f;
+	primitive_context->number = 2;
+	primitive_context->timer = 0.0f;
 
 	// ライト初期化
 	Light::Initialize();
@@ -82,12 +86,8 @@ void SceneBattle::Initialize()
 	// テクスチャの読み込み
 	sprite = std::make_unique<Sprite>();
 	sky = ResourceManager::Instance().LoadTexture("Data/Sprite/SkyBox/FS002_Night.png");
-	anybutton_texture = std::make_unique<Texture>();
-	anybutton_texture->Load("Data/Sprite/PushAnyButton.png");
-	clear_texture = std::make_unique<Texture>();
-	clear_texture->Load("Data/Sprite/GameClear.png");
-	over_texture = std::make_unique<Texture>();
-	over_texture->Load("Data/Sprite/YouDead.png");
+	anybutton_texture = ResourceManager::Instance().LoadTexture("Data/Sprite/PushAnyButton.png");
+
 	// ステージ読み込み
 	{
 		std::shared_ptr<Actor> actor = ActorManager::Instance().Create();
@@ -109,7 +109,7 @@ void SceneBattle::Initialize()
 		actor->SetAngle(DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f));
 		actor->SetScale(DirectX::XMFLOAT3(0.04f, 0.04f, 0.04f));
 		actor->AddComponent<Movement>();
-		actor->AddComponent<Charactor>();
+		actor->AddComponent<Charactor>(static_cast<int>(MetaAI::Identity::Player));
 		std::shared_ptr<PlayerHealthUI> ui = actor->AddComponent<PlayerHealthUI>();
 		actor->AddComponent<Player>();
 		actor->AddComponent<PlayerCollision>();
@@ -165,25 +165,20 @@ void SceneBattle::Update(float elapsed_time)
 	// ゲームがクリアかゲームオーバーになっていれば
 	if (isgame_clear || isgame_over)
 	{
-		GamePad& gamePad = Input::Instance().GetGamePad();
-		const GamePadButton any_button =
-			GamePad::BTN_A
-			| GamePad::BTN_B
-			| GamePad::BTN_X
-			| GamePad::BTN_Y;
-		if (gamePad.GetButtonDown() & any_button)
-		{
-			SceneManager::Instance().ChangeScene(new SceneTitle());
-		}
+		SceneManager::Instance().ChangeScene(new SceneClear());
 		return;
 	}
-
-	// プリミティブコンテキストのコンストラクタ更新
-	if (primitive_context.timer < 40)
+	if (isbuttle_end)
 	{
-		primitive_context.timer++;
+		SceneManager::Instance().ChangeScene(new SceneGame());
+		return;
 	}
-	if (primitive_context.timer >= 40)
+	// プリミティブコンテキストのコンストラクタ更新
+	if (primitive_context->timer < 40)
+	{
+		primitive_context->timer++;
+	}
+	if (primitive_context->timer >= 40)
 	{
 		primitive_falg = false;
 	}
@@ -228,13 +223,13 @@ void SceneBattle::Render()
 	DirectX::XMFLOAT2 screen_size = { graphics.GetScreenWidth(), graphics.GetScreenHeight() };
 
 	// 描画処理
-	render_context.light_direction = Light::LightDir;
-	render_context.ShadowParameter = { shadow_color.x, shadow_color.y, shadow_color.z, 0.001f };
+	render_context->light_direction = Light::LightDir;
+	render_context->ShadowParameter = { shadow_color.x, shadow_color.y, shadow_color.z, 0.001f };
 
 	// カメラパラメータ設定
 	Camera& camera = Camera::Instance();
-	render_context.view = camera.GetView();
-	render_context.projection = camera.GetProjection();
+	render_context->view = camera.GetView();
+	render_context->projection = camera.GetProjection();
 
 	// バックバッファのクリア処理
 	{
@@ -244,21 +239,22 @@ void SceneBattle::Render()
 		graphics.ScreenClear(&render_target_view, depth_stencil_view);
 	}
 
+
 	// ポストテクスチャ描画
-	PostRender(context, render_context, screen_size);
+	PostRender(context, render_context.get(), screen_size);
 
 	// スクリーンテクスチャに描画
-	ScreenRender(context, render_context, screen_size);
+	ScreenRender(context, render_context.get(), screen_size);
 
 	// バックバッファに描画
-	BuckBufferRender(context, render_context, screen_size);
+	BuckBufferRender(context, render_context.get(), screen_size);
 }
 
 
 //-------------------------------------
 // スクリーンテクスチャ描画
 //-------------------------------------
-void SceneBattle::ScreenRender(ID3D11DeviceContext* context, RenderContext& render_context, const DirectX::XMFLOAT2& screen_size)
+void SceneBattle::ScreenRender(ID3D11DeviceContext* context, RenderContext* render_context, const DirectX::XMFLOAT2& screen_size)
 {
 	Graphics& graphics = Graphics::Instance();
 	ShaderManager& shader_manager = ShaderManager::Instance();
@@ -296,10 +292,22 @@ void SceneBattle::ScreenRender(ID3D11DeviceContext* context, RenderContext& rend
 		shader->End(context);
 	}
 
+	// デバッグプリミティブ描画
+	{
+		// 敵縄張りのデバッグプリミティブ描画
+		EnemyTerritoryManager::Instance().Render();
+		// 敵のデバッグプリミティブ描画
+		EnemyManager::Instance().DrawDebugPrimitive();
+		// 当たり判定ののデバッグプリミティブ描画
+		CollisionManager::Instance().Draw();
+
+		graphics.GetDebugRenderer()->Render(context, render_context->view, render_context->projection);
+	}
+
 	// アクター描画
 	{
 		// シャドウマップ作成
-		ActorManager::Instance().ShadowRender(render_context, blur_render_context);
+		ActorManager::Instance().ShadowRender(render_context, blur_render_context.get());
 
 		// レンダーターゲットの回復
 		graphics.SetRenderTargetView(&screen_texture, depth_stencil_view);
@@ -315,7 +323,7 @@ void SceneBattle::ScreenRender(ID3D11DeviceContext* context, RenderContext& rend
 //-------------------------------------
 // ポストテクスチャ描画
 //-------------------------------------
-void SceneBattle::PostRender(ID3D11DeviceContext* context, RenderContext& render_context, const DirectX::XMFLOAT2& screen_size)
+void SceneBattle::PostRender(ID3D11DeviceContext* context, RenderContext* render_context, const DirectX::XMFLOAT2& screen_size)
 {
 	ShaderManager& shader_manager = ShaderManager::Instance();
 	if (!sky_bloom_flag)
@@ -328,11 +336,41 @@ void SceneBattle::PostRender(ID3D11DeviceContext* context, RenderContext& render
 		sky_bloom_flag = true;
 	}
 }
+//-------------------------------------
+// ゲームオーバー・クリアの瞬間を描画
+//-------------------------------------
+void SceneBattle::MomentRender(ID3D11DeviceContext* context, const DirectX::XMFLOAT2& screen_size)
+{
+	Graphics& graphics = Graphics::Instance();
+	ShaderManager& shader_manager = ShaderManager::Instance();
+	GameDataBase& database = GameDataBase::Instance();
+	// レンダーターゲット設定
+	{
+		ID3D11RenderTargetView* render_target_view = database.GetTimingTexture()->GetRenderTargetView();
+		ID3D11DepthStencilView* depth_stencil_view = graphics.GetDepthStencilView();
+		graphics.SetRenderTargetView(&render_target_view, depth_stencil_view);
+	}
+	// ビューポート設定
+	graphics.SetViewport(screen_size.x, screen_size.y);
+
+	//バックバッファにスクリーンテクスチャを描画
+	std::shared_ptr<Shader> sprite_shader = shader_manager.GetShader(ShaderManager::ShaderType::Sprite);
+	sprite_shader->Begin(context);
+	// スクリーンテクスチャ
+	sprite->Render(context, graphics.GetTexture(),
+		0, 0,
+		screen_size.x, screen_size.y,
+		0, 0,
+		(float)graphics.GetTexture()->GetWidth(), (float)graphics.GetTexture()->GetHeight(),
+		0,
+		1, 1, 1, 1);
+	sprite_shader->End(context);
+}
 
 //-------------------------------------
 // バックバッファ描画
 //-------------------------------------
-void SceneBattle::BuckBufferRender(ID3D11DeviceContext* context, RenderContext& render_context, const DirectX::XMFLOAT2& screen_size)
+void SceneBattle::BuckBufferRender(ID3D11DeviceContext* context, RenderContext* render_context, const DirectX::XMFLOAT2& screen_size)
 {
 	Graphics& graphics = Graphics::Instance();
 	ShaderManager& shader_manager = ShaderManager::Instance();
@@ -378,7 +416,7 @@ void SceneBattle::BuckBufferRender(ID3D11DeviceContext* context, RenderContext& 
 		{
 			// ブルームシェーダー取得
 			std::shared_ptr<Shader> primitive_shader = shader_manager.GetShader(ShaderManager::ShaderType::Primitive);
-			primitive_shader->Begin(context, primitive_context);
+			primitive_shader->Begin(context, primitive_context.get());
 			sprite->Render(context,
 				0, 0,
 				screen_size.x, screen_size.y,
@@ -387,9 +425,6 @@ void SceneBattle::BuckBufferRender(ID3D11DeviceContext* context, RenderContext& 
 			primitive_shader->End(context);
 		}
 	}
-
-	// ゲームオーバー、クリアの描画
-	ClearOrOverRender(context);
 }
 
 //-------------------------------------
@@ -397,13 +432,38 @@ void SceneBattle::BuckBufferRender(ID3D11DeviceContext* context, RenderContext& 
 //-------------------------------------
 bool SceneBattle::OnMessages(const Telegram& telegram)
 {
+	Graphics& graphics = Graphics::Instance();
 	switch (telegram.message_box.message)
 	{
+	case MessageType::Message_Buttle_End:
+		// 倒した敵を記録
+		EnemyManager::Instance().SetDefeatTeritory(telegram.message_box.territory_tag, true);
+
+		// クリアしているか判定
+		if (IsGameClearJudgment())
+		{
+			// クリアならフラグを立てる
+			isgame_clear = true;
+			return true;
+		}
+		isbuttle_end = true;
+		break;
 	case MessageType::Message_GameClear:
 		isgame_clear = true;
+		return true;
 		break;
 	case MessageType::Message_GameOver:
 		isgame_over = true;
+		return true;
+		break;
+	case MessageType::Message_Moment_Render:
+	{
+		// スクリーンサイズ取得
+		DirectX::XMFLOAT2 screen_size = { graphics.GetScreenWidth(), graphics.GetScreenHeight() };
+		// ゲームオーバー・クリアの瞬間を描画
+		MomentRender(graphics.GetDeviceContext(), screen_size);
+		return true;
+	}
 		break;
 	}
 	return false;
@@ -422,61 +482,11 @@ void SceneBattle::OnGui()
 	ImGui::Checkbox("ShadowmapDrawFlag", &isshadowmap);
 
 	ImGui::TextColored(ImVec4(1, 1, 0, 1), u8"-------2Dプリミティブ-------");
-	ImGui::SliderInt("PrimitiveType", &primitive_context.number, 1, 10);
-	ImGui::InputFloat("Timer", &primitive_context.timer);
+	ImGui::SliderInt("PrimitiveType", &primitive_context->number, 1, 10);
+	ImGui::InputFloat("Timer", &primitive_context->timer);
 	ImGui::Checkbox("PrimitiveFlag", &primitive_falg);
 
 	ImGui::End();
-
-}
-
-//-------------------------------------
-// クリアかゲームオーバー描画
-//-------------------------------------
-void SceneBattle::ClearOrOverRender(ID3D11DeviceContext*context)
-{
-	ShaderManager& shader_manager = ShaderManager::Instance();
-	std::shared_ptr<Shader> sprite_shader = shader_manager.GetShader(ShaderManager::ShaderType::Sprite);
-	sprite_shader->Begin(context);
-	if (isgame_clear)
-	{
-		sprite->Render(context,
-			clear_texture.get(),
-			400, 100,
-			(float)clear_texture->GetWidth(), (float)clear_texture->GetHeight(),
-			0, 0,
-			(float)clear_texture->GetWidth(), (float)clear_texture->GetHeight(),
-			0,
-			1, 1, 1, 1);
-		sprite->Render(context,
-			anybutton_texture.get(),
-			400, 400,
-			(float)anybutton_texture->GetWidth(), (float)anybutton_texture->GetHeight(),
-			0, 0,
-			(float)anybutton_texture->GetWidth(), (float)anybutton_texture->GetHeight(),
-			0,
-			1, 1, 1, 1);
-	}
-	else if (isgame_over)
-	{
-		sprite->Render(context,
-			over_texture.get(),
-			400, 100,
-			(float)over_texture->GetWidth(), (float)over_texture->GetHeight(),
-			0, 0,
-			(float)over_texture->GetWidth(), (float)over_texture->GetHeight(),
-			0,
-			1, 1, 1, 1);
-		sprite->Render(context,
-			anybutton_texture.get(),
-			400, 400,
-			(float)anybutton_texture->GetWidth(), (float)anybutton_texture->GetHeight(),
-			0, 0,
-			(float)anybutton_texture->GetWidth(), (float)anybutton_texture->GetHeight(),
-			0,
-			1, 1, 1, 1);
-	}
-	sprite_shader->End(context);
 
 }
 
@@ -485,10 +495,10 @@ void SceneBattle::ClearOrOverRender(ID3D11DeviceContext*context)
 //-------------------------------------
 bool SceneBattle::IsGameClearJudgment()
 {
-	// 撃破フラグを格納したコンテナ取得
-	std::map<EnemyTerritoryTag, bool> defeat_teritory = EnemyManager::Instance().GetDefeatTeritory();
+	// エネミーマネージャー取得
+	EnemyManager& enemy_manager = EnemyManager::Instance();
 	
 	// ドラゴンを全て撃破したらクリア
-	return (defeat_teritory[EnemyTerritoryTag::ButtlePosition4] == true &&
-		defeat_teritory[EnemyTerritoryTag::ButtlePosition5] == true);
+	return (enemy_manager.GetDefeatTeritory(EnemyTerritoryTag::Territory4) == true &&
+		enemy_manager.GetDefeatTeritory(EnemyTerritoryTag::Territory5) == true);
 }

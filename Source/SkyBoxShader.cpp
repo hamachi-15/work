@@ -25,13 +25,13 @@ SkyBoxShader::SkyBoxShader(ID3D11Device* device)
 //----------------------------------
 // •`‰æŠJŽn
 //----------------------------------
-void SkyBoxShader::Begin(ID3D11DeviceContext* context, RenderContext& render_context)
+void SkyBoxShader::Begin(ID3D11DeviceContext* context, RenderContext* render_context)
 {
 	Activate(context);
 
 	CBBuffers cb;
-	DirectX::XMMATRIX v = DirectX::XMLoadFloat4x4(&render_context.view);
-	DirectX::XMMATRIX p = DirectX::XMLoadFloat4x4(&render_context.projection);
+	DirectX::XMMATRIX v = DirectX::XMLoadFloat4x4(&render_context->view);
+	DirectX::XMMATRIX p = DirectX::XMLoadFloat4x4(&render_context->projection);
 	DirectX::XMStoreFloat4x4(&cb.inverse_view, XMMatrixInverse(nullptr, v));
 	DirectX::XMStoreFloat4x4(&cb.inverse_projection, XMMatrixInverse(nullptr, p));
 	cb.eye_position.x = cb.inverse_view._41;

@@ -15,7 +15,11 @@ public:
 	// GUI描画
 	void OnGUI() override;
 
+	// 開始処理
 	void Start() override;
+
+	// 更新処理
+	void Update(float elapsed_time) override;
 
 	// 速力更新処理
 	void UpdateVelocity(float elapsed_time);

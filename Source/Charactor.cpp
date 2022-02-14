@@ -27,13 +27,12 @@ bool Charactor::ApplyDamage(int damage, float invincible_time)
 	// 死亡通知
 	if (health <= 0)
 	{
-		OnDead();
-
+		death_flag = true;
 	}
 	// ダメージ通知
 	else
 	{
-		OnDamaged();
+		damage_flag = true;
 	}
 
 	return true;
@@ -45,12 +44,20 @@ void Charactor::Start()
 
 void Charactor::Update(float elapsed_time)
 {
+	// 無敵時間更新処理
+	UpdateInvincibleTimer(elapsed_time);
+
+	// ヒットストップの更新処理
+	UpdateHitStop(elapsed_time);
 }
 
 void Charactor::OnGUI()
 {
 	ImGui::InputInt("Health", &health);
 	ImGui::InputInt("ID", &id);
+	ImGui::Checkbox("AttackFlag", &hit_attack_flag);
+	ImGui::Checkbox("DamageFlag", &damage_flag);
+
 }
 
 //-----------------------------------------

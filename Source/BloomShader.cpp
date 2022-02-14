@@ -69,7 +69,7 @@ void Bloom::Begin(ID3D11DeviceContext* context)
 //--------------------------------------
 // 輝度抽出処理
 //--------------------------------------
-Texture* Bloom::Render(ID3D11DeviceContext* context, RenderContext& render_context, Texture* texture)
+Texture* Bloom::Render(ID3D11DeviceContext* context, RenderContext* render_context, Texture* texture)
 {
 	Graphics& graphics = Graphics::Instance();
 	// 輝度抽出テクスチャにレンダーターゲットを設定

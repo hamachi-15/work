@@ -14,7 +14,7 @@ public:
 	const char* GetShaderName() const override { return "Lambert"; }
 
 	// •`‰æŠJnˆ—
-	void Begin(ID3D11DeviceContext* context, RenderContext& render_context);
+	void Begin(ID3D11DeviceContext* context, RenderContext* render_context);
 
 	// •`‰æI—¹ˆ—
 	void End(ID3D11DeviceContext* context) ;

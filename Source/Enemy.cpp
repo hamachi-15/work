@@ -151,22 +151,6 @@ void Enemy::PlayAnimation(const char* animation_name)
 }
 
 //-----------------------------------------
-// ダメージ処理
-//-----------------------------------------
-void Enemy::OnDamaged()
-{
-	GetCharactor()->SetDamageFlag(true);
-}
-
-//-----------------------------------------
-// 死亡処理
-//-----------------------------------------
-void Enemy::OnDead()
-{
-	GetCharactor()->SetDeathFlag(true);
-}
-
-//-----------------------------------------
 // ビヘイビアのGUI描画
 //-----------------------------------------
 void Enemy::DrawBehaviorGUI()
@@ -188,4 +172,6 @@ void Enemy::DrawBehaviorGUI()
 		ImGui::TextColored(ImVec4(1, 0, 1, 1), u8"-------ノードツリー-------");
 		ai_tree->DrawNodeGUI();
 	}
+
+	ImGui::Checkbox("AttackRight", &rightofattack);
 }

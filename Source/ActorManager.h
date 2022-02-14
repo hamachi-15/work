@@ -45,11 +45,11 @@ public:
 	void UpdateTransform();
 
 	// シャドウマップ描画処理
-	void ShadowRender(RenderContext& render_context, BlurRenderContext& bulr_render_context);
+	void ShadowRender( RenderContext* render_context,  BlurRenderContext* bulr_render_context);
 	
 	// 描画処理
-	void Render(RenderContext& render_context);
-	void BrightRender(RenderContext& render_context);
+	void Render( RenderContext* render_context);
+	void BrightRender( RenderContext* render_context);
 
 	// シャドウマップ取得
 	Texture* GetShadowTexture(int index) const { return shadow_texture[index].get(); }

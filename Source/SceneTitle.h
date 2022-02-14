@@ -1,9 +1,14 @@
 #pragma once
 #include <memory>
 #include "Scene.h"
+#include "CameraController.h"
 #include "Sprite.h"
 #include "Texture.h"
-#include "CameraController.h"
+
+struct RenderContext;
+struct BlurRenderContext;
+//class Sprite;
+//class Texture;
 
 class SceneTitle : public Scene
 {
@@ -11,6 +16,9 @@ public:
 	// コンストラクタ・デストラクタ
 	SceneTitle() {};
 	~SceneTitle()override{}
+
+	// シーン名取得
+	std::string GetName() const override { return "SceneTitle"; }
 
 	// 初期化処理
 	void Initialize() override;
@@ -22,11 +30,11 @@ public:
 	void Update(float elapsed_time) override;
 
 	// スクリーンテクスチャ描画
-	void ScreenRender(ID3D11DeviceContext* context, RenderContext& render_context, const DirectX::XMFLOAT2& screen_size);
+	void ScreenRender(ID3D11DeviceContext* context, RenderContext* render_context, const DirectX::XMFLOAT2& screen_size);
 
-	// バックバッファ描画
-	void BuckBufferRender(ID3D11DeviceContext* context, RenderContext& render_context, const DirectX::XMFLOAT2& screen_size);
-	
+	//バックバッファ描画
+	void BuckBufferRender(ID3D11DeviceContext* context, RenderContext* render_context, const DirectX::XMFLOAT2& screen_size);
+
 	// 描画処理
 	void Render() override;
 
@@ -36,11 +44,12 @@ public:
 	// ImGui描画
 	void OnGui();
 private:
-	RenderContext render_context;
-	BlurRenderContext blur_render_context;
+	std::unique_ptr<RenderContext>						render_context;
+	std::unique_ptr<BlurRenderContext>					blur_render_context;
 
 	std::unique_ptr<Sprite> sprite;
 	std::unique_ptr<Texture> sky;
+	std::unique_ptr<Texture> title_bg;
 	std::unique_ptr<Texture> mask_texture;
 
 	//ライト

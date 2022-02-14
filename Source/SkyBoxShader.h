@@ -15,7 +15,7 @@ public:
 	const char* GetShaderName()const override { return "SkyBox"; }
 
 	// •`‰æŠJn
-	void Begin(ID3D11DeviceContext* context, RenderContext& render);
+	void Begin(ID3D11DeviceContext* context, RenderContext* render);
 
 	// •`‰æI—¹
 	void End(ID3D11DeviceContext* context);

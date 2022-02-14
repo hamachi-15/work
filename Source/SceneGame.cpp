@@ -45,28 +45,36 @@
 #include "Texture.h"
 #include "Sprite.h"
 
+//-------------------------------------
+//-------------------------------------
 SceneGame::SceneGame()
 {
 	
 }
 
+//-------------------------------------
+//-------------------------------------
 SceneGame::~SceneGame()
 {
 
 }
 
+//-------------------------------------
+// 初期化処理
+//-------------------------------------
 void SceneGame::Initialize()
 {
 	Graphics& graphics = Graphics::Instance();
 	ID3D11Device* device = graphics.GetDevice();
 
+	render_context = std::make_unique<RenderContext>();
+	blur_render_context = std::make_unique<BlurRenderContext>();
+	primitive_context = std::make_unique<PrimitiveContext>();
+
 	// プリミティブのコンスタントバッファの初期設定
 	primitive_falg = true;
-	primitive_context.number = 2;
-	primitive_context.timer = 0.0f;
-
-	// シーン名設定
-	SetName("SceneWorldMap");
+	primitive_context->number = 2;
+	primitive_context->timer = 0.0f;
 
 	// カメラ初期設定
 	Camera& camera = Camera::Instance();
@@ -118,7 +126,7 @@ void SceneGame::Initialize()
 		actor->SetAngle(DirectX::XMFLOAT3(0, 0, 0));
 		actor->SetScale(DirectX::XMFLOAT3(0.04f, 0.04f, 0.04f));
 		actor->AddComponent<Movement>();
-		actor->AddComponent<Charactor>();
+		actor->AddComponent<Charactor>(static_cast<int>(MetaAI::Identity::Player));
 		actor->AddComponent<Player>();
 		actor->AddComponent<PlayerCollision>();
 		// プレイヤーのカリングコリジョンを追加
@@ -133,6 +141,9 @@ void SceneGame::Initialize()
 	ActorManager::Instance().UpdateTransform();
 }
 
+//-------------------------------------
+// 終了処理
+//-------------------------------------
 void SceneGame::Finalize()
 {
 	// 敵マネージャーのクリア
@@ -152,6 +163,9 @@ void SceneGame::Finalize()
 
 }
 
+//-------------------------------------
+// 更新処理
+//-------------------------------------
 void SceneGame::Update(float elapsed_time)
 {
 	//	メニューオープン中はメニューを更新する
@@ -175,16 +189,16 @@ void SceneGame::Update(float elapsed_time)
 	}
 
 	// プリミティブコンテキストのコンストラクタ更新
-	if (primitive_context.timer < Primitive_Max_Time)
+	if (primitive_context->timer < Primitive_Max_Time)
 	{
-		primitive_context.timer++;
+		primitive_context->timer++;
 	}
 
 	// バトルシーンへの遷移フラグが立っている
 	if (battle_flag)
 	{
 		// タイマーが一定以上なら
-		if (primitive_context.timer >= Primitive_Max_Time)
+		if (primitive_context->timer >= Primitive_Max_Time)
 		{
 			// バトルシーンへ遷移
 			SceneManager::Instance().ChangeScene(new SceneBattle());
@@ -197,7 +211,7 @@ void SceneGame::Update(float elapsed_time)
 	}
 
 	// プリミティブ用のタイマーが一定以上なら
-	if (primitive_context.timer >= Primitive_Max_Time)
+	if (primitive_context->timer >= Primitive_Max_Time)
 	{
 		// プリミティブプラグをfalseに
 		primitive_falg = false;
@@ -234,7 +248,9 @@ void SceneGame::Update(float elapsed_time)
 	camera_controller->Update(elapsed_time);
 }
 
+//-------------------------------------
 // 描画処理	
+//-------------------------------------
 void SceneGame::Render()
 {
 	Graphics& graphics = Graphics::Instance();
@@ -244,28 +260,28 @@ void SceneGame::Render()
 	DirectX::XMFLOAT2 screen_size = { graphics.GetScreenWidth(), graphics.GetScreenHeight() };
 
 	// 描画処理
-	render_context.light_direction = Light::LightDir;
-	render_context.ShadowParameter = { shadow_color.x, shadow_color.y, shadow_color.z, 0.001f };
+	render_context->light_direction = Light::LightDir;
+	render_context->ShadowParameter = { shadow_color.x, shadow_color.y, shadow_color.z, 0.001f };
 
 	// カメラパラメータ設定
 	Camera& camera = Camera::Instance();
-	render_context.view = camera.GetView();
-	render_context.projection = camera.GetProjection();
+	render_context->view = camera.GetView();
+	render_context->projection = camera.GetProjection();
 
 	// ポストテクスチャ描画
-	PostRender(context, render_context, screen_size);
+	PostRender(context, render_context.get(), screen_size);
 
 	// スクリーンテクスチャに描画
-	ScreenRender(context, render_context, screen_size);
+	ScreenRender(context, render_context.get(), screen_size);
 
 	// バックバッファに描画
-	BuckBufferRender(context, render_context, screen_size);
+	BuckBufferRender(context, render_context.get(), screen_size);
 }
 
 //-------------------------------------
 // スクリーンテクスチャに描画
 //-------------------------------------
-void SceneGame::ScreenRender(ID3D11DeviceContext* context, RenderContext& render_context, const DirectX::XMFLOAT2& screen_size)
+void SceneGame::ScreenRender(ID3D11DeviceContext* context, RenderContext* render_context, const DirectX::XMFLOAT2& screen_size)
 {
 	Graphics& graphics = Graphics::Instance();
 	ShaderManager& shader_manager = ShaderManager::Instance();
@@ -302,10 +318,22 @@ void SceneGame::ScreenRender(ID3D11DeviceContext* context, RenderContext& render
 		skybox_shader->End(context);
 	}
 
+	// デバッグプリミティブ描画
+	{
+		// 敵縄張りのデバッグプリミティブ描画
+		EnemyTerritoryManager::Instance().Render();
+		// 敵のデバッグプリミティブ描画
+		EnemyManager::Instance().DrawDebugPrimitive();
+		// 当たり判定ののデバッグプリミティブ描画
+		CollisionManager::Instance().Draw();
+
+		graphics.GetDebugRenderer()->Render(context, render_context->view, render_context->projection);
+	}
+
 	// アクター描画
 	{
 		// シャドウマップ作成
-		ActorManager::Instance().ShadowRender(render_context, blur_render_context);
+		ActorManager::Instance().ShadowRender(render_context, blur_render_context.get());
 		
 		// レンダーターゲットの回復
 		graphics.SetRenderTargetView(&screen_texture, depth_stencil_view);
@@ -321,7 +349,7 @@ void SceneGame::ScreenRender(ID3D11DeviceContext* context, RenderContext& render
 //-------------------------------------
 // ポストエフェクトに使うテクスチャ描画
 //-------------------------------------
-void SceneGame::PostRender(ID3D11DeviceContext* context, RenderContext& render_context, const DirectX::XMFLOAT2& screen_size)
+void SceneGame::PostRender(ID3D11DeviceContext* context, RenderContext* render_context, const DirectX::XMFLOAT2& screen_size)
 {
 	ShaderManager& shader_manager = ShaderManager::Instance();
 	if(!sky_bloom_flag)
@@ -338,7 +366,7 @@ void SceneGame::PostRender(ID3D11DeviceContext* context, RenderContext& render_c
 //-------------------------------------
 // バックバッファに描画
 //-------------------------------------
-void SceneGame::BuckBufferRender(ID3D11DeviceContext* context, RenderContext& render_context, const DirectX::XMFLOAT2& screen_size)
+void SceneGame::BuckBufferRender(ID3D11DeviceContext* context, RenderContext* render_context, const DirectX::XMFLOAT2& screen_size)
 {
 	Graphics& graphics = Graphics::Instance();
 	ShaderManager& shader_manager = ShaderManager::Instance();
@@ -381,7 +409,7 @@ void SceneGame::BuckBufferRender(ID3D11DeviceContext* context, RenderContext& re
 		{
 			// ブルームシェーダー取得
 			std::shared_ptr<Shader> primitive_shader = shader_manager.GetShader(ShaderManager::ShaderType::Primitive);
-			primitive_shader->Begin(context, primitive_context);
+			primitive_shader->Begin(context, primitive_context.get());
 			sprite->Render(context,
 				0, 0,
 				screen_size.x, screen_size.y,
@@ -402,8 +430,8 @@ bool SceneGame::OnMessages(const Telegram& telegram)
 	case MessageType::Message_Hit_Boddy:
 		battle_flag = true;
 		primitive_falg = true;
-		primitive_context.number = 3;
-		primitive_context.timer = 0.0f;
+		primitive_context->number = 3;
+		primitive_context->timer = 0.0f;
 
 		// TODO エンカウントした敵のテリトリーに属ずる敵を探す
 		GameDataBase::Instance().EnemyFriendFromTerritory(telegram.message_box.territory_tag);
@@ -444,8 +472,8 @@ void SceneGame::OnGui()
 	ImGui::Checkbox("ShadowmapDrawFlag", &isshadowmap);
 
 	ImGui::TextColored(ImVec4(1, 1, 0, 1), u8"-------2Dプリミティブ-------");
-	ImGui::SliderInt("PrimitiveType", &primitive_context.number, 1, 10);
-	ImGui::InputFloat("Timer", &primitive_context.timer);
+	ImGui::SliderInt("PrimitiveType", &primitive_context->number, 1, 10);
+	ImGui::InputFloat("Timer", &primitive_context->timer);
 	ImGui::Checkbox("PrimitiveFlag", &primitive_falg);
 
 

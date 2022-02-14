@@ -44,20 +44,6 @@ void EnemyLAT::Destroy()
 	// アクターの取得
 	std::shared_ptr<Actor> actor = GetActor();
 
-	//// コリジョン削除
-	//// 球コリジョン削除
-	//std::vector<std::shared_ptr<CollisionSphere>> list = CollisionManager::Instance().GetCollisionSphereFromID(GetCharactor()->GetID() + GetIdentity());
-	//for (std::shared_ptr<CollisionSphere> sphere : list)
-	//{
-	//	CollisionManager::Instance().UnregisterSphere(sphere);
-	//}
-	//
-	//// 円柱コリジョン削除
-	//CollisionManager::Instance().UnregisterCylinder(CollisionManager::Instance().GetCollisionCylinderFromName(actor->GetName()));
-
-	//// 立方体コリジョン削除
-	//CollisionManager::Instance().UnregisterBox(CollisionManager::Instance().GetCollisionBoxFromName("LATAABB"));
-
 	// 敵マネージャーから削除
 	EnemyManager::Instance().EnemyRemove(GetActor()->GetComponent<EnemyLAT>());
 
@@ -71,9 +57,6 @@ void EnemyLAT::Destroy()
 //-----------------------------------------
 void EnemyLAT::OnGUI()
 {
-	bool attack_flag = GetAttackFlag();
-	ImGui::Checkbox("AttackFlag", &attack_flag);
-
 	// ビヘイビア関連情報
 	DrawBehaviorGUI();
 }
@@ -89,8 +72,6 @@ bool EnemyLAT::OnMessages(const Telegram& message)
 
 		break;
 	case MessageType::Message_GetHit_Attack:
-		//ダメージフラグをオンに
-		OnDamaged();
 		// 衝突した位置を設定
 		SetHitPosition(message.message_box.hit_position);
 		break;
@@ -128,11 +109,6 @@ void EnemyLAT::Start()
 
 	// 攻撃範囲の設定
 	SetAttackRange(5.0f);
-
-	// テリトリー範囲の設定
-	DirectX::XMFLOAT3 position = actor->GetPosition();
-	//SetTerritoryOrigin(position);
-
 
 	// 最初はターゲット座標を自身の座標に設定
 	SetTargetPosition(actor->GetPosition());
@@ -239,12 +215,6 @@ void EnemyLAT::Update(float elapsed_time)
 {
 	// ビヘイビア更新処理
 	BehaviorUpdate(elapsed_time);
-
-	// 速力更新処理
-	GetMovement()->UpdateVelocity(elapsed_time);
-
-	// 無敵時間更新処理
-	GetCharactor()->UpdateInvincibleTimer(elapsed_time);
 }
 
 //-----------------------------------------

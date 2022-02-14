@@ -81,7 +81,7 @@ private:
 	DirectX::XMFLOAT3				target = { 0.0f, 0.0f, 0.0f };
 	DirectX::XMFLOAT3				angle = { 0.0f, 0.0f, 0.0f };
 	float							roll_speed = Mathf::ConvartToRadian(90);
-	float							range = 75.0f;
+	float							range = 50.0f;
 	float							max_angleX = Mathf::ConvartToRadian(45);
 	float							min_angleX = Mathf::ConvartToRadian(-45);
 

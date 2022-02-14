@@ -37,7 +37,7 @@ void UIManager::Update(float elapsed_time)
 	{
 		ui_removes.erase(iterate_remove);
 	}
-
+	ui_removes.clear();
 	for (std::shared_ptr<UI> ui : ui_starts)
 	{
 		ui->Start();
@@ -93,12 +93,26 @@ void UIManager::UnRegisterUI(std::shared_ptr<UI> ui)
 //------------------------------
 void UIManager::AllDelete()
 {
+	std::vector<std::shared_ptr<UI>>::iterator iterate_start = ui_starts.begin();
+	for (; iterate_start != ui_starts.end(); iterate_start = ui_starts.begin())
+	{
+		ui_starts.erase(iterate_start);
+	}
+	ui_starts.clear();
+
 	std::vector<std::shared_ptr<UI>>::iterator iterate_update = ui_updates.begin();
 	for (; iterate_update != ui_updates.end(); iterate_update = ui_updates.begin())
 	{
 		ui_updates.erase(iterate_update);
 	}
 	ui_updates.clear();
+
+	std::vector<std::shared_ptr<UI>>::iterator iterate_remove = ui_removes.begin();
+	for (; iterate_remove != ui_removes.end(); iterate_remove = ui_removes.begin())
+	{
+		ui_removes.erase(iterate_remove);
+	}
+	ui_removes.clear();
 }
 
 //------------------------------

@@ -109,9 +109,11 @@ struct AnimationDataReader
 struct EncountEnemyTerritory
 {
 	int id;
+	EnemyTerritoryTag tag;
 };
 
 class Actor;
+class Texture;
 
 class GameDataBase
 {
@@ -191,6 +193,9 @@ public:
 
 	// アニメーションデータ取得
 	std::shared_ptr<AnimationData> GetAnimationData(std::string animation_name);
+
+	// ゲームオーバー・クリアの瞬間のテクスチャ取得
+	Texture* GetTimingTexture() { return timing_texture.get(); }
 public:
 	enum EnemyTerritoryDataIndex
 	{
@@ -209,7 +214,9 @@ private:
 	using AnimationMap = std::map<std::string, std::shared_ptr<AnimationData>>;
 	AnimationMap animation_data;
 
-	
+	std::unique_ptr<Texture> timing_texture; // ゲームオーバー・クリアの瞬間のテクスチャ
+
+
 	int world_map_data_count;
 
 	int enemy_data_count;

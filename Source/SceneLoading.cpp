@@ -3,6 +3,7 @@
 #include "SceneLoading.h"
 #include "SceneManager.h"
 #include "ShaderManager.h"
+#include"Sprite.h"
 
 //----------------------------------
 // コンストラクタ

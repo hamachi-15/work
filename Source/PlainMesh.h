@@ -1,12 +1,12 @@
 #pragma once
 #include <DirectXMath.h>
-#include "Texture.h"
 #include "Shader.h"
+
+class Texture;
 
 //--------------------------------------------------------------------
 //	PlainMeshƒNƒ‰ƒX
 //--------------------------------------------------------------------
-
 class PlainMesh
 {
 private:
@@ -38,7 +38,7 @@ public:
 	~PlainMesh();
 	void Update();
 	void Render(Shader* shader, DirectX::XMMATRIX* view, DirectX::XMMATRIX* projection, D3D_PRIMITIVE_TOPOLOGY topology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	void Render(Shader* shader, Texture* texture, RenderContext& render_context, D3D_PRIMITIVE_TOPOLOGY topology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	void Render(Shader* shader, Texture* texture, RenderContext* render_context, D3D_PRIMITIVE_TOPOLOGY topology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	void SetPos(const DirectX::XMFLOAT3& pos) { this->pos = pos; }
 	void SetScale(const DirectX::XMFLOAT3& scale) { this->scale = scale; }

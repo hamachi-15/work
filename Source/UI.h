@@ -1,11 +1,7 @@
 #pragma once
-#include <memory>
-#include <vector>
 #include <string>
-#include <DirectXMath.h>
 #include <d3d11.h>
-#include "Component.h"
-
+#include <memory>
 class UINodeTree;
 class Charactor;
 
@@ -18,7 +14,7 @@ class UI
 {
 public:
 	// コンストラクタ
-	UI() {}
+	UI();
 
 	// デストラクタ
 	virtual ~UI();
@@ -36,5 +32,5 @@ public:
 	void Render(ID3D11DeviceContext* context);
 
 public:
-	UINodeTree* ui_node_tree = nullptr;
+	std::unique_ptr<UINodeTree> ui_node_tree = nullptr;
 };

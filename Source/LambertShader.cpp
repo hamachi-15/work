@@ -56,7 +56,7 @@ LambertShader::LambertShader(ID3D11Device* device)
 //---------------------------------------
 // 描画開始
 //---------------------------------------
-void LambertShader::Begin(ID3D11DeviceContext* context, RenderContext& rc)
+void LambertShader::Begin(ID3D11DeviceContext* context, RenderContext* rc)
 {
 	Graphics& graphics = Graphics::Instance();
 
@@ -81,11 +81,11 @@ void LambertShader::Begin(ID3D11DeviceContext* context, RenderContext& rc)
 
 	// シーン用定数バッファ更新
 	CbScene cbScene;
-	DirectX::XMMATRIX V = DirectX::XMLoadFloat4x4(&rc.view);
-	DirectX::XMMATRIX P = DirectX::XMLoadFloat4x4(&rc.projection);
+	DirectX::XMMATRIX V = DirectX::XMLoadFloat4x4(&rc->view);
+	DirectX::XMMATRIX P = DirectX::XMLoadFloat4x4(&rc->projection);
 	DirectX::XMStoreFloat4x4(&cbScene.view_projection, V * P);
 
-	cbScene.light_direction = rc.light_direction;
+	cbScene.light_direction = rc->light_direction;
 	context->UpdateSubresource(scene_constant_buffer.Get(), 0, 0, &cbScene, 0, 0);
 }
 

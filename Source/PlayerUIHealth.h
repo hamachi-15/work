@@ -1,5 +1,8 @@
 #pragma once
+#include <memory>
 #include "UI.h"
+#include "UIData.h"
+#include "Component.h"
 
 
 //*************************************
@@ -21,4 +24,10 @@ public:
 	
 	// ŠJnˆ—
 	void Start() override;
+
+private:
+	std::unique_ptr<UIData> health_red_gauge_data;
+	std::unique_ptr<UIData> health_green_gauge_data;
+	std::unique_ptr<UIData> health_gauge_base_data;
+	std::unique_ptr<UIData> health_gauge_freame_data;
 };

@@ -76,14 +76,13 @@ bool EnemyDragonSoulEater::OnMessages(const Telegram& message)
 	case MessageType::Message_Hit_Attack:
 		break;
 	case MessageType::Message_GetHit_Attack:
-		//ダメージフラグをオンに
-		OnDamaged();
-		// 衝突した位置を設定
-		SetHitPosition(message.message_box.hit_position);
 		break;
 	case MessageType::Message_Give_Attack_Right:
-		// 攻撃フラグをオンに
-		SetAttackFlag(true);
+	{
+		std::shared_ptr<Charactor> charactor = GetActor()->GetComponent<Charactor>();
+		// 攻撃ヒットフラグを立てる
+		charactor->SetHitAttackFlag(true);
+	}
 		break;
 	case MessageType::Message_Hit_Boddy:
 		break;

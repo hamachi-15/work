@@ -13,7 +13,7 @@ class Charactor : public Component
 {
 public:
 	// コンストラクタ
-	Charactor(){}
+	Charactor(int id) : id(id) {}
 
 	// デストラクタ
 	~Charactor() override {}
@@ -108,9 +108,6 @@ public:
 	// 識別番号取得
 	int GetID() const { return id; }
 
-	// 識別番号設定
-	void SetID(int id) { this->id = id; }
-
 	// ダメージを与える
 	bool ApplyDamage(int damage, float invincible_time);
 
@@ -135,12 +132,6 @@ public:
 	// 着地した時に呼ばれる
 	virtual void OnLanding() {}
 
-	// ダメージを受けた時に呼ばれる
-	void OnDamaged() { damage_flag = true; }
-
-	// 死亡した時に呼ばれる
-	void OnDead() { death_flag = true; }
-	bool GetDead() const { return death_flag; }
 private:
 	int		id = 0;							// アクターの識別番号
 	bool	hit_attack_flag = false;	// 攻撃がヒットしたかのフラグ

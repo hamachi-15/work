@@ -16,6 +16,8 @@
 //-----------------------------------
 MetaAI::MetaAI()
 {	
+	// “G‚Ì“ê’£‚èİ’è
+	EnemyManager::Instance().CreateTerritory();
 }
 
 //-----------------------------------
@@ -89,7 +91,7 @@ bool MetaAI::OnMessages(const Telegram& telegram)
 		for (int i = 0; i < enemy_count; ++i)
 		{
 			std::shared_ptr<Enemy> enemy = EnemyManager::Instance().GetEnemy(i);
-			if (enemy->GetAttackFlag()) count++;
+			if (enemy->GetRightOfAttack()) count++;
 		}
 		// ‘¼‚ÉUŒ‚Œ ‚Á‚Ä‚¢‚é“G‚ª‚¢‚È‚¢‚È‚çA—v‹‚µ‚Ä‚«‚½“G‚ÉUŒ‚Œ ‚ğ—^‚¦‚éƒƒbƒZ[ƒW‚ğ‘—‚éB
 		if (count < 1)
@@ -161,8 +163,6 @@ void MetaAI::SendMessaging(int sender, int receiver, Message message, int enemy_
 //-----------------------------------
 void MetaAI::AppearanceEnemy()
 {
-	// “G‚Ì“ê’£‚èİ’è
-	EnemyManager::Instance().CreateTerritory();
 	// “G‚ğ¶¬
 	EnemyManager::Instance().CreateEnemies();
 }

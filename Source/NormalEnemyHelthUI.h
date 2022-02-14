@@ -1,5 +1,6 @@
 #pragma once
 #include "UI.h"
+#include "Component.h"
 
 class UINodeBase;
 

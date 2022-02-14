@@ -109,18 +109,18 @@ public:
 
 	// 索敵範囲設定
 	void SetSearchRange(const float search_range) { this->search_range = search_range; }
-
-	// 攻撃フラグ設定
-	void SetAttackFlag(bool attack_flag) { this->attack_flag = attack_flag; }
-	
-	// 攻撃フラグ取得
-	const bool& GetAttackFlag() const { return attack_flag; }
 	
 	// 怒り状態フラグ設定
 	void SetAngerFlag(bool anger_flag) { this->anger_flag = anger_flag; }
 
 	// 怒り状態フラグ取得
 	const bool& GetAngerFlag() const { return anger_flag; }
+
+	// 攻撃権取得
+	bool GetRightOfAttack() const { return rightofattack; }
+	
+	// 攻撃権設定
+	void SetRightOfAttack(bool flag) { rightofattack = flag; }
 
 	float GetRunTimer() const { return run_timer; }
 
@@ -129,24 +129,17 @@ public:
 	// アニメーション再生
 	virtual void PlayAnimation(const char* animation_name);
 
-	// ダメージ処理
-	void OnDamaged();
-
-	// 死亡処理
-	void OnDead();
-
 	// メッセージを受信したときの処理
 	virtual bool OnMessages(const Telegram& message) = 0;
 
 	// ビヘイビアのGUI描画
 	void DrawBehaviorGUI();
 
-	// 
 private:
 	int							id;
 	int							identity;			// 何番目の敵か
-	bool						attack_flag = false;		// 攻撃フラグ
 	bool						anger_flag = false;				 // 怒り状態フラグ
+	bool						rightofattack = false;
 	std::shared_ptr<Movement>	movement;
 	std::shared_ptr<Charactor>	charactor;
 	EnemyTerritoryTag			teritory_tag;
@@ -159,8 +152,6 @@ protected:
 	NodeBase*			active_node = nullptr;
 	NodeBase*			old_active_node = nullptr;
 	float				run_timer = 0.0f;
-	//float				territory_range = 10.0f; // 縄張りの範囲
-	//DirectX::XMFLOAT3	territory_origin = { 0.0f,0.0f,0.0f };
 	float				search_range = 5.0f;	 // 索敵範囲
 	float				attack_range = 1.5f;	 // 攻撃に移る範囲
 };

@@ -119,6 +119,7 @@ void EnemyCollision::Update(float elapsed_time)
 
     // コリジョンの座標更新のタイプに合わせて更新
     UpdateCollision(collision_cylinder, actor, model);
+    std::shared_ptr<Charactor> charactor = GetActor()->GetComponent<Charactor>();
 
     size_t sphere_count = collision_spheres.size();
     size_t cylinder_count = CollisionManager::Instance().GetCollisionCylinderCount();
@@ -127,6 +128,9 @@ void EnemyCollision::Update(float elapsed_time)
         CollisionSphere* sphere = collision_spheres.at(i).get();
         // 攻撃フラグが立っていなかったら飛ばす
         if (!sphere->GetAttackFlag()) continue;
+
+        // 攻撃が当たっていた場合飛ばす
+        if (charactor->GetHitAttackFlag()) break;
 
         for (size_t j = 0; j < cylinder_count; j++)
         {
@@ -139,10 +143,9 @@ void EnemyCollision::Update(float elapsed_time)
 
             if (CollisionManager::Instance().IntersectSphereVsCylinder(sphere, cylinder.get()))
             {
+                std::shared_ptr<Actor> cylinder_actor = ActorManager::Instance().GetActor(cylinder->GetActorName());
                 Message message;
-                message.message = MessageType::Message_GetHit_Attack;
-                message.hit_position = sphere->GetPosition();
-                Reaction(cylinder->GetActorID(), message);
+                cylinder_actor->GetComponent<Charactor>()->ApplyDamage(charactor->GetAttack(), 0.8f);
 
                 message.message = MessageType::Message_Hit_Attack;
                 message.hit_position = { 0.0f, 0.0f, 0.0f };

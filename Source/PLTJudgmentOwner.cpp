@@ -15,7 +15,7 @@ bool BlowJudgment::Judgment()
         static_cast<int>(MetaAI::Identity::Meta),          // 受信先
         message);                                        // メッセージ
     // 攻撃権があれば
-    if (owner->GetAttackFlag())
+    if (owner->GetRightOfAttack())
     {
         return true;
     }

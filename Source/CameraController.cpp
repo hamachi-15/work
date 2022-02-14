@@ -58,10 +58,6 @@ void CameraController::Update(float elapsed_time)
 	target.z   += (new_target.z - target.z) * speed;
 	GamePad& gamepad = Input::Instance().GetGamePad();
 
-	if (gamepad.GetButtonDown() & gamepad.BTN_X)
-	{
-		CalculateFrustum();
-	}
 	// ƒJƒƒ‰‚ÌŽ‹“_‚Æ’Ž‹“_‚ÉÝ’è
 	Camera::Instance().SetLookAt(position, this->target, DirectX::XMFLOAT3(0, 1, 0));
 

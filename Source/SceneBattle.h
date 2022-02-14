@@ -2,8 +2,10 @@
 #include <memory>
 #include <d3d11.h>
 #include "Scene.h"
-#include "RenderContext.h"
 
+struct RenderContext;
+struct BlurRenderContext;
+struct PrimitiveContext;
 class Texture;
 class Sprite;
 class CameraController;
@@ -24,6 +26,9 @@ public:
 	// デストラクタ
 	~SceneBattle() override;
 
+	// シーン名取得
+	std::string GetName() const override { return "SceneBattle"; }
+
 	// 初期化処理
 	void Initialize() override;
 
@@ -37,13 +42,16 @@ public:
 	void Render() override;
 
 	// スクリーンテクスチャ描画
-	void ScreenRender(ID3D11DeviceContext* context, RenderContext& render_context, const DirectX::XMFLOAT2& screen_size);
+	void ScreenRender(ID3D11DeviceContext* context, RenderContext* render_context, const DirectX::XMFLOAT2& screen_size);
 
 	// ポストテクスチャ描画
-	void PostRender(ID3D11DeviceContext* context, RenderContext& render_context, const DirectX::XMFLOAT2& screen_size);
+	void PostRender(ID3D11DeviceContext* context, RenderContext* render_context, const DirectX::XMFLOAT2& screen_size);
+
+	// ゲームオーバー・クリアの瞬間を描画
+	void MomentRender(ID3D11DeviceContext* context, const DirectX::XMFLOAT2& screen_size);
 
 	//バックバッファ描画
-	void BuckBufferRender(ID3D11DeviceContext* context, RenderContext& render_context, const DirectX::XMFLOAT2& screen_size);
+	void BuckBufferRender(ID3D11DeviceContext* context, RenderContext* render_context, const DirectX::XMFLOAT2& screen_size);
 
 	// メッセージ処理
 	bool OnMessages(const Telegram& telegram) override;
@@ -51,21 +59,16 @@ public:
 	// GUI描画
 	void OnGui();
 
-	// クリアかゲームオーバー描画
-	void ClearOrOverRender(ID3D11DeviceContext* context);
-
 	// ゲームクリア判定処理
 	bool IsGameClearJudgment();
 private:
-	RenderContext						render_context;
-	BlurRenderContext					blur_render_context;
-	PrimitiveContext					primitive_context;
+	std::unique_ptr<RenderContext>						render_context;
+	std::unique_ptr<BlurRenderContext>					blur_render_context;
+	std::unique_ptr<PrimitiveContext>					primitive_context;
 
 	std::unique_ptr<Sprite>				sprite;
 	std::shared_ptr<Texture>			sky;
-	std::unique_ptr<Texture>			over_texture;
-	std::unique_ptr<Texture>			clear_texture;
-	std::unique_ptr<Texture>			anybutton_texture;
+	std::shared_ptr<Texture>			anybutton_texture;
 	Texture*							bloom_texture;
 
 	//ライト
@@ -78,4 +81,5 @@ private:
 	bool								isshadowmap = false;
 	bool								isgame_clear = false;
 	bool								isgame_over = false;
+	bool								isbuttle_end = false;
 };

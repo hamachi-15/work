@@ -91,12 +91,7 @@ void Player::Start()
 	// キャラクターの取得
 	charactor = actor->GetComponent<Charactor>();
 
-	// ムーブメントの取得
 	movement = actor->GetComponent<Movement>();
-
-	// IDの設定
-	charactor->SetID(static_cast<int>(MetaAI::Identity::Player));
-
 	// 走った時のスピード倍率設定
 	charactor->SetRunSpeedScale(1.5f);
 	
@@ -124,17 +119,22 @@ void Player::Update(float elapsed_time)
 	case State::Revive:	UpdateReviveState(elapsed_time); break;
 	}
 
-	// キャラクター操作処理
-	movement->UpdateVelocity(elapsed_time);
-
 	// コマンド履歴クリア処理
 	CommandListClear(elapsed_time);
 
-	// 無敵時間更新処理
-	charactor->UpdateInvincibleTimer(elapsed_time);
+	// ダメージフラグが立っていれば
+	if (charactor->GetDamageFlag())
+	{
+		// ダメージ状態に遷移
+		TransitionDamageState();
+	}
 
-	// ヒットストップの更新処理
-	charactor->UpdateHitStop(elapsed_time);
+	// 死亡フラグが立っていれば
+	if (charactor->GetDeathFlag())
+	{
+		// 死亡状態に遷移
+		TransitionDeathState();
+	}
 }
 
 
@@ -156,19 +156,6 @@ bool Player::OnMessages(const Telegram& message)
 		// TODOダメージを受ける
 		charactor->ApplyDamage(1, 0.9f);
 
-		// ダメージフラグが立っていれば
-		if (charactor->GetDamageFlag()) 
-		{
-			// ダメージ状態に遷移
-			TransitionDamageState();
-		}
-
-		// 死亡フラグが立っていれば
-		if (charactor->GetDeathFlag())
-		{
-			// 死亡状態に遷移
-			TransitionDeathState();
-		}
 		return true;
 		break;
 	case MessageType::Message_Hit_Boddy:
@@ -476,6 +463,7 @@ void Player::TransitionDamageState()
 		// アニメーション再生
 		model->PlayAnimation(animation->number, animation->roop_flag, animation->blend);
 	}
+	charactor->SetDamageFlag(false);
 }
 
 //-----------------------------------------
@@ -495,12 +483,17 @@ void Player::TransitionDeathState()
 		// アニメーション再生
 		model->PlayAnimation(animation->number, animation->roop_flag, animation->blend);
 	}
+
+	// 死亡の瞬間を描画
 	Message message;
-	message.message = MessageType::Message_GameOver;
+	message.message = MessageType::Message_Moment_Render;
 	MetaAI::Instance().SendMessaging(
 		static_cast<int>(MetaAI::Identity::Player),   // 送信元
 		static_cast<int>(MetaAI::Identity::WorldMap),    // 受信先
 		message);                                        // メッセージ
+
+	// 死亡フラグを元に戻しておく(またここに処理が来ないように)
+	charactor->SetDeathFlag(false);
 }
 
 //-----------------------------------------
@@ -997,16 +990,19 @@ void Player::UpdateDeathState(float elapsed_time)
 {
 	std::shared_ptr<Actor> actor = GetActor();
 	Model* model = actor->GetModel();
-	//if (!model->IsPlayAnimation())
-	//{
-	//	// ボタンを押したら復活状態へ遷移
-	//	GamePad& gamePad = Input::Instance().GetGamePad();
-	//	if (gamePad.GetButtonDown() & GamePad::BTN_A)
-	//	{
-	//		TransitionReviveState();
-	//	}
-	//}
-
+	timer += elapsed_time * 60.0f;
+	if (!model->IsPlayAnimation())
+	{
+		if (timer >= 90.0f)
+		{
+			Message message;
+			message.message = MessageType::Message_GameOver;
+			MetaAI::Instance().SendMessaging(
+				static_cast<int>(MetaAI::Identity::Player),   // 送信元
+				static_cast<int>(MetaAI::Identity::WorldMap),    // 受信先
+				message);                                        // メッセージ
+		}
+	}
 }
 
 //-----------------------------------------
@@ -1070,22 +1066,6 @@ DirectX::XMFLOAT3 Player::GetMoveVec() const
 	vec.y = 0.0f;
 
 	return vec;
-}
-
-//-----------------------------------------
-// 武器コリジョンのワールド座標算出と設定
-//-----------------------------------------
-void Player::SetWepponCollisionPosition()
-{
-	Model::Node* node = GetActor()->GetModel()->FindNode("B_R_Hand");
-	DirectX::XMFLOAT3 float_world_position;
-	DirectX::XMMATRIX node_world_transform = DirectX::XMLoadFloat4x4(&node->world_transform);
-	for (int i = 0; i < Weppon_Collision_Max; ++i)
-	{
-		DirectX::XMVECTOR world_position = DirectX::XMVector3TransformCoord(DirectX::XMLoadFloat3(&Weppon_Collison_List[i].Weppon_Local_Position), node_world_transform);
-		DirectX::XMStoreFloat3(&float_world_position, world_position);
-		CollisionManager::Instance().GetCollisionSphereFromName(Weppon_Collison_List[i].collision_name)->SetPosition(float_world_position);
-	}
 }
 
 //----------------------------------------------
@@ -1214,33 +1194,6 @@ bool Player::InputAvoid()
 		return true;
 	}
 	return false;
-}
-
-//-----------------------------------------
-// 着地したときに呼ばれる
-//-----------------------------------------
-void Player::OnLanding()
-{
-	// 着地状態へ遷移
-	//TransitionLandState();
-}
-
-//-----------------------------------------
-// ダメージを受けたときに呼ばれる
-//-----------------------------------------
-void Player::OnDamaged()
-{
-	// ダメージ状態へ遷移
-	TransitionDamageState();
-}
-
-//-----------------------------------------
-// 死亡したときに呼ばれる
-//-----------------------------------------
-void Player::OnDead()
-{
-	// 死亡状態へ遷移
-	TransitionDeathState();
 }
 
 //-----------------------------------------

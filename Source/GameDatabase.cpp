@@ -3,6 +3,8 @@
 #include <fstream>
 #include "EnemyManager.h"
 #include "Actor.h"
+#include "Graphics.h"
+#include "Texture.h"
 
 //-----------------------------------
 // ファイル読み込み
@@ -23,6 +25,11 @@ char* LoadBuffer(const char* filepath)
 //-----------------------------------
 GameDataBase::GameDataBase()
 {
+	Graphics& graphics = Graphics::Instance();
+	// テクスチャ作成
+	timing_texture = std::make_unique<Texture>();
+	timing_texture->Create(graphics.GetScreenWidth(), graphics.GetScreenHeight(), DXGI_FORMAT_R8G8B8A8_UNORM);
+
 	// ファイル読み込み
 	char* world_map_data_buffer = LoadBuffer("Data/GameData/WorldMapData.dat");
 
@@ -283,6 +290,7 @@ void GameDataBase::EnemyFriendFromTerritory(EnemyTerritoryTag territory_tag)
 		{
 			EncountEnemyTerritory enemy_data;
 			enemy_data.id = enemy->GetEnemyDataID();
+			enemy_data.tag = territory_tag;
 			encount_enemy.emplace_back(enemy_data);
 		}
 	}

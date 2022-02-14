@@ -2,7 +2,8 @@
 #include "Framework.h"
 #include "SceneManager.h"
 #include "SceneTitle.h"
-
+#include "SceneOver.h"
+#include "SceneClear.h"
 // ‚’¼“¯ŠúŠÔŠuİ’è
 static const int syncInterval = 1;
 Framework::Framework(HWND hwnd) :

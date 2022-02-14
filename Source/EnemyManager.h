@@ -34,7 +34,7 @@ public:
 	void CreateEnemies();
 	
 	// 敵データIDから敵を生成
-	void CreateEnemies(int id);
+	void CreateEnemies(int id, EnemyTerritoryTag territory_tag);
 	
 	// エンカウントデータから敵情報を取得して敵を生成する
 	bool CreateEnemyEncountData();
@@ -67,13 +67,18 @@ public:
 	int GetEnemyCount() const { return static_cast<int>(enemies.size()); }
 
 	// テリトリーの敵が撃破されているかのコンテナを取得
-	std::map<EnemyTerritoryTag, bool> GetDefeatTeritory() { return defeat_teritory; }
+	std::map<EnemyTerritoryTag, bool> GetDefeatTeritory() { return defeat_territory; }
+
+	bool GetDefeatTeritory(EnemyTerritoryTag tag) { return defeat_territory[tag]; }
+
+	// テリトリーの敵が撃破されているかのフラグを設定
+	void SetDefeatTeritory(EnemyTerritoryTag tag, bool flag) { defeat_territory[tag] = flag; }
 
 	// バトルシーンか判定
 	bool IsBattleScene() const { return (SceneManager::Instance().GetCurrentScene()->GetName() == "SceneBattle"); }
 private:
 	std::vector<std::shared_ptr<Enemy>>		enemies;						// 敵の配列
-	std::map<EnemyTerritoryTag, bool>		defeat_teritory;				// テリトリーの敵が撃破されているかのコンテナ
+	std::map<EnemyTerritoryTag, bool>		defeat_territory;				// テリトリーの敵が撃破されているかのコンテナ
 	int										identity;
 	bool									appearance_ramdam_flag = true;	// ランダムな位置に出現させるかのフラグ
 };

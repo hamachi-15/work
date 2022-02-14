@@ -14,6 +14,8 @@ enum class MessageType
 	Message_GetHit_Attack,			// 攻撃を受けた(Enemy,Playerで使用)
 	Message_GameOver,				// ゲームクリア
 	Message_GameClear,				// ゲームオーバー
+	Message_Moment_Render,			// ゲームオーバー・クリアのタイミング
+	Message_Buttle_End,				// 戦闘が終了した
 };
 
 struct Message

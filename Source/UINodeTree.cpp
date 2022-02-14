@@ -1,5 +1,8 @@
 #include "UINodeTree.h"
 #include "UINodeBase.h"
+UINodeTree::UINodeTree()
+{
+}
 //--------------------------
 // デストラクタ
 //--------------------------

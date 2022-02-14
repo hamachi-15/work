@@ -27,13 +27,7 @@ void Actor::Update(float elapsed_time)
 	// アニメーション更新
 	if (model != nullptr && animation_flag)
 	{
-		bool hitstop_flag = false;
-		std::shared_ptr<Charactor> charactor = GetComponent<Charactor>();
-		if (charactor != nullptr)
-		{
-			hitstop_flag = charactor->GetHitStopFlag();
-		}
-		model->UpdateAnimation(elapsed_time, hitstop_flag);
+		model->UpdateAnimation(elapsed_time);
 	}
 	// 更新処理
 	for (std::shared_ptr<Component>& component : components)

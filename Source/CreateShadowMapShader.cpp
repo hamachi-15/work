@@ -53,20 +53,20 @@ CreateShadowMap::CreateShadowMap(ID3D11Device* device)
 //-------------------------------
 // 描画開始処理
 //-------------------------------
-void CreateShadowMap::Begin(ID3D11DeviceContext* context, RenderContext& render_context)
+void CreateShadowMap::Begin(ID3D11DeviceContext* context, RenderContext* render_context)
 {
 	Graphics& graphics = Graphics::Instance();
 
 	Activate(context);
 
-	ID3D11Buffer* constantBuffers[] =
+	ID3D11Buffer* constant_buffers[] =
 	{
 		scene_constant_buffer.Get(),
 		mesh_constant_buffer.Get(),
 		subset_constant_buffer.Get()
 	};
-	context->VSSetConstantBuffers(0, ARRAYSIZE(constantBuffers), constantBuffers);
-	context->PSSetConstantBuffers(0, ARRAYSIZE(constantBuffers), constantBuffers);
+	context->VSSetConstantBuffers(0, ARRAYSIZE(constant_buffers), constant_buffers);
+	context->PSSetConstantBuffers(0, ARRAYSIZE(constant_buffers), constant_buffers);
 
 	//ブレンドステート設定
 	context->OMSetBlendState(graphics.Instance().GetBlendState(static_cast<int>(Graphics::BlendState::Alpha)), nullptr, 0xFFFFFFFF);
@@ -81,7 +81,7 @@ void CreateShadowMap::Begin(ID3D11DeviceContext* context, RenderContext& render_
 
 	// シーン用定数バッファ更新
 	CBScene cbscene;
-	cbscene.view_projection = render_context.single_light_view_projection;
+	cbscene.view_projection = render_context->single_light_view_projection;
 	context->UpdateSubresource(scene_constant_buffer.Get(), 0, 0, &cbscene, 0, 0);
 }
 

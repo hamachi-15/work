@@ -13,7 +13,7 @@ public:
 	const char* GetShaderName() const override { return "CreateShadowMap"; }
 
 	// •`‰æŠJnˆ—
-	void Begin(ID3D11DeviceContext* context, RenderContext& render_context)override;
+	void Begin(ID3D11DeviceContext* context, RenderContext* render_context)override;
 
 	// •`‰æI—¹ˆ—
 	void End(ID3D11DeviceContext* context)override;

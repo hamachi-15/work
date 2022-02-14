@@ -127,9 +127,9 @@ NodeBase* BehaviorTree::Run(Enemy* enemy, NodeBase* action_node, BehaviorData* d
 	ActionBase::State state = action_node->Run(elapsed_time);
 
 	// TECK リアクション用
-	if (enemy->GetCharactor()->GetDamageFlag() || enemy->GetCharactor()->GetDeathFlag())
+	if (enemy->GetCharactor()->GetDeathFlag())
 	{
-		if (action_node->GetName() != "Damage" && action_node->GetName() != "Death")
+		if (action_node->GetName() != "Death")
 		{
 			return NULL;
 		}

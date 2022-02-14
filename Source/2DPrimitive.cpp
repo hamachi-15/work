@@ -41,7 +41,7 @@ Primitive::Primitive(ID3D11Device* device)
 //------------------------------
 // 描画開始処理
 //------------------------------
-void Primitive::Begin(ID3D11DeviceContext* context, PrimitiveContext& cprimitive_context)
+void Primitive::Begin(ID3D11DeviceContext* context, PrimitiveContext* cprimitive_context)
 {
 	Graphics& graphics = Graphics::Instance();
 	Activate(context);
@@ -57,8 +57,8 @@ void Primitive::Begin(ID3D11DeviceContext* context, PrimitiveContext& cprimitive
 	
 	// コンスタントバッファ更新
 	ConstantBuffer cbscene;
-	cbscene.timer = cprimitive_context.timer;
-	cbscene.number = cprimitive_context.number;
+	cbscene.timer = cprimitive_context->timer;
+	cbscene.number = cprimitive_context->number;
 
 	context->VSSetConstantBuffers(0, 1, constant_buffer.GetAddressOf());
 	context->PSSetConstantBuffers(0, 1, constant_buffer.GetAddressOf());

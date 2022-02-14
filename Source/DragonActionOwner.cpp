@@ -191,7 +191,7 @@ ActionBase::State BasicAttackAction::Run(float elapsed_time)
 	if (!owner->GetActor()->GetModel()->IsPlayAnimation())
 	{
 		owner->SetRunTimer(0.0f);
-		owner->SetAttackFlag(false);
+		owner->SetRightOfAttack(false);
 		return ActionBase::State::Complete;
 	}
 	return ActionBase::State::Run;
@@ -230,7 +230,7 @@ ActionBase::State ClawAttackAction::Run(float elapsed_time)
 	if (!owner->GetActor()->GetModel()->IsPlayAnimation())
 	{
 		owner->SetRunTimer(0.0f);
-		owner->SetAttackFlag(false);
+		owner->SetRightOfAttack(false);
 		return ActionBase::State::Complete;
 	}
 	return ActionBase::State::Run;
@@ -270,7 +270,7 @@ ActionBase::State HornAttackAction::Run(float elapsed_time)
 	if (!owner->GetActor()->GetModel()->IsPlayAnimation())
 	{
 		owner->SetRunTimer(0.0f);
-		owner->SetAttackFlag(false);
+		owner->SetRightOfAttack(false);
 		return ActionBase::State::Complete;
 	}
 	return ActionBase::State::Run;
@@ -319,7 +319,7 @@ ActionBase::State BodyPressAttackAction::Run(float elapsed_time)
 	if (!owner->GetActor()->GetModel()->IsPlayAnimation() && run_timer <= 0.0f)
 	{
 		owner->SetRunTimer(0.0f);
-		owner->SetAttackFlag(false);
+		owner->SetRightOfAttack(false);
 		return ActionBase::State::Complete;
 	}
 
@@ -391,6 +391,7 @@ ActionBase::State LungesAttackAction::Run(float elapsed_time)
 		CollisionManager& collision_manager = CollisionManager::Instance();
 		std::shared_ptr<CollisionCylinder> collision = collision_manager.GetCollisionCylinderFromName(collision_name);
 		collision->SetAttackFlag(false);
+		owner->SetRightOfAttack(false);
 		return ActionBase::State::Complete;
 	}
 	std::shared_ptr<EnemyTerritory> territory = EnemyTerritoryManager::Instance().GetTerritory(owner->GetBelongingToTerritory());
@@ -398,11 +399,18 @@ ActionBase::State LungesAttackAction::Run(float elapsed_time)
 	float territory_range = territory->GetTerritoryRange();
 	float length;
 	DirectX::XMStoreFloat(&length, DirectX::XMVector3Length(Mathf::ReturnVectorSubtract(owner->GetActor()->GetPosition(), territory_origine)));
+	
 	// タイムが終了したら
 	if (run_timer <= 0.0f || length >= territory_range)
 	{
 		// タイマー設定
 		owner->SetRunTimer(0.0f);
+		// 攻撃の当たり判定処理
+		std::string collision_name = owner_actor->GetName();
+		CollisionManager& collision_manager = CollisionManager::Instance();
+		std::shared_ptr<CollisionCylinder> collision = collision_manager.GetCollisionCylinderFromName(collision_name);
+		collision->SetAttackFlag(false);
+		owner->SetRightOfAttack(false);
 		return ActionBase::State::Complete;
 	}
 

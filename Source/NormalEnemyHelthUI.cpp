@@ -37,7 +37,7 @@ void NormalEnemyHealthUI::Start()
 	parameter.position = { 23, 7 };
 	UIData* health_red_gage_data = new UIData(parameter);
 
-	ui_node_tree = new UINodeTree();
+	ui_node_tree = std::make_unique<UINodeTree>();
 
 	// UIÝ’è
 	ui_node_tree->AddNode("", "root", NULL, NULL, NULL);

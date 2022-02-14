@@ -53,14 +53,12 @@ HeavyBodyAttackAction::State HeavyBodyAttackAction::Run(float elapsed_time)
 	if (run_timer <= 0.0f)
 	{
 		owner->SetRunTimer(0.0f);
-		owner->SetAttackFlag(false);
 		return ActionBase::State::Complete;
 	}
 	// アニメーション再生が終了したら完了を返す
 	if (!owner->GetActor()->GetModel()->IsPlayAnimation())
 	{
 		owner->SetRunTimer(0.0f);
-		owner->SetAttackFlag(false);
 		return ActionBase::State::Complete;
 	}
 	return ActionBase::State::Run;
@@ -98,7 +96,6 @@ ActionBase::State BodyAttackAction::Run(float elapsed_time)
 	if (!actor->GetModel()->IsPlayAnimation())
 	{
 		owner->SetRunTimer(0.0f);
-		owner->SetAttackFlag(false);
 		return ActionBase::State::Complete;
 	}
 	return ActionBase::State::Run;

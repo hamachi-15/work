@@ -3,8 +3,10 @@
 #include <DirectXMath.h>
 #include "Shader.h"
 #include "Scene.h"
-#include "RenderContext.h"
 
+struct RenderContext;
+struct BlurRenderContext;
+struct PrimitiveContext;
 class Texture;
 class Sprite;
 class CameraController;
@@ -16,6 +18,9 @@ public:
 	SceneGame();
 	~SceneGame() override;
 private:
+
+	// シーン名取得
+	std::string GetName() const override { return "SceneWorldMap"; }
 
 	// 初期化処理
 	void Initialize() override;
@@ -29,14 +34,14 @@ private:
 	// 描画処理
 	void Render() override;
 
-	// スクリーンテクスチャに描画
-	void ScreenRender(ID3D11DeviceContext* context, RenderContext& render_context, const DirectX::XMFLOAT2& screen_size);
+	// スクリーンテクスチャ描画
+	void ScreenRender(ID3D11DeviceContext* context, RenderContext* render_context, const DirectX::XMFLOAT2& screen_size);
 
-	// ポストエフェクトに使うテクスチャ描画
-	void PostRender(ID3D11DeviceContext* context, RenderContext& render_context, const DirectX::XMFLOAT2& screen_size);
+	// ポストテクスチャ描画
+	void PostRender(ID3D11DeviceContext* context, RenderContext* render_context, const DirectX::XMFLOAT2& screen_size);
 
-	// バックバッファに描画
-	void BuckBufferRender(ID3D11DeviceContext* context, RenderContext& render_context, const DirectX::XMFLOAT2& screen_size);
+	//バックバッファ描画
+	void BuckBufferRender(ID3D11DeviceContext* context, RenderContext* render_context, const DirectX::XMFLOAT2& screen_size);
 
 	// メッセージ処理
 	bool OnMessages(const Telegram& telegram) override;
@@ -47,9 +52,9 @@ private:
 	const int Primitive_Max_Time = 40;
 
 private:
-	RenderContext						render_context;
-	BlurRenderContext					blur_render_context;
-	PrimitiveContext					primitive_context;
+	std::unique_ptr<RenderContext>						render_context;
+	std::unique_ptr<BlurRenderContext>					blur_render_context;
+	std::unique_ptr<PrimitiveContext>					primitive_context;
 
 	std::unique_ptr<Sprite>				sprite;
 	std::shared_ptr<Texture>			sky;

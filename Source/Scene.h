@@ -9,14 +9,12 @@ class Scene
 public:
 	// コンストラクタ
 	Scene(){}
+
 	// デストラクタ
 	virtual ~Scene(){}
 
-	// シーン名設定
-	void SetName(const char* scene_name) { this->scene_name = scene_name; }
-
 	// シーン名取得
-	std::string GetName() const { return scene_name.c_str(); }
+	virtual std::string GetName() const = 0;
 
 	// 初期化処理
 	virtual void Initialize() = 0;

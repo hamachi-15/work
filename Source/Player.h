@@ -149,9 +149,6 @@ private:
 	// スティック入力値から移動ベクトルを算出
 	DirectX::XMFLOAT3 GetMoveVec() const;
 
-	// 武器コリジョンのワールド座標算出と設定
-	void SetWepponCollisionPosition();
-
 	// 武器コリジョンのあたり判定フラグを切り替える処理
 	void SetOnOrOffWepponCollisionFlag(bool flag);
 
@@ -175,18 +172,6 @@ private:
 
 	// 回避入力処理
 	bool InputAvoid();
-
-	// 着地したときに呼ばれる
-	void OnLanding();
-
-	// ダメージを受けたときに呼ばれる
-	void OnDamaged();
-
-	// 死亡したときに呼ばれる
-	void OnDead();
-
-	// ヒットストップの更新処理
-	void UpdateHitStop(float elapsed_time);
 
 	// カメラステートの更新
 	void UpdateCameraState(float elapsedtime);
@@ -234,21 +219,8 @@ private:
 		Conbo_End_Attack,			// 強攻撃弱攻撃のコンボ最終攻撃
 	};
 
-	// 武器コリジョン用
-	struct WepponCollisionList
-	{
-		DirectX::XMFLOAT3 Weppon_Local_Position;
-		const char* collision_name;
-	};
-
 	// 武器のあたり判定のローカル座標を格納する用
 	static const int Weppon_Collision_Max = 4;
-	const WepponCollisionList Weppon_Collison_List[Weppon_Collision_Max] = {
-		{{ -23, -15, 200 }, "PlayerWeppon1"},
-		{{ -23, -12, 150 }, "PlayerWeppon2" },
-		{{ -23, -5, 100 }, "PlayerWeppon3"},
-		{{ -23, -5, 50 }, "PlayerWeppon4"},
-	};
 private:
 	std::shared_ptr<Movement>   movement;
 	std::shared_ptr<Charactor>  charactor;
@@ -266,7 +238,6 @@ private:
 	float						lockon_target_change_time_max = 8;
 	std::shared_ptr<Enemy>		lockon_enemy;
 	DirectX::XMFLOAT3			lock_direction;
-	// TODO
-	DirectX::XMFLOAT3			start_position;
-	int							fase = 0;
+
+	float timer = 0.0f;
 };

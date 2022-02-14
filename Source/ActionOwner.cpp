@@ -113,7 +113,7 @@ void DamageAction::Start()
 {
 	std::shared_ptr<Charactor> player_charactor = ActorManager::Instance().GetActor("Player")->GetComponent<Charactor>();
 	// ダメージ
-	owner->GetCharactor()->ApplyDamage(player_charactor->GetAttack(), 0.7f);
+	owner->GetCharactor()->ApplyDamage(player_charactor->GetAttack(), 1.0f);
 }
 
 //----------------------------------
@@ -123,8 +123,6 @@ ActionBase::State DamageAction::Run(float elapsed_time)
 {
 	owner->SetRandomTargetPosition();
 	owner->SetRunTimer(0.0f);
-	owner->SetAttackFlag(false);
-	owner->GetCharactor()->SetDamageFlag(false);
 	return ActionBase::State::Complete;
 }
 
@@ -144,6 +142,14 @@ void DeathAction::Start()
 
 	// アニメーション再生
 	owner->PlayAnimation(animation_name.c_str());
+
+	// 死亡の瞬間を描画を要請するメッセージを飛ばす
+	Message message;
+	message.message = MessageType::Message_Moment_Render;
+	MetaAI::Instance().SendMessaging(
+		static_cast<int>(MetaAI::Identity::Player),   // 送信元
+		static_cast<int>(MetaAI::Identity::WorldMap),    // 受信先
+		message);                                        // メッセージ
 }
 
 //----------------------------------
@@ -155,7 +161,8 @@ ActionBase::State DeathAction::Run(float elapsed_time)
 	if (!owner->GetActor()->GetModel()->IsPlayAnimation())
 	{
 		Message message;
-		message.message = MessageType::Message_GameClear;
+		message.message = MessageType::Message_Buttle_End;
+		message.territory_tag = owner->GetBelongingToTerritory();
 		MetaAI::Instance().SendMessaging(
 			static_cast<int>(MetaAI::Identity::Enemy),   // 送信元
 			static_cast<int>(MetaAI::Identity::WorldMap),    // 受信先

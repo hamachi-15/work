@@ -72,9 +72,6 @@ void EnemyPLT::Destroy()
 //-----------------------------------------
 void EnemyPLT::OnGUI()
 {
-	bool attack_flag = GetAttackFlag();
-	ImGui::Checkbox("AttackFlag", &attack_flag);
-
 	// ビヘイビア関連情報
 	DrawBehaviorGUI();
 }
@@ -90,16 +87,18 @@ bool EnemyPLT::OnMessages(const Telegram& message)
 
 		break;
 	case MessageType::Message_GetHit_Attack:
-		//ダメージフラグをオンに
-		OnDamaged();
 		// 衝突した位置を設定
 		SetHitPosition(message.message_box.hit_position);
 		break;
 	case MessageType::Message_Hit_Boddy:
 		break;
 	case MessageType::Message_Give_Attack_Right:
-		SetAttackFlag(true);
-		break;
+	{
+		std::shared_ptr<Charactor> charactor = GetActor()->GetComponent<Charactor>();
+		// 攻撃ヒットフラグを立てる
+		charactor->SetHitAttackFlag(true);
+	}
+	break;
 	}
 	return false;
 }
@@ -235,12 +234,6 @@ void EnemyPLT::Update(float elapsed_time)
 {
 	// ビヘイビア更新処理
 	BehaviorUpdate(elapsed_time);
-
-	// 速力更新処理
-	GetMovement()->UpdateVelocity(elapsed_time);
-
-	// 無敵時間更新処理
-	GetCharactor()->UpdateInvincibleTimer(elapsed_time);
 }
 
 //-----------------------------------------

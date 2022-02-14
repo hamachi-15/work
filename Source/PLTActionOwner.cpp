@@ -33,7 +33,6 @@ ActionBase::State BlowAttackAction::Run(float elapsed_time)
 	if (!owner->GetActor()->GetModel()->IsPlayAnimation())
 	{
 		owner->SetRunTimer(0.0f);
-		owner->SetAttackFlag(false);
 		return ActionBase::State::Complete;
 	}
 	return ActionBase::State::Run;

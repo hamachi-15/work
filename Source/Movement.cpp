@@ -31,8 +31,20 @@ void Movement::OnGUI()
 	ImGui::InputInt("IsGround", &ground);
 }
 
+//----------------------------
+// 開始処理
+//----------------------------
 void Movement::Start()
 {
+}
+
+//----------------------------
+// 更新処理
+//----------------------------
+void Movement::Update(float elapsed_time)
+{
+	// 速力更新処理
+	UpdateVelocity(elapsed_time);
 }
 
 //----------------------------

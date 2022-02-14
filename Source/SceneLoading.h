@@ -1,8 +1,9 @@
 #pragma once
 #include <memory>
 #include "Scene.h"
-#include "Sprite.h"
-#include "Texture.h"
+
+class Sprite;
+class Texture;
 
 class SceneLoading : public Scene
 {
@@ -10,6 +11,9 @@ public:
 	// コンストラクタ・デストラクタ
 	SceneLoading(Scene* next_scene);
 	~SceneLoading() override {}
+
+	// シーン名取得
+	std::string GetName() const override { return "SceneLoading"; }
 
 	// 初期化処理
 	void Initialize() override;

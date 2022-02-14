@@ -11,7 +11,7 @@ class UINodeTree
 {
 public:
 	// コンストラクタ
-	UINodeTree() : root(NULL) {}
+	UINodeTree();
 
 	// デストラクタ
 	~UINodeTree();
@@ -29,5 +29,5 @@ private:
 	// ノード全削除
 	void NodeAllClear(UINodeBase* del_node);
 private:
-	UINodeBase* root;
+	UINodeBase* root = NULL;
 };

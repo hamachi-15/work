@@ -1,4 +1,5 @@
 #pragma once
+#include <memory>
 #include "UI.h"
 #include "UIData.h"
 
@@ -17,7 +18,7 @@ public:
 	TitleUI() {}
 
 	// デストラクタ
-	~TitleUI() override;
+	~TitleUI() override {}
 
 	// 名前取得
 	std::string GetName() const override { return "TitleButtonUI"; }
@@ -43,15 +44,15 @@ public:
 		Button_Max
 	};
 private:
-	SelectState select_button[static_cast<int>(ButtonType::Button_Max)];
+	SelectState select_button[static_cast<int>(ButtonType::Button_Max)] = {};
 
-	UIData* start_button_data;
-	UIData* select_start_button_data;
-	UIData* start_data;
+	std::unique_ptr<UIData> start_button_data;
+	std::unique_ptr<UIData> select_start_button_data;
+	std::unique_ptr<UIData> start_data;
 
-	UIData* operate_button_data;
-	UIData* select_operate_button_data;
-	UIData* operate_data;
+	std::unique_ptr<UIData> operate_button_data;
+	std::unique_ptr<UIData> select_operate_button_data;
+	std::unique_ptr<UIData> operate_data;
 
-	UIData* title_logo;
+	std::unique_ptr<UIData> title_logo;
 };
