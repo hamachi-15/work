@@ -74,6 +74,18 @@ void EnemyManager::CreateTerritory()
 }
 
 //-----------------------------------------------
+// 撃破フラグをクリア
+//-----------------------------------------------
+void EnemyManager::CrearDefeat()
+{
+	// 撃破フラグをクリア
+	defeat_territory.clear();
+
+	// 縄張りの設定
+	CreateTerritory();
+}
+
+//-----------------------------------------------
 // 敵を登録
 //-----------------------------------------------
 void EnemyManager::EnemyRegister(std::shared_ptr<Enemy> enemy)
@@ -304,11 +316,19 @@ void EnemyManager::AddComponent(std::shared_ptr<Actor> actor, std::shared_ptr<En
 		CollisionManager::Instance().RegisterCulling(
 			std::make_shared<CullingCollision>(EnemyCategory::PLT, actor));
 		break;
-	case EnemyCategory::NightmareDragon:
-		//break;
 	case EnemyCategory::SoulEaterDragon:
-		//break;
 	case EnemyCategory::DragonUsurper:
+		if (IsBattleScene()) {
+			std::shared_ptr<BossHealthUI> ui = actor->AddComponent<BossHealthUI>();
+			UIManager::Instance().RegisterUI(ui);
+		}
+		enemy = actor->AddComponent<EnemyDragonSoulEater>();
+		actor->AddComponent<EnemyCollision>(EnemyCategory::SoulEaterDragon, identity);
+		// カリング用コリジョンを追加
+		//CollisionManager::Instance().RegisterCulling(
+		//	std::make_shared<CullingCollision>(EnemyCategory::NightmareDragon, actor));
+		break;
+	case EnemyCategory::NightmareDragon:
 		if (IsBattleScene()) {
 			std::shared_ptr<BossHealthUI> ui = actor->AddComponent<BossHealthUI>();
 			UIManager::Instance().RegisterUI(ui);

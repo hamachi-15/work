@@ -14,6 +14,8 @@
 #include "Charactor.h"
 #include "Enemy.h"
 
+#include "Effect.h"
+#include "EffectManager.h"
 
 //************************************
 // 
@@ -25,6 +27,7 @@
 //-----------------------------------
 EnemyCollision::~EnemyCollision()
 {
+    // 球コリジョンの破棄処理
     std::vector<std::shared_ptr<CollisionSphere>>::iterator iterate_sphere = collision_spheres.begin();
     for (; iterate_sphere != collision_spheres.end(); iterate_sphere = collision_spheres.begin())
     {
@@ -32,13 +35,14 @@ EnemyCollision::~EnemyCollision()
     }
     collision_spheres.clear();
 
-    // マネージャーのコリジョン削除
-    // 球コリジョン削除
+    // マネージャーの球コリジョン削除
     for (std::shared_ptr<CollisionSphere> sphere : collision_spheres)
     {  
+        // 球コリジョン削除
     	CollisionManager::Instance().UnregisterSphere(sphere);
     }
 
+    // マネージャーの円柱コリジョン削除
     // 円柱コリジョン削除
     CollisionManager::Instance().UnregisterCylinder(collision_cylinder);
 }
@@ -61,6 +65,12 @@ void EnemyCollision::Start()
 
     // キャラクターの取得
     std::shared_ptr<Charactor> charactor = actor->GetComponent<Charactor>();
+
+    // エフェクトマネージャース取得
+    std::shared_ptr<EffectManager> effect_manager = Graphics::Instance().GetEffectManager();
+
+    // エフェクト読み込み
+    hit_effect = std::make_shared<Effect>("Data/Effect/Hit.efk", effect_manager->GetEffekseerManager());
 
     // モデル取得
     Model* model = actor->GetModel();
@@ -121,18 +131,25 @@ void EnemyCollision::Update(float elapsed_time)
     UpdateCollision(collision_cylinder, actor, model);
     std::shared_ptr<Charactor> charactor = GetActor()->GetComponent<Charactor>();
 
-    size_t sphere_count = collision_spheres.size();
-    size_t cylinder_count = CollisionManager::Instance().GetCollisionCylinderCount();
-    for (size_t i = 0; i < sphere_count; i++)
+    // 球コリジョン取得
+    int sphere_count = static_cast<int>(collision_spheres.size());
+
+    // マネージャーの円柱の数取得
+    int cylinder_count = static_cast<int>(CollisionManager::Instance().GetCollisionCylinderCount());
+
+    // 敵の球コリジョンとマネージャーに設定されている円柱コリジョンの当たり判定
+    for (int i = 0; i < sphere_count; i++)
     {
+        // 球コリジョン取得
         CollisionSphere* sphere = collision_spheres.at(i).get();
+
         // 攻撃フラグが立っていなかったら飛ばす
         if (!sphere->GetAttackFlag()) continue;
 
         // 攻撃が当たっていた場合飛ばす
         if (charactor->GetHitAttackFlag()) break;
 
-        for (size_t j = 0; j < cylinder_count; j++)
+        for (int j = 0; j < cylinder_count; j++)
         {
             std::shared_ptr<CollisionCylinder> cylinder = CollisionManager::Instance().GetCollisionCylinder(j);
             // 同じアクター同士の当たり判定なら飛ばす
@@ -140,13 +157,29 @@ void EnemyCollision::Update(float elapsed_time)
 
             // 当たり判定フラグが立っていなかったら飛ばす
             if (!cylinder->GetCollisionFlag()) continue;
-
+            // 球と円柱が当たっていたら
             if (CollisionManager::Instance().IntersectSphereVsCylinder(sphere, cylinder.get()))
             {
+                // 円柱コリジョンのアクター取得
                 std::shared_ptr<Actor> cylinder_actor = ActorManager::Instance().GetActor(cylinder->GetActorName());
-                Message message;
+
+                // 円柱コリジョンを持っているキャラクターにダメージを与える
                 cylinder_actor->GetComponent<Charactor>()->ApplyDamage(charactor->GetAttack(), 0.8f);
 
+                // 円柱コリジョンを持つアクター位置取得
+                DirectX::XMFLOAT3 cylinder_actor_position = cylinder_actor->GetPosition();
+
+                // エフェクトの再生位置を設定
+                DirectX::XMFLOAT3 play_position = {
+                    cylinder_actor_position.x,
+                    cylinder_actor_position.y + 5.0f,
+                    cylinder_actor_position.z };
+                // ヒットエフェクト再生
+                hit_effect->Play(Graphics::Instance().GetEffectManager()->GetEffekseerManager(),
+                    play_position, hit_effect_scale);
+
+                // リアクションをメッセージに送る
+                Message message;
                 message.message = MessageType::Message_Hit_Attack;
                 message.hit_position = { 0.0f, 0.0f, 0.0f };
                 Reaction(sphere->GetActorID(), message);
@@ -158,9 +191,9 @@ void EnemyCollision::Update(float elapsed_time)
     // 当たり判定フラグが立っていなかったら飛ばす
     if (!collision_cylinder->GetCollisionFlag()) return;
 
-    // 
+    // 円柱Vs円柱
     ObjectCollisionResult result;
-    for (size_t j = 0; j < cylinder_count; j++)
+    for (int j = 0; j < cylinder_count; j++)
     {
         std::shared_ptr<CollisionCylinder> cylinderB = CollisionManager::Instance().GetCollisionCylinder(j);
         // 当たり判定フラグが立っていなかったら飛ばす
@@ -170,6 +203,7 @@ void EnemyCollision::Update(float elapsed_time)
         if (collision_cylinder->GetActorType() == cylinderB->GetActorType()) continue;
 
         std::shared_ptr<Actor> cylinderB_actor = ActorManager::Instance().GetActor(cylinderB->GetActorName());
+        // 円柱同士が当たっていたら
         if (CollisionManager::Instance().IntersectCylinderVsCylinder(collision_cylinder.get(), GetActor(), cylinderB.get(), cylinderB_actor, result))
         {
             CollisionManager::Instance().PushOutCollision(collision_cylinder.get(), GetActor(), cylinderB.get(), cylinderB_actor, result);
@@ -178,6 +212,9 @@ void EnemyCollision::Update(float elapsed_time)
 
 }
 
+//--------------------------------
+// コリジョン更新処理
+//--------------------------------
 void EnemyCollision::UpdateCollision(std::shared_ptr<CollisionObject> collision, std::shared_ptr<Actor> actor, Model* model)
 {
     // コリジョンの座標更新のタイプに合わせて更新

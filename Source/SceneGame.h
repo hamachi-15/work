@@ -3,6 +3,7 @@
 #include <DirectXMath.h>
 #include "Shader.h"
 #include "Scene.h"
+#include "Effect.h"
 
 struct RenderContext;
 struct BlurRenderContext;

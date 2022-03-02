@@ -326,7 +326,7 @@ void ActorManager::Render(RenderContext* render_context)
 	for (std::shared_ptr<Actor>& actor : update_actors)
 	{
 		// カリングフラグが立っていれば描画しない
-		if (actor->GetCullingFlag()) continue;
+		//if (actor->GetCullingFlag()) continue;
 
 		// 現在セットされているシェーダーとこれからの描画に使うシェーダーが同じか
 		if (actor->GetShaderType() != shader_type)
@@ -349,8 +349,8 @@ void ActorManager::Render(RenderContext* render_context)
 	
 	shader_type = static_cast<ShaderManager::ShaderType>(-1);
 
-	DrawLister();
-	DrawDetail();
+	//DrawLister();
+	//DrawDetail();
 }
 
 //------------------------------

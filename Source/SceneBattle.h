@@ -2,6 +2,7 @@
 #include <memory>
 #include <d3d11.h>
 #include "Scene.h"
+#include "Effect.h"
 
 struct RenderContext;
 struct BlurRenderContext;

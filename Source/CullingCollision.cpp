@@ -73,7 +73,6 @@ void CullingCollision::Update()
 //-----------------------------------
 void CullingCollision::Render(DebugRenderer* renderer)
 {
-    if (!collision_culling->GetAttackFlag()) return;
     collision_culling->Render(renderer);
 }
 

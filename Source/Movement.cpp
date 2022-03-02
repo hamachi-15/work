@@ -213,11 +213,6 @@ void Movement::UpdateVerticalMove(float elapsed_time)
 
 			normal = hit.normal;
 
-			// ’…’n‚µ‚½
-			if (!isground)
-			{
-				
-			}
 			isground = true;
 			velocity.y = 0.0f;
 		}
@@ -232,7 +227,7 @@ void Movement::UpdateVerticalMove(float elapsed_time)
 	// ã¸’†
 	else if(my > 0.0f)
 	{
-		DirectX::XMFLOAT3 position =actor->GetPosition();
+		DirectX::XMFLOAT3 position = actor->GetPosition();
 		isground = false;
 		position.y += my;
 		actor->SetPosition(position);

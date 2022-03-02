@@ -18,6 +18,9 @@ public:
 	// GUI描画
 	void OnGUI() override;
 
+	// メッセージを受信したときの処理
+	bool OnMessages(const Telegram& message)override;
+
 	// 開始処理
 	void Start() override;
 
@@ -33,7 +36,5 @@ public:
 	// 当たり範囲デバッグプリミティブ描画
 	void DrawDebugPrimitive()override;
 
-	// メッセージを受信したときの処理
-	bool OnMessages(const Telegram& message)override;
 
 };

@@ -137,8 +137,8 @@ private:
 	bool	hit_attack_flag = false;	// 攻撃がヒットしたかのフラグ
 	bool	old_collision_time_flag = false;
 	
-	int		max_health = 5;
-	int		health = 5;
+	int		max_health = 50;
+	int		health = 50;
 	int		attack = 10;
 	float	invincible_timer = 0.0f;
 	float	move_speed = 30.0f;

@@ -3,6 +3,10 @@
 #include "Camera.h"
 #include "Messenger.h"
 
+#include "ActorManager.h"
+#include "CollisionManager.h"
+
+#include "Mathf.h"
 //*************************************
 // 
 // カメラマネージャークラス
@@ -43,26 +47,62 @@ void CameraController::Update(float elapsed_time)
 	// 各モードでの処理
 	switch (mode)
 	{
-	case	Mode::FreeCamera:	UpdateFreeCamera(elapsed_time);	break;
+	case	Mode::FreeCamera:	UpdateFreeCamera(elapsed_time);		break;
 	case	Mode::LockonCamera:	UpdateLockonCamera(elapsed_time);	break;
 	case	Mode::MotionCamera:	UpdateMotionCamera(elapsed_time);	break;
 	}
 
+	Model* model = ActorManager::Instance().GetActor("Filde")->GetModel();
+
+	// フィールドとのレイキャスト
+	HitResult result;
+	GamePad& gamepad = Input::Instance().GetGamePad();
+	float ax = gamepad.GetAxisRX();
+	float ay = gamepad.GetAxisRY();
+	DirectX::XMFLOAT3 ray_end = { new_position.x, new_position.y , new_position.z};
+	if (CollisionManager::Instance().IntersectRayVsModel(new_target, new_position, model, result))
+	{
+		DirectX::XMVECTOR vec_position = DirectX::XMLoadFloat3(&result.position);
+		DirectX::XMVECTOR cuv = DirectX::XMVectorSet(0, 1, 0, 0);
+		vec_position = DirectX::XMVectorMultiplyAdd(DirectX::XMVectorSet(2, 2, 2, 0), cuv, vec_position);
+		DirectX::XMVECTOR vec_target = DirectX::XMLoadFloat3(&new_target);
+		DirectX::XMVECTOR vec_length = DirectX::XMVectorSubtract(vec_target, vec_position);
+		DirectX::XMFLOAT3 vector = Mathf::ReturnFloatSubtract(target, position);
+		float length = sqrtf(vector.x * vector.x + vector.z * vector.z);
+
+		// ターゲットへのベクトルの長さがリミットを超えていなければ
+		// カメラの座標を更新する
+		if (length >= 20)
+		{
+			DirectX::XMFLOAT3 camera_pos;
+			DirectX::XMStoreFloat3(&new_position, vec_position);
+			//new_position.y = camera_pos.y;
+		}
+		else
+		{
+			new_position = position;
+		}
+		isground = true;
+	}
+	else
+	{
+		isground = false;
+	}
 	// 徐々に目標に近づける
-	static	constexpr	float	speed = 1.0f / 8.0f;
+	static	constexpr	float	speed = 1.0f / 16.0f;
 	position.x += (new_position.x - position.x) * speed;
 	position.y += (new_position.y - position.y) * speed;
 	position.z += (new_position.z - position.z) * speed;
-	target.x   += (new_target.x - target.x) * speed;
-	target.y   += (new_target.y - target.y) * speed;
-	target.z   += (new_target.z - target.z) * speed;
-	GamePad& gamepad = Input::Instance().GetGamePad();
+	target.x += (new_target.x - target.x) * speed;
+	target.y += (new_target.y - target.y) * speed;
+	target.z += (new_target.z - target.z) * speed;
 
-	// カメラの視点と注視点に設定
+
+	// カメラの視点と注視点を設定
 	Camera::Instance().SetLookAt(position, this->target, DirectX::XMFLOAT3(0, 1, 0));
 
+	// 視錐台更新
 	CalculateFrustum();
-
 }
 
 //-----------------------------
@@ -70,13 +110,11 @@ void CameraController::Update(float elapsed_time)
 //-----------------------------
 void CameraController::CalculateFrustum()
 {
+	// カメラ取得
 	Camera& camera = Camera::Instance();
+
+	// 錐台配列クリア
 	frustum.clear();
-	//DirectX::XMMATRIX view = DirectX::XMMatrixLookAtLH(DirectX::XMLoadFloat3(&camera.GetEye()), DirectX::XMLoadFloat3(&camera.GetFocus()), DirectX::XMLoadFloat3(&camera.GetUp()));
-	//DirectX::XMMATRIX projection = DirectX::XMMatrixPerspectiveFovLH(DirectX::XMConvertToRadians(45),
-	//	1280.0f / 720.0f,
-	//	20,
-	//	60.0f);
 
 	// ビューとプロジェクション取得
 	DirectX::XMMATRIX view = DirectX::XMLoadFloat4x4(&camera.GetView());
@@ -138,6 +176,7 @@ void CameraController::CalculateFrustum()
 		DirectX::XMStoreFloat(&plane.direction, DirectX::XMVector3Dot(DirectX::XMLoadFloat3(&near_position[0]), DirectX::XMLoadFloat3(&plane.normal)));
 		frustum.emplace_back(plane);
 	}
+
 	// 右側面
 	{
 		Plane plane;
@@ -150,6 +189,7 @@ void CameraController::CalculateFrustum()
 		
 		frustum.emplace_back(plane);
 	}
+
 	// 下側面
 	{
 		Plane plane;
@@ -162,6 +202,7 @@ void CameraController::CalculateFrustum()
 		
 		frustum.emplace_back(plane);
 	}
+
 	// 上側面
 	{
 		Plane plane;
@@ -174,6 +215,7 @@ void CameraController::CalculateFrustum()
 		
 		frustum.emplace_back(plane);
 	}
+
 	// 奥側面
 	{
 		Plane plane;
@@ -186,6 +228,7 @@ void CameraController::CalculateFrustum()
 		
 		frustum.emplace_back(plane);
 	}
+
 	// 手前側面
 	{
 		Plane plane;
@@ -203,16 +246,17 @@ void CameraController::CalculateFrustum()
 // ----------------------------
 // 平面算出
 // ----------------------------
-void CameraController::CalculatePlane(Plane& frustum, DirectX::XMFLOAT3& position1, DirectX::XMFLOAT3& position2, DirectX::XMFLOAT3& position3, DirectX::XMFLOAT3& position4)
+void CameraController::CalculatePlane(DirectX::XMFLOAT3& position1, DirectX::XMFLOAT3& position2, DirectX::XMFLOAT3& position3, DirectX::XMFLOAT3& position4, DirectX::XMFLOAT3& position5)
 {
+	Plane plane;
 	// 平面の法線算出
 	DirectX::XMVECTOR vector1 = DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&position1), DirectX::XMLoadFloat3(&position2));
 	DirectX::XMVECTOR vector2 = DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&position3), DirectX::XMLoadFloat3(&position4));
-	DirectX::XMStoreFloat3(&frustum.normal, DirectX::XMVector3Cross(vector1, vector2));
-	DirectX::XMStoreFloat3(&frustum.normal, DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&frustum.normal)));
-	
+	DirectX::XMStoreFloat3(&plane.normal, DirectX::XMVector3Cross(vector1, vector2));
+	DirectX::XMStoreFloat3(&plane.normal, DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&plane.normal)));
 	// 原点からの最短距離算出
-	DirectX::XMStoreFloat(&frustum.direction, DirectX::XMVector3Dot(DirectX::XMLoadFloat3(&position1), DirectX::XMLoadFloat3(&frustum.normal)));
+	DirectX::XMStoreFloat(&plane.direction, DirectX::XMVector3Dot(DirectX::XMLoadFloat3(&position5), DirectX::XMLoadFloat3(&plane.normal)));
+	frustum.emplace_back(plane);
 }
 
 //-----------------------------
@@ -229,6 +273,9 @@ void CameraController::OnFreeMode(void* data)
 		vector.x = new_position.x - new_target.x;
 		vector.y = new_position.y - new_target.y;
 		vector.z = new_position.z - new_target.z;
+		angle.y = atan2f(vector.x, vector.z) + DirectX::XM_PI;
+		angle.x = atan2f(vector.y, vector.z);
+		//	角度の正規化
 		angle.y = atan2f(sinf(angle.y), cosf(angle.y));
 		angle.x = atan2f(sinf(angle.x), cosf(angle.x));
 	}
@@ -282,7 +329,8 @@ void CameraController::UpdateFreeCamera(float elapsed_time)
 
 	// スティックの入力値に応じてX軸とY軸
 	angle.x += ay * speed;
-	angle.y += ax * speed;
+	// カメラが地面に当たっていなければアングルを更新
+	if(!isground) angle.y += ax * speed;
 
 	// X軸のカメラの回転を制御
 	if (angle.x > max_angleX)
@@ -293,6 +341,7 @@ void CameraController::UpdateFreeCamera(float elapsed_time)
 	{
 		angle.x = min_angleX;
 	}
+
 	// Y軸の回転値を-3.14～3.14に収まるようにする
 	if (angle.y > -DirectX::XM_PI)
 	{

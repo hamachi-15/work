@@ -1,10 +1,15 @@
 #include "SceneClear.h"
+#include "EnemyManager.h"
 #include "ResourceManager.h"
 #include "ShaderManager.h"
+#include "SceneManager.h"
+#include "SceneTitle.h"
 #include "Graphics.h"
 #include "Sprite.h"
 
 #include "GameDatabase.h"
+
+#include "Input.h"
 //-------------------------------------
 // 初期化処理
 //-------------------------------------
@@ -22,6 +27,8 @@ void SceneClear::Initialize()
 //-------------------------------------
 void SceneClear::Finalize()
 {
+	// 撃破フラグをクリア
+	EnemyManager::Instance().CrearDefeat();
 }
 
 //-------------------------------------
@@ -29,6 +36,18 @@ void SceneClear::Finalize()
 //-------------------------------------
 void SceneClear::Update(float elapsed_time)
 {
+	GamePad& gamepad = Input::Instance().GetGamePad();
+	const GamePadButton any_button =
+		GamePad::BTN_A
+		| GamePad::BTN_B
+		| GamePad::BTN_X
+		| GamePad::BTN_Y;
+	// A、B、X、Yボタンが押されたときにタイトル画面に遷移
+	if (gamepad.GetButtonDown() & any_button)
+	{
+		// タイトルに遷移
+		SceneManager::Instance().ChangeScene(new SceneTitle());
+	}
 }
 
 //-------------------------------------

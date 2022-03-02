@@ -76,3 +76,18 @@ public:
 	//判定
 	bool Judgment() override;
 };
+
+//*****************************************
+// 
+// 火球ブレスノードに移行できるか判定
+// 
+//*****************************************
+class FireBallAttackJudgment : public JudgmentBase
+{
+public:
+	// コンストラクタ
+	FireBallAttackJudgment(Enemy* enemy) : JudgmentBase(enemy) {}
+
+	//判定
+	bool Judgment() override;
+};

@@ -4,6 +4,8 @@
 #include "SceneTitle.h"
 #include "SceneOver.h"
 #include "SceneClear.h"
+#include "EffectManager.h"
+
 // 垂直同期間隔設定
 static const int syncInterval = 1;
 Framework::Framework(HWND hwnd) :
@@ -11,7 +13,6 @@ Framework::Framework(HWND hwnd) :
 	input(hwnd),
 	graphics(hwnd)
 {
-	
 	// シーン初期化
 	SceneManager::Instance().ChangeScene(new SceneTitle());
 }
@@ -26,6 +27,7 @@ void Framework::Update(float elapsed_time)
 {
 	// 入力更新処理
 	input.Update();
+
 	// IMGUIフレーム開始処理
 	graphics.GetImGuiRenderer()->NewFrame();
 

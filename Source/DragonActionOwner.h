@@ -167,4 +167,7 @@ public:
 
 	// Àsˆ—
 	ActionBase::State Run(float elapsed_time) override;
+private:
+	DirectX::XMFLOAT3	direction;
+	bool				flag = false;
 };

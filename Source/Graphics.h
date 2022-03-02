@@ -10,6 +10,7 @@
 #include "AudioSource.h"
 
 class Texture;
+class EffectManager;
 
 class Graphics
 {
@@ -63,6 +64,9 @@ public:
 
 	// シーンテクスチャ取得
 	Texture* GetTexture() const { return scene_texture.get(); }
+
+	// エフェクトマネージャー取得
+	std::shared_ptr<EffectManager> GetEffectManager() { return effect_manager; }
 
 	// ミューテクス取得
 	std::mutex& GetMutex() { return mutex; }
@@ -133,6 +137,7 @@ private:
 	std::unique_ptr<ImGuiRenderer>					imgui_renderer;
 
 	std::unique_ptr<AudioSource>					BGM;
+	std::shared_ptr<EffectManager>					effect_manager;
 
 	std::unique_ptr<Texture>						scene_texture;
 	std::mutex										mutex;

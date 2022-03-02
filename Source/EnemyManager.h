@@ -74,6 +74,9 @@ public:
 	// テリトリーの敵が撃破されているかのフラグを設定
 	void SetDefeatTeritory(EnemyTerritoryTag tag, bool flag) { defeat_territory[tag] = flag; }
 
+	// 撃破フラグをクリア
+	void CrearDefeat();
+
 	// バトルシーンか判定
 	bool IsBattleScene() const { return (SceneManager::Instance().GetCurrentScene()->GetName() == "SceneBattle"); }
 private:

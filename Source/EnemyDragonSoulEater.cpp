@@ -6,6 +6,7 @@
 #include "ActorManager.h"
 #include "EnemyManager.h"
 #include "CollisionManager.h"
+#include "EnemyTerritoryManager.h"
 
 #include "BehaviorTree.h"
 #include "BehaviorData.h"
@@ -13,6 +14,9 @@
 #include "DragonActionOwner.h"
 #include "JudgmentOwner.h"
 #include "DragonJudgmentOwner.h"
+
+#include "Graphics.h"
+#include "EnemyTerritory.h"
 //*********************************
 // 
 // ソウルイータードラゴンクラス
@@ -30,31 +34,6 @@ EnemyDragonSoulEater::EnemyDragonSoulEater()
 //------------------------------------
 EnemyDragonSoulEater::~EnemyDragonSoulEater()
 {
-}
-
-//------------------------------------
-// 敵の破棄処理
-//------------------------------------
-void EnemyDragonSoulEater::Destroy()
-{
-	// アクターの取得
-	std::shared_ptr<Actor> actor = GetActor();
-
-	// コリジョン削除
-	//std::vector<std::shared_ptr<CollisionSphere>> list = CollisionManager::Instance().GetCollisionSphereFromID(GetCharactor()->GetID() + GetIdentity());
-	//for (std::shared_ptr<CollisionSphere> sphere : list)
-	//{
-	//	CollisionManager::Instance().UnregisterSphere(sphere);
-	//}
-	//CollisionManager::Instance().UnregisterCylinder(CollisionManager::Instance().GetCollisionCylinderFromName(actor->GetName()));
-	//// 立方体コリジョン削除
-	//CollisionManager::Instance().UnregisterBox(CollisionManager::Instance().GetCollisionBoxFromName(actor->GetName()));
-
-	// 敵マネージャーから削除
-	EnemyManager::Instance().EnemyRemove(GetActor()->GetComponent<EnemyDragonSoulEater>());
-
-	// アクターマネージャーから削除
-	ActorManager::Instance().Remove(GetActor());
 }
 
 //------------------------------------
@@ -76,14 +55,16 @@ bool EnemyDragonSoulEater::OnMessages(const Telegram& message)
 	case MessageType::Message_Hit_Attack:
 		break;
 	case MessageType::Message_GetHit_Attack:
+		// 衝突した位置を設定
+		SetHitPosition(message.message_box.hit_position);
 		break;
 	case MessageType::Message_Give_Attack_Right:
 	{
 		std::shared_ptr<Charactor> charactor = GetActor()->GetComponent<Charactor>();
 		// 攻撃ヒットフラグを立てる
-		charactor->SetHitAttackFlag(true);
+		SetRightOfAttack(true);
 	}
-		break;
+	break;
 	case MessageType::Message_Hit_Boddy:
 		break;
 	}
@@ -104,6 +85,12 @@ void EnemyDragonSoulEater::Start()
 	// 名前設定
 	SetName("SoulEaterDragon");
 
+	// 索敵範囲の設定
+	SetSearchRange(80.0f);
+
+	// 攻撃範囲の設定
+	SetAttackRange(60.0f);
+
 	// ムーブメントコンポーネントの設定
 	SetMovement(actor->GetComponent<Movement>());
 
@@ -112,65 +99,6 @@ void EnemyDragonSoulEater::Start()
 
 	// マネージャーに登録
 	EnemyManager::Instance().EnemyRegister(actor->GetComponent<EnemyDragonSoulEater>());
-	
-	// コリジョンの設定
-	//{
-	//	Model* model = GetActor()->GetModel();
-	//	CollisionParameter parameter;
-	//	// カリング用のコリジョン
-	//	parameter.name = "SoulEaterDragonAABB";
-	//	parameter.node_name = "";
-	//	parameter.position = {};
-	//	parameter.float3_radius = DirectX::XMFLOAT3(1.5f, 1.5f, 1.5f);
-	//	parameter.height = 9.0f;
-	//	parameter.collision_flg = true;
-	//	parameter.actor_id = charactor->GetID();
-	//	parameter.element = CollisionElement::Body;
-	//	parameter.position_mask = CollisionPositionMask::Collision_Mask_Actor_Position;
-	//	charactor->SetCollision(actor, parameter, CollisionMeshType::AABB);
-	//	
-	//	// 体のコリジョン設定
-	//	parameter.name = actor->GetName();
-	//	parameter.node_name = "";
-	//	parameter.actor_id = charactor->GetID() + GetIdentity();
-	//	parameter.position = { 0, 0, 0 };
-	//	parameter.radius = 20.5f;
-	//	parameter.height = 26.5f;
-	//	parameter.weight = 6.5f;
-	//	parameter.collision_flg = true;
-	//	parameter.actor_type = CollisionActorType::Enemy;
-	//	parameter.element = CollisionElement::Body;
-	//	parameter.position_mask = CollisionPositionMask::Collision_Mask_Actor_Position;
-	//	charactor->SetCollision(actor, parameter, CollisionMeshType::Cylinder);
-
-	//	// 頭コリジョン
-	//	name.clear();
-	//	name = actor->GetName();
-	//	name += "Head";
-	//	parameter.name = name.c_str();
-	//	parameter.node_name = "UpperHead02";
-	//	parameter.radius = 6.5f;
-	//	parameter.height = 0.0f;
-	//	parameter.weight = 1.0f;
-	//	parameter.collision_flg = false;
-	//	parameter.actor_type = CollisionActorType::Enemy;
-	//	parameter.element = CollisionElement::Weppon;
-	//	parameter.position_mask = CollisionPositionMask::Collision_Mask_Member_Position;
-	//	charactor->SetCollision(actor, parameter, CollisionMeshType::Sphere);
-	//
-	//	// 尻尾コリジョン
-	//	name.clear();
-	//	name = actor->GetName();
-	//	name += "Tail";
-	//	parameter.name = name.c_str();
-	//	parameter.node_name = "TailEnd";
-	//	parameter.radius = 3.5f;
-	//	parameter.collision_flg = false;
-	//	parameter.actor_type = CollisionActorType::Enemy;
-	//	parameter.element = CollisionElement::Weppon;
-	//	parameter.position_mask = CollisionPositionMask::Collision_Mask_Member_Position;
-	//	charactor->SetCollision(actor, parameter, CollisionMeshType::Sphere);
-	//}
 
 	// ビヘイビアツリー設定
 	behavior_data = new BehaviorData();
@@ -189,29 +117,49 @@ void EnemyDragonSoulEater::SetBehaviorNode()
 	std::string scene_name = SceneManager::Instance().GetCurrentScene()->GetName();
 
 	// シーンがワールドマップ時のノード設定
-	if (scene_name, "SceneWorldMap")
-	{
+	if (scene_name == "SceneBattle")
+	{	// シーンがバトルシーンの時のノード設定
 		ai_tree->AddNode("", "Root", 0, BehaviorTree::SelectRule::Priority, NULL, NULL);
-		ai_tree->AddNode("Root", "Sleep", 1, BehaviorTree::SelectRule::Non, NULL, new SleepAction(this));
-
-	} // シーンがバトルシーンの時のノード設定
+		ai_tree->AddNode("Root", "Death", 1, BehaviorTree::SelectRule::Non, new DeathJudgment(this), new DeathAction(this));
+		//ai_tree->AddNode("Root",				"Damage",					2, BehaviorTree::SelectRule::Non,		new DamageJudgment(this),			new DamageAction(this));
+		ai_tree->AddNode("Root", "Battle", 3, BehaviorTree::SelectRule::Priority, NULL/*new BattleJudgment(this)*/, NULL);
+		ai_tree->AddNode("Root", "Scount", 4, BehaviorTree::SelectRule::Priority, NULL, NULL);
+		ai_tree->AddNode("Battle", "Attack", 1, BehaviorTree::SelectRule::On_Off_Ramdom, new AttackJudgment(this), NULL);
+		ai_tree->AddNode("Battle", "OutRange", 2, BehaviorTree::SelectRule::Random, NULL, NULL);
+		ai_tree->AddNode("Scount", "Idle", 1, BehaviorTree::SelectRule::Non, NULL, new IdleAction(this));
+		//ai_tree->AddNode("OutRange", "Pursuit", 0, BehaviorTree::SelectRule::Non, NULL, new PursuitAction(this));
+		ai_tree->AddNode("OutRange", "FireBallShoot", 0, BehaviorTree::SelectRule::Sequence,NULL, NULL);
+		ai_tree->AddNode("Attack", "BasicAttack", 0, BehaviorTree::SelectRule::Sequence, new BasicAttackJudgment(this), NULL);
+		ai_tree->AddNode("Attack", "PlayerToTurn", 0, BehaviorTree::SelectRule::Non, new TurnToTargetJudgment(this), new TurnToTargetAction(this));
+		
+		ai_tree->AddNode("FireBallShoot", "TurnSequence", 0, BehaviorTree::SelectRule::Non, NULL, new TurnToTargetAction(this));
+		ai_tree->AddNode("FireBallShoot", "FireBallShootSequence", 0, BehaviorTree::SelectRule::Non, NULL, new FireBollAttackAction(this));
+		
+		ai_tree->AddNode("BasicAttack", "TurnSequence", 0, BehaviorTree::SelectRule::Non, NULL, new TurnToTargetAction(this));
+		ai_tree->AddNode("BasicAttack", "BasicAttackSequence", 0, BehaviorTree::SelectRule::Non, NULL, new BasicAttackAction(this));
+	}
 	else
 	{
 		ai_tree->AddNode("", "Root", 0, BehaviorTree::SelectRule::Priority, NULL, NULL);
-		ai_tree->AddNode("Root", "Death", 1, BehaviorTree::SelectRule::Non, new DeathJudgment(this), new DeathAction(this));
-		ai_tree->AddNode("Root", "Damage", 2, BehaviorTree::SelectRule::Non, new DamageJudgment(this), new DamageAction(this));
-		ai_tree->AddNode("Root", "Battle", 3, BehaviorTree::SelectRule::Priority, new BattleJudgment(this), NULL);
-		ai_tree->AddNode("Root", "Scount", 4, BehaviorTree::SelectRule::Priority, NULL, NULL);
-		ai_tree->AddNode("Battle", "Attack", 1, BehaviorTree::SelectRule::Priority, new AttackJudgment(this), NULL);
-		ai_tree->AddNode("Battle", "Pursuit", 2, BehaviorTree::SelectRule::Non, NULL, new PursuitAction(this));
-		ai_tree->AddNode("Attack", "BasicAttack", 1, BehaviorTree::SelectRule::Non, new BasicAttackJudgment(this), new BasicAttackAction(this));
-		ai_tree->AddNode("Attack", "ClawAttack", 2, BehaviorTree::SelectRule::Non, new ClawAttackJudgment(this), new ClawAttackAction(this));
-		ai_tree->AddNode("Attack", "HornAttack", 3, BehaviorTree::SelectRule::Non, new ClawAttackJudgment(this), new HornAttackAction(this));
-	//	ai_tree->AddNode("Attack", "FireBollAttack", 4, BehaviorTree::SelectRule::Non, new JumpAttackJudgment(this), new JumpAttackAction(this));
-		ai_tree->AddNode("Scount", "Wander", 1, BehaviorTree::SelectRule::Non, new WanderJudgment(this), new WanderAction(this));
-		ai_tree->AddNode("Scount", "Idle", 2, BehaviorTree::SelectRule::Non, NULL, new IdleAction(this));
+		ai_tree->AddNode("Root", "Sleep", 1, BehaviorTree::SelectRule::Non, NULL, new SleepAction(this));
 	}
 }
+
+//------------------------------------
+// 敵の破棄処理
+//------------------------------------
+void EnemyDragonSoulEater::Destroy()
+{
+	// アクターの取得
+	std::shared_ptr<Actor> actor = GetActor();
+
+	// 敵マネージャーから削除
+	EnemyManager::Instance().EnemyRemove(GetActor()->GetComponent<EnemyDragonSoulEater>());
+
+	// アクターマネージャーから削除
+	ActorManager::Instance().Remove(GetActor());
+}
+
 
 //------------------------------------
 // 更新処理
@@ -219,13 +167,7 @@ void EnemyDragonSoulEater::SetBehaviorNode()
 void EnemyDragonSoulEater::Update(float elapsed_time)
 {
 	// ビヘイビア更新処理
-	BehaviorUpdate(elapsed_time);
-
-	// 速力更新処理
-	GetMovement()->UpdateVelocity(elapsed_time);
-
-	// 無敵時間更新処理
-	GetCharactor()->UpdateInvincibleTimer(elapsed_time);
+	BehaviorUpdate(elapsed_time);	
 }
 
 //------------------------------------
@@ -233,5 +175,24 @@ void EnemyDragonSoulEater::Update(float elapsed_time)
 //------------------------------------
 void EnemyDragonSoulEater::DrawDebugPrimitive()
 {
+	DebugRenderer* renderer = Graphics::Instance().GetDebugRenderer();
+	std::shared_ptr<Actor> actor = GetActor();
+	DirectX::XMFLOAT3 position = actor->GetPosition();
+	EnemyTerritoryTag teritory_tag = GetBelongingToTerritory();
+	std::shared_ptr<EnemyTerritory> enemy_territory = EnemyTerritoryManager::Instance().GetTerritory(teritory_tag);
+	float territory_range = enemy_territory->GetTerritoryRange();
+	DirectX::XMFLOAT3 territory_origin = enemy_territory->GetTerritoryOrigin();
+	territory_origin.y = actor->GetPosition().y;
+	// 縄張り範囲をデバッグ円柱描画
+	renderer->DrawCylinder(territory_origin, territory_range, 1.0f, DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f));
+
+	// 索敵範囲をデバッグ円柱描画
+	renderer->DrawCylinder(position, search_range, 1.0f, DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f));
+
+	// 攻撃範囲をデバッグ円柱描画
+	renderer->DrawCylinder(position, GetAttackRange(), 1.0f, DirectX::XMFLOAT4(1.0f, 0.0f, 1.0f, 1.0f));
+
+	// ターゲット座標の球描画
+	renderer->DrawSphere(target_position, 0.5f, DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
 }
 

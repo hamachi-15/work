@@ -21,6 +21,7 @@
 #include "ShaderManager.h"
 #include "UIManager.h"
 #include "EnemyTerritoryManager.h"
+#include "EffectManager.h"
 
 #include "Actor.h"
 #include "Player.h"
@@ -46,6 +47,7 @@
 #include "Sprite.h"
 
 //-------------------------------------
+// コンストラクタ
 //-------------------------------------
 SceneGame::SceneGame()
 {
@@ -53,6 +55,7 @@ SceneGame::SceneGame()
 }
 
 //-------------------------------------
+// デストラクタ
 //-------------------------------------
 SceneGame::~SceneGame()
 {
@@ -95,7 +98,6 @@ void SceneGame::Initialize()
 	// テクスチャの読み込み
 	sprite = std::make_unique<Sprite>();
 	sky = ResourceManager::Instance().LoadTexture("Data/Sprite/SkyBox/FS002_Night.png");
-
 	// ステージ読み込み
 	{
 		std::shared_ptr<Actor> actor = ActorManager::Instance().Create();
@@ -239,8 +241,10 @@ void SceneGame::Update(float elapsed_time)
 	// UI更新処理
 	UIManager::Instance().Update(elapsed_time);
 
-	// カメラ更新処理
 	std::shared_ptr<Actor> actor = ActorManager::Instance().GetActor("Player");
+	GamePad& gamepad = Input::Instance().GetGamePad();
+
+	// カメラ更新処理
 	camera_controller->SetTarget({
 		actor->GetPosition().x,
 		actor->GetPosition().y + 1.0f,
@@ -319,16 +323,16 @@ void SceneGame::ScreenRender(ID3D11DeviceContext* context, RenderContext* render
 	}
 
 	// デバッグプリミティブ描画
-	{
-		// 敵縄張りのデバッグプリミティブ描画
-		EnemyTerritoryManager::Instance().Render();
-		// 敵のデバッグプリミティブ描画
-		EnemyManager::Instance().DrawDebugPrimitive();
-		// 当たり判定ののデバッグプリミティブ描画
-		CollisionManager::Instance().Draw();
+	//{
+	//	// 敵縄張りのデバッグプリミティブ描画
+	//	EnemyTerritoryManager::Instance().Render();
+	//	// 敵のデバッグプリミティブ描画
+	//	EnemyManager::Instance().DrawDebugPrimitive();
+	//	// 当たり判定ののデバッグプリミティブ描画
+	//	CollisionManager::Instance().Draw();
 
-		graphics.GetDebugRenderer()->Render(context, render_context->view, render_context->projection);
-	}
+	//	graphics.GetDebugRenderer()->Render(context, render_context->view, render_context->projection);
+	//}
 
 	// アクター描画
 	{
@@ -393,7 +397,7 @@ void SceneGame::BuckBufferRender(ID3D11DeviceContext* context, RenderContext* re
 		(float)graphics.GetTexture()->GetWidth(), (float)graphics.GetTexture()->GetHeight(),
 		0,
 		1, 1, 1, 1);
-	
+
 	// メニュー描画
 	{
 		if (MenuSystem::Instance().IsOpened())

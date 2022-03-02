@@ -142,3 +142,15 @@ bool TurnToTargetJudgment::Judgment()
 	// 前方にいればfalse
 	return false;
 }
+
+//*****************************************
+// 
+// 火球ブレスノードに移行できるか判定
+// 
+//*****************************************
+//判定
+bool FireBallAttackJudgment::Judgment()
+{
+
+	return false;
+}

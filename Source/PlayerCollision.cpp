@@ -65,9 +65,6 @@ void PlayerCollision::Start()
     // キャラクターの取得
     std::shared_ptr<Charactor> charactor = actor->GetComponent<Charactor>();
 
-    // モデル取得
-    Model* model = actor->GetModel();
-
     std::vector<std::shared_ptr<CollisionParameterData>> collision_parameter = GameDataBase::Instance().GetAttackCollitionParamterDataList(EnemyCategory::None);
     for (std::shared_ptr<CollisionParameterData> data : collision_parameter)
     {
@@ -148,9 +145,6 @@ void PlayerCollision::Update(float elapsed_time)
                 std::shared_ptr<Actor> cylinder_actor = ActorManager::Instance().GetActor(cylinder->GetActorName());
                 Message message;
                 // 攻撃が当たったことのメッセージ
-                //message.message = MessageType::Message_GetHit_Attack;
-                //message.hit_position = sphere->GetPosition();
-                //Reaction(cylinder->GetActorID(), message);
                 cylinder_actor->GetComponent<Charactor>()->ApplyDamage(charactor->GetAttack(), 0.0f);
                 // 攻撃を当てたことのメッセージ
                 message.message = MessageType::Message_Hit_Attack;

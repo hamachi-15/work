@@ -164,11 +164,11 @@ bool CollisionRayCast::IntersectRayVsModel(const DirectX::XMFLOAT3& start,
             // ƒqƒbƒgî•ñ•Û‘¶
             if (hit_result.distance > distance)
             {
-                DirectX::XMVECTOR WorldNormal = DirectX::XMVector3Transform(hit_normal, world_transform);
+                DirectX::XMVECTOR world_normal = DirectX::XMVector3Transform(hit_normal, world_transform);
                 hit_result.distance = distance;
                 hit_result.material_index = material_index;
                 DirectX::XMStoreFloat3(&hit_result.position, world_position);
-                DirectX::XMStoreFloat3(&hit_result.normal, DirectX::XMVector3Normalize(WorldNormal));
+                DirectX::XMStoreFloat3(&hit_result.normal, DirectX::XMVector3Normalize(world_normal));
                 hit = true;
             }
         }

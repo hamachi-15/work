@@ -37,7 +37,7 @@ GameDataBase::GameDataBase()
 
 	char* enemy_territory_data_buffer = LoadBuffer("Data/GameData/EnemyTerritoryPosition.dat");
 
-	char* culling_parameter_data_buffer = LoadBuffer("Data/GameData/CullingCollisionParameter.dat");
+	char* culling_parameter_data_buffer = LoadBuffer("Data/GameData/CullingCollisionParameterData.dat");
 
 	char* collision_parameter_data_buffer = LoadBuffer("Data/GameData/CollisionParameterData.dat");
 
@@ -119,12 +119,6 @@ GameDataBase::GameDataBase()
 	{
 		collision_time_data.emplace_back(std::make_unique<AttackCollitionTime>());
 	}
-
-	// アニメーションデータ
-	//for (int i = 0; i < animation_data_count; ++i)
-	//{
-	//	animation_data.emplace_back(std::make_unique<AnimationData>());
-	//}
 
 	// テキストバッファ生成
 	enemy_data_text_buffer = new char[enemy_data_headder.string_length];

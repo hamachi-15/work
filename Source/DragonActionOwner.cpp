@@ -5,9 +5,11 @@
 #include "Actor.h"
 #include "Enemy.h"
 #include "Charactor.h"
+
 // マネージャー
 #include "ActorManager.h"
 #include "EnemyManager.h"
+#include "FireBallManager.h"
 #include "CollisionManager.h"
 #include "EnemyTerritoryManager.h"
 
@@ -62,7 +64,7 @@ ActionBase::State TurnToTargetAction::Run(float elapsed_time)
 	front_direction.z = cosf(angle.y);
 	front_direction.x= Mathf::Lerp(front_direction.x, turn_direction.x, larp_timer);
 	front_direction.z= Mathf::Lerp(front_direction.z, turn_direction.z, larp_timer);
-	float rot = owner->TurnToTarget(front_direction);
+	float rot = owner->TurnToTarget(turn_direction);
 	// タイマー更新
 	owner->SetRunTimer(run_timer);
 
@@ -184,7 +186,7 @@ ActionBase::State BasicAttackAction::Run(float elapsed_time)
 
 	// 攻撃の当たり判定処理
 	std::string collision_name = actor->GetName();
-	collision_name += "mouth";
+	collision_name += "Mouth";
 	AttackCollision(actor, collision_name.c_str(), collision_time_data);
 
 	// アニメーション再生が終了したら完了を返す
@@ -316,7 +318,7 @@ ActionBase::State BodyPressAttackAction::Run(float elapsed_time)
 	run_timer -= elapsed_time;
 
 	// アニメーション再生が終了したら完了を返す
-	if (!owner->GetActor()->GetModel()->IsPlayAnimation() && run_timer <= 0.0f)
+	if (!actor->GetModel()->IsPlayAnimation() && run_timer <= 0.0f)
 	{
 		owner->SetRunTimer(0.0f);
 		owner->SetRightOfAttack(false);
@@ -416,6 +418,65 @@ ActionBase::State LungesAttackAction::Run(float elapsed_time)
 
 	// 目的地点へ移動
 	owner->MoveToDirection(target_direction, 2.5f);
+
+	return ActionBase::State::Run;
+}
+//*****************************
+// 
+// 火球攻撃
+// 
+//*****************************
+//-----------------------------
+// 実行前処理
+//-----------------------------
+void FireBollAttackAction::Start()
+{
+	std::shared_ptr<Actor> owner_actor = owner->GetActor();
+	// アニメーション再生
+	owner->PlayAnimation("SoulEaterDragonFireBallShoot");
+
+	// 攻撃の当たり判定処理
+	std::string collision_name = owner_actor->GetName();
+
+	// コリジョンマネージャー取得
+	CollisionManager& collision_manager = CollisionManager::Instance();
+	std::shared_ptr<CollisionCylinder> collision = collision_manager.GetCollisionCylinderFromName(collision_name);
+	collision->SetAttackFlag(true);
+
+	//DirectX::XMFLOAT3 player_position = ActorManager::Instance().GetActor("Player")->GetPosition();
+	//direction = Mathf::ReturnNormalizeFloatSubtract(player_position, owner->GetActor()->GetPosition());
+}
+
+//-----------------------------
+// 実行処理
+//-----------------------------
+ActionBase::State FireBollAttackAction::Run(float elapsed_time)
+{
+	std::shared_ptr<Actor> actor = owner->GetActor();
+	Model* model = actor->GetModel();
+
+	// 特定のアニメーション時間になればブレスを発射する
+	float time = model->GetCurrentAnimationSeconds();
+	if (time >= 0.5f && !flag && time <= 0.6f && !flag)
+	{
+		// 進行ベクトル取得
+		DirectX::XMFLOAT3 angle = actor->GetAngle();
+		direction.x = sinf(angle.y);
+		direction.z = cosf(angle.y);
+
+		// 火球を発射
+		FireBallManager::Instance().Create(actor, direction);
+		flag = true;
+	}
+
+	// アニメーション再生が終了したら完了を返す
+	if (!model->IsPlayAnimation())
+	{
+		owner->SetRunTimer(0.0f);
+		owner->SetRightOfAttack(false);
+		flag = false;
+		return ActionBase::State::Complete;
+	}
 
 	return ActionBase::State::Run;
 }

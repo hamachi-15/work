@@ -4,6 +4,8 @@
 #include "Texture.h"
 
 #include "ShaderManager.h"
+#include "EffectManager.h"
+
 #include "SpriteShader.h"
 #include "SkyBoxShader.h"
 #include "2DPrimitive.h"
@@ -185,8 +187,17 @@ Graphics::Graphics(HWND hwnd)
 		scene_texture->Create(screen_width, screen_height, DXGI_FORMAT_R8G8B8A8_UNORM);
 
 	}
-	BGM = Audio::Instance().LoadAudioSource("Data\\Audio\\BGM\\BGM.wav", true);
 
+	// サウンド
+	{
+		BGM = Audio::Instance().LoadAudioSource("Data\\Audio\\BGM\\BGM.wav", true);
+	}
+
+	// エフェクトマネージャー初期化
+	{
+		effect_manager = std::make_shared<EffectManager>();
+		effect_manager->Initialize();
+	}
 }
 
 //-----------------------------

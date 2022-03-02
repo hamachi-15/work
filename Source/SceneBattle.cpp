@@ -18,6 +18,8 @@
 #include "EnemySlime.h"
 #include "Player.h"
 #include "Stage.h"
+#include "FireBallManager.h"
+#include "EffectManager.h"
 #include "EnemyTerritoryManager.h"
 
 #include "MenuSystem.h"
@@ -50,6 +52,9 @@ SceneBattle::~SceneBattle()
 {
 }
 
+//---------------------------------
+// 開始処理
+//---------------------------------
 void SceneBattle::Initialize()
 {
 	Graphics& graphics = Graphics::Instance();
@@ -123,6 +128,9 @@ void SceneBattle::Initialize()
 	EnemyManager::Instance().CreateEnemyEncountData();
 }
 
+//---------------------------------
+// 終了処理
+//---------------------------------
 void SceneBattle::Finalize()
 {
 	// 敵マネージャーのクリア
@@ -137,12 +145,21 @@ void SceneBattle::Finalize()
 	// コリジョンの破棄
 	CollisionManager::Instance().Destroy();
 
+	// 火球マネージャー破棄
+	FireBallManager::Instance().Destroy();
+
 	// メッセンジャーのクリア
 	Messenger::Instance().Clear();
 }
 
+//---------------------------------
+// 更新処理
+//---------------------------------
 void SceneBattle::Update(float elapsed_time)
 {
+	// グラフィクス取得
+	Graphics& graphics = Graphics::Instance();
+
 	//	メニューオープン中はメニューを更新する
 	MenuSystem::Instance().Update(elapsed_time);
 
@@ -162,17 +179,25 @@ void SceneBattle::Update(float elapsed_time)
 			Messenger::Instance().SendData(MessageData::MENUOPENEVENT, &data);
 		}
 	}
-	// ゲームがクリアかゲームオーバーになっていれば
-	if (isgame_clear || isgame_over)
+	// ゲームがクリアになっていれば
+	if (isgame_clear)
 	{
 		SceneManager::Instance().ChangeScene(new SceneClear());
 		return;
 	}
+	// ゲームオーバーになっていれば
+	if (isgame_over)
+	{
+		SceneManager::Instance().ChangeScene(new SceneOver());
+		return;
+	}
+	// 戦闘が終了したら
 	if (isbuttle_end)
 	{
 		SceneManager::Instance().ChangeScene(new SceneGame());
 		return;
 	}
+
 	// プリミティブコンテキストのコンストラクタ更新
 	if (primitive_context->timer < 40)
 	{
@@ -182,11 +207,12 @@ void SceneBattle::Update(float elapsed_time)
 	{
 		primitive_falg = false;
 	}
+	std::shared_ptr<Actor> actor = ActorManager::Instance().GetActor("Player");
+	GamePad& gamepad = Input::Instance().GetGamePad();
 
-	//ライト
 	static float light_angle = DirectX::XM_PI;
-	if (GetKeyState('E') < 0) light_angle += elapsed_time * 2.0f;
-	if (GetKeyState('Q') < 0) light_angle -= elapsed_time * 2.0f;
+	//if (GetKeyState('E') < 0) light_angle += elapsed_time * 2.0f;
+	//if (GetKeyState('Q') < 0) light_angle -= elapsed_time * 2.0f;
 
 	//ライト方向
 	LightDir.x = sinf(light_angle);
@@ -199,21 +225,27 @@ void SceneBattle::Update(float elapsed_time)
 	ActorManager::Instance().Update(elapsed_time);
 	ActorManager::Instance().UpdateTransform();
 
+	// 火球更新処理
+	FireBallManager::Instance().Update(elapsed_time);
+	
+	//エフェクト更新処理
+	graphics.GetEffectManager()->Update(elapsed_time);
+
 	// 当たり判定更新処理
 	CollisionManager::Instance().Update();
 
 	// UI更新処理
 	UIManager::Instance().Update(elapsed_time);
 
+	// ターゲットをプレイヤー座標に設定
+	camera_controller->SetTarget({actor->GetPosition().x, actor->GetPosition().y + 1.0f, actor->GetPosition().z });
 	// カメラ更新処理
-	std::shared_ptr<Actor> actor = ActorManager::Instance().GetActor("Player");
-	camera_controller->SetTarget({
-		actor->GetPosition().x,
-		actor->GetPosition().y + 1.0f,
-		actor->GetPosition().z });
 	camera_controller->Update(elapsed_time);
 }
 
+//-------------------------------------
+// 描画処理
+//-------------------------------------
 void SceneBattle::Render()
 {
 	Graphics& graphics = Graphics::Instance();
@@ -293,16 +325,16 @@ void SceneBattle::ScreenRender(ID3D11DeviceContext* context, RenderContext* rend
 	}
 
 	// デバッグプリミティブ描画
-	{
-		// 敵縄張りのデバッグプリミティブ描画
-		EnemyTerritoryManager::Instance().Render();
-		// 敵のデバッグプリミティブ描画
-		EnemyManager::Instance().DrawDebugPrimitive();
-		// 当たり判定ののデバッグプリミティブ描画
-		CollisionManager::Instance().Draw();
+	//{
+	//	// 敵縄張りのデバッグプリミティブ描画
+	//	EnemyTerritoryManager::Instance().Render();
+	//	// 敵のデバッグプリミティブ描画
+	//	EnemyManager::Instance().DrawDebugPrimitive();
+	//	// 当たり判定ののデバッグプリミティブ描画
+	//	CollisionManager::Instance().Draw();
 
-		graphics.GetDebugRenderer()->Render(context, render_context->view, render_context->projection);
-	}
+	//	graphics.GetDebugRenderer()->Render(context, render_context->view, render_context->projection);
+	//}
 
 	// アクター描画
 	{
@@ -318,6 +350,11 @@ void SceneBattle::ScreenRender(ID3D11DeviceContext* context, RenderContext* rend
 		// 描画
 		ActorManager::Instance().Render(render_context);
 	}
+	//エフェクト描画処理
+	graphics.GetEffectManager()->Render(render_context->view, render_context->projection);
+
+	// 火球描画処理
+	FireBallManager::Instance().Render(render_context->view, render_context->projection);
 }
 
 //-------------------------------------
@@ -336,6 +373,7 @@ void SceneBattle::PostRender(ID3D11DeviceContext* context, RenderContext* render
 		sky_bloom_flag = true;
 	}
 }
+
 //-------------------------------------
 // ゲームオーバー・クリアの瞬間を描画
 //-------------------------------------

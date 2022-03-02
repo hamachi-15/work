@@ -238,6 +238,8 @@
     <ClCompile Include="Source\EnemySlime.cpp" />
     <ClCompile Include="Source\EnemyTerritory.cpp" />
     <ClCompile Include="Source\EnemyTerritoryManager.cpp" />
+    <ClCompile Include="Source\FireBall.cpp" />
+    <ClCompile Include="Source\FireBallManager.cpp" />
     <ClCompile Include="Source\Font.cpp" />
     <ClCompile Include="Source\FontShader.cpp" />
     <ClCompile Include="Source\Framework.cpp" />
@@ -379,6 +381,8 @@
     <ClInclude Include="Source\EnemySlime.h" />
     <ClInclude Include="Source\EnemyTerritory.h" />
     <ClInclude Include="Source\EnemyTerritoryManager.h" />
+    <ClInclude Include="Source\FireBall.h" />
+    <ClInclude Include="Source\FireBallManager.h" />
     <ClInclude Include="Source\Font.h" />
     <ClInclude Include="Source\FontShader.h" />
     <ClInclude Include="Source\Framework.h" />

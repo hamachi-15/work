@@ -480,6 +480,12 @@
     <ClCompile Include="Source\SceneOver.cpp">
       <Filter>ソース ファイル\Scene</Filter>
     </ClCompile>
+    <ClCompile Include="Source\FireBall.cpp">
+      <Filter>ソース ファイル\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\FireBallManager.cpp">
+      <Filter>ソース ファイル\Character</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\imgui\imconfig.h">
@@ -904,6 +910,12 @@
     </ClInclude>
     <ClInclude Include="Source\SceneOver.h">
       <Filter>ソース ファイル\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\FireBall.h">
+      <Filter>ソース ファイル\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\FireBallManager.h">
+      <Filter>ソース ファイル\Character</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

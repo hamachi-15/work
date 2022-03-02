@@ -8,18 +8,11 @@
 //------------------------------------
 class EffectManager
 {
-private:
+public:
 	// コンストラクタ
 	EffectManager() {}
 	// デストラクタ
 	~EffectManager() {}
-public:
-	// インスタンス取得
-	static EffectManager& Instance()
-	{
-		static EffectManager instance;
-		return instance;
-	}
 
 	// 初期化処理
 	void Initialize();
