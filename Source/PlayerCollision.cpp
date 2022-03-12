@@ -6,13 +6,15 @@
 #include "DebugRenderer.h"
 #include "Graphics.h"
 
+#include "EffectManager.h"
 #include "ActorManager.h"
 #include "CollisionManager.h"
-
 #include "SceneManager.h"
 
 #include "Charactor.h"
 #include "Enemy.h"
+
+#include "Effect.h"
 
 #include "GameDatabase.h"
 
@@ -64,6 +66,12 @@ void PlayerCollision::Start()
 
     // キャラクターの取得
     std::shared_ptr<Charactor> charactor = actor->GetComponent<Charactor>();
+
+    // エフェクトマネージャー取得
+    std::shared_ptr<EffectManager> effect_manager = Graphics::Instance().GetEffectManager();
+
+    // エフェクト読み込み
+    hit_effect = std::make_shared<Effect>("Data/Effect/Hit.efk", effect_manager->GetEffekseerManager());
 
     std::vector<std::shared_ptr<CollisionParameterData>> collision_parameter = GameDataBase::Instance().GetAttackCollitionParamterDataList(EnemyCategory::None);
     for (std::shared_ptr<CollisionParameterData> data : collision_parameter)
@@ -140,12 +148,27 @@ void PlayerCollision::Update(float elapsed_time)
             // 当たり判定フラグが立っていなかったら飛ばす
             if (!cylinder->GetCollisionFlag()) continue;
 
-            if (CollisionManager::Instance().IntersectSphereVsCylinder(sphere, cylinder.get()))
+            ObjectCollisionResult result;
+            if (CollisionManager::Instance().IntersectSphereVsCylinder(sphere, cylinder.get(), result))
             {
                 std::shared_ptr<Actor> cylinder_actor = ActorManager::Instance().GetActor(cylinder->GetActorName());
                 Message message;
                 // 攻撃が当たったことのメッセージ
                 cylinder_actor->GetComponent<Charactor>()->ApplyDamage(charactor->GetAttack(), 0.0f);
+
+                // エフェクトの再生位置を設定
+                DirectX::XMFLOAT3 diff;
+                DirectX::XMStoreFloat3(&diff, result.vector);
+                DirectX::XMFLOAT3 sphere_position = sphere->GetPosition();
+                DirectX::XMFLOAT3 play_position = {
+                    sphere_position.x - diff.x,
+                    sphere_position.y - diff.y,
+                    sphere_position.z - diff.z };
+                // ヒットエフェクト再生
+                hit_effect->Play(Graphics::Instance().GetEffectManager()->GetEffekseerManager(),
+                    play_position, hit_effect_scale);
+
+
                 // 攻撃を当てたことのメッセージ
                 message.message = MessageType::Message_Hit_Attack;
                 message.hit_position = { 0.0f, 0.0f, 0.0f };

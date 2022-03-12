@@ -66,9 +66,9 @@ void FireBall::Start()
     effekseer_manager->Initialize();
 
     // エフェクト読み込み
-    fireball_effect = std::make_unique<Effect>("Data/Effect/Hit.efk", effekseer_manager->GetEffekseerManager());
+    fireball_effect = std::make_unique<Effect>("Data/Effect/test.efk", effekseer_manager->GetEffekseerManager());
 
-
+    fireball_position.y = 9;
     collision_sphere->SetPosition(fireball_position);
 }
 
@@ -90,12 +90,12 @@ void FireBall::Update(float elapsed_time)
 
         // 当たり判定フラグが立っていなかったら飛ばす
         if (!cylinder->GetCollisionFlag()) continue;
-
-        if (CollisionManager::Instance().IntersectSphereVsCylinder(collision_sphere.get(), cylinder.get()))
+        ObjectCollisionResult result;
+        if (CollisionManager::Instance().IntersectSphereVsCylinder(collision_sphere.get(), cylinder.get(), result))
         {
             // 円柱のアクター取得
             std::shared_ptr<Actor> cylinder_actor = ActorManager::Instance().
-                GetActor(cylinder->GetActorName());
+            GetActor(cylinder->GetActorName());
 
             Message message;
             // 攻撃が当たったことのメッセージ
@@ -117,7 +117,7 @@ void FireBall::Update(float elapsed_time)
 
     // エフェクトマネージャー更新処理
     effekseer_manager->Update(elapsed_time);
-
+    effekseer_manager->GetEffekseerManager()->StopAllEffects();
     // 当たり判定の座標設定
     collision_sphere->SetPosition(fireball_position);
 

@@ -306,6 +306,7 @@
     <ClCompile Include="Source\SpriteLayout.cpp" />
     <ClCompile Include="Source\SpriteShader.cpp" />
     <ClCompile Include="Source\Stage.cpp" />
+    <ClCompile Include="Source\StageManager.cpp" />
     <ClCompile Include="Source\Telegram.cpp" />
     <ClCompile Include="Source\Texture.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
@@ -399,6 +400,9 @@
     <ClInclude Include="Source\GameData\EnemyData.h" />
     <ClInclude Include="Source\GameData\EnemyTerritoryPosition.h" />
     <ClInclude Include="Source\GameData\EnemyTerritoryTag.h" />
+    <ClInclude Include="Source\GameData\StageObjectCategory.h" />
+    <ClInclude Include="Source\GameData\StageObjectData.h" />
+    <ClInclude Include="Source\GameData\StageObjectSetPosition.h" />
     <ClInclude Include="Source\GameData\WorldMapData.h" />
     <ClInclude Include="Source\GamePad.h" />
     <ClInclude Include="Source\GaussianBlurShader.h" />
@@ -471,6 +475,7 @@
     <ClInclude Include="Source\SpriteLayout.h" />
     <ClInclude Include="Source\SpriteShader.h" />
     <ClInclude Include="Source\Stage.h" />
+    <ClInclude Include="Source\StageManager.h" />
     <ClInclude Include="Source\Telegram.h" />
     <ClInclude Include="Source\Template.h" />
     <ClInclude Include="Source\Texture.h">

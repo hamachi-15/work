@@ -84,19 +84,22 @@ bool Charactor::SearchAnimationTime(std::shared_ptr<Actor> actor, float start_ti
 }
 
 //-----------------------------------------
-// ヒットストップタイマーの更新処理
+// ヒットストップの更新処理
 //-----------------------------------------
 void Charactor::UpdateHitStop(float elapsed_time)
 {
 	// ヒットストップフラグが立っていなければ処理はしない
 	if (!hitstop_flag) return;
-	// ヒットストップタイマーが一定時間以上ならフラグをfalseにする
-	if (hitstop_timer >= 0.3f)
+
+	// ヒットストップフレームが0以下ならフラグをfalseにする
+	if (hitstop_frame <= 0.0f)
 	{
+		// フラグをOFFに
 		hitstop_flag = false;
-		hitstop_timer = 0.0f;
+		// 0.0fに初期化
+		hitstop_frame = 0.0f;
 		return;
 	}
-	// ヒットストップタイマー増加
-	hitstop_timer += elapsed_time;
+	// ヒットストップフレームのデクリメント
+	hitstop_frame--;
 }

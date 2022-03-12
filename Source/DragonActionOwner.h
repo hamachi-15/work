@@ -171,3 +171,22 @@ private:
 	DirectX::XMFLOAT3	direction;
 	bool				flag = false;
 };
+
+//*****************************
+// 
+// 尻尾攻撃
+// 
+//*****************************
+class TailAttackAction : public ActionBase
+{
+public:
+	// コンストラクタ
+	TailAttackAction(Enemy* enemy) : ActionBase(enemy) {}
+
+	// 実行前処理
+	void Start() override;
+
+	// 実行処理
+	ActionBase::State Run(float elapsed_time) override;
+
+};

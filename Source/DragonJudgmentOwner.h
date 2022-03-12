@@ -91,3 +91,18 @@ public:
 	//判定
 	bool Judgment() override;
 };
+
+//*****************************************
+// 
+// 尻尾攻撃ノードに移行できるか判定
+// 
+//*****************************************
+class TailAttackJudgment : public JudgmentBase
+{
+public:
+	// コンストラクタ
+	TailAttackJudgment(Enemy* enemy) : JudgmentBase(enemy) {}
+
+	//判定
+	bool Judgment() override;
+};

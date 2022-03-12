@@ -86,10 +86,10 @@ void EnemyDragonSoulEater::Start()
 	SetName("SoulEaterDragon");
 
 	// 索敵範囲の設定
-	SetSearchRange(80.0f);
+	SetSearchRange(50.0f);
 
 	// 攻撃範囲の設定
-	SetAttackRange(60.0f);
+	SetAttackRange(30.0f);
 
 	// ムーブメントコンポーネントの設定
 	SetMovement(actor->GetComponent<Movement>());
@@ -100,11 +100,11 @@ void EnemyDragonSoulEater::Start()
 	// マネージャーに登録
 	EnemyManager::Instance().EnemyRegister(actor->GetComponent<EnemyDragonSoulEater>());
 
-	// ビヘイビアツリー設定
+	// ビヘイビアツリー初期化
 	behavior_data = new BehaviorData();
 	ai_tree = new BehaviorTree();
 
-	// ノード設定
+	// ビヘイビアツリーのノード設定
 	SetBehaviorNode();
 }
 
@@ -121,16 +121,16 @@ void EnemyDragonSoulEater::SetBehaviorNode()
 	{	// シーンがバトルシーンの時のノード設定
 		ai_tree->AddNode("", "Root", 0, BehaviorTree::SelectRule::Priority, NULL, NULL);
 		ai_tree->AddNode("Root", "Death", 1, BehaviorTree::SelectRule::Non, new DeathJudgment(this), new DeathAction(this));
-		//ai_tree->AddNode("Root",				"Damage",					2, BehaviorTree::SelectRule::Non,		new DamageJudgment(this),			new DamageAction(this));
+		//ai_tree->AddNode("Root",	"Damage", 2, BehaviorTree::SelectRule::Non, new DamageJudgment(this),	new DamageAction(this));
 		ai_tree->AddNode("Root", "Battle", 3, BehaviorTree::SelectRule::Priority, NULL/*new BattleJudgment(this)*/, NULL);
 		ai_tree->AddNode("Root", "Scount", 4, BehaviorTree::SelectRule::Priority, NULL, NULL);
 		ai_tree->AddNode("Battle", "Attack", 1, BehaviorTree::SelectRule::On_Off_Ramdom, new AttackJudgment(this), NULL);
-		ai_tree->AddNode("Battle", "OutRange", 2, BehaviorTree::SelectRule::Random, NULL, NULL);
+		ai_tree->AddNode("Battle", "OutRange", 2, BehaviorTree::SelectRule::On_Off_Ramdom, NULL, NULL);
 		ai_tree->AddNode("Scount", "Idle", 1, BehaviorTree::SelectRule::Non, NULL, new IdleAction(this));
-		//ai_tree->AddNode("OutRange", "Pursuit", 0, BehaviorTree::SelectRule::Non, NULL, new PursuitAction(this));
+		ai_tree->AddNode("OutRange", "Pursuit", 0, BehaviorTree::SelectRule::Non, NULL, new PursuitAction(this));
 		ai_tree->AddNode("OutRange", "FireBallShoot", 0, BehaviorTree::SelectRule::Sequence,NULL, NULL);
 		ai_tree->AddNode("Attack", "BasicAttack", 0, BehaviorTree::SelectRule::Sequence, new BasicAttackJudgment(this), NULL);
-		ai_tree->AddNode("Attack", "PlayerToTurn", 0, BehaviorTree::SelectRule::Non, new TurnToTargetJudgment(this), new TurnToTargetAction(this));
+		ai_tree->AddNode("Attack", "TailAttack", 0, BehaviorTree::SelectRule::Non, new TailAttackJudgment(this), new TailAttackAction(this));
 		
 		ai_tree->AddNode("FireBallShoot", "TurnSequence", 0, BehaviorTree::SelectRule::Non, NULL, new TurnToTargetAction(this));
 		ai_tree->AddNode("FireBallShoot", "FireBallShootSequence", 0, BehaviorTree::SelectRule::Non, NULL, new FireBollAttackAction(this));

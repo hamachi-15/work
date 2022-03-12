@@ -106,16 +106,17 @@ void SceneGame::Initialize()
 		actor->SetPosition(DirectX::XMFLOAT3(0, 0, 0));
 		actor->SetAngle(DirectX::XMFLOAT3( 0, Mathf::ConvartToRadian(-90), 0));
 		actor->SetScale(DirectX::XMFLOAT3(0.1f, 0.1f, 0.1f));
-		actor->AddComponent<Stage>();
+		//actor->AddComponent<Stage>();
 		actor->SetShaderType(ShaderManager::ShaderType::CascadeShadowMap);
 	}
 	{
 		std::shared_ptr<Actor> actor = ActorManager::Instance().Create();
 		actor->SetUpModel("Data/Model/Filde/StageObjects.mdl", nullptr);
+		//actor->SetUpModel("Data/Model/Filde/StageObject/Conifer.mdl", nullptr);
 		actor->SetName("FildeObjects");
-		actor->SetPosition(DirectX::XMFLOAT3(0, 0, 0));
+		actor->SetPosition(DirectX::XMFLOAT3(-100, 0.3f, 100));
 		actor->SetAngle(DirectX::XMFLOAT3(0, Mathf::ConvartToRadian(-90), 0));
-		actor->SetScale(DirectX::XMFLOAT3(0.1f, 0.1f, 0.1f));
+		actor->SetScale(DirectX::XMFLOAT3(8.f, 8.f, 8.f));
 		actor->AddComponent<Stage>();
 		actor->SetShaderType(ShaderManager::ShaderType::Lambert);
 	}
@@ -310,15 +311,15 @@ void SceneGame::ScreenRender(ID3D11DeviceContext* context, RenderContext* render
 			0, 0,
 			(float)sky->GetWidth(), (float)sky->GetHeight());
 		//ブレンドステート設定
-		context->OMSetBlendState(graphics.GetBlendState((int)Graphics::BlendState::Add), nullptr, 0xFFFFFFFF);
-		sprite->AddRender(context,
-			bloom_texture,
-			0, 0,
-			screen_size.x, screen_size.y,
-			0, 0,
-			static_cast<float>(bloom_texture->GetWidth()), static_cast<float>(bloom_texture->GetHeight()),
-			0,
-			1, 1, 1, 1);
+		//context->OMSetBlendState(graphics.GetBlendState((int)Graphics::BlendState::Add), nullptr, 0xFFFFFFFF);
+		//sprite->AddRender(context,
+		//	bloom_texture,
+		//	0, 0,
+		//	screen_size.x, screen_size.y,
+		//	0, 0,
+		//	static_cast<float>(bloom_texture->GetWidth()), static_cast<float>(bloom_texture->GetHeight()),
+		//	0,
+		//	1, 1, 1, 1);
 		skybox_shader->End(context);
 	}
 

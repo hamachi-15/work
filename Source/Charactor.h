@@ -97,10 +97,10 @@ public:
 	float GetTurnSpeed() const { return this->turn_speed; }
 
 	// ヒットストップタイマー設定
-	void SetHitStopTimer(float hitstop_timer) { this->hitstop_timer = hitstop_timer; }
+	void SetHitStopFrame(float hitstop_frame = 12.0f) { this->hitstop_frame = hitstop_frame; }
 
 	// ヒットストップタイマー取得
-	float GetHitStopTimer() const { return hitstop_timer; }
+	float GetHitStopFrame() const { return hitstop_frame; }
 
 	// 無敵時間取得
 	float GetInvincibleTimer() const { return invincible_timer; }
@@ -117,7 +117,7 @@ public:
 	// アニメーションの範囲区間判定
 	bool SearchAnimationTime(std::shared_ptr<Actor> actor, float start_time, float end_time);
 
-	// ヒットストップタイマーの更新処理
+	// ヒットストップの更新処理
 	void UpdateHitStop(float elapsed_time);
 
 	// 無敵時間更新
@@ -146,7 +146,7 @@ private:
 	float	turn_speed = DirectX::XMConvertToRadians(360);
 	bool	damage_flag = false;		// ダメージを受けているかのフラグ
 	bool	death_flag = false;			// 死亡状態かのフラグ
-	float	hitstop_timer = 0.0f;		// ヒットストップタイマー
+	float	hitstop_frame = 0.0f;		// ヒットストップタイマー
 	bool	hitstop_flag = false;		// ヒットストップを行うかのフラグ
 
 	int level;							// レベル

@@ -63,6 +63,10 @@ bool EnemyDragonNightmare::OnMessages(const Telegram& message)
 	switch (message.message_box.message)
 	{
 	case MessageType::Message_Hit_Attack:
+	{
+		std::shared_ptr<Charactor> charactor = GetActor()->GetComponent<Charactor>();
+		charactor->SetHitAttackFlag(true);
+	}
 		break;
 	case MessageType::Message_GetHit_Attack:
 		// Õ“Ë‚µ‚½ˆÊ’u‚ğİ’è
@@ -70,8 +74,7 @@ bool EnemyDragonNightmare::OnMessages(const Telegram& message)
 		break;
 	case MessageType::Message_Give_Attack_Right:
 	{
-		std::shared_ptr<Charactor> charactor = GetActor()->GetComponent<Charactor>();
-		// UŒ‚ƒqƒbƒgƒtƒ‰ƒO‚ğ—§‚Ä‚é
+		// UŒ‚Œ ‚ğ—^‚¦‚é
 		SetRightOfAttack(true);
 	}
 	break;
@@ -136,12 +139,12 @@ void EnemyDragonNightmare::SetBehaviorNode()
 		ai_tree->AddNode("Root",				"Battle",					3, BehaviorTree::SelectRule::Priority,	NULL/*new BattleJudgment(this)*/,	NULL);
 		ai_tree->AddNode("Root",				"Scount",					4, BehaviorTree::SelectRule::Priority,	NULL,								NULL);
 		ai_tree->AddNode("Battle",				"Attack",					1, BehaviorTree::SelectRule::On_Off_Ramdom,	new AttackJudgment(this),			NULL);
-		ai_tree->AddNode("Battle",				"OutRange",					2, BehaviorTree::SelectRule::Random,		NULL,								NULL);
+		ai_tree->AddNode("Battle",				"OutRange",					2, BehaviorTree::SelectRule::Priority,		NULL,								NULL);
 		ai_tree->AddNode("Scount",				"Idle",						1, BehaviorTree::SelectRule::Non,		NULL,								new IdleAction(this));
 		ai_tree->AddNode("OutRange",			"Pursuit",					0, BehaviorTree::SelectRule::Non,		NULL, new PursuitAction(this));
-		ai_tree->AddNode("OutRange",			"LungesAttack",				0, BehaviorTree::SelectRule::Sequence,	NULL, NULL);
-		ai_tree->AddNode("LungesAttack",		"TurnSequence",				0, BehaviorTree::SelectRule::Non,		NULL, new TurnToTargetAction(this));
-		ai_tree->AddNode("LungesAttack",		"LungesAttackSequence",		0, BehaviorTree::SelectRule::Non,		NULL, new LungesAttackAction(this));
+		//ai_tree->AddNode("OutRange",			"LungesAttack",				1, BehaviorTree::SelectRule::Sequence,	NULL, NULL);
+		//ai_tree->AddNode("LungesAttack",		"TurnSequence",				0, BehaviorTree::SelectRule::Non,		NULL, new TurnToTargetAction(this));
+		//ai_tree->AddNode("LungesAttack",		"LungesAttackSequence",		1, BehaviorTree::SelectRule::Non,		NULL, new LungesAttackAction(this));
 		ai_tree->AddNode("Attack",				"BasicAttack",				0, BehaviorTree::SelectRule::Sequence,	new BasicAttackJudgment(this),		NULL);
 		ai_tree->AddNode("Attack",				"BodyPressAttack",			0, BehaviorTree::SelectRule::Random,	new BodyPressAttackJudgment(this), NULL);
 		ai_tree->AddNode("Attack",				"PlayerToTurn",				0, BehaviorTree::SelectRule::Non,		new TurnToTargetJudgment(this),	new TurnToTargetAction(this));

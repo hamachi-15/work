@@ -51,12 +51,7 @@ public:
 	
 	// アニメーションの再再生処理
 	void AnimationReplay() { animation_stop_flag = false; }
-
-	const DirectX::XMFLOAT3 GetAnimationPosition() const { return animation_position; }
-	void SetAnimationPosition(DirectX::XMFLOAT3 position) { animation_position = position; }
 	
-	// ヒットストップ処理
-	float HitStop(float t, float t0, float t1, float k);
 private:
 	std::shared_ptr<ModelResource>	resource;
 	std::vector<Node>				nodes;
@@ -67,5 +62,4 @@ private:
 	bool							animation_stop_flag = false;
 	float							animation_blend_time = 0.0f;
 	float							animation_blend_seconds = 0.0f;
-	DirectX::XMFLOAT3				animation_position = {};
 };

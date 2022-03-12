@@ -178,9 +178,8 @@ void Movement::UpdateVerticalVelocity(float elapsed_frame)
 void Movement::UpdateVerticalMove(float elapsed_time)
 {
 	std::shared_ptr<Actor> actor = GetActor();
-	std::shared_ptr<Actor> actor_stage = ActorManager::Instance().GetActor("Filde");;
-	std::shared_ptr<Stage> stage = actor_stage->GetComponent<Stage>();
-	std::shared_ptr<Actor> actor_player = ActorManager::Instance().GetActor("Player");;
+	std::shared_ptr<Actor> actor_stage = ActorManager::Instance().GetActor("Filde");
+	std::shared_ptr<Actor> actor_player = ActorManager::Instance().GetActor("Player");
 	std::shared_ptr<Player> player = actor_player->GetComponent<Player>();
 
 	float my = velocity.y * elapsed_time;
@@ -201,7 +200,7 @@ void Movement::UpdateVerticalMove(float elapsed_time)
 
 		// レイキャストによる地面判定
 		HitResult hit;
-		if(CollisionManager::Instance().IntersectRayVsModel(start, end, stage->GetActor()->GetModel(), hit))
+		if(CollisionManager::Instance().IntersectRayVsModel(start, end, actor_stage->GetModel(), hit))
 		{
 			// 地面に接地している
 			position.y = hit.position.y;
@@ -310,7 +309,6 @@ void Movement::UpdateHorizontalMove(float elapsed_time)
 {
 	std::shared_ptr<Actor> actor = GetActor();
 	std::shared_ptr<Actor> actor_stage = ActorManager::Instance().GetActor("Filde");;
-	std::shared_ptr<Stage> stage = actor_stage->GetComponent<Stage>();
 
 	DirectX::XMFLOAT3 position = actor->GetPosition();
 
@@ -327,7 +325,7 @@ void Movement::UpdateHorizontalMove(float elapsed_time)
 
 		// TODO レイキャストで壁ずり等
 		HitResult hit;
-		if (CollisionManager::Instance().IntersectRayVsModel(start, end, stage->GetActor()->GetModel(), hit))
+		if (CollisionManager::Instance().IntersectRayVsModel(start, end, actor_stage->GetModel(), hit))
 		{
 			// 壁までのベクトル
 			DirectX::XMVECTOR _start = DirectX::XMLoadFloat3(&start);
@@ -347,7 +345,7 @@ void Movement::UpdateHorizontalMove(float elapsed_time)
 
 			// 壁ずり方向へレイキャスト
 			HitResult hit2;
-			if (!CollisionManager::Instance().IntersectRayVsModel(hit.position, collect_position, stage->GetActor()->GetModel(), hit2))
+			if (!CollisionManager::Instance().IntersectRayVsModel(hit.position, collect_position, actor_stage->GetModel(), hit2))
 			{
 				// 壁ずり方向で壁に当たらなかったら補正位置に移動
 				position.x = collect_position.x;

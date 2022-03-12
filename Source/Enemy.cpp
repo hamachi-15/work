@@ -145,6 +145,10 @@ void Enemy::PlayAnimation(const char* animation_name)
 	
 	// アニメーションデータ取得
 	std::shared_ptr<AnimationData> animation = GameDataBase::Instance().GetAnimationData(animation_name);
+	if (!animation)
+	{
+		return;
+	}
 
 	// アニメーション再生
 	model->PlayAnimation(animation->number, animation->roop_flag, animation->blend);

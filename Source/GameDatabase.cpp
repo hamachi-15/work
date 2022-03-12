@@ -69,18 +69,25 @@ GameDataBase::GameDataBase()
 
 
 	// データ数設定
+	// ワールドマップのデータ数取得
 	world_map_data_count = world_map_data_headder.data_count;
 
+	// 敵のデータ数取得
 	enemy_data_count = enemy_data_headder.data_count;
 
+	// 敵テリトリーのデータ数取得
 	enemy_territory_data_count = enemy_territory_data_headder.data_count;
 
+	// 当たり判定を行う時間のデータ数取得
 	collision_time_data_count = collision_time_data_headder.data_count;
 
+	// コリジョンのデータ数取得
 	collision_parameter_data_count = collision_parameter_data_headder.data_count;
 	
+	// カリングコリジョンのデータ数取得
 	culling_parameter_data_count = culling_parameter_data_headder.data_count;
 
+	// アニメーションのデータ数取得
 	animation_data_count = aniamtion_data_headder.data_count;
 
 	// データ生成

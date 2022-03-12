@@ -40,7 +40,7 @@ public:
 	std::shared_ptr<CollisionCylinder> GetEnemyBodyCollision() { return collision_cylinder; }
 private:
 	std::shared_ptr<Effect>							hit_effect = nullptr;
-	float											hit_effect_scale = 3.0f;
+	float											hit_effect_scale = 5.0f;
 	std::shared_ptr<CollisionCylinder>				collision_cylinder;
 	std::vector<std::shared_ptr<CollisionSphere>>	collision_spheres;
 	std::string										name = "";

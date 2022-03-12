@@ -89,7 +89,7 @@ void CameraController::Update(float elapsed_time)
 		isground = false;
 	}
 	// 徐々に目標に近づける
-	static	constexpr	float	speed = 1.0f / 16.0f;
+	static	constexpr	float	speed = 1.0f / 8.0f;
 	position.x += (new_position.x - position.x) * speed;
 	position.y += (new_position.y - position.y) * speed;
 	position.z += (new_position.z - position.z) * speed;
@@ -101,8 +101,13 @@ void CameraController::Update(float elapsed_time)
 	// カメラの視点と注視点を設定
 	Camera::Instance().SetLookAt(position, this->target, DirectX::XMFLOAT3(0, 1, 0));
 
+	if (gamepad.GetButtonDown() & gamepad.BTN_X)
+	{
+		CalculateFrustum();
+	}
+
 	// 視錐台更新
-	CalculateFrustum();
+	//CalculateFrustum();
 }
 
 //-----------------------------
@@ -296,7 +301,7 @@ void CameraController::OnLockonMode(void* data)
 	mode = Mode::LockonCamera;
 	target_work[0] = camera_data->start;
 	target_work[1] = camera_data->target;
-	target_work[0].y += 50.0f;
+	target_work[0].y += 20.0f;
 	target_work[1].y += 0.01f;
 }
 
@@ -330,7 +335,7 @@ void CameraController::UpdateFreeCamera(float elapsed_time)
 	// スティックの入力値に応じてX軸とY軸
 	angle.x += ay * speed;
 	// カメラが地面に当たっていなければアングルを更新
-	if(!isground) angle.y += ax * speed;
+	if(!isground)angle.y += ax * speed;
 
 	// X軸のカメラの回転を制御
 	if (angle.x > max_angleX)
@@ -391,7 +396,7 @@ void CameraController::UpdateLockonCamera(float elapsed_time)
 		DirectX::XMVectorReplicate(length_limit[0]),
 		DirectX::XMVectorReplicate(length_limit[1]));
 	target1 = DirectX::XMVectorMultiplyAdd(length, DirectX::XMVector3Normalize(DirectX::XMVectorNegate(vector)), target1);
-	target1 = DirectX::XMVectorMultiplyAdd(camera_right_view, DirectX::XMVectorReplicate(side_value * 3.0f), target1);
+	target1 = DirectX::XMVectorMultiplyAdd(camera_right_view, DirectX::XMVectorReplicate(side_value*3.0f), target1);
 	target1 = DirectX::XMVectorMultiplyAdd(camera_up_view, DirectX::XMVectorReplicate(3.0f), target1);
 	DirectX::XMStoreFloat3(&new_position, target1);
 }

@@ -107,10 +107,19 @@ public:
 	bool IntersectSphereVsSphere(CollisionSphere* sphereA, CollisionSphere* sphereB);
 
 	// 球と円柱の交差判定
-	bool IntersectSphereVsCylinder(CollisionSphere* sphere, CollisionCylinder* cylinder);
+	bool IntersectSphereVsCylinder(CollisionSphere* sphere, CollisionCylinder* cylinder, ObjectCollisionResult& result);
 
 	// 円柱と円柱の交差判定
-	bool IntersectCylinderVsCylinder(CollisionCylinder* cylinderA, std::shared_ptr<Actor> collisionA_actor, CollisionCylinder* cylinderB, std::shared_ptr<Actor> collisionB_actor, ObjectCollisionResult& result);
+	/// 引数------------------------------
+	/// 円柱コリジョンA
+	/// 円柱コリジョンAを持っているアクター
+	/// 円柱コリジョンB
+	/// 円柱コリジョンBを持っているアクター
+	/// 当たり判定のリザルトを格納する
+	/// ----------------------------------
+	bool IntersectCylinderVsCylinder(CollisionCylinder* cylinderA, std::shared_ptr<Actor> collisionA_actor,
+		CollisionCylinder* cylinderB, std::shared_ptr<Actor> collisionB_actor, 
+		ObjectCollisionResult& result);
 
 
 private:

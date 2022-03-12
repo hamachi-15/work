@@ -149,13 +149,13 @@ bool Player::OnMessages(const Telegram& message)
 
 		// 攻撃ヒットフラグを立てる
 		charactor->SetHitAttackFlag(true);
+		// ヒットストップを行うフレーム数
+		charactor->SetHitStopFrame();
+		charactor->SetHitStopFlag(true);
 		return true;
 		break;
 	// 敵の攻撃がプレイヤーに当たった
 	case MessageType::Message_GetHit_Attack:
-		// TODOダメージを受ける
-		charactor->ApplyDamage(1, 0.9f);
-
 		return true;
 		break;
 	case MessageType::Message_Hit_Boddy:

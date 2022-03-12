@@ -66,7 +66,7 @@ void EnemyCollision::Start()
     // キャラクターの取得
     std::shared_ptr<Charactor> charactor = actor->GetComponent<Charactor>();
 
-    // エフェクトマネージャース取得
+    // エフェクトマネージャー取得
     std::shared_ptr<EffectManager> effect_manager = Graphics::Instance().GetEffectManager();
 
     // エフェクト読み込み
@@ -158,7 +158,8 @@ void EnemyCollision::Update(float elapsed_time)
             // 当たり判定フラグが立っていなかったら飛ばす
             if (!cylinder->GetCollisionFlag()) continue;
             // 球と円柱が当たっていたら
-            if (CollisionManager::Instance().IntersectSphereVsCylinder(sphere, cylinder.get()))
+            ObjectCollisionResult result;
+            if (CollisionManager::Instance().IntersectSphereVsCylinder(sphere, cylinder.get(), result))
             {
                 // 円柱コリジョンのアクター取得
                 std::shared_ptr<Actor> cylinder_actor = ActorManager::Instance().GetActor(cylinder->GetActorName());
@@ -170,10 +171,13 @@ void EnemyCollision::Update(float elapsed_time)
                 DirectX::XMFLOAT3 cylinder_actor_position = cylinder_actor->GetPosition();
 
                 // エフェクトの再生位置を設定
+                DirectX::XMFLOAT3 diff;
+                DirectX::XMStoreFloat3(&diff, result.vector);
+                DirectX::XMFLOAT3 sphere_position = sphere->GetPosition();
                 DirectX::XMFLOAT3 play_position = {
-                    cylinder_actor_position.x,
-                    cylinder_actor_position.y + 5.0f,
-                    cylinder_actor_position.z };
+                    sphere_position.x - diff.x,
+                    sphere_position.y - diff.y,
+                    sphere_position.z - diff.z };
                 // ヒットエフェクト再生
                 hit_effect->Play(Graphics::Instance().GetEffectManager()->GetEffekseerManager(),
                     play_position, hit_effect_scale);

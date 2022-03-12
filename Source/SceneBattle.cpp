@@ -101,7 +101,6 @@ void SceneBattle::Initialize()
 		actor->SetPosition(DirectX::XMFLOAT3(0, 0, 0));
 		actor->SetAngle(DirectX::XMFLOAT3(0, Mathf::ConvartToRadian(-90), 0));
 		actor->SetScale(DirectX::XMFLOAT3(0.1f, 0.1f, 0.1f));
-		actor->AddComponent<Stage>();
 		actor->SetShaderType(ShaderManager::ShaderType::CascadeShadowMap);
 	}
 
@@ -125,7 +124,7 @@ void SceneBattle::Initialize()
 	ActorManager::Instance().UpdateTransform();
 	
 	// エンカウントデータから敵の生成
-	EnemyManager::Instance().CreateEnemyEncountData();
+	//EnemyManager::Instance().CreateEnemyEncountData();
 }
 
 //---------------------------------
@@ -325,16 +324,16 @@ void SceneBattle::ScreenRender(ID3D11DeviceContext* context, RenderContext* rend
 	}
 
 	// デバッグプリミティブ描画
-	//{
-	//	// 敵縄張りのデバッグプリミティブ描画
-	//	EnemyTerritoryManager::Instance().Render();
-	//	// 敵のデバッグプリミティブ描画
-	//	EnemyManager::Instance().DrawDebugPrimitive();
-	//	// 当たり判定ののデバッグプリミティブ描画
-	//	CollisionManager::Instance().Draw();
+	{
+		// 敵縄張りのデバッグプリミティブ描画
+		EnemyTerritoryManager::Instance().Render();
+		// 敵のデバッグプリミティブ描画
+		EnemyManager::Instance().DrawDebugPrimitive();
+		// 当たり判定ののデバッグプリミティブ描画
+		CollisionManager::Instance().Draw();
 
-	//	graphics.GetDebugRenderer()->Render(context, render_context->view, render_context->projection);
-	//}
+		graphics.GetDebugRenderer()->Render(context, render_context->view, render_context->projection);
+	}
 
 	// アクター描画
 	{

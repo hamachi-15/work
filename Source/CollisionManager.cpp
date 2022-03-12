@@ -78,7 +78,7 @@ void CollisionManager::Draw()
     // 球コリジョン描画
     for (std::shared_ptr<CollisionSphere> sphere : spheres)
     {
-        if (!sphere->GetAttackFlag()) continue;
+        //if (!sphere->GetAttackFlag()) continue;
         sphere->Render(renderer);
     }
 
@@ -307,31 +307,30 @@ bool CollisionManager::IntersectSphereVsSphere(CollisionSphere* sphereA, Collisi
 //-----------------------------------------
 // 球と円柱の交差判定
 //-----------------------------------------
-bool CollisionManager::IntersectSphereVsCylinder(CollisionSphere* sphere, CollisionCylinder* cylinder)
+bool CollisionManager::IntersectSphereVsCylinder(CollisionSphere* sphere, CollisionCylinder* cylinder, ObjectCollisionResult& result)
 {
     // 座標取得
-    DirectX::XMFLOAT3 sphere_position = sphere->GetPosition();
-    DirectX::XMFLOAT3 cylinder_position = cylinder->GetPosition();
+    result.positionA = sphere->GetPosition();
+    result.positionB = cylinder->GetPosition();
     float             sphere_radius = sphere->GetRadius();
     float             cylinder_radius = cylinder->GetRadius();
     float             cylinder_height = cylinder->GetHeight();
     //Aの足元がBの頭より上なら当たっていない
-    if (sphere_position.y - sphere_radius > cylinder_position.y + cylinder_height)
+    if (result.positionA.y - sphere_radius > result.positionB.y + cylinder_height)
     {
         return false;
     }
     //Aの頭がBの足元より下なら当たっていない
-    if (sphere_position.y + sphere_radius < cylinder_position.y)
+    if (result.positionA.y + sphere_radius < result.positionB.y)
     {
         return false;
     }
 
     // XZ平面での範囲チェック
-    DirectX::XMVECTOR vec_sphere_position = DirectX::XMLoadFloat3(&sphere_position);
-    DirectX::XMVECTOR vec_cylinder_position = DirectX::XMLoadFloat3(&cylinder_position);
-    //vec_sphere_position = DirectX::XMVectorSet(cylinder_position.x, sphere_position.y, cylinder_position.z, 0.0f);
-    DirectX::XMVECTOR  vector = DirectX::XMVectorSubtract(vec_sphere_position, vec_cylinder_position);
-    DirectX::XMVECTOR vec_length = DirectX::XMVector3Length(vector);
+    DirectX::XMVECTOR vec_sphere_position = DirectX::XMLoadFloat3(&result.positionA);
+    DirectX::XMVECTOR vec_cylinder_position = DirectX::XMLoadFloat3(&result.positionB);
+    result.vector = DirectX::XMVectorSubtract(vec_sphere_position, vec_cylinder_position);
+    DirectX::XMVECTOR vec_length = DirectX::XMVector3Length(result.vector);
     float			  length;
     DirectX::XMStoreFloat(&length, vec_length);
     float renge = sphere_radius + cylinder_radius;
@@ -341,11 +340,11 @@ bool CollisionManager::IntersectSphereVsCylinder(CollisionSphere* sphere, Collis
     }
 
     // 単位ベクトル化
-    vector = DirectX::XMVector3Normalize(vector);
+    result.vector = DirectX::XMVector3Normalize(result.vector);
 
     // めりこみ量を求める
     float diff = renge - length;
-    vector = DirectX::XMVectorScale(vector, diff);
+    result.vector = DirectX::XMVectorScale(result.vector, diff);
 
     return true;
 }

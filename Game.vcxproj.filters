@@ -486,6 +486,9 @@
     <ClCompile Include="Source\FireBallManager.cpp">
       <Filter>ソース ファイル\Character</Filter>
     </ClCompile>
+    <ClCompile Include="Source\StageManager.cpp">
+      <Filter>ソース ファイル\Character</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\imgui\imconfig.h">
@@ -916,6 +919,18 @@
     </ClInclude>
     <ClInclude Include="Source\FireBallManager.h">
       <Filter>ソース ファイル\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\StageManager.h">
+      <Filter>ソース ファイル\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GameData\StageObjectCategory.h">
+      <Filter>ソース ファイル\GameData</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GameData\StageObjectData.h">
+      <Filter>ソース ファイル\GameData</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GameData\StageObjectSetPosition.h">
+      <Filter>ソース ファイル\GameData</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

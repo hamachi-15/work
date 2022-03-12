@@ -2,13 +2,12 @@
 	@file	CollisionParameterData.h
 	@brief	ツールにて自動生成しています。絶対に書き換えないでください。
 	@autor	DataBase.xlsm
-	@data	2022/03/03
+	@data	2022/03/12
 **/
 #pragma	once
 
 #include	"EnemyCategory.h"
 #include	"CollisionMeshType.h"
-#include	"ActorType.h"
 #include	"CollisionUpdateType.h"
 
 

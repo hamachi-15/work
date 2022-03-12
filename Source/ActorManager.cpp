@@ -128,6 +128,9 @@ void ActorManager::Update(float elapsed_time)
 
 	for (std::shared_ptr<Actor>& actor : update_actors)
 	{
+		// カリングされているなら更新しない
+		if (actor->GetCullingFlag()) continue;
+
 		actor->Update(elapsed_time);
 	}
 
@@ -227,41 +230,38 @@ void ActorManager::ShadowRender( RenderContext* render_context, BlurRenderContex
 
 		// エリアを内包する8頂点を算出する
 		DirectX::XMVECTOR	vertex[8];
-		{
-			//	エリアの近平面の中心からの上面までの距離を求める
-			float	nearY = tanf(camera.GetFov() * 0.5f) * near_depth;
-			//	エリアの近平面の中心からの右面までの距離を求める
-			float	nearX = nearY * camera.GetAspect();
-			//	エリアの遠平面の中心からの上面までの距離を求める
-			float	farY = tanf(camera.GetFov() * 0.5f) * far_depth;
-			//	エリアの遠平面の中心からの右面までの距離を求める
-			float	farX = farY * camera.GetAspect();
+		//	エリアの近平面の中心からの上面までの距離を求める
+		float	nearY = tanf(camera.GetFov() * 0.5f) * near_depth;
+		//	エリアの近平面の中心からの右面までの距離を求める
+		float	nearX = nearY * camera.GetAspect();
+		//	エリアの遠平面の中心からの上面までの距離を求める
+		float	farY = tanf(camera.GetFov() * 0.5f) * far_depth;
+		//	エリアの遠平面の中心からの右面までの距離を求める
+		float	farX = farY * camera.GetAspect();
 
-			//	エリアの近平面の中心座標を求める
-			DirectX::XMVECTOR	near_position = DirectX::XMVectorAdd(view_pos, DirectX::XMVectorScale(view_front, near_depth));
-			//	エリアの遠平面の中心座標を求める
-			DirectX::XMVECTOR	far_position = DirectX::XMVectorAdd(view_pos, DirectX::XMVectorScale(view_front, far_depth));
+		//	エリアの近平面の中心座標を求める
+		DirectX::XMVECTOR	near_position = DirectX::XMVectorAdd(view_pos, DirectX::XMVectorScale(view_front, near_depth));
+		//	エリアの遠平面の中心座標を求める
+		DirectX::XMVECTOR	far_position = DirectX::XMVectorAdd(view_pos, DirectX::XMVectorScale(view_front, far_depth));
 
-			//	8頂点を求める
-			{
-				// 近平面の右上
-				vertex[0] = DirectX::XMVectorAdd(near_position, DirectX::XMVectorAdd(DirectX::XMVectorScale(view_up, nearY), DirectX::XMVectorScale(view_right, nearX)));
-				// 近平面の左上
-				vertex[1] = DirectX::XMVectorAdd(near_position, DirectX::XMVectorAdd(DirectX::XMVectorScale(view_up, nearY), DirectX::XMVectorScale(view_right, -nearX)));
-				// 近平面の右下
-				vertex[2] = DirectX::XMVectorAdd(near_position, DirectX::XMVectorAdd(DirectX::XMVectorScale(view_up, -nearY), DirectX::XMVectorScale(view_right, nearX)));
-				// 近平面の左下
-				vertex[3] = DirectX::XMVectorAdd(near_position, DirectX::XMVectorAdd(DirectX::XMVectorScale(view_up, -nearY), DirectX::XMVectorScale(view_right, -nearX)));
-				// 遠平面の右上
-				vertex[4] = DirectX::XMVectorAdd(far_position, DirectX::XMVectorAdd(DirectX::XMVectorScale(view_up, farY), DirectX::XMVectorScale(view_right, farX)));
-				// 遠平面の左上
-				vertex[5] = DirectX::XMVectorAdd(far_position, DirectX::XMVectorAdd(DirectX::XMVectorScale(view_up, farY), DirectX::XMVectorScale(view_right, -farX)));
-				// 遠平面の右下
-				vertex[6] = DirectX::XMVectorAdd(far_position, DirectX::XMVectorAdd(DirectX::XMVectorScale(view_up, -farY), DirectX::XMVectorScale(view_right, farX)));
-				// 遠平面の左下
-				vertex[7] = DirectX::XMVectorAdd(far_position, DirectX::XMVectorAdd(DirectX::XMVectorScale(view_up, -farY), DirectX::XMVectorScale(view_right, -farX)));
-			}
-		}
+		//	8頂点を求める
+		// 近平面の右上
+		vertex[0] = DirectX::XMVectorAdd(near_position, DirectX::XMVectorAdd(DirectX::XMVectorScale(view_up, nearY), DirectX::XMVectorScale(view_right, nearX)));
+		// 近平面の左上
+		vertex[1] = DirectX::XMVectorAdd(near_position, DirectX::XMVectorAdd(DirectX::XMVectorScale(view_up, nearY), DirectX::XMVectorScale(view_right, -nearX)));
+		// 近平面の右下
+		vertex[2] = DirectX::XMVectorAdd(near_position, DirectX::XMVectorAdd(DirectX::XMVectorScale(view_up, -nearY), DirectX::XMVectorScale(view_right, nearX)));
+		// 近平面の左下
+		vertex[3] = DirectX::XMVectorAdd(near_position, DirectX::XMVectorAdd(DirectX::XMVectorScale(view_up, -nearY), DirectX::XMVectorScale(view_right, -nearX)));
+		// 遠平面の右上
+		vertex[4] = DirectX::XMVectorAdd(far_position, DirectX::XMVectorAdd(DirectX::XMVectorScale(view_up, farY), DirectX::XMVectorScale(view_right, farX)));
+		// 遠平面の左上
+		vertex[5] = DirectX::XMVectorAdd(far_position, DirectX::XMVectorAdd(DirectX::XMVectorScale(view_up, farY), DirectX::XMVectorScale(view_right, -farX)));
+		// 遠平面の右下
+		vertex[6] = DirectX::XMVectorAdd(far_position, DirectX::XMVectorAdd(DirectX::XMVectorScale(view_up, -farY), DirectX::XMVectorScale(view_right, farX)));
+		// 遠平面の左下
+		vertex[7] = DirectX::XMVectorAdd(far_position, DirectX::XMVectorAdd(DirectX::XMVectorScale(view_up, -farY), DirectX::XMVectorScale(view_right, -farX)));
+
 		//	8頂点をライトビュープロジェクション空間に変換して、最大値、最小値を求める
 		DirectX::XMFLOAT3	vertex_min(FLT_MAX, FLT_MAX, FLT_MAX), vertex_max(-FLT_MAX, -FLT_MAX, -FLT_MAX);
 		for (auto& it : vertex)
@@ -300,7 +300,9 @@ void ActorManager::ShadowRender( RenderContext* render_context, BlurRenderContex
 			// カリングフラグが立っていれば描画しない
 			if (actor->GetCullingFlag()) continue;
 			
+			// フィールドは描画しない
 			if (strcmp(actor->GetName(), "Filde") == 0) continue;
+			
 			// モデルがあれば描画
 			Model* model = actor->GetModel();
 			if (model != nullptr)
@@ -326,7 +328,7 @@ void ActorManager::Render(RenderContext* render_context)
 	for (std::shared_ptr<Actor>& actor : update_actors)
 	{
 		// カリングフラグが立っていれば描画しない
-		//if (actor->GetCullingFlag()) continue;
+		if (actor->GetCullingFlag()) continue;
 
 		// 現在セットされているシェーダーとこれからの描画に使うシェーダーが同じか
 		if (actor->GetShaderType() != shader_type)
@@ -345,12 +347,17 @@ void ActorManager::Render(RenderContext* render_context)
 			shader->Draw(context, model);
 		}
 	}
+	// 描画終了処理
 	if(shader) shader->End(context);
 	
+	// シェーダータイプの初期化
 	shader_type = static_cast<ShaderManager::ShaderType>(-1);
 
-	//DrawLister();
-	//DrawDetail();
+	// IMGUIのリスター描画
+	DrawLister();
+
+	// IMGUIの詳細描画
+	DrawDetail();
 }
 
 //------------------------------

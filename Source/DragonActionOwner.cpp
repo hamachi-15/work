@@ -28,7 +28,8 @@
 void TurnToTargetAction::Start()
 {
 	// アニメーション再生
-	owner->PlayAnimation("NightmareDragonWalkRight");
+	std::string animation_name = owner->GetName() + "Walk";
+	owner->PlayAnimation(animation_name.c_str());
 
 	larp_timer = 0.0f;
 	// プレイヤーへの方向ベクトル算出
@@ -57,14 +58,25 @@ ActionBase::State TurnToTargetAction::Run(float elapsed_time)
 		larp_timer += elapsed_time;
 		run_timer = owner->GetRunTimer() - elapsed_time;
 	}
+	// プレイヤーへのベクトル算出
+	// プレイヤー座標取得
+	DirectX::XMFLOAT3 player_position = ActorManager::Instance().GetActor("Player")->GetPosition();
+	turn_direction = Mathf::ReturnNormalizeFloatSubtract(player_position, owner->GetActor()->GetPosition());
+	// Y軸は考慮しない
+	turn_direction.y = 0.0f;
 
 	// 振り向き処理
+	// 前方向算出
 	DirectX::XMFLOAT3 angle = owner->GetActor()->GetAngle();
 	front_direction.x = sinf(angle.y);
 	front_direction.z = cosf(angle.y);
-	front_direction.x= Mathf::Lerp(front_direction.x, turn_direction.x, larp_timer);
-	front_direction.z= Mathf::Lerp(front_direction.z, turn_direction.z, larp_timer);
-	float rot = owner->TurnToTarget(turn_direction);
+	// 線形補間
+	front_direction.x = Mathf::Lerp(front_direction.x, turn_direction.x, larp_timer);
+	front_direction.z = Mathf::Lerp(front_direction.z, turn_direction.z, larp_timer);
+	
+	// 算出した方向ベクトルにターンする
+	owner->TurnToTarget(turn_direction);
+
 	// タイマー更新
 	owner->SetRunTimer(run_timer);
 
@@ -194,6 +206,8 @@ ActionBase::State BasicAttackAction::Run(float elapsed_time)
 	{
 		owner->SetRunTimer(0.0f);
 		owner->SetRightOfAttack(false);
+		std::shared_ptr<Charactor> charactor = actor->GetComponent<Charactor>();
+		charactor->SetHitAttackFlag(false);
 		return ActionBase::State::Complete;
 	}
 	return ActionBase::State::Run;
@@ -233,6 +247,8 @@ ActionBase::State ClawAttackAction::Run(float elapsed_time)
 	{
 		owner->SetRunTimer(0.0f);
 		owner->SetRightOfAttack(false);
+		std::shared_ptr<Charactor> charactor = actor->GetComponent<Charactor>();
+		charactor->SetHitAttackFlag(false);
 		return ActionBase::State::Complete;
 	}
 	return ActionBase::State::Run;
@@ -273,6 +289,8 @@ ActionBase::State HornAttackAction::Run(float elapsed_time)
 	{
 		owner->SetRunTimer(0.0f);
 		owner->SetRightOfAttack(false);
+		std::shared_ptr<Charactor> charactor = actor->GetComponent<Charactor>();
+		charactor->SetHitAttackFlag(false);
 		return ActionBase::State::Complete;
 	}
 	return ActionBase::State::Run;
@@ -322,6 +340,8 @@ ActionBase::State BodyPressAttackAction::Run(float elapsed_time)
 	{
 		owner->SetRunTimer(0.0f);
 		owner->SetRightOfAttack(false);
+		std::shared_ptr<Charactor> charactor = actor->GetComponent<Charactor>();
+		charactor->SetHitAttackFlag(false);
 		return ActionBase::State::Complete;
 	}
 
@@ -367,7 +387,7 @@ void LungesAttackAction::Start()
 ActionBase::State LungesAttackAction::Run(float elapsed_time)
 {
 	// アクター取得
-	std::shared_ptr<Actor> owner_actor = owner->GetActor();
+	std::shared_ptr<Actor> actor = owner->GetActor();
 
 	float run_timer = owner->GetRunTimer();
 	if (run_timer <= 0.0f)
@@ -385,15 +405,18 @@ ActionBase::State LungesAttackAction::Run(float elapsed_time)
 	owner->SetRunTimer(run_timer);
 
 	// 目的地へ着いたかの判定処理
-	if (JedgmentToTargetPosition(owner->GetTargetPosition(), owner_actor->GetPosition(), owner_actor->GetName()))
+	if (JedgmentToTargetPosition(owner->GetTargetPosition(), actor->GetPosition(), actor->GetName()))
 	{
 		// 攻撃の当たり判定処理
-		std::string collision_name = owner_actor->GetName();
+		std::string collision_name = actor->GetName();
 		// コリジョンマネージャー取得
 		CollisionManager& collision_manager = CollisionManager::Instance();
 		std::shared_ptr<CollisionCylinder> collision = collision_manager.GetCollisionCylinderFromName(collision_name);
 		collision->SetAttackFlag(false);
 		owner->SetRightOfAttack(false);
+		
+		std::shared_ptr<Charactor> charactor = actor->GetComponent<Charactor>();
+		charactor->SetHitAttackFlag(false);
 		return ActionBase::State::Complete;
 	}
 	std::shared_ptr<EnemyTerritory> territory = EnemyTerritoryManager::Instance().GetTerritory(owner->GetBelongingToTerritory());
@@ -408,11 +431,13 @@ ActionBase::State LungesAttackAction::Run(float elapsed_time)
 		// タイマー設定
 		owner->SetRunTimer(0.0f);
 		// 攻撃の当たり判定処理
-		std::string collision_name = owner_actor->GetName();
+		std::string collision_name = actor->GetName();
 		CollisionManager& collision_manager = CollisionManager::Instance();
 		std::shared_ptr<CollisionCylinder> collision = collision_manager.GetCollisionCylinderFromName(collision_name);
 		collision->SetAttackFlag(false);
 		owner->SetRightOfAttack(false);
+		std::shared_ptr<Charactor> charactor = actor->GetComponent<Charactor>();
+		charactor->SetHitAttackFlag(false);
 		return ActionBase::State::Complete;
 	}
 
@@ -439,9 +464,9 @@ void FireBollAttackAction::Start()
 	std::string collision_name = owner_actor->GetName();
 
 	// コリジョンマネージャー取得
-	CollisionManager& collision_manager = CollisionManager::Instance();
-	std::shared_ptr<CollisionCylinder> collision = collision_manager.GetCollisionCylinderFromName(collision_name);
-	collision->SetAttackFlag(true);
+	//CollisionManager& collision_manager = CollisionManager::Instance();
+	//std::shared_ptr<CollisionCylinder> collision = collision_manager.GetCollisionCylinderFromName(collision_name);
+	//collision->SetAttackFlag(true);
 
 	//DirectX::XMFLOAT3 player_position = ActorManager::Instance().GetActor("Player")->GetPosition();
 	//direction = Mathf::ReturnNormalizeFloatSubtract(player_position, owner->GetActor()->GetPosition());
@@ -457,18 +482,22 @@ ActionBase::State FireBollAttackAction::Run(float elapsed_time)
 
 	// 特定のアニメーション時間になればブレスを発射する
 	float time = model->GetCurrentAnimationSeconds();
-	if (time >= 0.5f && !flag && time <= 0.6f && !flag)
+
+	// 火球発射フラグが立っていなければ
+	if (!flag)
 	{
-		// 進行ベクトル取得
-		DirectX::XMFLOAT3 angle = actor->GetAngle();
-		direction.x = sinf(angle.y);
-		direction.z = cosf(angle.y);
+		if (time >= 0.5f && time <= 0.6f)
+		{
+			// 進行ベクトル取得
+			DirectX::XMFLOAT3 angle = actor->GetAngle();
+			direction.x = sinf(angle.y);
+			direction.z = cosf(angle.y);
 
-		// 火球を発射
-		FireBallManager::Instance().Create(actor, direction);
-		flag = true;
+			// 火球を発射
+			FireBallManager::Instance().Create(actor, direction);
+			flag = true;
+		}
 	}
-
 	// アニメーション再生が終了したら完了を返す
 	if (!model->IsPlayAnimation())
 	{
@@ -478,5 +507,48 @@ ActionBase::State FireBollAttackAction::Run(float elapsed_time)
 		return ActionBase::State::Complete;
 	}
 
+	return ActionBase::State::Run;
+}
+
+//*****************************
+// 
+// 尻尾攻撃
+// 
+//*****************************
+//-----------------------------
+// 実行前処理
+//-----------------------------
+void TailAttackAction::Start()
+{
+	std::shared_ptr<Actor> owner_actor = owner->GetActor();
+	// アニメーション再生
+	owner->PlayAnimation("SoulEaterDragonTailAttack");
+
+	// 当たり判定を行う時間のデータを取得
+	collision_time_data = GameDataBase::Instance().GetAttackCollitionTimeData(AttackCategory::TailAttack, EnemyCategory::SoulEaterDragon);
+}
+
+//-----------------------------
+// 実行処理
+//-----------------------------
+ActionBase::State TailAttackAction::Run(float elapsed_time)
+{
+	// アクター取得
+	std::shared_ptr<Actor> actor = owner->GetActor();
+
+	// 攻撃の当たり判定処理
+	std::string collision_name = actor->GetName();
+	collision_name += "Tail";
+	AttackCollision(actor, collision_name.c_str(), collision_time_data);
+
+	// アニメーション再生が終了したら完了を返す
+	if (!owner->GetActor()->GetModel()->IsPlayAnimation())
+	{
+		owner->SetRunTimer(0.0f);
+		owner->SetRightOfAttack(false);
+		std::shared_ptr<Charactor> charactor = actor->GetComponent<Charactor>();
+		charactor->SetHitAttackFlag(false);
+		return ActionBase::State::Complete;
+	}
 	return ActionBase::State::Run;
 }

@@ -91,7 +91,10 @@ Model::Node* Model::FindNode(const char* name)
 //-------------------------------------
 void Model::UpdateAnimation(float elapsed_time, bool hitstop_flag)
 {
-	// 再生中なら更新しない
+	// ヒットストップフラグが立っているなら更新しない
+	if (hitstop_flag) return;
+
+	// 再生中ではないなら更新しない
 	if (!IsPlayAnimation() || animation_stop_flag) return;
 
 	// ブレンド率の計算
@@ -224,14 +227,4 @@ bool Model::IsPlayAnimation() const
 	if (current_animation_index < 0) return false;
 	if (current_animation_index >= resource->GetAnimations().size()) return false;
 	return true;
-}
-
-//-------------------------------------
-// ヒットストップ
-//-------------------------------------
-float Model::HitStop(float t, float t0, float t1, float k)
-{
-	if (t < t0) { return t; }//float elapsed_time, float start_time, float end_time, float coefficient
-	if (t0 <= t && t <= t1) { return k * (t - t0) + t0; }
-	return  (t - t1) + (k * (t1 - t0) + t0);
 }
