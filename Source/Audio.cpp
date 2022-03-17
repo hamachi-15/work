@@ -1,6 +1,9 @@
 #include "Misc.h"
 #include "Audio.h"
-// TODO オーディオ作成する
+
+//--------------------------------
+// コンストラクタ
+//--------------------------------
 Audio::Audio()
 {
 	HRESULT hr = S_OK;
@@ -22,6 +25,9 @@ Audio::Audio()
 
 }
 
+//--------------------------------
+// デストラクタ
+//--------------------------------
 Audio::~Audio()
 {
 	// マスタリングボイス破棄
@@ -39,12 +45,13 @@ Audio::~Audio()
 	// COM終了化
 	CoUninitialize();
 }
+
 //-------------------------------
 // オーディオ読み込み
 //-------------------------------
-std::unique_ptr<AudioSource> Audio::LoadAudioSource(const char* filename, bool loop)
+std::shared_ptr<AudioSource> Audio::LoadAudioSource(const char* filename, bool loop)
 {
 	std::shared_ptr<AudioResource> resource = std::make_shared<AudioResource>(filename);
 
-	return std::make_unique<AudioSource>(xaudio, resource, loop);
+	return std::make_shared<AudioSource>(xaudio, resource, loop);
 }

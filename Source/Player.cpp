@@ -14,6 +14,7 @@
 #include "ActorManager.h"
 #include "EnemyManager.h"
 #include "UIManager.h"
+#include "AudioManager.h"
 
 #include "GameDatabase.h"
 #include "AttackCategory.h"
@@ -23,8 +24,7 @@
 #include "Messenger.h"
 
 #include "PlayerUIHealth.h"
-// プレイヤーの攻撃が当たった時にヒットストップを掛けるo
-// TODO プレイヤーの攻撃時にすこし移動できるようにする？
+
 //-----------------------------------------
 // ImGui描画
 //-----------------------------------------
@@ -92,6 +92,7 @@ void Player::Start()
 	charactor = actor->GetComponent<Charactor>();
 
 	movement = actor->GetComponent<Movement>();
+
 	// 走った時のスピード倍率設定
 	charactor->SetRunSpeedScale(1.5f);
 	
@@ -152,10 +153,16 @@ bool Player::OnMessages(const Telegram& message)
 		// ヒットストップを行うフレーム数
 		charactor->SetHitStopFrame();
 		charactor->SetHitStopFlag(true);
+
+		// ヒットSE再生
+		AudioManager::Instance().PlaySoundEffect(SEType::SwordHit);
 		return true;
 		break;
 	// 敵の攻撃がプレイヤーに当たった
 	case MessageType::Message_GetHit_Attack:
+		// ヒットSE再生
+		AudioManager::Instance().PlaySoundEffect(SEType::PlayerGetHit);
+
 		return true;
 		break;
 	case MessageType::Message_Hit_Boddy:

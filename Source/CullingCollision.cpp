@@ -1,3 +1,4 @@
+#include <string>
 #include "Collision.h"
 #include "CullingCollision.h"
 #include "CollisionManager.h"
@@ -6,7 +7,7 @@
 
 //************************************
 // 
-// プレイヤーのカリングコリジョン
+// カリングコリジョン
 // 
 //************************************
 //-----------------------------------
@@ -28,9 +29,15 @@ CullingCollision::CullingCollision(EnemyCategory enemy_category, std::shared_ptr
         parameter.actor_name = this->actor->GetName();
         parameter.node_name = data->node_name;
         parameter.xmfloat_radius = { data->radius_x, data->radius_y,data->radius_z };
+        parameter.local_position = { data->local_x, data->local_y, data->local_z };
+        DirectX::XMFLOAT3 node_position = {};
+        parameter.update_type = data->update_type;
+        Mathf::GetNodePosition(parameter.node_name.c_str(), node_position, model);
+        parameter.position = { node_position.x, node_position.y + 0.5f, node_position.z };
         collision_culling = std::make_shared<CollisionBox>(parameter);
     }
 }
+
 //-----------------------------------
 // デストラクタ
 //-----------------------------------
@@ -61,7 +68,16 @@ void CullingCollision::Update()
     Model* model = actor->GetModel();
 
     // 指定されたノードのローカル座標に更新
-    Universal::NodePositionUpdate(collision_culling.get(), collision_culling->GetNodeName(), model);
+    // 更新方法がその他に設定されていなければ
+    if (collision_culling->GetUpdateType() == CollisionUpdateType::Update_Node)
+    {// 特定のノードの位置に更新
+        Universal::NodePositionUpdate(collision_culling.get(), collision_culling->GetNodeName(), model);
+    }
+    else if (collision_culling->GetUpdateType() == CollisionUpdateType::Update_Local)
+    {
+        Model::Node* node = model->FindNode(collision_culling->GetNodeName());
+        Universal::LocalPositionUpdate(collision_culling.get(), node);
+    }
 
     // カリングを行うかの判定
     std::vector<Plane> frustum = SceneManager::Instance().GetCurrentScene()->GetCameraController()->GetFrustum();
@@ -73,6 +89,7 @@ void CullingCollision::Update()
 //-----------------------------------
 void CullingCollision::Render(DebugRenderer* renderer)
 {
+    // デバッグプリミティブ描画
     collision_culling->Render(renderer);
 }
 
@@ -81,5 +98,6 @@ void CullingCollision::Render(DebugRenderer* renderer)
 //-----------------------------------
 void CullingCollision::Reaction(bool flag)
 {
+    // カリングフラグの設定
     actor->SetCullingFlag(flag);
 }

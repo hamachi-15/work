@@ -11,7 +11,7 @@ public:
 	std::string GetName() const override { return "Stage"; }
 	
 	// 開始処理
-	void Start() override {}
+	void Start() override;
 	
 	// 更新処理
 	void Update(float elapsed_time) override {}

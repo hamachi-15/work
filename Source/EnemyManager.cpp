@@ -138,7 +138,7 @@ void EnemyManager::CreateEnemies()
 {
 	std::vector<std::shared_ptr<WorldMapData>> world_map_data = GameDataBase::Instance().GetWorldMapDataList();
 	
-	int world_map_data_max_count = world_map_data.size();
+	int world_map_data_max_count = static_cast<int>(world_map_data.size());
 	for (int i = 0; i < world_map_data_max_count; ++i)
 	{
 		// ワールドマップデータを取得
@@ -317,7 +317,6 @@ void EnemyManager::AddComponent(std::shared_ptr<Actor> actor, std::shared_ptr<En
 			std::make_shared<CullingCollision>(EnemyCategory::PLT, actor));
 		break;
 	case EnemyCategory::SoulEaterDragon:
-	case EnemyCategory::DragonUsurper:
 		if (IsBattleScene()) {
 			std::shared_ptr<BossHealthUI> ui = actor->AddComponent<BossHealthUI>();
 			UIManager::Instance().RegisterUI(ui);
@@ -325,8 +324,8 @@ void EnemyManager::AddComponent(std::shared_ptr<Actor> actor, std::shared_ptr<En
 		enemy = actor->AddComponent<EnemyDragonSoulEater>();
 		actor->AddComponent<EnemyCollision>(EnemyCategory::SoulEaterDragon, identity);
 		// カリング用コリジョンを追加
-		//CollisionManager::Instance().RegisterCulling(
-		//	std::make_shared<CullingCollision>(EnemyCategory::NightmareDragon, actor));
+		CollisionManager::Instance().RegisterCulling(
+			std::make_shared<CullingCollision>(EnemyCategory::SoulEaterDragon, actor));
 		break;
 	case EnemyCategory::NightmareDragon:
 		if (IsBattleScene()) {

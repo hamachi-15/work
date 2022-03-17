@@ -489,6 +489,9 @@
     <ClCompile Include="Source\StageManager.cpp">
       <Filter>ソース ファイル\Character</Filter>
     </ClCompile>
+    <ClCompile Include="Source\AudioManager.cpp">
+      <Filter>ソース ファイル\Audio</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\imgui\imconfig.h">
@@ -931,6 +934,9 @@
     </ClInclude>
     <ClInclude Include="Source\GameData\StageObjectSetPosition.h">
       <Filter>ソース ファイル\GameData</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\AudioManager.h">
+      <Filter>ソース ファイル\Audio</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,10 +1,10 @@
 #include "Misc.h"
 #include "Graphics.h"
-#include "Audio.h"
 #include "Texture.h"
 
 #include "ShaderManager.h"
 #include "EffectManager.h"
+#include "AudioManager.h"
 
 #include "SpriteShader.h"
 #include "SkyBoxShader.h"
@@ -190,7 +190,17 @@ Graphics::Graphics(HWND hwnd)
 
 	// サウンド
 	{
-		BGM = Audio::Instance().LoadAudioSource("Data\\Audio\\BGM\\BGM.wav", true);
+		// SE登録
+		AudioManager::Instance().RegisterSoundEffect("Data/Audio/SE/SwordHit.wav", false);
+		AudioManager::Instance().RegisterSoundEffect("Data/Audio/SE/PlayerGetHit.wav", false);
+		AudioManager::Instance().RegisterSoundEffect("Data/Audio/SE/PlayerWalk.wav", false);
+		AudioManager::Instance().RegisterSoundEffect("Data/Audio/SE/DragonVoice.wav", false);
+		// BGM登録
+		AudioManager::Instance().RegisterBGM("Data/Audio/BGM/TitleBGM.wav", true);
+		AudioManager::Instance().RegisterBGM("Data/Audio/BGM/WorldMapBGM.wav", true);
+		AudioManager::Instance().RegisterBGM("Data/Audio/BGM/ButtleBGM.wav", true);
+		AudioManager::Instance().RegisterBGM("Data/Audio/BGM/GameClearBGM.wav", true);
+		AudioManager::Instance().RegisterBGM("Data/Audio/BGM/GameOverBGM.wav", true);
 	}
 
 	// エフェクトマネージャー初期化

@@ -12,15 +12,21 @@
 
 #include "BloomShader.h"
 
-#include "Actor.h"
 #include "ActorManager.h"
 #include "EnemyManager.h"
-#include "EnemySlime.h"
-#include "Player.h"
-#include "Stage.h"
 #include "FireBallManager.h"
 #include "EffectManager.h"
 #include "EnemyTerritoryManager.h"
+#include "ResourceManager.h"
+#include "CollisionManager.h"
+#include "ShaderManager.h"
+#include "StageManager.h"
+#include "AudioManager.h"
+
+#include "Actor.h"
+#include "EnemySlime.h"
+#include "Player.h"
+#include "Stage.h"
 
 #include "MenuSystem.h"
 #include "UIManager.h"
@@ -28,10 +34,7 @@
 #include "Messenger.h"
 #include "MessageData.h"
 #include "GameDataBase.h"
-#include "ResourceManager.h"
 
-#include "CollisionManager.h"
-#include "ShaderManager.h"
 
 #include "Texture.h"
 #include "Sprite.h"
@@ -103,6 +106,9 @@ void SceneBattle::Initialize()
 		actor->SetScale(DirectX::XMFLOAT3(0.1f, 0.1f, 0.1f));
 		actor->SetShaderType(ShaderManager::ShaderType::CascadeShadowMap);
 	}
+	
+	// ステージオブジェクトの配置
+	StageManager::Instance().Register();
 
 	// プレイヤー読み込み
 	{
@@ -118,13 +124,16 @@ void SceneBattle::Initialize()
 		actor->AddComponent<Player>();
 		actor->AddComponent<PlayerCollision>();
 		UIManager::Instance().RegisterUI(ui);
-		actor->SetShaderType(ShaderManager::ShaderType::Lambert);
+		actor->SetShaderType(ShaderManager::ShaderType::Phong);
 	}
 	ActorManager::Instance().Update(0.01f);
 	ActorManager::Instance().UpdateTransform();
 	
 	// エンカウントデータから敵の生成
-	//EnemyManager::Instance().CreateEnemyEncountData();
+	EnemyManager::Instance().CreateEnemyEncountData();
+
+	// BGM再生
+	AudioManager::Instance().StopBGM(BGMType::ButtleMap);
 }
 
 //---------------------------------
@@ -181,18 +190,30 @@ void SceneBattle::Update(float elapsed_time)
 	// ゲームがクリアになっていれば
 	if (isgame_clear)
 	{
+		// BGM再生停止
+		AudioManager::Instance().StopBGM(BGMType::ButtleMap);
+		
+		// クリアシーンに遷移
 		SceneManager::Instance().ChangeScene(new SceneClear());
 		return;
 	}
 	// ゲームオーバーになっていれば
 	if (isgame_over)
 	{
+		// BGM再生停止
+		AudioManager::Instance().StopBGM(BGMType::ButtleMap);
+		
+		// ゲームオーバーシーンに遷移
 		SceneManager::Instance().ChangeScene(new SceneOver());
 		return;
 	}
 	// 戦闘が終了したら
 	if (isbuttle_end)
 	{
+		// BGM再生停止
+		AudioManager::Instance().StopBGM(BGMType::ButtleMap);
+		
+		// ゲームシーンに遷移
 		SceneManager::Instance().ChangeScene(new SceneGame());
 		return;
 	}
@@ -206,19 +227,7 @@ void SceneBattle::Update(float elapsed_time)
 	{
 		primitive_falg = false;
 	}
-	std::shared_ptr<Actor> actor = ActorManager::Instance().GetActor("Player");
-	GamePad& gamepad = Input::Instance().GetGamePad();
 
-	static float light_angle = DirectX::XM_PI;
-	//if (GetKeyState('E') < 0) light_angle += elapsed_time * 2.0f;
-	//if (GetKeyState('Q') < 0) light_angle -= elapsed_time * 2.0f;
-
-	//ライト方向
-	LightDir.x = sinf(light_angle);
-	LightDir.y = -1.0f;
-	LightDir.z = cosf(light_angle);
-	Light::SetDirLight(LightDir, DirectX::XMFLOAT3(0.6f, 0.6f, 0.6f));
-	Light::SetAmbient(DirectX::XMFLOAT3(0.2f, 0.2f, 0.2f));
 
 	// アクター更新処理
 	ActorManager::Instance().Update(elapsed_time);
@@ -236,8 +245,6 @@ void SceneBattle::Update(float elapsed_time)
 	// UI更新処理
 	UIManager::Instance().Update(elapsed_time);
 
-	// ターゲットをプレイヤー座標に設定
-	camera_controller->SetTarget({actor->GetPosition().x, actor->GetPosition().y + 1.0f, actor->GetPosition().z });
 	// カメラ更新処理
 	camera_controller->Update(elapsed_time);
 }

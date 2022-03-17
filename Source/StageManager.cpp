@@ -1,6 +1,10 @@
 // マネージャーインクルード
 #include "StageManager.h"
 #include "ActorManager.h"
+#include "CollisionManager.h"
+
+// コリジョンインクルード
+#include "CullingCollision.h"
 
 // アクター・コンポーネントインクルード
 #include "Actor.h"
@@ -11,6 +15,8 @@
 
 // データベースインクルード
 #include "GameDatabase.h"
+#include "StageObjectData.h"
+#include "StageObjectSetPosition.h"
 
 //*************************************************
 // 
@@ -24,14 +30,39 @@ void StageManager::Register()
 {
 	// データベースインスタンス取得
 	GameDataBase& data_base = GameDataBase::Instance();
-	std::shared_ptr<Actor> actor = ActorManager::Instance().Create();
-	actor->SetUpModel("Data/Model/Filde/StageObjects.mdl", nullptr);
-	actor->SetName("FildeObjects");
-	actor->SetPosition(DirectX::XMFLOAT3(0, 0, 0));
-	actor->SetAngle(DirectX::XMFLOAT3(0, Mathf::ConvartToRadian(-90), 0));
-	actor->SetScale(DirectX::XMFLOAT3(0.1f, 0.1f, 0.1f));
-	actor->AddComponent<Stage>();
-	actor->SetShaderType(ShaderManager::ShaderType::Lambert);
+	// ステージオブジェクトデータを取得
+	std::vector<std::shared_ptr<StageObjectData>> stage_object_list = data_base.GetButtleMapObjectDataList();
+	// バトルマップのオブジェクト配置位置データを取得
+	std::vector<std::shared_ptr<StageObjectSetPosition>> stage_object_position_list = data_base.GetButtleMapObjectPositionDataList();
+	// データのサイズ取得
+	int data_max_count = data_base.GetButtleMapObjectPositionDataCount();
+	
+	for (int i = 0; i < data_max_count; ++i)
+	{
+		// オブジェクト配置データを取得
+		std::shared_ptr<StageObjectSetPosition> object_position_data = stage_object_position_list.at(i);
+		// オブジェクトの配置データからオブジェクトデータを取得する
+		std::shared_ptr<StageObjectData> object_data = data_base.GetButtleMapObjectData(object_position_data->object_category);
+		// アクターを作成
+		std::shared_ptr<Actor> actor = ActorManager::Instance().Create();
+		// モデル読み込み
+		actor->SetUpModel(object_data->model_path, nullptr);
+		// 角度設定
+		actor->SetAngle({ object_data->angle_x, object_data->angle_y, object_data->angle_z });
+		// スケール設定
+		actor->SetScale({ object_data->scale_x, object_data->scale_y, object_data->scale_z });
+		// 名前設定
+		actor->SetName(object_position_data->name);
+		// 位置設定
+		actor->SetPosition({ object_position_data->position_x, object_position_data->position_y, object_position_data->position_z });
+		// コンポーネント追加
+		actor->AddComponent<Stage>();
+		// プレイヤーのカリングコリジョンを追加
+		CollisionManager::Instance().RegisterCulling(std::make_shared<CullingCollision>(EnemyCategory::Conifer, actor));
+		// シェーダー設定
+		actor->SetShaderType(ShaderManager::ShaderType::Phong);
+	}
+
 
 }
 

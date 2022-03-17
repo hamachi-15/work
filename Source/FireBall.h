@@ -43,6 +43,6 @@ private:
 	DirectX::XMFLOAT3					direction;			// 進行ベクトル
 	float								speed = 100.0f;		// 火球の移動速度
 
-	float								attack = 5.0f;		// 攻撃力
+	int									attack = 5;		// 攻撃力
 	float								life_timer = 4.0f;	// 生存時間
 };

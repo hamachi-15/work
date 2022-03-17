@@ -10,6 +10,7 @@
 #include "ActorManager.h"
 #include "CollisionManager.h"
 #include "SceneManager.h"
+#include "AudioManager.h"
 
 #include "Charactor.h"
 #include "Enemy.h"
@@ -73,6 +74,7 @@ void PlayerCollision::Start()
     // エフェクト読み込み
     hit_effect = std::make_shared<Effect>("Data/Effect/Hit.efk", effect_manager->GetEffekseerManager());
 
+    // コリジョンのデータからプレイヤーのコリジョンデータを設定
     std::vector<std::shared_ptr<CollisionParameterData>> collision_parameter = GameDataBase::Instance().GetAttackCollitionParamterDataList(EnemyCategory::None);
     for (std::shared_ptr<CollisionParameterData> data : collision_parameter)
     {
@@ -127,10 +129,10 @@ void PlayerCollision::Update(float elapsed_time)
     UpdateCollision(collision_cylinder, actor, model);
 
     std::shared_ptr<Charactor> charactor = GetActor()->GetComponent<Charactor>();
-    // 球VS円柱
-    size_t sphere_count = collision_spheres.size();
-    size_t cylinder_count = CollisionManager::Instance().GetCollisionCylinderCount();
-    for (size_t i = 0; i < sphere_count; i++)
+    // プレイヤー球VSコリジョンマネージャー円柱
+    int sphere_count = static_cast<int>(collision_spheres.size());
+    int cylinder_count = CollisionManager::Instance().GetCollisionCylinderCount();
+    for (int i = 0; i < sphere_count; i++)
     {
         CollisionSphere* sphere = collision_spheres.at(i).get();
         // 攻撃フラグが立っていなかったら飛ばす
@@ -139,7 +141,7 @@ void PlayerCollision::Update(float elapsed_time)
         // 攻撃が当たっていた場合飛ばす
         if (charactor->GetHitAttackFlag()) break;
 
-        for (size_t j = 0; j < cylinder_count; j++)
+        for (int j = 0; j < cylinder_count; j++)
         {
             std::shared_ptr<CollisionCylinder> cylinder = CollisionManager::Instance().GetCollisionCylinder(j);
             // アクターがプレイヤーなら飛ばす
@@ -182,7 +184,7 @@ void PlayerCollision::Update(float elapsed_time)
 
     // 円柱VS円柱
     ObjectCollisionResult result;
-    for (size_t j = 0; j < cylinder_count; j++)
+    for (int j = 0; j < cylinder_count; j++)
     {
         std::shared_ptr<CollisionCylinder> cylinderB = CollisionManager::Instance().GetCollisionCylinder(j);
         // 当たり判定フラグが立っていなかったら飛ばす

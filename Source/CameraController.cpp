@@ -55,39 +55,37 @@ void CameraController::Update(float elapsed_time)
 	Model* model = ActorManager::Instance().GetActor("Filde")->GetModel();
 
 	// フィールドとのレイキャスト
-	HitResult result;
+	//HitResult result;
 	GamePad& gamepad = Input::Instance().GetGamePad();
-	float ax = gamepad.GetAxisRX();
-	float ay = gamepad.GetAxisRY();
-	DirectX::XMFLOAT3 ray_end = { new_position.x, new_position.y , new_position.z};
-	if (CollisionManager::Instance().IntersectRayVsModel(new_target, new_position, model, result))
-	{
-		DirectX::XMVECTOR vec_position = DirectX::XMLoadFloat3(&result.position);
-		DirectX::XMVECTOR cuv = DirectX::XMVectorSet(0, 1, 0, 0);
-		vec_position = DirectX::XMVectorMultiplyAdd(DirectX::XMVectorSet(2, 2, 2, 0), cuv, vec_position);
-		DirectX::XMVECTOR vec_target = DirectX::XMLoadFloat3(&new_target);
-		DirectX::XMVECTOR vec_length = DirectX::XMVectorSubtract(vec_target, vec_position);
-		DirectX::XMFLOAT3 vector = Mathf::ReturnFloatSubtract(target, position);
-		float length = sqrtf(vector.x * vector.x + vector.z * vector.z);
+	//float ax = gamepad.GetAxisRX();
+	//float ay = gamepad.GetAxisRY();
+	//DirectX::XMFLOAT3 ray_end = { new_position.x, new_position.y , new_position.z};
+	//if (CollisionManager::Instance().IntersectRayVsModel(new_target, new_position, model, result))
+	//{
+	//	DirectX::XMVECTOR vec_position = DirectX::XMLoadFloat3(&result.position);
+	//	DirectX::XMVECTOR cuv = DirectX::XMVectorSet(0, 1, 0, 0);
+	//	vec_position = DirectX::XMVectorMultiplyAdd(DirectX::XMVectorSet(2, 2, 2, 0), cuv, vec_position);
+	//	DirectX::XMVECTOR vec_target = DirectX::XMLoadFloat3(&new_target);
+	//	DirectX::XMVECTOR vec_length = DirectX::XMVectorSubtract(vec_target, vec_position);
+	//	DirectX::XMFLOAT3 vector = Mathf::ReturnFloatSubtract(target, position);
+	//	float length = sqrtf(vector.x * vector.x + vector.z * vector.z);
 
-		// ターゲットへのベクトルの長さがリミットを超えていなければ
-		// カメラの座標を更新する
-		if (length >= 20)
-		{
-			DirectX::XMFLOAT3 camera_pos;
-			DirectX::XMStoreFloat3(&new_position, vec_position);
-			//new_position.y = camera_pos.y;
-		}
-		else
-		{
-			new_position = position;
-		}
-		isground = true;
-	}
-	else
-	{
-		isground = false;
-	}
+	//	// ターゲットへのベクトルの長さがリミットを超えていなければ
+	//	// カメラの座標を更新する
+	//	if (length >= 20)
+	//	{
+	//		DirectX::XMStoreFloat3(&new_position, vec_position);
+	//	}
+	//	else
+	//	{
+	//		new_position = position;
+	//	}
+	//	isground = true;
+	//}
+	//else
+	//{
+	//	isground = false;
+	//}
 	// 徐々に目標に近づける
 	static	constexpr	float	speed = 1.0f / 8.0f;
 	position.x += (new_position.x - position.x) * speed;
@@ -107,7 +105,7 @@ void CameraController::Update(float elapsed_time)
 	}
 
 	// 視錐台更新
-	//CalculateFrustum();
+	CalculateFrustum();
 }
 
 //-----------------------------

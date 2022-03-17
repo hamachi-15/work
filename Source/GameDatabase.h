@@ -13,6 +13,36 @@
 #include "AnimationData.h"
 #include "WorldMapData.h"
 
+// 前方宣言
+enum class StageObjectCategory;
+struct StageObjectData;
+struct StageObjectSetPosition;
+class Actor;
+class Texture;
+
+struct StageObjectDataReader
+{
+	int	id;	//!<	id
+	int object_name;	//!<	名前
+	int model_path;	//!<	モデルパス
+	StageObjectCategory	object_category;	//!<	オブジェクトの種類
+	float	scale_x;	//!<	大きさ(X)
+	float	scale_y;	//!<	大きさ(Y)
+	float	scale_z;	//!<	大きさ(Z)
+	float	angle_x;	//!<	角度(X)
+	float	angle_y;	//!<	角度(Y)
+	float	angle_z;	//!<	角度(Z)
+};
+
+struct StageObjectSetPositionReader
+{
+	int	id;	//!<	id
+	int name;	//!<	名前
+	StageObjectCategory	object_category;	//!<	オブジェクトの種類
+	float	position_x;	//!<	座標(X)
+	float	position_y;	//!<	座標(Y)
+	float	position_z;	//!<	座標(Z)
+};
 
 struct DataHeadder
 {
@@ -86,6 +116,10 @@ struct	CullingCollisionParameterDataReader
 	float	radius_x;	//!<	半径X
 	float	radius_y;	//!<	半径Y
 	float	radius_z;	//!<	半径Z
+	float	local_x;	//!<	ローカルX座標
+	float	local_y;	//!<	ローカルY座標
+	float	local_z;	//!<	ローカルZ座標
+	CollisionUpdateType	update_type;	//!<	更新方法の種類
 };
 
 struct AttackCollitionTimeReader
@@ -112,9 +146,6 @@ struct EncountEnemyTerritory
 	EnemyTerritoryTag tag;
 };
 
-class Actor;
-class Texture;
-
 class GameDataBase
 {
 private:
@@ -131,6 +162,27 @@ public:
 	// エンカウントした敵のテリトリー内の敵のデータを集める
 	void EnemyFriendFromTerritory(EnemyTerritoryTag territory_tag);
 
+	// ステージオブジェクトデータリスト取得
+	std::vector<std::shared_ptr<StageObjectData>> GetButtleMapObjectDataList() const { return buttle_map_object_data; }
+
+	// ワールドのステージオブジェクトデータ取得
+	std::shared_ptr<StageObjectData> GetButtleMapObjectData(int& index) const { return buttle_map_object_data.at(index); }
+
+	// ワールドのステージオブジェクトデータ取得
+	std::shared_ptr<StageObjectData> GetButtleMapObjectData(const StageObjectCategory& category) const;
+
+	// ステージオブジェクトデータリストのデータ数を取得
+	const int GetButtleMapObjectDataCount() { return buttle_map_object_count; }
+
+	// ステージオブジェクトデータリスト取得
+	std::vector<std::shared_ptr<StageObjectSetPosition>> GetButtleMapObjectPositionDataList() const { return buttle_map_object_position_data; }
+
+	// ワールドのステージオブジェクトデータ取得
+	std::shared_ptr<StageObjectSetPosition> GetButtleMapObjectPositionData(int& index) const { return buttle_map_object_position_data.at(index); }
+
+	// ステージオブジェクトデータリストのデータ数を取得
+	const int GetButtleMapObjectPositionDataCount() { return buttle_map_object_position_count; }
+
 	// ワールドデータリスト取得
 	std::vector<std::shared_ptr<WorldMapData>> GetWorldMapDataList() const { return world_map_data; }
 	
@@ -138,7 +190,7 @@ public:
 	std::shared_ptr<WorldMapData> GetWorldMapData(int& index) const { return world_map_data.at(index); }
 	
 	// ワールドデータリストのデータ数を取得
-	const	int GetWorldMapDataCount() { return world_map_data_count; }
+	const int GetWorldMapDataCount() { return world_map_data_count; }
 
 	// 敵データリスト取得
 	std::vector<std::shared_ptr<EnemyData>> GetEnemyDataList() const { return enemy_data; }
@@ -150,7 +202,7 @@ public:
 	std::shared_ptr<EnemyData> GetEnemyDataFromID(int& enemy_id) const;
 	
 	// 敵データリストのデータ数を取得
-	const	int GetEnemyDataCount() { return enemy_data_count; }
+	const int GetEnemyDataCount() { return enemy_data_count; }
 
 	// 敵の出現位置リスト取得
 	std::vector<std::shared_ptr<EnemyTerritoryPosition>> GetEnemyTerritoryDataList() const { return enemy_territory_data; }
@@ -162,7 +214,7 @@ public:
 	std::shared_ptr<EnemyTerritoryPosition> GetEnemyTerritoryData(EnemyTerritoryTag& tag) const;
 	
 	// 敵の出現位置リストのデータ数を取得
-	const	int GetEnemyTerritoryCount() { return	enemy_territory_data_count; }
+	const int GetEnemyTerritoryCount() { return	enemy_territory_data_count; }
 
 	// エンカウントした敵データリスト取得
 	std::vector<EncountEnemyTerritory> GetEncountEnemyList() { return encount_enemy; }
@@ -173,10 +225,10 @@ public:
 	// カテゴリーごとのパラメータデータを抽出したデータを渡す
 	std::vector<std::shared_ptr<CollisionParameterData>> GetAttackCollitionParamterDataList(EnemyCategory enemy_category) const;
 
-	// コリジョンパラメータリスト取得
+	// カリングコリジョンパラメータリスト取得
 	std::vector<std::shared_ptr<CullingCollisionParameterData>> GetAttackCullingCollisionParameterDataList() const { return culling_parameter_data; }
 
-	// カテゴリーごとのパラメータデータを抽出したデータを渡す
+	// カテゴリーからカリングコリジョンパラメータデータをデータを渡す
 	std::vector<std::shared_ptr<CullingCollisionParameterData>> GetAttackCullingCollisionParameterDataList(EnemyCategory enemy_category) const;
 	
 	// 当たり判定を行うアニメーション区間リストを取得
@@ -186,7 +238,7 @@ public:
 	std::shared_ptr<AttackCollitionTime> GetAttackCollitionTimeData(AttackCategory attack_category, EnemyCategory attacker_category) const;
 	
 	// 当たり判定を行うアニメーション区間リストのデータ数を取得
-	const	int GetCollitionTimeCount() { return	collision_time_data_count; }
+	const int GetCollitionTimeCount() { return	collision_time_data_count; }
 	
 	// 敵のカテゴリーから当たり判定を行うアニメーション区間を取得
 	std::shared_ptr<AttackCollitionTime> GetAttackCollitionTimeData(AttackCategory attack_category) const;
@@ -204,6 +256,8 @@ public:
 	};
 
 private:
+	std::vector<std::shared_ptr<StageObjectData>> buttle_map_object_data;
+	std::vector<std::shared_ptr<StageObjectSetPosition>> buttle_map_object_position_data;
 	std::vector<std::shared_ptr<WorldMapData>> world_map_data;
 	std::vector<std::shared_ptr<EnemyData>> enemy_data;
 	std::vector<std::shared_ptr<EnemyTerritoryPosition>> enemy_territory_data;
@@ -216,6 +270,12 @@ private:
 
 	std::unique_ptr<Texture> timing_texture; // ゲームオーバー・クリアの瞬間のテクスチャ
 
+
+	int buttle_map_object_count;
+	char* buttle_map_object_text_buffer;
+
+	int buttle_map_object_position_count;
+	char* buttle_map_object_position_text_buffer;
 
 	int world_map_data_count;
 

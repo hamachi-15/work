@@ -2,12 +2,15 @@
 #include "Framework.h"
 #include "SceneManager.h"
 #include "SceneTitle.h"
-#include "SceneOver.h"
-#include "SceneClear.h"
 #include "EffectManager.h"
+#include "AudioManager.h"
 
 // 垂直同期間隔設定
 static const int syncInterval = 1;
+
+//-------------------------------
+// コンストラクタ
+//-------------------------------
 Framework::Framework(HWND hwnd) :
 	hwnd(hwnd),
 	input(hwnd),
@@ -17,12 +20,21 @@ Framework::Framework(HWND hwnd) :
 	SceneManager::Instance().ChangeScene(new SceneTitle());
 }
 
+//-------------------------------
+// デストラクタ
+//-------------------------------
 Framework::~Framework()
 {
 	// シーン終了処理
 	SceneManager::Instance().Clear();
+
+	// オーディオの破棄処理
+	AudioManager::Instance().Destroy();
 }
 
+//-------------------------------
+// 更新処理
+//-------------------------------
 void Framework::Update(float elapsed_time)
 {
 	// 入力更新処理
@@ -35,6 +47,9 @@ void Framework::Update(float elapsed_time)
 	SceneManager::Instance().Update(elapsed_time);
 }
 
+//-------------------------------
+// 描画処理
+//-------------------------------
 void Framework::Render(float elapsed_time)
 {
 	ID3D11DeviceContext* dc = graphics.GetDeviceContext();
@@ -52,6 +67,9 @@ void Framework::Render(float elapsed_time)
 	graphics.GetSwapChain()->Present(syncInterval, 0);
 }
 
+//-------------------------------
+// fps計算
+//-------------------------------
 void Framework::CalculateFrameStats()
 {
 	static int frames = 0;
@@ -73,6 +91,9 @@ void Framework::CalculateFrameStats()
 	}
 }
 
+//-------------------------------
+// メッセージループ
+//-------------------------------
 int Framework::Run()
 {
 	MSG msg = {};

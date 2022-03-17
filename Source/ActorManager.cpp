@@ -291,7 +291,6 @@ void ActorManager::ShadowRender( RenderContext* render_context, BlurRenderContex
 			clop_matrix = DirectX::XMLoadFloat4x4(&float_clop_matrix);
 		}
 		//ライトビュープロジェクション行列を計算
-		DirectX::XMFLOAT4X4 plane_light_view_projection[3];
 		DirectX::XMStoreFloat4x4(&render_context->light_view_projection[i], light_view_projection * clop_matrix);
 		render_context->single_light_view_projection = render_context->light_view_projection[i];
 		create_chadowmap->Begin(context, render_context);

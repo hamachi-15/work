@@ -15,6 +15,7 @@
 #include "EnemyManager.h"
 #include "EnemyTerritoryManager.h"
 #include "CollisionManager.h"
+#include "AudioManager.h"
 
 #include "EnemyCollision.h"
 
@@ -65,7 +66,10 @@ bool EnemyDragonNightmare::OnMessages(const Telegram& message)
 	case MessageType::Message_Hit_Attack:
 	{
 		std::shared_ptr<Charactor> charactor = GetActor()->GetComponent<Charactor>();
+		// 自身の攻撃ヒットフラグを立てる
 		charactor->SetHitAttackFlag(true);
+		// ヒットSE再生
+		AudioManager::Instance().PlaySoundEffect(SEType::PlayerGetHit);
 	}
 		break;
 	case MessageType::Message_GetHit_Attack:

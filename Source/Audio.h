@@ -17,7 +17,7 @@ public:
 	}
 
 	// オーディオ読み込み
-	std::unique_ptr<AudioSource> LoadAudioSource(const char* filename, bool loop);
+	std::shared_ptr<AudioSource> LoadAudioSource(const char* filename, bool loop);
 private:
 	IXAudio2* xaudio = nullptr;
 	IXAudio2MasteringVoice* mastering_voice = nullptr;

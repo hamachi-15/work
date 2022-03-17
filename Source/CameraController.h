@@ -83,7 +83,7 @@ private:
 	float							roll_speed = Mathf::ConvartToRadian(60);
 	float							range = 50.0f;
 	float							max_angleX = Mathf::ConvartToRadian(45);
-	float							min_angleX = Mathf::ConvartToRadian(0);
+	float							min_angleX = Mathf::ConvartToRadian(-45);
 
 	std::vector<Plane>				frustum;
 

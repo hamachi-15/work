@@ -7,7 +7,6 @@
 #include "SpriteShader.h"
 #include "ImGuiRenderer.h"
 #include "DebugRenderer.h"
-#include "AudioSource.h"
 
 class Texture;
 class EffectManager;
@@ -59,8 +58,6 @@ public:
 
 	// デバックレンダラー取得
 	DebugRenderer* GetDebugRenderer() const { return debug_renderer.get(); }
-
-	AudioSource* GetAudio() const { return BGM.get(); }
 
 	// シーンテクスチャ取得
 	Texture* GetTexture() const { return scene_texture.get(); }
@@ -136,10 +133,9 @@ private:
 	std::unique_ptr<DebugRenderer>					debug_renderer;
 	std::unique_ptr<ImGuiRenderer>					imgui_renderer;
 
-	std::unique_ptr<AudioSource>					BGM;
-	std::shared_ptr<EffectManager>					effect_manager;
+	std::shared_ptr<EffectManager>					effect_manager;// エフェクトマネージャー
 
-	std::unique_ptr<Texture>						scene_texture;
+	std::unique_ptr<Texture>						scene_texture;// シーンを描画する用のテクスチャ
 	std::mutex										mutex;
 	float screen_width;
 	float screen_height;

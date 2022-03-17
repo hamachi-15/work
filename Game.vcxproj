@@ -198,6 +198,7 @@
     <ClCompile Include="Source\Actor.cpp" />
     <ClCompile Include="Source\ActorManager.cpp" />
     <ClCompile Include="Source\Audio.cpp" />
+    <ClCompile Include="Source\AudioManager.cpp" />
     <ClCompile Include="Source\AudioResource.cpp" />
     <ClCompile Include="Source\AudioSource.cpp" />
     <ClCompile Include="Source\BehaviorData.cpp" />
@@ -340,6 +341,7 @@
     <ClInclude Include="Source\Actor.h" />
     <ClInclude Include="Source\ActorManager.h" />
     <ClInclude Include="Source\Audio.h" />
+    <ClInclude Include="Source\AudioManager.h" />
     <ClInclude Include="Source\AudioResource.h" />
     <ClInclude Include="Source\AudioSource.h" />
     <ClInclude Include="Source\BehaviorData.h" />

@@ -19,7 +19,8 @@ private:
 
 	// 描画処理
 	void Render(float elapsed_time);
-
+	
+	// fps計算
 	void CalculateFrameStats();
 public:
 	// メッセージループ

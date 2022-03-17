@@ -47,6 +47,5 @@ private:
 	std::shared_ptr<Actor> actor;
 	std::shared_ptr<CollisionBox> collision_culling;
 	std::string name = "";
-	bool attack_falg = false;
 	EnemyCategory	enemy_category; // データベースのコリジョンデータ検索に使う
 };

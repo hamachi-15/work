@@ -1,7 +1,6 @@
 #include <imgui.h>
 #include "SceneGame.h"
 #include "SceneBattle.h"
-#include "SceneManager.h"
 #include "Mathf.h"
 
 // データ系
@@ -22,6 +21,8 @@
 #include "UIManager.h"
 #include "EnemyTerritoryManager.h"
 #include "EffectManager.h"
+#include "SceneManager.h"
+#include "AudioManager.h"
 
 #include "Actor.h"
 #include "Player.h"
@@ -69,7 +70,8 @@ void SceneGame::Initialize()
 {
 	Graphics& graphics = Graphics::Instance();
 	ID3D11Device* device = graphics.GetDevice();
-
+	
+	// GPUに渡すデータ初期化
 	render_context = std::make_unique<RenderContext>();
 	blur_render_context = std::make_unique<BlurRenderContext>();
 	primitive_context = std::make_unique<PrimitiveContext>();
@@ -78,6 +80,9 @@ void SceneGame::Initialize()
 	primitive_falg = true;
 	primitive_context->number = 2;
 	primitive_context->timer = 0.0f;
+
+	// ライト初期化
+	Light::Initialize();
 
 	// カメラ初期設定
 	Camera& camera = Camera::Instance();
@@ -106,13 +111,12 @@ void SceneGame::Initialize()
 		actor->SetPosition(DirectX::XMFLOAT3(0, 0, 0));
 		actor->SetAngle(DirectX::XMFLOAT3( 0, Mathf::ConvartToRadian(-90), 0));
 		actor->SetScale(DirectX::XMFLOAT3(0.1f, 0.1f, 0.1f));
-		//actor->AddComponent<Stage>();
 		actor->SetShaderType(ShaderManager::ShaderType::CascadeShadowMap);
 	}
+	// ステージオブジェクト読み込み
 	{
 		std::shared_ptr<Actor> actor = ActorManager::Instance().Create();
-		actor->SetUpModel("Data/Model/Filde/StageObjects.mdl", nullptr);
-		//actor->SetUpModel("Data/Model/Filde/StageObject/Conifer.mdl", nullptr);
+		actor->SetUpModel("Data/Model/Filde/StageObject/Conifer.mdl", nullptr);
 		actor->SetName("FildeObjects");
 		actor->SetPosition(DirectX::XMFLOAT3(-100, 0.3f, 100));
 		actor->SetAngle(DirectX::XMFLOAT3(0, Mathf::ConvartToRadian(-90), 0));
@@ -128,13 +132,14 @@ void SceneGame::Initialize()
 		actor->SetPosition(DirectX::XMFLOAT3(-100, 6, 116));
 		actor->SetAngle(DirectX::XMFLOAT3(0, 0, 0));
 		actor->SetScale(DirectX::XMFLOAT3(0.04f, 0.04f, 0.04f));
+		// コンポーネント追加
 		actor->AddComponent<Movement>();
 		actor->AddComponent<Charactor>(static_cast<int>(MetaAI::Identity::Player));
 		actor->AddComponent<Player>();
 		actor->AddComponent<PlayerCollision>();
 		// プレイヤーのカリングコリジョンを追加
 		CollisionManager::Instance().RegisterCulling(std::make_shared<CullingCollision>(EnemyCategory::None, actor));
-		actor->SetShaderType(ShaderManager::ShaderType::Lambert);
+		actor->SetShaderType(ShaderManager::ShaderType::Phong);
 	}
 	// 敵の生成
 	MetaAI::Instance().AppearanceEnemy();
@@ -142,6 +147,10 @@ void SceneGame::Initialize()
 	// アクター更新処理
 	ActorManager::Instance().Update(0.01f);
 	ActorManager::Instance().UpdateTransform();
+
+	// BGM再生
+	AudioManager::Instance().PlayBGM(BGMType::WorldMap);
+	AudioManager::Instance().SetBGMVolume(BGMType::WorldMap, 0.6f);
 }
 
 //-------------------------------------
@@ -163,7 +172,6 @@ void SceneGame::Finalize()
 
 	// メッセンジャーのクリア
 	Messenger::Instance().Clear();
-
 }
 
 //-------------------------------------
@@ -203,6 +211,8 @@ void SceneGame::Update(float elapsed_time)
 		// タイマーが一定以上なら
 		if (primitive_context->timer >= Primitive_Max_Time)
 		{
+			// BGM再生停止
+			AudioManager::Instance().StopBGM(BGMType::WorldMap);
 			// バトルシーンへ遷移
 			SceneManager::Instance().ChangeScene(new SceneBattle());
 			return;
@@ -220,18 +230,6 @@ void SceneGame::Update(float elapsed_time)
 		primitive_falg = false;
 	}
 
-	//ライト
-	static float light_angle = DirectX::XM_PI;
-	if (GetKeyState('E') < 0) light_angle += elapsed_time * 2.0f;
-	if (GetKeyState('Q') < 0) light_angle -= elapsed_time * 2.0f;
-
-	Light::SetAmbient(DirectX::XMFLOAT3(0.2f, 0.2f, 0.2f));
-	//ライト方向
-	LightDir.x = sinf(light_angle);
-	LightDir.y = -1.0f;
-	LightDir.z = cosf(light_angle);
-	Light::SetDirLight(LightDir, DirectX::XMFLOAT3(0.6f, 0.6f, 0.6f));
-
 	// 当たり判定更新処理
 	CollisionManager::Instance().Update();
 
@@ -242,14 +240,7 @@ void SceneGame::Update(float elapsed_time)
 	// UI更新処理
 	UIManager::Instance().Update(elapsed_time);
 
-	std::shared_ptr<Actor> actor = ActorManager::Instance().GetActor("Player");
-	GamePad& gamepad = Input::Instance().GetGamePad();
-
 	// カメラ更新処理
-	camera_controller->SetTarget({
-		actor->GetPosition().x,
-		actor->GetPosition().y + 1.0f,
-		actor->GetPosition().z });
 	camera_controller->Update(elapsed_time);
 }
 
@@ -311,29 +302,29 @@ void SceneGame::ScreenRender(ID3D11DeviceContext* context, RenderContext* render
 			0, 0,
 			(float)sky->GetWidth(), (float)sky->GetHeight());
 		//ブレンドステート設定
-		//context->OMSetBlendState(graphics.GetBlendState((int)Graphics::BlendState::Add), nullptr, 0xFFFFFFFF);
-		//sprite->AddRender(context,
-		//	bloom_texture,
-		//	0, 0,
-		//	screen_size.x, screen_size.y,
-		//	0, 0,
-		//	static_cast<float>(bloom_texture->GetWidth()), static_cast<float>(bloom_texture->GetHeight()),
-		//	0,
-		//	1, 1, 1, 1);
+		context->OMSetBlendState(graphics.GetBlendState((int)Graphics::BlendState::Add), nullptr, 0xFFFFFFFF);
+		sprite->AddRender(context,
+			bloom_texture,
+			0, 0,
+			screen_size.x, screen_size.y,
+			0, 0,
+			static_cast<float>(bloom_texture->GetWidth()), static_cast<float>(bloom_texture->GetHeight()),
+			0,
+			1, 1, 1, 1);
 		skybox_shader->End(context);
 	}
 
 	// デバッグプリミティブ描画
-	//{
-	//	// 敵縄張りのデバッグプリミティブ描画
-	//	EnemyTerritoryManager::Instance().Render();
-	//	// 敵のデバッグプリミティブ描画
-	//	EnemyManager::Instance().DrawDebugPrimitive();
-	//	// 当たり判定ののデバッグプリミティブ描画
-	//	CollisionManager::Instance().Draw();
+	{
+		// 敵縄張りのデバッグプリミティブ描画
+		EnemyTerritoryManager::Instance().Render();
+		// 敵のデバッグプリミティブ描画
+		EnemyManager::Instance().DrawDebugPrimitive();
+		// 当たり判定ののデバッグプリミティブ描画
+		CollisionManager::Instance().Draw();
 
-	//	graphics.GetDebugRenderer()->Render(context, render_context->view, render_context->projection);
-	//}
+		graphics.GetDebugRenderer()->Render(context, render_context->view, render_context->projection);
+	}
 
 	// アクター描画
 	{

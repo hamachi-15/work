@@ -7,6 +7,8 @@
 
 #include "DissolveShader.h"
 #include "ShaderManager.h"
+#include "AudioManager.h"
+#include "EffectManager.h"
 
 #include "SceneManager.h"
 #include "SceneLoading.h"
@@ -31,6 +33,9 @@ void SceneTitle::Initialize()
 	title_bg = std::make_unique<Texture>();
 	title_bg->Load("Data/Sprite/TitleBG.jpg");
 	UIManager::Instance().RegisterUI(std::make_shared<TitleUI>());
+
+	AudioManager::Instance().PlayBGM(BGMType::Title);
+	AudioManager::Instance().SetBGMVolume(BGMType::Title, 0.5f);
 }
 
 //----------------------------------
@@ -43,6 +48,7 @@ void SceneTitle::Finalize()
 
 	// メッセンジャーのクリア
 	Messenger::Instance().Clear();
+
 }
 
 //----------------------------------
@@ -56,6 +62,9 @@ void SceneTitle::Update(float elapsed_time)
 		timer += elapsed_time;
 		if (timer >= 1.2f)
 		{
+			// BGM再生停止
+			AudioManager::Instance().StopBGM(BGMType::Title);
+			// ゲームシーンに遷移
 			SceneManager::Instance().ChangeScene(new SceneLoading(new SceneGame()));
 		}
 	}

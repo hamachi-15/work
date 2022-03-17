@@ -2,11 +2,12 @@
 	@file	CullingCollisionParameterData.h
 	@brief	ツールにて自動生成しています。絶対に書き換えないでください。
 	@autor	DataBase.xlsm
-	@data	2022/03/12
+	@data	2022/03/18
 **/
 #pragma	once
 
 #include	"EnemyCategory.h"
+#include	"CollisionUpdateType.h"
 
 
 /*!
@@ -23,4 +24,8 @@ struct	CullingCollisionParameterData
 	float	radius_x;	//!<	半径X
 	float	radius_y;	//!<	半径Y
 	float	radius_z;	//!<	半径Z
+	float	local_x;	//!<	ローカルX座標
+	float	local_y;	//!<	ローカルY座標
+	float	local_z;	//!<	ローカルZ座標
+	CollisionUpdateType	update_type;	//!<	更新方法の種類
 };

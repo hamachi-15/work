@@ -12,6 +12,7 @@
 #include "FireBallManager.h"
 
 #include "Charactor.h"
+#include "Enemy.h"
 
 #include "Model.h"
 
@@ -81,8 +82,8 @@ void FireBall::Update(float elapsed_time)
     Model* model = actor->GetModel();
 
     // 球VS円柱
-    size_t cylinder_count = CollisionManager::Instance().GetCollisionCylinderCount();
-    for (size_t j = 0; j < cylinder_count; j++)
+    int cylinder_count = CollisionManager::Instance().GetCollisionCylinderCount();
+    for (int j = 0; j < cylinder_count; j++)
     {
         std::shared_ptr<CollisionCylinder> cylinder = CollisionManager::Instance().GetCollisionCylinder(j);
         // アクターがプレイヤーなら飛ばす
@@ -102,9 +103,11 @@ void FireBall::Update(float elapsed_time)
             cylinder_actor->GetComponent<Charactor>()->ApplyDamage(attack, 0.0f);
 
             // 攻撃を当てたことのメッセージ
+            // 敵コンポーネント取得
+            std::shared_ptr<Enemy> enemy = actor->GetComponent<Enemy>();
             message.message = MessageType::Message_Hit_Attack;
             message.hit_position = { 0.0f, 0.0f, 0.0f };
-            Reaction(collision_sphere->GetActorID(), message);
+            Reaction(collision_sphere->GetActorID() + enemy->GetIdentity(), message);
         }
     }
 

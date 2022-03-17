@@ -14,12 +14,12 @@ public:
 	
 	// 実行前処理
 	void Start() override;
-
+	
 	// 実行処理
 	ActionBase::State Run(float elapsed_time) override;
 private:
-	DirectX::XMFLOAT3 turn_direction; // 向く方向ベクトル
-	DirectX::XMFLOAT3 front_direction;
+	DirectX::XMFLOAT3 turn_direction = {}; // 向く方向ベクトル
+	DirectX::XMFLOAT3 front_direction = {};
 	float			larp_timer = 0.0f;
 };
 
@@ -168,7 +168,7 @@ public:
 	// 実行処理
 	ActionBase::State Run(float elapsed_time) override;
 private:
-	DirectX::XMFLOAT3	direction;
+	DirectX::XMFLOAT3	direction = {};
 	bool				flag = false;
 };
 

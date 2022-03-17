@@ -89,7 +89,7 @@ public:
 	std::shared_ptr<CollisionSphere> GetCollisionSphereFromNameAndID(int id, std::string name);
 
 	// 円柱コリジョンの数取得
-	size_t GetCollisionCylinderCount() const { return cylinderes.size(); }
+	int GetCollisionCylinderCount() const { return static_cast<int>(cylinderes.size()); }
 	
 	// インデックスから円柱コリジョン取得
 	std::shared_ptr<CollisionCylinder> GetCollisionCylinder(int index) { return cylinderes.at(index); }

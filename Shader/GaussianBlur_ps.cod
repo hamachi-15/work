@@ -46,7 +46,7 @@
 // SV_TARGET                0   xyzw        0   TARGET   float   xyzw
 //
 ps_5_0
-dcl_globalFlags refactoringAllowed
+dcl_globalFlags refactoringAllowed | skipOptimization
 dcl_constantbuffer CB0[2], immediateIndexed
 dcl_sampler s0, mode_default
 dcl_resource_texture2d (float,float,float,float) t0
@@ -60,37 +60,100 @@ dcl_input_ps linear v8.xyzw
 dcl_input_ps linear v9.xyzw
 dcl_output o0.xyzw
 dcl_temps 2
-sample_indexable(texture2d)(float,float,float,float) r0.xyzw, v3.xyxx, t0.xyzw, s0
-mul r0.xyzw, r0.xyzw, cb0[0].yyyy
-sample_indexable(texture2d)(float,float,float,float) r1.xyzw, v2.xyxx, t0.xyzw, s0
-mad r0.xyzw, cb0[0].xxxx, r1.xyzw, r0.xyzw
+//
+// Initial variable locations:
+//   v0.x <- input.position.x; v0.y <- input.position.y; v0.z <- input.position.z; v0.w <- input.position.w; 
+//   v1.x <- input.color.x; v1.y <- input.color.y; v1.z <- input.color.z; v1.w <- input.color.w; 
+//   v2.x <- input.tex0.x; v2.y <- input.tex0.y; v2.z <- input.tex0.z; v2.w <- input.tex0.w; 
+//   v3.x <- input.tex1.x; v3.y <- input.tex1.y; v3.z <- input.tex1.z; v3.w <- input.tex1.w; 
+//   v4.x <- input.tex2.x; v4.y <- input.tex2.y; v4.z <- input.tex2.z; v4.w <- input.tex2.w; 
+//   v5.x <- input.tex3.x; v5.y <- input.tex3.y; v5.z <- input.tex3.z; v5.w <- input.tex3.w; 
+//   v6.x <- input.tex4.x; v6.y <- input.tex4.y; v6.z <- input.tex4.z; v6.w <- input.tex4.w; 
+//   v7.x <- input.tex5.x; v7.y <- input.tex5.y; v7.z <- input.tex5.z; v7.w <- input.tex5.w; 
+//   v8.x <- input.tex6.x; v8.y <- input.tex6.y; v8.z <- input.tex6.z; v8.w <- input.tex6.w; 
+//   v9.x <- input.tex7.x; v9.y <- input.tex7.y; v9.z <- input.tex7.z; v9.w <- input.tex7.w; 
+//   o0.x <- <main return value>.x; o0.y <- <main return value>.y; o0.z <- <main return value>.z; o0.w <- <main return value>.w
+//
+#line 10 "E:\就職作品\ライブラリ\DragonSlayer\HLSL\GaussianBlur_ps.hlsl"
+sample_indexable(texture2d)(float,float,float,float) r0.xyzw, v2.xyxx, t0.xyzw, s0
+mul r0.xyzw, r0.xyzw, cb0[0].xxxx  // r0.x <- color.x; r0.y <- color.y; r0.z <- color.z; r0.w <- color.w
+
+#line 11
+sample_indexable(texture2d)(float,float,float,float) r1.xyzw, v3.xyxx, t0.xyzw, s0
+mul r1.xyzw, r1.xyzw, cb0[0].yyyy
+add r0.xyzw, r0.xyzw, r1.xyzw
+
+#line 12
 sample_indexable(texture2d)(float,float,float,float) r1.xyzw, v4.xyxx, t0.xyzw, s0
-mad r0.xyzw, cb0[0].zzzz, r1.xyzw, r0.xyzw
+mul r1.xyzw, r1.xyzw, cb0[0].zzzz
+add r0.xyzw, r0.xyzw, r1.xyzw
+
+#line 13
 sample_indexable(texture2d)(float,float,float,float) r1.xyzw, v5.xyxx, t0.xyzw, s0
-mad r0.xyzw, cb0[0].wwww, r1.xyzw, r0.xyzw
+mul r1.xyzw, r1.xyzw, cb0[0].wwww
+add r0.xyzw, r0.xyzw, r1.xyzw
+
+#line 14
 sample_indexable(texture2d)(float,float,float,float) r1.xyzw, v6.xyxx, t0.xyzw, s0
-mad r0.xyzw, cb0[1].xxxx, r1.xyzw, r0.xyzw
+mul r1.xyzw, r1.xyzw, cb0[1].xxxx
+add r0.xyzw, r0.xyzw, r1.xyzw
+
+#line 15
 sample_indexable(texture2d)(float,float,float,float) r1.xyzw, v7.xyxx, t0.xyzw, s0
-mad r0.xyzw, cb0[1].yyyy, r1.xyzw, r0.xyzw
+mul r1.xyzw, r1.xyzw, cb0[1].yyyy
+add r0.xyzw, r0.xyzw, r1.xyzw
+
+#line 16
 sample_indexable(texture2d)(float,float,float,float) r1.xyzw, v8.xyxx, t0.xyzw, s0
-mad r0.xyzw, cb0[1].zzzz, r1.xyzw, r0.xyzw
+mul r1.xyzw, r1.xyzw, cb0[1].zzzz
+add r0.xyzw, r0.xyzw, r1.xyzw
+
+#line 17
 sample_indexable(texture2d)(float,float,float,float) r1.xyzw, v9.xyxx, t0.xyzw, s0
-mad r0.xyzw, cb0[1].wwww, r1.xyzw, r0.xyzw
+mul r1.xyzw, r1.xyzw, cb0[1].wwww
+add r0.xyzw, r0.xyzw, r1.xyzw
+
+#line 20
 sample_indexable(texture2d)(float,float,float,float) r1.xyzw, v2.zwzz, t0.xyzw, s0
-mad r0.xyzw, cb0[0].xxxx, r1.xyzw, r0.xyzw
+mul r1.xyzw, r1.xyzw, cb0[0].xxxx
+add r0.xyzw, r0.xyzw, r1.xyzw
+
+#line 21
 sample_indexable(texture2d)(float,float,float,float) r1.xyzw, v3.zwzz, t0.xyzw, s0
-mad r0.xyzw, cb0[0].yyyy, r1.xyzw, r0.xyzw
+mul r1.xyzw, r1.xyzw, cb0[0].yyyy
+add r0.xyzw, r0.xyzw, r1.xyzw
+
+#line 22
 sample_indexable(texture2d)(float,float,float,float) r1.xyzw, v4.zwzz, t0.xyzw, s0
-mad r0.xyzw, cb0[0].zzzz, r1.xyzw, r0.xyzw
+mul r1.xyzw, r1.xyzw, cb0[0].zzzz
+add r0.xyzw, r0.xyzw, r1.xyzw
+
+#line 23
 sample_indexable(texture2d)(float,float,float,float) r1.xyzw, v5.zwzz, t0.xyzw, s0
-mad r0.xyzw, cb0[0].wwww, r1.xyzw, r0.xyzw
+mul r1.xyzw, r1.xyzw, cb0[0].wwww
+add r0.xyzw, r0.xyzw, r1.xyzw
+
+#line 24
 sample_indexable(texture2d)(float,float,float,float) r1.xyzw, v6.zwzz, t0.xyzw, s0
-mad r0.xyzw, cb0[1].xxxx, r1.xyzw, r0.xyzw
+mul r1.xyzw, r1.xyzw, cb0[1].xxxx
+add r0.xyzw, r0.xyzw, r1.xyzw
+
+#line 25
 sample_indexable(texture2d)(float,float,float,float) r1.xyzw, v7.zwzz, t0.xyzw, s0
-mad r0.xyzw, cb0[1].yyyy, r1.xyzw, r0.xyzw
+mul r1.xyzw, r1.xyzw, cb0[1].yyyy
+add r0.xyzw, r0.xyzw, r1.xyzw
+
+#line 26
 sample_indexable(texture2d)(float,float,float,float) r1.xyzw, v8.zwzz, t0.xyzw, s0
-mad r0.xyzw, cb0[1].zzzz, r1.xyzw, r0.xyzw
+mul r1.xyzw, r1.xyzw, cb0[1].zzzz
+add r0.xyzw, r0.xyzw, r1.xyzw
+
+#line 27
 sample_indexable(texture2d)(float,float,float,float) r1.xyzw, v9.zwzz, t0.xyzw, s0
-mad o0.xyzw, cb0[1].wwww, r1.xyzw, r0.xyzw
+mul r1.xyzw, r1.xyzw, cb0[1].wwww
+add r0.xyzw, r0.xyzw, r1.xyzw
+
+#line 29
+mov o0.xyzw, r0.xyzw
 ret 
-// Approximately 33 instruction slots used
+// Approximately 49 instruction slots used

@@ -39,7 +39,7 @@ dcl_temps 3
 //   o1.x <- <main return value>.texcoord.x; o1.y <- <main return value>.texcoord.y; 
 //   o0.x <- <main return value>.position.x; o0.y <- <main return value>.position.y; o0.z <- <main return value>.position.z; o0.w <- <main return value>.position.w
 //
-#line 8 "C:\Users\2190015\Desktop\DragonSlayer\HLSL\Mask_vs.hlsl"
+#line 8 "E:\就職作品\ライブラリ\DragonSlayer\HLSL\Mask_vs.hlsl"
 mov r0.xyz, v0.xyzx  // r0.x <- P.x; r0.y <- P.y; r0.z <- P.z
 mov r0.w, l(1.000000)  // r0.w <- P.w
 

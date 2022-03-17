@@ -1,21 +1,24 @@
 
-#include "Charactor.h"
 #include "EnemyDragonSoulEater.h"
-
+// コンポーネント
+#include "Charactor.h"
+// マネージャー
 #include "SceneManager.h"
 #include "ActorManager.h"
 #include "EnemyManager.h"
 #include "CollisionManager.h"
 #include "EnemyTerritoryManager.h"
-
+#include "AudioManager.h"
+// AI
 #include "BehaviorTree.h"
 #include "BehaviorData.h"
 #include "ActionOwner.h"
 #include "DragonActionOwner.h"
 #include "JudgmentOwner.h"
 #include "DragonJudgmentOwner.h"
-
+// 描画
 #include "Graphics.h"
+// テリトリー関連
 #include "EnemyTerritory.h"
 //*********************************
 // 
@@ -53,17 +56,21 @@ bool EnemyDragonSoulEater::OnMessages(const Telegram& message)
 	switch (message.message_box.message)
 	{
 	case MessageType::Message_Hit_Attack:
-		break;
+	{
+		std::shared_ptr<Charactor> charactor = GetActor()->GetComponent<Charactor>();
+		// 自身の攻撃ヒットフラグを立てる
+		charactor->SetHitAttackFlag(true);
+		// ヒットSE再生
+		AudioManager::Instance().PlaySoundEffect(SEType::PlayerGetHit);
+	}
+	break;
 	case MessageType::Message_GetHit_Attack:
 		// 衝突した位置を設定
 		SetHitPosition(message.message_box.hit_position);
 		break;
 	case MessageType::Message_Give_Attack_Right:
-	{
-		std::shared_ptr<Charactor> charactor = GetActor()->GetComponent<Charactor>();
 		// 攻撃ヒットフラグを立てる
 		SetRightOfAttack(true);
-	}
 	break;
 	case MessageType::Message_Hit_Boddy:
 		break;
@@ -130,8 +137,9 @@ void EnemyDragonSoulEater::SetBehaviorNode()
 		ai_tree->AddNode("OutRange", "Pursuit", 0, BehaviorTree::SelectRule::Non, NULL, new PursuitAction(this));
 		ai_tree->AddNode("OutRange", "FireBallShoot", 0, BehaviorTree::SelectRule::Sequence,NULL, NULL);
 		ai_tree->AddNode("Attack", "BasicAttack", 0, BehaviorTree::SelectRule::Sequence, new BasicAttackJudgment(this), NULL);
-		ai_tree->AddNode("Attack", "TailAttack", 0, BehaviorTree::SelectRule::Non, new TailAttackJudgment(this), new TailAttackAction(this));
-		
+		ai_tree->AddNode("Attack", "TailAttack", 0, BehaviorTree::SelectRule::Non, NULL, new TailAttackAction(this));
+		ai_tree->AddNode("Attack", "FireBallShoot", 0, BehaviorTree::SelectRule::Sequence, NULL, NULL);
+
 		ai_tree->AddNode("FireBallShoot", "TurnSequence", 0, BehaviorTree::SelectRule::Non, NULL, new TurnToTargetAction(this));
 		ai_tree->AddNode("FireBallShoot", "FireBallShootSequence", 0, BehaviorTree::SelectRule::Non, NULL, new FireBollAttackAction(this));
 		

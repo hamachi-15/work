@@ -2,7 +2,7 @@
 	@file	EnemyCategory.h
 	@brief	ツールにて自動生成しています。絶対に書き換えないでください。
 	@autor	DataBase.xlsm
-	@data	2022/03/12
+	@data	2022/03/18
 **/
 #pragma	once
 
@@ -22,4 +22,5 @@ enum	class	EnemyCategory
 	SoulEaterDragon,	//!<	ソウルイータードラゴン
 	DragonUsurper,	//!<	ドラゴン
 	FireBall,	//!<	火球
+	Conifer,	//!<	針葉樹
 };
