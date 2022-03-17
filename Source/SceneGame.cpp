@@ -106,24 +106,24 @@ void SceneGame::Initialize()
 	// ステージ読み込み
 	{
 		std::shared_ptr<Actor> actor = ActorManager::Instance().Create();
-		actor->SetUpModel("Data/Model/Filde/Filde.mdl", nullptr);
+		actor->SetUpModel("Data/Model/Filde/Stage.mdl", nullptr);
 		actor->SetName("Filde");
 		actor->SetPosition(DirectX::XMFLOAT3(0, 0, 0));
 		actor->SetAngle(DirectX::XMFLOAT3( 0, Mathf::ConvartToRadian(-90), 0));
 		actor->SetScale(DirectX::XMFLOAT3(0.1f, 0.1f, 0.1f));
 		actor->SetShaderType(ShaderManager::ShaderType::CascadeShadowMap);
 	}
-	// ステージオブジェクト読み込み
-	{
-		std::shared_ptr<Actor> actor = ActorManager::Instance().Create();
-		actor->SetUpModel("Data/Model/Filde/StageObject/Conifer.mdl", nullptr);
-		actor->SetName("FildeObjects");
-		actor->SetPosition(DirectX::XMFLOAT3(-100, 0.3f, 100));
-		actor->SetAngle(DirectX::XMFLOAT3(0, Mathf::ConvartToRadian(-90), 0));
-		actor->SetScale(DirectX::XMFLOAT3(8.f, 8.f, 8.f));
-		actor->AddComponent<Stage>();
-		actor->SetShaderType(ShaderManager::ShaderType::Lambert);
-	}
+	//// ステージオブジェクト読み込み
+	//{
+	//	std::shared_ptr<Actor> actor = ActorManager::Instance().Create();
+	//	actor->SetUpModel("Data/Model/Filde/StageObject/Conifer.mdl", nullptr);
+	//	actor->SetName("FildeObjects");
+	//	actor->SetPosition(DirectX::XMFLOAT3(-100, 0.3f, 100));
+	//	actor->SetAngle(DirectX::XMFLOAT3(0, Mathf::ConvartToRadian(-90), 0));
+	//	actor->SetScale(DirectX::XMFLOAT3(8.f, 8.f, 8.f));
+	//	actor->AddComponent<Stage>();
+	//	actor->SetShaderType(ShaderManager::ShaderType::Lambert);
+	//}
 	// プレイヤー読み込み
 	{
 		std::shared_ptr<Actor> actor = ActorManager::Instance().Create();

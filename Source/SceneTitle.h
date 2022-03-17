@@ -51,7 +51,9 @@ private:
 	std::unique_ptr<Texture> sky;
 	std::unique_ptr<Texture> title_bg;
 	std::unique_ptr<Texture> mask_texture;
-
+	std::unique_ptr<Texture> controll_texture;
+	DirectX::XMFLOAT2 controll_texture_size = { 512, 512 };
+	DirectX::XMFLOAT2 render_start_position = { -20, 250 };
 	//ƒ‰ƒCƒg
 	DirectX::XMFLOAT3 LightDir = { 0,0,0 };
 

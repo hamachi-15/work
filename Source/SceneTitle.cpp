@@ -32,6 +32,9 @@ void SceneTitle::Initialize()
 
 	title_bg = std::make_unique<Texture>();
 	title_bg->Load("Data/Sprite/TitleBG.jpg");
+
+	controll_texture = std::make_unique<Texture>();
+	controll_texture->Load("Data/Sprite/Controll.png");
 	UIManager::Instance().RegisterUI(std::make_shared<TitleUI>());
 
 	AudioManager::Instance().PlayBGM(BGMType::Title);
@@ -107,6 +110,17 @@ void SceneTitle::ScreenRender(ID3D11DeviceContext* context, RenderContext* rende
 
 	// タイトル画面のUI描画
 	UIManager::Instance().Draw(context);
+
+	// 操作説明描画
+	sprite_shader->Begin(context);
+	sprite->Render(context,
+		controll_texture.get(),
+		render_start_position.x, render_start_position.y,
+		controll_texture_size.x, controll_texture_size.y,
+		0, 0,
+		controll_texture_size.x, controll_texture_size.y);
+		sprite_shader->End(context);
+
 }
 
 //----------------------------------
@@ -116,7 +130,8 @@ void SceneTitle::BuckBufferRender(ID3D11DeviceContext* context, RenderContext* r
 {
 	Graphics& graphics = Graphics::Instance();
 	ShaderManager& shader_manager = ShaderManager::Instance();
-	// スプライトシェーダー取得
+	// シェーダー取得
+	std::shared_ptr<Shader> sprite_shader = shader_manager.GetShader(ShaderManager::ShaderType::Sprite);
 	std::shared_ptr<Shader> dissolve_shader = shader_manager.GetShader(ShaderManager::ShaderType::Dissolve);
 	// レンダーターゲット設定
 	{
