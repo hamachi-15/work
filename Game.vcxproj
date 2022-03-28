@@ -273,10 +273,6 @@
     <ClCompile Include="Source\OperateDictionaryMenu.cpp" />
     <ClCompile Include="Source\PhongShader.cpp" />
     <ClCompile Include="Source\PhongVarianceShadowMap.cpp" />
-    <ClCompile Include="Source\PlainMesh.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="Source\Player.cpp" />
     <ClCompile Include="Source\PlayerCollision.cpp" />
     <ClCompile Include="Source\PlayerUIAction.cpp" />
@@ -441,10 +437,6 @@
     <ClInclude Include="Source\OperateDictionaryMenu.h" />
     <ClInclude Include="Source\PhongShader.h" />
     <ClInclude Include="Source\PhongVarianceShadowMap.h" />
-    <ClInclude Include="Source\PlainMesh.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-    </ClInclude>
     <ClInclude Include="Source\Player.h" />
     <ClInclude Include="Source\PlayerCollision.h" />
     <ClInclude Include="Source\PlayerUIAction.h" />

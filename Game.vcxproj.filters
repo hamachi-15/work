@@ -148,6 +148,87 @@
     <Filter Include="ソース ファイル\AI\MetaAI">
       <UniqueIdentifier>{4d80d0c9-b07c-468f-a7a6-ff248a781cfa}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\Character\Enemy">
+      <UniqueIdentifier>{ffc2eb55-33b5-4425-953f-a0157fcbe196}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Character\Player">
+      <UniqueIdentifier>{773d8cfd-0fd9-4112-bec2-56279ab2135d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Character\StageObject">
+      <UniqueIdentifier>{40a8f639-1ffd-49d8-a87d-b480f75bde76}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Graphics\Model">
+      <UniqueIdentifier>{4c9990f2-0c33-4899-b60d-7112abb8b1d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Graphics\ImGuiRenderer">
+      <UniqueIdentifier>{4c11f0e3-821b-4d8d-a030-a57a27166881}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Graphics\DebugPrimitive">
+      <UniqueIdentifier>{97a03cad-4653-429c-b603-3b74b6352254}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\UI\EnemyUI">
+      <UniqueIdentifier>{83ea6d8c-cad9-4e2b-a015-1d11f01445a6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\UI\PlayerUI">
+      <UniqueIdentifier>{dcfc9c72-aeec-4fa2-8020-a7ee4074094f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\System\Component">
+      <UniqueIdentifier>{c328a2f9-817e-4c14-a8ea-394fc3294a93}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\System\General">
+      <UniqueIdentifier>{3f98d88b-3593-4865-8215-2b7e731a347b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\System\Message">
+      <UniqueIdentifier>{0f71129c-9b14-457a-b354-c2e029075320}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\System\Territory">
+      <UniqueIdentifier>{57735bf5-dd6d-4e4d-b5dd-238acc451596}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\System\Script">
+      <UniqueIdentifier>{ad349e77-98d0-4639-9c9f-fd89a2337d06}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\System\Actor">
+      <UniqueIdentifier>{3b0c4a75-4b4d-44b1-b072-bb457cad07bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Graphics\Sprite">
+      <UniqueIdentifier>{ab7af5c6-6cf4-4a1f-8fda-cd2550ebc320}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Graphics\Shader\ShadowMap">
+      <UniqueIdentifier>{3cd6ac74-d6a4-4ba4-bde2-3255de058101}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Graphics\Shader\GaussianBlur">
+      <UniqueIdentifier>{3f588ef6-f9ae-4946-bdf5-912dab8ead9a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Graphics\Shader\Lambert">
+      <UniqueIdentifier>{0569a116-906c-4b8f-aa85-fac0fc0adb7f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Graphics\Shader\Phong">
+      <UniqueIdentifier>{bf1e55e3-ac9a-43ee-969d-c0933ee5aed4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Graphics\Shader\Dissolve">
+      <UniqueIdentifier>{50dbb909-3752-4c22-aba5-9d7fdd5bd8c3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Graphics\Shader\Skybox">
+      <UniqueIdentifier>{90fac9da-7346-440c-87c1-19300d0a0c6b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Graphics\Shader\Bloom">
+      <UniqueIdentifier>{9b2ed7bc-586c-466b-adc3-4cae6b7f55d4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Graphics\Shader\Sprite">
+      <UniqueIdentifier>{4fcc41ab-9046-4241-bed7-e7f4aa73b94e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Graphics\Shader\2DPrimitive">
+      <UniqueIdentifier>{99928cbb-b7eb-413b-b021-8fc8b27d6275}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Graphics\Shader\3DObj">
+      <UniqueIdentifier>{00aa8ec8-fb6c-4436-8733-97b04332446f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Graphics\Shader\Font">
+      <UniqueIdentifier>{12a38313-f10f-4eee-8a14-d87fdbf80f23}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Graphics\Font">
+      <UniqueIdentifier>{24b1f632-6b27-4fa2-8cea-6cc5fe05c12c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui\imgui.cpp">
@@ -174,86 +255,20 @@
     <ClCompile Include="Source\AudioResource.cpp">
       <Filter>ソース ファイル\Audio</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Enemy.cpp">
-      <Filter>ソース ファイル\Character</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\EnemyManager.cpp">
-      <Filter>ソース ファイル\Character</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\EnemySlime.cpp">
-      <Filter>ソース ファイル\Character</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\FontShader.cpp">
-      <Filter>ソース ファイル\Graphics\Shader</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\GaussianBlurShader.cpp">
-      <Filter>ソース ファイル\Graphics\Shader</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\LambertShader.cpp">
-      <Filter>ソース ファイル\Graphics\Shader</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\PhongVarianceShadowMap.cpp">
-      <Filter>ソース ファイル\Graphics\Shader</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\SkyBoxShader.cpp">
-      <Filter>ソース ファイル\Graphics\Shader</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\SpriteShader.cpp">
-      <Filter>ソース ファイル\Graphics\Shader</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\VarianceShadowMap.cpp">
-      <Filter>ソース ファイル\Graphics\Shader</Filter>
-    </ClCompile>
     <ClCompile Include="Source\WinMain.cpp">
       <Filter>ソース ファイル\System</Filter>
     </ClCompile>
     <ClCompile Include="Source\Framework.cpp">
       <Filter>ソース ファイル\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Font.cpp">
-      <Filter>ソース ファイル\Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Graphics.cpp">
       <Filter>ソース ファイル\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Texture.cpp">
-      <Filter>ソース ファイル\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\SpriteLayout.cpp">
-      <Filter>ソース ファイル\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Sprite.cpp">
-      <Filter>ソース ファイル\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Stage.cpp">
-      <Filter>ソース ファイル\Character</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Player.cpp">
-      <Filter>ソース ファイル\Character</Filter>
     </ClCompile>
     <ClCompile Include="Source\GameDatabase.cpp">
       <Filter>ソース ファイル\GameData</Filter>
     </ClCompile>
-    <ClCompile Include="Source\ImGuiRenderer.cpp">
-      <Filter>ソース ファイル\Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Shader.cpp">
       <Filter>ソース ファイル\Graphics\Shader</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\PlainMesh.cpp">
-      <Filter>ソース ファイル\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Model.cpp">
-      <Filter>ソース ファイル\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\ModelResource.cpp">
-      <Filter>ソース ファイル\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\3DObj.cpp">
-      <Filter>ソース ファイル\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\DebugRenderer.cpp">
-      <Filter>ソース ファイル\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Source\Light.cpp">
       <Filter>ソース ファイル\Graphics</Filter>
@@ -273,9 +288,6 @@
     <ClCompile Include="Source\SceneGame.cpp">
       <Filter>ソース ファイル\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Mathf.cpp">
-      <Filter>ソース ファイル\System</Filter>
-    </ClCompile>
     <ClCompile Include="Source\MenuSystem.cpp">
       <Filter>ソース ファイル\MenuSystem</Filter>
     </ClCompile>
@@ -294,44 +306,14 @@
     <ClCompile Include="Source\Mouse.cpp">
       <Filter>ソース ファイル\Input</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Actor.cpp">
-      <Filter>ソース ファイル\System</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\ActorManager.cpp">
-      <Filter>ソース ファイル\System</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Messenger.cpp">
-      <Filter>ソース ファイル\System</Filter>
-    </ClCompile>
     <ClCompile Include="Source\ResourceManager.cpp">
       <Filter>ソース ファイル\Memory</Filter>
     </ClCompile>
     <ClCompile Include="Source\Button.cpp">
       <Filter>ソース ファイル\MenuSystem</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Charactor.cpp">
-      <Filter>ソース ファイル\Character</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Movement.cpp">
-      <Filter>ソース ファイル\Character</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Logger.cpp">
-      <Filter>ソース ファイル\System</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\GaussianXBlur.cpp">
-      <Filter>ソース ファイル\Graphics\Shader</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\GaussianYBlur.cpp">
-      <Filter>ソース ファイル\Graphics\Shader</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Telegram.cpp">
       <Filter>ソース ファイル\AI</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\EnemyLAT.cpp">
-      <Filter>ソース ファイル\Character</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\EnemyPLT.cpp">
-      <Filter>ソース ファイル\Character</Filter>
     </ClCompile>
     <ClCompile Include="Source\Effect.cpp">
       <Filter>ソース ファイル\Effect</Filter>
@@ -339,26 +321,8 @@
     <ClCompile Include="Source\EffectManager.cpp">
       <Filter>ソース ファイル\Effect</Filter>
     </ClCompile>
-    <ClCompile Include="Source\PlayerUIHealth.cpp">
-      <Filter>ソース ファイル\UI</Filter>
-    </ClCompile>
     <ClCompile Include="Source\SceneBattle.cpp">
       <Filter>ソース ファイル\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Script.cpp">
-      <Filter>ソース ファイル\System</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\BloomShader.cpp">
-      <Filter>ソース ファイル\Graphics\Shader</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\PhongShader.cpp">
-      <Filter>ソース ファイル\Graphics\Shader</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\EnemyDragonNightmare.cpp">
-      <Filter>ソース ファイル\Character</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\CascadeShadowMapShader.cpp">
-      <Filter>ソース ファイル\Graphics\Shader</Filter>
     </ClCompile>
     <ClCompile Include="Source\SlimeActionOwner.cpp">
       <Filter>ソース ファイル\AI\SlimeAINode</Filter>
@@ -375,32 +339,11 @@
     <ClCompile Include="Source\LATActionOwner.cpp">
       <Filter>ソース ファイル\AI\LATAINode</Filter>
     </ClCompile>
-    <ClCompile Include="Source\EnemyTerritory.cpp">
-      <Filter>ソース ファイル\System</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\EnemyTerritoryManager.cpp">
-      <Filter>ソース ファイル\System</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\CreateShadowMapShader.cpp">
-      <Filter>ソース ファイル\Graphics\Shader</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\2DPrimitive.cpp">
-      <Filter>ソース ファイル\Graphics\Shader</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\EnemyDragonSoulEater.cpp">
-      <Filter>ソース ファイル\Character</Filter>
-    </ClCompile>
     <ClCompile Include="Source\DragonActionOwner.cpp">
       <Filter>ソース ファイル\AI\DragonAINode</Filter>
     </ClCompile>
     <ClCompile Include="Source\DragonJudgmentOwner.cpp">
       <Filter>ソース ファイル\AI\DragonAINode</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Universal.cpp">
-      <Filter>ソース ファイル\Character</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\PlayerUIAction.cpp">
-      <Filter>ソース ファイル\UI</Filter>
     </ClCompile>
     <ClCompile Include="Source\UINodeBase.cpp">
       <Filter>ソース ファイル\UI</Filter>
@@ -414,15 +357,6 @@
     <ClCompile Include="Source\UIManager.cpp">
       <Filter>ソース ファイル\UI</Filter>
     </ClCompile>
-    <ClCompile Include="Source\BossHealthUI.cpp">
-      <Filter>ソース ファイル\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\NormalEnemyHelthUI.cpp">
-      <Filter>ソース ファイル\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\DissolveShader.cpp">
-      <Filter>ソース ファイル\Graphics\Shader</Filter>
-    </ClCompile>
     <ClCompile Include="Source\TitleButtonUI.cpp">
       <Filter>ソース ファイル\UI</Filter>
     </ClCompile>
@@ -430,9 +364,6 @@
       <Filter>ソース ファイル\UI</Filter>
     </ClCompile>
     <ClCompile Include="Source\TitleButtonUIAction.cpp">
-      <Filter>ソース ファイル\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\BossHealthUIAction.cpp">
       <Filter>ソース ファイル\UI</Filter>
     </ClCompile>
     <ClCompile Include="Source\PlayerCollision.cpp">
@@ -449,15 +380,6 @@
     </ClCompile>
     <ClCompile Include="Source\SceneOver.cpp">
       <Filter>ソース ファイル\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\FireBall.cpp">
-      <Filter>ソース ファイル\Character</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\FireBallManager.cpp">
-      <Filter>ソース ファイル\Character</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\StageManager.cpp">
-      <Filter>ソース ファイル\Character</Filter>
     </ClCompile>
     <ClCompile Include="Source\AudioManager.cpp">
       <Filter>ソース ファイル\Audio</Filter>
@@ -501,6 +423,162 @@
     <ClCompile Include="Source\MetaAI.cpp">
       <Filter>ソース ファイル\AI\MetaAI</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Enemy.cpp">
+      <Filter>ソース ファイル\Character\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\EnemyDragonNightmare.cpp">
+      <Filter>ソース ファイル\Character\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\EnemyDragonSoulEater.cpp">
+      <Filter>ソース ファイル\Character\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\EnemyLAT.cpp">
+      <Filter>ソース ファイル\Character\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\EnemyManager.cpp">
+      <Filter>ソース ファイル\Character\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\EnemyPLT.cpp">
+      <Filter>ソース ファイル\Character\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\EnemySlime.cpp">
+      <Filter>ソース ファイル\Character\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Stage.cpp">
+      <Filter>ソース ファイル\Character\StageObject</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\StageManager.cpp">
+      <Filter>ソース ファイル\Character\StageObject</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\FireBall.cpp">
+      <Filter>ソース ファイル\Character\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\FireBallManager.cpp">
+      <Filter>ソース ファイル\Character\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Model.cpp">
+      <Filter>ソース ファイル\Graphics\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\ModelResource.cpp">
+      <Filter>ソース ファイル\Graphics\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\ImGuiRenderer.cpp">
+      <Filter>ソース ファイル\Graphics\ImGuiRenderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\DebugRenderer.cpp">
+      <Filter>ソース ファイル\Graphics\DebugPrimitive</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Player.cpp">
+      <Filter>ソース ファイル\Character\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\BossHealthUI.cpp">
+      <Filter>ソース ファイル\UI\EnemyUI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\BossHealthUIAction.cpp">
+      <Filter>ソース ファイル\UI\EnemyUI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\NormalEnemyHelthUI.cpp">
+      <Filter>ソース ファイル\UI\EnemyUI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\PlayerUIAction.cpp">
+      <Filter>ソース ファイル\UI\PlayerUI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\PlayerUIHealth.cpp">
+      <Filter>ソース ファイル\UI\PlayerUI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Charactor.cpp">
+      <Filter>ソース ファイル\System\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Movement.cpp">
+      <Filter>ソース ファイル\System\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Mathf.cpp">
+      <Filter>ソース ファイル\System\General</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Universal.cpp">
+      <Filter>ソース ファイル\System\General</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Messenger.cpp">
+      <Filter>ソース ファイル\System\Message</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Logger.cpp">
+      <Filter>ソース ファイル\System\Message</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\EnemyTerritory.cpp">
+      <Filter>ソース ファイル\System\Territory</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\EnemyTerritoryManager.cpp">
+      <Filter>ソース ファイル\System\Territory</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Script.cpp">
+      <Filter>ソース ファイル\System\Script</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\ActorManager.cpp">
+      <Filter>ソース ファイル\System\Actor</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor.cpp">
+      <Filter>ソース ファイル\System\Actor</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Sprite.cpp">
+      <Filter>ソース ファイル\Graphics\Sprite</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\SpriteLayout.cpp">
+      <Filter>ソース ファイル\Graphics\Sprite</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Texture.cpp">
+      <Filter>ソース ファイル\Graphics\Sprite</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\CascadeShadowMapShader.cpp">
+      <Filter>ソース ファイル\Graphics\Shader\ShadowMap</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\CreateShadowMapShader.cpp">
+      <Filter>ソース ファイル\Graphics\Shader\ShadowMap</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\VarianceShadowMap.cpp">
+      <Filter>ソース ファイル\Graphics\Shader\ShadowMap</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\PhongVarianceShadowMap.cpp">
+      <Filter>ソース ファイル\Graphics\Shader\ShadowMap</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GaussianBlurShader.cpp">
+      <Filter>ソース ファイル\Graphics\Shader\GaussianBlur</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GaussianXBlur.cpp">
+      <Filter>ソース ファイル\Graphics\Shader\GaussianBlur</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GaussianYBlur.cpp">
+      <Filter>ソース ファイル\Graphics\Shader\GaussianBlur</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\PhongShader.cpp">
+      <Filter>ソース ファイル\Graphics\Shader\Phong</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\LambertShader.cpp">
+      <Filter>ソース ファイル\Graphics\Shader\Lambert</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\DissolveShader.cpp">
+      <Filter>ソース ファイル\Graphics\Shader\Dissolve</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\SkyBoxShader.cpp">
+      <Filter>ソース ファイル\Graphics\Shader\Skybox</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\BloomShader.cpp">
+      <Filter>ソース ファイル\Graphics\Shader\Bloom</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\SpriteShader.cpp">
+      <Filter>ソース ファイル\Graphics\Shader\Sprite</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\2DPrimitive.cpp">
+      <Filter>ソース ファイル\Graphics\Shader\2DPrimitive</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\3DObj.cpp">
+      <Filter>ソース ファイル\Graphics\Shader\3DObj</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\FontShader.cpp">
+      <Filter>ソース ファイル\Graphics\Shader\Font</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Font.cpp">
+      <Filter>ソース ファイル\Graphics\Font</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\imgui\imconfig.h">
@@ -542,47 +620,11 @@
     <ClInclude Include="Source\SceneTutorial.h">
       <Filter>ソース ファイル\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="Source\VarianceShadowMap.h">
-      <Filter>ソース ファイル\Graphics\Shader</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\SpriteShader.h">
-      <Filter>ソース ファイル\Graphics\Shader</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\SkyBoxShader.h">
-      <Filter>ソース ファイル\Graphics\Shader</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\PhongVarianceShadowMap.h">
-      <Filter>ソース ファイル\Graphics\Shader</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Actor.h">
-      <Filter>ソース ファイル\System</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\ActorManager.h">
-      <Filter>ソース ファイル\System</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\EnemySlime.h">
-      <Filter>ソース ファイル\Character</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\EnemyManager.h">
-      <Filter>ソース ファイル\Character</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Enemy.h">
-      <Filter>ソース ファイル\Character</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Player.h">
-      <Filter>ソース ファイル\Character</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Stage.h">
-      <Filter>ソース ファイル\Character</Filter>
-    </ClInclude>
     <ClInclude Include="Source\GameDatabase.h">
       <Filter>ソース ファイル\GameData</Filter>
     </ClInclude>
     <ClInclude Include="Source\ResourceManager.h">
       <Filter>ソース ファイル\Memory</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Component.h">
-      <Filter>ソース ファイル\System</Filter>
     </ClInclude>
     <ClInclude Include="Source\AudioSource.h">
       <Filter>ソース ファイル\Audio</Filter>
@@ -596,46 +638,16 @@
     <ClInclude Include="Source\HighResolutionTimer.h">
       <Filter>ソース ファイル\System</Filter>
     </ClInclude>
-    <ClInclude Include="Source\3DObj.h">
-      <Filter>ソース ファイル\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\DebugRenderer.h">
-      <Filter>ソース ファイル\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Font.h">
-      <Filter>ソース ファイル\Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Framework.h">
       <Filter>ソース ファイル\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Source\Graphics.h">
       <Filter>ソース ファイル\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="Source\ImGuiRenderer.h">
-      <Filter>ソース ファイル\Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Light.h">
       <Filter>ソース ファイル\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Sprite.h">
-      <Filter>ソース ファイル\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\SpriteLayout.h">
-      <Filter>ソース ファイル\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Texture.h">
-      <Filter>ソース ファイル\Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="Source\RenderContext.h">
-      <Filter>ソース ファイル\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\PlainMesh.h">
-      <Filter>ソース ファイル\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\ModelResource.h">
-      <Filter>ソース ファイル\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Model.h">
       <Filter>ソース ファイル\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Source\Button.h">
@@ -656,18 +668,6 @@
     <ClInclude Include="Source\TopMenu.h">
       <Filter>ソース ファイル\MenuSystem</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Logger.h">
-      <Filter>ソース ファイル\System</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Mathf.h">
-      <Filter>ソース ファイル\System</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Messenger.h">
-      <Filter>ソース ファイル\System</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Misc.h">
-      <Filter>ソース ファイル\System</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Input.h">
       <Filter>ソース ファイル\Input</Filter>
     </ClInclude>
@@ -677,23 +677,8 @@
     <ClInclude Include="Source\Mouse.h">
       <Filter>ソース ファイル\Input</Filter>
     </ClInclude>
-    <ClInclude Include="Source\FontShader.h">
-      <Filter>ソース ファイル\Graphics\Shader</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Charactor.h">
-      <Filter>ソース ファイル\Character</Filter>
-    </ClInclude>
     <ClInclude Include="Source\MessageData.h">
       <Filter>ソース ファイル\MenuSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Movement.h">
-      <Filter>ソース ファイル\Character</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\GaussianBlurShader.h">
-      <Filter>ソース ファイル\Graphics\Shader</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\LambertShader.h">
-      <Filter>ソース ファイル\Graphics\Shader</Filter>
     </ClInclude>
     <ClInclude Include="Source\Shader.h">
       <Filter>ソース ファイル\Graphics\Shader</Filter>
@@ -707,20 +692,8 @@
     <ClInclude Include="Source\GameData\AttackCategory.h">
       <Filter>ソース ファイル\GameData</Filter>
     </ClInclude>
-    <ClInclude Include="Source\GaussianYBlur.h">
-      <Filter>ソース ファイル\Graphics\Shader</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\GaussianXBlur.h">
-      <Filter>ソース ファイル\Graphics\Shader</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Telegram.h">
       <Filter>ソース ファイル\AI</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\EnemyLAT.h">
-      <Filter>ソース ファイル\Character</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\EnemyPLT.h">
-      <Filter>ソース ファイル\Character</Filter>
     </ClInclude>
     <ClInclude Include="Source\GameData\AnimationData.h">
       <Filter>ソース ファイル\GameData</Filter>
@@ -731,26 +704,8 @@
     <ClInclude Include="Source\EffectManager.h">
       <Filter>ソース ファイル\Effect</Filter>
     </ClInclude>
-    <ClInclude Include="Source\PlayerUIHealth.h">
-      <Filter>ソース ファイル\UI</Filter>
-    </ClInclude>
     <ClInclude Include="Source\SceneBattle.h">
       <Filter>ソース ファイル\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Script.h">
-      <Filter>ソース ファイル\System</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\BloomShader.h">
-      <Filter>ソース ファイル\Graphics\Shader</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\PhongShader.h">
-      <Filter>ソース ファイル\Graphics\Shader</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\EnemyDragonNightmare.h">
-      <Filter>ソース ファイル\Character</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\CascadeShadowMapShader.h">
-      <Filter>ソース ファイル\Graphics\Shader</Filter>
     </ClInclude>
     <ClInclude Include="Source\SlimeActionOwner.h">
       <Filter>ソース ファイル\AI\SlimeAINode</Filter>
@@ -767,29 +722,14 @@
     <ClInclude Include="Source\LATActionOwner.h">
       <Filter>ソース ファイル\AI\LATAINode</Filter>
     </ClInclude>
-    <ClInclude Include="Source\EnemyTerritory.h">
-      <Filter>ソース ファイル\System</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\EnemyTerritoryManager.h">
-      <Filter>ソース ファイル\System</Filter>
-    </ClInclude>
     <ClInclude Include="Source\GameData\EnemyTerritoryTag.h">
       <Filter>ソース ファイル\GameData</Filter>
     </ClInclude>
     <ClInclude Include="Source\GameData\WorldMapData.h">
       <Filter>ソース ファイル\GameData</Filter>
     </ClInclude>
-    <ClInclude Include="Source\CreateShadowMapShader.h">
-      <Filter>ソース ファイル\Graphics\Shader</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\2DPrimitive.h">
-      <Filter>ソース ファイル\Graphics\Shader</Filter>
-    </ClInclude>
     <ClInclude Include="Source\ShaderManager.h">
       <Filter>ソース ファイル\Graphics\Shader</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\EnemyDragonSoulEater.h">
-      <Filter>ソース ファイル\Character</Filter>
     </ClInclude>
     <ClInclude Include="Source\DragonActionOwner.h">
       <Filter>ソース ファイル\AI\DragonAINode</Filter>
@@ -802,9 +742,6 @@
     </ClInclude>
     <ClInclude Include="Source\GameData\EnemyTerritoryPosition.h">
       <Filter>ソース ファイル\GameData</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\PlayerUIAction.h">
-      <Filter>ソース ファイル\UI</Filter>
     </ClInclude>
     <ClInclude Include="Source\UINodeBase.h">
       <Filter>ソース ファイル\UI</Filter>
@@ -824,15 +761,6 @@
     <ClInclude Include="Source\UIData.h">
       <Filter>ソース ファイル\UI</Filter>
     </ClInclude>
-    <ClInclude Include="Source\BossHealthUI.h">
-      <Filter>ソース ファイル\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\NormalEnemyHelthUI.h">
-      <Filter>ソース ファイル\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\DissolveShader.h">
-      <Filter>ソース ファイル\Graphics\Shader</Filter>
-    </ClInclude>
     <ClInclude Include="Source\TitleButtonUI.h">
       <Filter>ソース ファイル\UI</Filter>
     </ClInclude>
@@ -843,9 +771,6 @@
       <Filter>ソース ファイル\UI</Filter>
     </ClInclude>
     <ClInclude Include="Source\TitleButtonUIAction.h">
-      <Filter>ソース ファイル\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\BossHealthUIAction.h">
       <Filter>ソース ファイル\UI</Filter>
     </ClInclude>
     <ClInclude Include="Source\PlayerCollision.h">
@@ -877,15 +802,6 @@
     </ClInclude>
     <ClInclude Include="Source\SceneOver.h">
       <Filter>ソース ファイル\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\FireBall.h">
-      <Filter>ソース ファイル\Character</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\FireBallManager.h">
-      <Filter>ソース ファイル\Character</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\StageManager.h">
-      <Filter>ソース ファイル\Character</Filter>
     </ClInclude>
     <ClInclude Include="Source\GameData\StageObjectData.h">
       <Filter>ソース ファイル\GameData</Filter>
@@ -946,6 +862,165 @@
     </ClInclude>
     <ClInclude Include="Source\MetaAI.h">
       <Filter>ソース ファイル\AI\MetaAI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Enemy.h">
+      <Filter>ソース ファイル\Character\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\EnemyDragonNightmare.h">
+      <Filter>ソース ファイル\Character\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\EnemyDragonSoulEater.h">
+      <Filter>ソース ファイル\Character\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\EnemyLAT.h">
+      <Filter>ソース ファイル\Character\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\EnemyManager.h">
+      <Filter>ソース ファイル\Character\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\EnemyPLT.h">
+      <Filter>ソース ファイル\Character\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\EnemySlime.h">
+      <Filter>ソース ファイル\Character\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Stage.h">
+      <Filter>ソース ファイル\Character\StageObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\StageManager.h">
+      <Filter>ソース ファイル\Character\StageObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\FireBall.h">
+      <Filter>ソース ファイル\Character\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\FireBallManager.h">
+      <Filter>ソース ファイル\Character\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Model.h">
+      <Filter>ソース ファイル\Graphics\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ModelResource.h">
+      <Filter>ソース ファイル\Graphics\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ImGuiRenderer.h">
+      <Filter>ソース ファイル\Graphics\ImGuiRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\DebugRenderer.h">
+      <Filter>ソース ファイル\Graphics\DebugPrimitive</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Player.h">
+      <Filter>ソース ファイル\Character\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\BossHealthUI.h">
+      <Filter>ソース ファイル\UI\EnemyUI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\BossHealthUIAction.h">
+      <Filter>ソース ファイル\UI\EnemyUI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\NormalEnemyHelthUI.h">
+      <Filter>ソース ファイル\UI\EnemyUI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\PlayerUIAction.h">
+      <Filter>ソース ファイル\UI\PlayerUI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\PlayerUIHealth.h">
+      <Filter>ソース ファイル\UI\PlayerUI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Component.h">
+      <Filter>ソース ファイル\System\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Charactor.h">
+      <Filter>ソース ファイル\System\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Movement.h">
+      <Filter>ソース ファイル\System\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Misc.h">
+      <Filter>ソース ファイル\System\General</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Mathf.h">
+      <Filter>ソース ファイル\System\General</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Messenger.h">
+      <Filter>ソース ファイル\System\Message</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Logger.h">
+      <Filter>ソース ファイル\System\Message</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\EnemyTerritory.h">
+      <Filter>ソース ファイル\System\Territory</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\EnemyTerritoryManager.h">
+      <Filter>ソース ファイル\System\Territory</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Script.h">
+      <Filter>ソース ファイル\System\Script</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ActorManager.h">
+      <Filter>ソース ファイル\System\Actor</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor.h">
+      <Filter>ソース ファイル\System\Actor</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Sprite.h">
+      <Filter>ソース ファイル\Graphics\Sprite</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\SpriteLayout.h">
+      <Filter>ソース ファイル\Graphics\Sprite</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Texture.h">
+      <Filter>ソース ファイル\Graphics\Sprite</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\CascadeShadowMapShader.h">
+      <Filter>ソース ファイル\Graphics\Shader\ShadowMap</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\CreateShadowMapShader.h">
+      <Filter>ソース ファイル\Graphics\Shader\ShadowMap</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\VarianceShadowMap.h">
+      <Filter>ソース ファイル\Graphics\Shader\ShadowMap</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\PhongVarianceShadowMap.h">
+      <Filter>ソース ファイル\Graphics\Shader\ShadowMap</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GaussianBlurShader.h">
+      <Filter>ソース ファイル\Graphics\Shader\GaussianBlur</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GaussianXBlur.h">
+      <Filter>ソース ファイル\Graphics\Shader\GaussianBlur</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GaussianYBlur.h">
+      <Filter>ソース ファイル\Graphics\Shader\GaussianBlur</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\PhongShader.h">
+      <Filter>ソース ファイル\Graphics\Shader\Phong</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\LambertShader.h">
+      <Filter>ソース ファイル\Graphics\Shader\Lambert</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\DissolveShader.h">
+      <Filter>ソース ファイル\Graphics\Shader\Dissolve</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\SkyBoxShader.h">
+      <Filter>ソース ファイル\Graphics\Shader\Skybox</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\BloomShader.h">
+      <Filter>ソース ファイル\Graphics\Shader\Bloom</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\SpriteShader.h">
+      <Filter>ソース ファイル\Graphics\Shader\Sprite</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\2DPrimitive.h">
+      <Filter>ソース ファイル\Graphics\Shader\2DPrimitive</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\3DObj.h">
+      <Filter>ソース ファイル\Graphics\Shader\3DObj</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\FontShader.h">
+      <Filter>ソース ファイル\Graphics\Shader\Font</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Font.h">
+      <Filter>ソース ファイル\Graphics\Font</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

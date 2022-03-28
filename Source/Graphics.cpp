@@ -72,13 +72,12 @@ Graphics::Graphics(HWND hwnd)
 			swapchain_desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 			swapchain_desc.BufferCount = 1;		// バックバッファの数
 			swapchain_desc.OutputWindow = hwnd;	// DirectXで描いた画を表示するウインドウ
-			swapchain_desc.Windowed = TRUE;		// ウインドウモードか、フルスクリーンにするか。
+			swapchain_desc.Windowed = FALSE;		// ウインドウモードか、フルスクリーンにするか。
 			swapchain_desc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 			swapchain_desc.Flags = 0; // DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH
 		}	
 
 		D3D_FEATURE_LEVEL feature_level;
-
 		// デバイス＆スワップチェーンの生成
 		hr = D3D11CreateDeviceAndSwapChain(
 			nullptr,						// どのビデオアダプタを使用するか？既定ならばnullptrで、IDXGIAdapterのアドレスを渡す。

@@ -25,6 +25,9 @@ Framework::Framework(HWND hwnd) :
 //-------------------------------
 Framework::~Framework()
 {
+	// フルスクリーンを解除
+	graphics.GetSwapChain()->SetFullscreenState(false, NULL);
+
 	// シーン終了処理
 	SceneManager::Instance().Clear();
 

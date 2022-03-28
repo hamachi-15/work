@@ -111,7 +111,6 @@ void Obj::Begin(ID3D11DeviceContext* context, RenderContext& render_context)
 	cbscene.LightColor = { 1, 1, 1, 1 };
 	DirectX::XMMATRIX V = DirectX::XMLoadFloat4x4(&render_context.view);
 	DirectX::XMMATRIX P = DirectX::XMLoadFloat4x4(&render_context.projection);
-	//V = DirectX::XMMatrixInverse(nullptr, V);
 	DirectX::XMFLOAT4 v;
 	DirectX::XMStoreFloat4(&v, V.r[3]);
 	cbscene.EyePos = v;
