@@ -2,11 +2,11 @@
 	@file	CullingCollisionParameterData.h
 	@brief	ツールにて自動生成しています。絶対に書き換えないでください。
 	@autor	DataBase.xlsm
-	@data	2022/03/18
+	@data	2022/03/27
 **/
 #pragma	once
 
-#include	"EnemyCategory.h"
+#include	"ActorType.h"
 #include	"CollisionUpdateType.h"
 
 
@@ -17,7 +17,7 @@
 struct	CullingCollisionParameterData
 {
 	int	id;	//!<	id
-	EnemyCategory	enemy_category;	//!<	アクターの種類
+	ActorType	enemy_category;	//!<	アクターの種類
 	char*	collision_name;	//!<	名前
 	char*	node_name;	//!<	ノードの名前
 	float	angle;	//!<	アングル

@@ -109,23 +109,11 @@
     <Filter Include="ソース ファイル\HLSL\ShadowMap\ToShadowMap">
       <UniqueIdentifier>{94c20f59-bc46-4705-958a-495cc995b214}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ソース ファイル\AI\SlimeAI">
-      <UniqueIdentifier>{eaa1d039-6703-4936-84f5-eebb62479f11}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ソース ファイル\AI\PLTAI">
-      <UniqueIdentifier>{057527d2-322c-4e67-976a-339f0e854e8a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ソース ファイル\AI\LATAI">
-      <UniqueIdentifier>{2ad7e630-7557-4f27-b67e-c2f2a8189a92}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ソース ファイル\HLSL\2DPrimitive">
       <UniqueIdentifier>{f2243f7b-08de-412d-aee5-27a3d33d8c8a}</UniqueIdentifier>
     </Filter>
     <Filter Include="ソース ファイル\HLSL\Phong">
       <UniqueIdentifier>{d9c22e51-bc45-4644-a4a3-1121cf41e174}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ソース ファイル\AI\DragonAI">
-      <UniqueIdentifier>{6d44e4ac-0956-4829-bb3d-722f29238093}</UniqueIdentifier>
     </Filter>
     <Filter Include="ソース ファイル\HLSL\Mask">
       <UniqueIdentifier>{9382119a-301d-4926-ac0d-7f027526beae}</UniqueIdentifier>
@@ -135,6 +123,30 @@
     </Filter>
     <Filter Include="ソース ファイル\Collision">
       <UniqueIdentifier>{9a33e08a-89d8-4756-ad0f-8a37b42e7f1f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\System\Camera">
+      <UniqueIdentifier>{ce0c4b09-ce95-4e23-9f59-9a9c7a4a26ab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\AI\DragonAINode">
+      <UniqueIdentifier>{6d44e4ac-0956-4829-bb3d-722f29238093}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\AI\LATAINode">
+      <UniqueIdentifier>{2ad7e630-7557-4f27-b67e-c2f2a8189a92}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\AI\PLTAINode">
+      <UniqueIdentifier>{057527d2-322c-4e67-976a-339f0e854e8a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\AI\SlimeAINode">
+      <UniqueIdentifier>{eaa1d039-6703-4936-84f5-eebb62479f11}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\AI\BehaviorBase">
+      <UniqueIdentifier>{13fbb6cf-fac5-4818-84fa-0bbdad5f3fb6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\AI\GenericNode">
+      <UniqueIdentifier>{6f5769ed-3874-4bf1-8087-3f3227cf448a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\AI\MetaAI">
+      <UniqueIdentifier>{4d80d0c9-b07c-468f-a7a6-ff248a781cfa}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -161,18 +173,6 @@
     </ClCompile>
     <ClCompile Include="Source\AudioResource.cpp">
       <Filter>ソース ファイル\Audio</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\ActionOwner.cpp">
-      <Filter>ソース ファイル\AI</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\BehaviorData.cpp">
-      <Filter>ソース ファイル\AI</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\BehaviorTree.cpp">
-      <Filter>ソース ファイル\AI</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\CameraController.cpp">
-      <Filter>ソース ファイル\System</Filter>
     </ClCompile>
     <ClCompile Include="Source\Enemy.cpp">
       <Filter>ソース ファイル\Character</Filter>
@@ -237,9 +237,6 @@
     <ClCompile Include="Source\ImGuiRenderer.cpp">
       <Filter>ソース ファイル\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="Source\JudgmentOwner.cpp">
-      <Filter>ソース ファイル\AI</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Shader.cpp">
       <Filter>ソース ファイル\Graphics\Shader</Filter>
     </ClCompile>
@@ -279,16 +276,7 @@
     <ClCompile Include="Source\Mathf.cpp">
       <Filter>ソース ファイル\System</Filter>
     </ClCompile>
-    <ClCompile Include="Source\NodeBase.cpp">
-      <Filter>ソース ファイル\AI</Filter>
-    </ClCompile>
     <ClCompile Include="Source\MenuSystem.cpp">
-      <Filter>ソース ファイル\MenuSystem</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\MenuData.cpp">
-      <Filter>ソース ファイル\MenuSystem</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\MenuBase.cpp">
       <Filter>ソース ファイル\MenuSystem</Filter>
     </ClCompile>
     <ClCompile Include="Source\OperateDictionaryMenu.cpp">
@@ -315,9 +303,6 @@
     <ClCompile Include="Source\Messenger.cpp">
       <Filter>ソース ファイル\System</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Collision.cpp">
-      <Filter>ソース ファイル\System</Filter>
-    </ClCompile>
     <ClCompile Include="Source\ResourceManager.cpp">
       <Filter>ソース ファイル\Memory</Filter>
     </ClCompile>
@@ -330,14 +315,8 @@
     <ClCompile Include="Source\Movement.cpp">
       <Filter>ソース ファイル\Character</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Camera.cpp">
-      <Filter>ソース ファイル\System</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Logger.cpp">
       <Filter>ソース ファイル\System</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\MetaAI.cpp">
-      <Filter>ソース ファイル\AI</Filter>
     </ClCompile>
     <ClCompile Include="Source\GaussianXBlur.cpp">
       <Filter>ソース ファイル\Graphics\Shader</Filter>
@@ -382,19 +361,19 @@
       <Filter>ソース ファイル\Graphics\Shader</Filter>
     </ClCompile>
     <ClCompile Include="Source\SlimeActionOwner.cpp">
-      <Filter>ソース ファイル\AI\SlimeAI</Filter>
+      <Filter>ソース ファイル\AI\SlimeAINode</Filter>
     </ClCompile>
     <ClCompile Include="Source\SlimeJudgmentOwner.cpp">
-      <Filter>ソース ファイル\AI\SlimeAI</Filter>
+      <Filter>ソース ファイル\AI\SlimeAINode</Filter>
     </ClCompile>
     <ClCompile Include="Source\PLTActionOwner.cpp">
-      <Filter>ソース ファイル\AI\PLTAI</Filter>
+      <Filter>ソース ファイル\AI\PLTAINode</Filter>
     </ClCompile>
     <ClCompile Include="Source\PLTJudgmentOwner.cpp">
-      <Filter>ソース ファイル\AI\PLTAI</Filter>
+      <Filter>ソース ファイル\AI\PLTAINode</Filter>
     </ClCompile>
     <ClCompile Include="Source\LATActionOwner.cpp">
-      <Filter>ソース ファイル\AI\LATAI</Filter>
+      <Filter>ソース ファイル\AI\LATAINode</Filter>
     </ClCompile>
     <ClCompile Include="Source\EnemyTerritory.cpp">
       <Filter>ソース ファイル\System</Filter>
@@ -412,22 +391,13 @@
       <Filter>ソース ファイル\Character</Filter>
     </ClCompile>
     <ClCompile Include="Source\DragonActionOwner.cpp">
-      <Filter>ソース ファイル\AI\DragonAI</Filter>
+      <Filter>ソース ファイル\AI\DragonAINode</Filter>
     </ClCompile>
     <ClCompile Include="Source\DragonJudgmentOwner.cpp">
-      <Filter>ソース ファイル\AI\DragonAI</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\JudgmentUniversal.cpp">
-      <Filter>ソース ファイル\AI</Filter>
+      <Filter>ソース ファイル\AI\DragonAINode</Filter>
     </ClCompile>
     <ClCompile Include="Source\Universal.cpp">
       <Filter>ソース ファイル\Character</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\ActionBase.cpp">
-      <Filter>ソース ファイル\AI</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\CollisionManager.cpp">
-      <Filter>ソース ファイル\System</Filter>
     </ClCompile>
     <ClCompile Include="Source\PlayerUIAction.cpp">
       <Filter>ソース ファイル\UI</Filter>
@@ -492,6 +462,45 @@
     <ClCompile Include="Source\AudioManager.cpp">
       <Filter>ソース ファイル\Audio</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Camera.cpp">
+      <Filter>ソース ファイル\System\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\CameraController.cpp">
+      <Filter>ソース ファイル\System\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Collision.cpp">
+      <Filter>ソース ファイル\Collision</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\CollisionManager.cpp">
+      <Filter>ソース ファイル\Collision</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\StageObjectCollision.cpp">
+      <Filter>ソース ファイル\Collision</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\ActionBase.cpp">
+      <Filter>ソース ファイル\AI\BehaviorBase</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\BehaviorData.cpp">
+      <Filter>ソース ファイル\AI\BehaviorBase</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\BehaviorTree.cpp">
+      <Filter>ソース ファイル\AI\BehaviorBase</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\NodeBase.cpp">
+      <Filter>ソース ファイル\AI\BehaviorBase</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\ActionOwner.cpp">
+      <Filter>ソース ファイル\AI\GenericNode</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\JudgmentOwner.cpp">
+      <Filter>ソース ファイル\AI\GenericNode</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\JudgmentUniversal.cpp">
+      <Filter>ソース ファイル\AI\GenericNode</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\MetaAI.cpp">
+      <Filter>ソース ファイル\AI\MetaAI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\imgui\imconfig.h">
@@ -532,24 +541,6 @@
     </ClInclude>
     <ClInclude Include="Source\SceneTutorial.h">
       <Filter>ソース ファイル\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\ActionBase.h">
-      <Filter>ソース ファイル\AI</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\ActionOwner.h">
-      <Filter>ソース ファイル\AI</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\BehaviorData.h">
-      <Filter>ソース ファイル\AI</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\BehaviorTree.h">
-      <Filter>ソース ファイル\AI</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\JudgmentOwner.h">
-      <Filter>ソース ファイル\AI</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\JudgmentBase.h">
-      <Filter>ソース ファイル\AI</Filter>
     </ClInclude>
     <ClInclude Include="Source\VarianceShadowMap.h">
       <Filter>ソース ファイル\Graphics\Shader</Filter>
@@ -602,15 +593,6 @@
     <ClInclude Include="Source\Audio.h">
       <Filter>ソース ファイル\Audio</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Template.h">
-      <Filter>ソース ファイル\System</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Camera.h">
-      <Filter>ソース ファイル\System</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\CameraController.h">
-      <Filter>ソース ファイル\System</Filter>
-    </ClInclude>
     <ClInclude Include="Source\HighResolutionTimer.h">
       <Filter>ソース ファイル\System</Filter>
     </ClInclude>
@@ -655,9 +637,6 @@
     </ClInclude>
     <ClInclude Include="Source\Model.h">
       <Filter>ソース ファイル\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\NodeBase.h">
-      <Filter>ソース ファイル\AI</Filter>
     </ClInclude>
     <ClInclude Include="Source\Button.h">
       <Filter>ソース ファイル\MenuSystem</Filter>
@@ -707,9 +686,6 @@
     <ClInclude Include="Source\MessageData.h">
       <Filter>ソース ファイル\MenuSystem</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Collision.h">
-      <Filter>ソース ファイル\System</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Movement.h">
       <Filter>ソース ファイル\Character</Filter>
     </ClInclude>
@@ -722,9 +698,6 @@
     <ClInclude Include="Source\Shader.h">
       <Filter>ソース ファイル\Graphics\Shader</Filter>
     </ClInclude>
-    <ClInclude Include="Source\GameData\EnemyCategory.h">
-      <Filter>ソース ファイル\GameData</Filter>
-    </ClInclude>
     <ClInclude Include="Source\GameData\EnemyData.h">
       <Filter>ソース ファイル\GameData</Filter>
     </ClInclude>
@@ -733,9 +706,6 @@
     </ClInclude>
     <ClInclude Include="Source\GameData\AttackCategory.h">
       <Filter>ソース ファイル\GameData</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\MetaAI.h">
-      <Filter>ソース ファイル\AI</Filter>
     </ClInclude>
     <ClInclude Include="Source\GaussianYBlur.h">
       <Filter>ソース ファイル\Graphics\Shader</Filter>
@@ -783,19 +753,19 @@
       <Filter>ソース ファイル\Graphics\Shader</Filter>
     </ClInclude>
     <ClInclude Include="Source\SlimeActionOwner.h">
-      <Filter>ソース ファイル\AI\SlimeAI</Filter>
+      <Filter>ソース ファイル\AI\SlimeAINode</Filter>
     </ClInclude>
     <ClInclude Include="Source\SlimeJudgmentOwner.h">
-      <Filter>ソース ファイル\AI\SlimeAI</Filter>
+      <Filter>ソース ファイル\AI\SlimeAINode</Filter>
     </ClInclude>
     <ClInclude Include="Source\PLTActionOwner.h">
-      <Filter>ソース ファイル\AI\PLTAI</Filter>
+      <Filter>ソース ファイル\AI\PLTAINode</Filter>
     </ClInclude>
     <ClInclude Include="Source\PLTJudgmentOwner.h">
-      <Filter>ソース ファイル\AI\PLTAI</Filter>
+      <Filter>ソース ファイル\AI\PLTAINode</Filter>
     </ClInclude>
     <ClInclude Include="Source\LATActionOwner.h">
-      <Filter>ソース ファイル\AI\LATAI</Filter>
+      <Filter>ソース ファイル\AI\LATAINode</Filter>
     </ClInclude>
     <ClInclude Include="Source\EnemyTerritory.h">
       <Filter>ソース ファイル\System</Filter>
@@ -822,25 +792,16 @@
       <Filter>ソース ファイル\Character</Filter>
     </ClInclude>
     <ClInclude Include="Source\DragonActionOwner.h">
-      <Filter>ソース ファイル\AI\DragonAI</Filter>
+      <Filter>ソース ファイル\AI\DragonAINode</Filter>
     </ClInclude>
     <ClInclude Include="Source\DragonJudgmentOwner.h">
-      <Filter>ソース ファイル\AI\DragonAI</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\JudgmentUniversal.h">
-      <Filter>ソース ファイル\AI</Filter>
+      <Filter>ソース ファイル\AI\DragonAINode</Filter>
     </ClInclude>
     <ClInclude Include="Source\Universal.h">
       <Filter>ソース ファイル\Character</Filter>
     </ClInclude>
     <ClInclude Include="Source\GameData\EnemyTerritoryPosition.h">
       <Filter>ソース ファイル\GameData</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\CollisionManager.h">
-      <Filter>ソース ファイル\System</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\CollisionDataHeader.h">
-      <Filter>ソース ファイル\System</Filter>
     </ClInclude>
     <ClInclude Include="Source\PlayerUIAction.h">
       <Filter>ソース ファイル\UI</Filter>
@@ -926,17 +887,65 @@
     <ClInclude Include="Source\StageManager.h">
       <Filter>ソース ファイル\Character</Filter>
     </ClInclude>
-    <ClInclude Include="Source\GameData\StageObjectCategory.h">
-      <Filter>ソース ファイル\GameData</Filter>
-    </ClInclude>
     <ClInclude Include="Source\GameData\StageObjectData.h">
-      <Filter>ソース ファイル\GameData</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\GameData\StageObjectSetPosition.h">
       <Filter>ソース ファイル\GameData</Filter>
     </ClInclude>
     <ClInclude Include="Source\AudioManager.h">
       <Filter>ソース ファイル\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\CameraController.h">
+      <Filter>ソース ファイル\System\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Camera.h">
+      <Filter>ソース ファイル\System\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\CollisionManager.h">
+      <Filter>ソース ファイル\Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Collision.h">
+      <Filter>ソース ファイル\Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\CollisionDataHeader.h">
+      <Filter>ソース ファイル\Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\StageObjectCollision.h">
+      <Filter>ソース ファイル\Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GameData\ActorCategory.h">
+      <Filter>ソース ファイル\GameData</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GameData\ButtleMapObjectPositionData.h">
+      <Filter>ソース ファイル\GameData</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GameData\WorldMapObjectPositionData.h">
+      <Filter>ソース ファイル\GameData</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ActionBase.h">
+      <Filter>ソース ファイル\AI\BehaviorBase</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\BehaviorData.h">
+      <Filter>ソース ファイル\AI\BehaviorBase</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\BehaviorTree.h">
+      <Filter>ソース ファイル\AI\BehaviorBase</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\JudgmentBase.h">
+      <Filter>ソース ファイル\AI\BehaviorBase</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\NodeBase.h">
+      <Filter>ソース ファイル\AI\BehaviorBase</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ActionOwner.h">
+      <Filter>ソース ファイル\AI\GenericNode</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\JudgmentOwner.h">
+      <Filter>ソース ファイル\AI\GenericNode</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\JudgmentUniversal.h">
+      <Filter>ソース ファイル\AI\GenericNode</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\MetaAI.h">
+      <Filter>ソース ファイル\AI\MetaAI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

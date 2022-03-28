@@ -1,9 +1,12 @@
+#include "FireBall.h"
 #include <vector>
+// 算術関数
 #include "Mathf.h"
 
+// AI
 #include "MetaAI.h"
 
-#include "FireBall.h"
+// エフェクト
 #include "Effect.h"
 
 // マネージャーインクルード
@@ -11,12 +14,17 @@
 #include "CollisionManager.h"
 #include "FireBallManager.h"
 
+// コンポーネント
 #include "Charactor.h"
 #include "Enemy.h"
 
+// モデル
 #include "Model.h"
 
+// ゲームデータ
 #include "GameDatabase.h"
+#include "ActorType.h"
+#include "CollisionParameterData.h"
 //******************************
 // 
 // 火球クラス
@@ -31,7 +39,7 @@ void FireBall::Start()
     std::shared_ptr<Charactor> charactor = actor->GetComponent<Charactor>();
 
     // 当たり判定設定
-    std::vector<std::shared_ptr<CollisionParameterData>> collision_parameter = GameDataBase::Instance().GetAttackCollitionParamterDataList(EnemyCategory::FireBall);
+    std::vector<std::shared_ptr<CollisionParameterData>> collision_parameter = GameDataBase::Instance().GetAttackCollitionParamterDataList(ActorType::FireBall);
     CollisionParameter parameter;
     for (std::shared_ptr<CollisionParameterData> data : collision_parameter)
     {
@@ -69,7 +77,7 @@ void FireBall::Start()
     // エフェクト読み込み
     fireball_effect = std::make_unique<Effect>("Data/Effect/test.efk", effekseer_manager->GetEffekseerManager());
 
-    fireball_position.y = 9;
+    fireball_position.y = 12;
     collision_sphere->SetPosition(fireball_position);
 }
 
@@ -80,6 +88,8 @@ void FireBall::Update(float elapsed_time)
 {
     // モデル取得
     Model* model = actor->GetModel();
+    // キャラクターの取得
+    std::shared_ptr<Charactor> charactor = actor->GetComponent<Charactor>();
 
     // 球VS円柱
     int cylinder_count = CollisionManager::Instance().GetCollisionCylinderCount();
@@ -89,8 +99,15 @@ void FireBall::Update(float elapsed_time)
         // アクターがプレイヤーなら飛ばす
         if (collision_sphere->GetActorType() == cylinder->GetActorType()) continue;
 
+        // 円柱コリジョンがステージオブジェクトなら飛ばす
+        if (cylinder->GetActorType() == ActorCategory::StageObject) continue;
+
         // 当たり判定フラグが立っていなかったら飛ばす
         if (!cylinder->GetCollisionFlag()) continue;
+
+        // 攻撃ヒットフラグが立ってたら飛ばす
+        if (charactor->GetHitAttackFlag()) continue;
+
         ObjectCollisionResult result;
         if (CollisionManager::Instance().IntersectSphereVsCylinder(collision_sphere.get(), cylinder.get(), result))
         {
@@ -128,6 +145,7 @@ void FireBall::Update(float elapsed_time)
 
     if (life_timer <= 0.0f)
     {
+        charactor->SetHitAttackFlag(false);
         FireBallManager::Instance().Unregister(shared_from_this());
         CollisionManager::Instance().UnregisterSphere(collision_sphere);
     }

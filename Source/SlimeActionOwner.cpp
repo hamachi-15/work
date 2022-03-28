@@ -1,11 +1,20 @@
 #include "SlimeActionOwner.h"
-#include "Enemy.h"
+// ゲームデータ
 #include "GameDatabase.h"
+#include "ActorType.h"
+#include "AttackCategory.h"
+
+// コンポーネント
+#include "Enemy.h"
 #include "Charactor.h"
+
+// モデル
 #include "Model.h"
 
+// マネージャー
 #include "CollisionManager.h"
 
+// 汎用関数
 #include "Universal.h"
 
 //***********************************
@@ -22,7 +31,7 @@ void HeavyBodyAttackAction::Start()
 	owner->PlayAnimation("SlimeAttack2");
 
 	// 当たり判定を行う時間のデータを取得
-	collision_time_data = GameDataBase::Instance().GetAttackCollitionTimeData(AttackCategory::JumpAttack, EnemyCategory::Slime);
+	collision_time_data = GameDataBase::Instance().GetAttackCollitionTimeData(AttackCategory::JumpAttack, ActorType::Slime);
 }
 
 //-------------------------------------
@@ -78,7 +87,7 @@ void BodyAttackAction::Start()
 	owner->PlayAnimation("SlimeAttack1");
 
 	// 当たり判定を行う時間のデータを取得
-	collision_time_data = GameDataBase::Instance().GetAttackCollitionTimeData(AttackCategory::BodyAttack, EnemyCategory::Slime);
+	collision_time_data = GameDataBase::Instance().GetAttackCollitionTimeData(AttackCategory::BodyAttack, ActorType::Slime);
 }
 
 //-------------------------------------

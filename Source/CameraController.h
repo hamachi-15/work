@@ -37,9 +37,6 @@ private:
 	// 錐台計算
 	void CalculateFrustum();
 
-	// 平面計算
-	void CalculatePlane(DirectX::XMFLOAT3& position1, DirectX::XMFLOAT3& position2, DirectX::XMFLOAT3& position3, DirectX::XMFLOAT3& position4, DirectX::XMFLOAT3& position5);
-
 	// フリーカメラ
 	void OnFreeMode(void* data);
 
@@ -80,10 +77,10 @@ private:
 	DirectX::XMFLOAT3				position = { 0.0f, 0.0f, 0.0f };
 	DirectX::XMFLOAT3				target = { 0.0f, 0.0f, 0.0f };
 	DirectX::XMFLOAT3				angle = { 0.0f, 0.0f, 0.0f };
-	float							roll_speed = Mathf::ConvartToRadian(60);
+	float							roll_speed = Mathf::ConvartToRadian(90);
 	float							range = 50.0f;
 	float							max_angleX = Mathf::ConvartToRadian(45);
-	float							min_angleX = Mathf::ConvartToRadian(-45);
+	float							min_angleX = Mathf::ConvartToRadian(0);
 
 	std::vector<Plane>				frustum;
 

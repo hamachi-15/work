@@ -5,6 +5,10 @@
 #include "Universal.h"
 #include "SceneManager.h"
 
+// ゲームデータ
+#include "GameDatabase.h"
+#include "ActorType.h"
+#include "CullingCollisionParameterData.h"
 //************************************
 // 
 // カリングコリジョン
@@ -13,7 +17,7 @@
 //-----------------------------------
 // コンストラクタ
 //-----------------------------------
-CullingCollision::CullingCollision(EnemyCategory enemy_category, std::shared_ptr<Actor> actor)
+CullingCollision::CullingCollision(ActorType enemy_category, std::shared_ptr<Actor> actor)
 {
     // アクター設定
     this->actor = actor;
@@ -32,8 +36,8 @@ CullingCollision::CullingCollision(EnemyCategory enemy_category, std::shared_ptr
         parameter.local_position = { data->local_x, data->local_y, data->local_z };
         DirectX::XMFLOAT3 node_position = {};
         parameter.update_type = data->update_type;
-        Mathf::GetNodePosition(parameter.node_name.c_str(), node_position, model);
-        parameter.position = { node_position.x, node_position.y + 0.5f, node_position.z };
+        //Mathf::GetNodePosition(parameter.node_name.c_str(), node_position, model);
+        //parameter.position = { node_position.x, node_position.y + 0.5f, node_position.z };
         collision_culling = std::make_shared<CollisionBox>(parameter);
     }
 }

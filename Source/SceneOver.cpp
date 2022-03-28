@@ -4,6 +4,8 @@
 #include "ResourceManager.h"
 #include "ShaderManager.h"
 #include "SceneManager.h"
+#include "AudioManager.h"
+
 // シーンインクルード
 #include "SceneTitle.h"
 #include "Graphics.h"
@@ -22,6 +24,10 @@ void SceneOver::Initialize()
 	anybutton_texture = ResourceManager::Instance().LoadTexture("Data/Sprite/PushAnyButton.png");
 	over_texture = std::make_unique<Texture>();
 	over_texture->Load("Data/Sprite/YouDead.png");
+
+	// BGM再生
+	AudioManager::Instance().PlayBGM(BGMType::Over);
+	AudioManager::Instance().SetBGMVolume(BGMType::Over, 0.4f);
 }
 
 //-------------------------------------
@@ -31,6 +37,9 @@ void SceneOver::Finalize()
 {
 	// 撃破フラグをクリア
 	EnemyManager::Instance().CrearDefeat();
+
+	// BGM再生停止
+	AudioManager::Instance().StopBGM(BGMType::Over);
 }
 
 //-------------------------------------

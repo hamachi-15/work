@@ -1,17 +1,36 @@
 #include <imgui.h>
 #include <stdio.h>
-#include "Mathf.h"
+// シーン
 #include "SceneBattle.h"
+#include "SceneGame.h"
+#include "SceneOver.h"
+#include "SceneClear.h"
+
+// 算術関数
+#include "Mathf.h"
+
+// 描画
 #include "Graphics.h"
+#include "Light.h"
+
+// カメラ
 #include "Camera.h"
 #include "CameraController.h"
-#include "Template.h"
-#include "Light.h"
-#include "Input.h"
-#include "Movement.h"
 
+// 入力
+#include "Input.h"
+
+// コンポーネント
+#include "Movement.h"
+#include "Actor.h"
+#include "EnemySlime.h"
+#include "Player.h"
+#include "Stage.h"
+
+// シェーダー
 #include "BloomShader.h"
 
+// マネージャー
 #include "ActorManager.h"
 #include "EnemyManager.h"
 #include "FireBallManager.h"
@@ -22,35 +41,40 @@
 #include "ShaderManager.h"
 #include "StageManager.h"
 #include "AudioManager.h"
-
-#include "Actor.h"
-#include "EnemySlime.h"
-#include "Player.h"
-#include "Stage.h"
-
-#include "MenuSystem.h"
 #include "UIManager.h"
 
+// メニュー
+#include "MenuSystem.h"
+
+// メッセージ
 #include "Messenger.h"
 #include "MessageData.h"
+
+// ゲームデータ
 #include "GameDataBase.h"
 
-
+// テクスチャ
 #include "Texture.h"
 #include "Sprite.h"
+
+// AI
 #include "MetaAI.h"
 
+// UI
 #include "PlayerUIHealth.h"
 #include "PlayerCollision.h"
 
-#include "SceneGame.h"
-#include "SceneOver.h"
-#include "SceneClear.h"
 
+//---------------------------------
+// コンストラクタ
+//---------------------------------
 SceneBattle::SceneBattle()
 {
 }
 
+//---------------------------------
+// デストラクタ
+//---------------------------------
 SceneBattle::~SceneBattle()
 {
 }
@@ -108,7 +132,7 @@ void SceneBattle::Initialize()
 	}
 	
 	// ステージオブジェクトの配置
-	StageManager::Instance().Register();
+	StageManager::Instance().ButtleObjectRegister();
 
 	// プレイヤー読み込み
 	{
@@ -133,7 +157,8 @@ void SceneBattle::Initialize()
 	EnemyManager::Instance().CreateEnemyEncountData();
 
 	// BGM再生
-	AudioManager::Instance().StopBGM(BGMType::ButtleMap);
+	AudioManager::Instance().PlayBGM(BGMType::ButtleMap);
+	AudioManager::Instance().SetBGMVolume(BGMType::ButtleMap, 0.5f);
 }
 
 //---------------------------------
@@ -158,6 +183,9 @@ void SceneBattle::Finalize()
 
 	// メッセンジャーのクリア
 	Messenger::Instance().Clear();
+
+	// BGM再生停止
+	AudioManager::Instance().StopBGM(BGMType::ButtleMap);
 }
 
 //---------------------------------
@@ -189,30 +217,21 @@ void SceneBattle::Update(float elapsed_time)
 	}
 	// ゲームがクリアになっていれば
 	if (isgame_clear)
-	{
-		// BGM再生停止
-		AudioManager::Instance().StopBGM(BGMType::ButtleMap);
-		
+	{		
 		// クリアシーンに遷移
 		SceneManager::Instance().ChangeScene(new SceneClear());
 		return;
 	}
 	// ゲームオーバーになっていれば
 	if (isgame_over)
-	{
-		// BGM再生停止
-		AudioManager::Instance().StopBGM(BGMType::ButtleMap);
-		
+	{		
 		// ゲームオーバーシーンに遷移
 		SceneManager::Instance().ChangeScene(new SceneOver());
 		return;
 	}
 	// 戦闘が終了したら
 	if (isbuttle_end)
-	{
-		// BGM再生停止
-		AudioManager::Instance().StopBGM(BGMType::ButtleMap);
-		
+	{		
 		// ゲームシーンに遷移
 		SceneManager::Instance().ChangeScene(new SceneGame());
 		return;
@@ -439,20 +458,18 @@ void SceneBattle::BuckBufferRender(ID3D11DeviceContext* context, RenderContext* 
 		(float)graphics.GetTexture()->GetWidth(), (float)graphics.GetTexture()->GetHeight(),
 		0,
 		1, 1, 1, 1);
-	sprite_shader->End(context);
+	// UI描画処理
+	UIManager::Instance().Draw(context);
 
 	// メニュー描画
 	{
 		if (MenuSystem::Instance().IsOpened())
 		{
-			sprite_shader->Begin(context);
 			MenuSystem::Instance().Render(context);
-			sprite_shader->End(context);
 		}
 	}
+	sprite_shader->End(context);
 
-	// UI描画処理
-	UIManager::Instance().Draw(context);
 
 	// 2Dプリミティブ描画
 	{

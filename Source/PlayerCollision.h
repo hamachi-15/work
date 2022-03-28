@@ -19,7 +19,7 @@ public:
 	~PlayerCollision();
 	
 	// –¼‘OŽæ“¾
-	std::string GetName() const override { return this->name; }
+	std::string GetName() const override { return "PlayerCollision"; }
 
 	// GUI•`‰æ
 	void OnGUI() override;
@@ -44,5 +44,4 @@ private:
 	float											hit_effect_scale = 5.0f;
 	std::shared_ptr<CollisionCylinder>				collision_cylinder;
 	std::vector<std::shared_ptr<CollisionSphere>>	collision_spheres;
-	std::string										name = "";
 };

@@ -126,7 +126,7 @@ DebugRenderer::DebugRenderer(ID3D11Device* device)
 	}
 
 	// 球メッシュ作成
-	CreateSphereMesh(device, 1.0f, 8, 8);
+	CreateSphereMesh(device, 1.0f, 16, 16);
 
 	// 円柱メッシュ作成
 	CreateCylinderMesh(device, 1.0f, 1.0f, 0.0f, 1.0f, 16, 1);

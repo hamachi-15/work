@@ -1,17 +1,20 @@
 #include "Model.h"
-
+// 描画
 #include "Graphics.h"
-#include "SceneManager.h"
+// メッセージ
 #include "Telegram.h"
-
+// コンポーネント
 #include "EnemySlime.h"
 #include "Charactor.h"
 
+// マネージャー
+#include "SceneManager.h"
 #include "ActorManager.h"
 #include "EnemyManager.h"
 #include "EnemyTerritoryManager.h"
 #include "CollisionManager.h"
 
+// AI
 #include "NodeBase.h"
 #include "BehaviorTree.h"
 #include "BehaviorData.h"
@@ -20,6 +23,7 @@
 #include "ActionOwner.h"
 #include "SlimeActionOwner.h"
 
+// コリジョン
 #include "EnemyCollision.h"
 
 //-----------------------------------------
@@ -68,61 +72,8 @@ void EnemySlime::Start()
 	// マネージャーに登録
 	EnemyManager::Instance().EnemyRegister(actor->GetComponent<EnemySlime>());
 	
-	// 索敵範囲の設定
-	SetSearchRange(20.0f);
-
-	// 攻撃範囲の設定
-	SetAttackRange(10.0f);
-
 	// 最初はターゲット座標を自身の座標に設定
 	SetTargetPosition(actor->GetPosition());
-
-	// コリジョンの設定
-	//{
-	//	Model* model = GetActor()->GetModel();
-	//	CollisionParameter parameter;
-	//	std::vector<CollisionParameter> sphere_parameter;
-	//	std::vector<CollisionParameter> cylinder_parameter;
-
-	//	 カリング用のコリジョン
-	//	parameter.name = "SlimeAABB";
-	//	parameter.node_name = "Spine01";
-	//	parameter.xmfloat_radius = DirectX::XMFLOAT3(5.5f, 5.5f, 5.5f);
-	//	parameter.collision_flg = true;
-	//	parameter.actor_id = charactor->GetID();
-	//	parameter.actor_type = CollisionActorType::Enemy;
-	//	parameter.update_type = CollisionUpdateType::Update_Node_Position;
-
-	//	 体のコリジョン設定
-	//	parameter.name = actor->GetName();
-	//	parameter.actor_name = actor->GetName();
-	//	parameter.node_name = "";
-	//	parameter.actor_id = charactor->GetID() + GetIdentity();
-	//	parameter.radius = 3.5f;
-	//	parameter.height = 6.5f;
-	//	parameter.weight = 6.5f;
-	//	parameter.collision_flg = true;
-	//	parameter.actor_type = CollisionActorType::Enemy;
-	//	parameter.update_type = CollisionUpdateType::Update_Actor;
-	//	cylinder_parameter.emplace_back(parameter);
-
-	//	 頭突きのコリジョン設定
-	//	Mathf::GetNodePosition("BottomEyeCover", head_position, model);
-	//	haed_collision_name = actor->GetName();
-	//	haed_collision_name += "Head";
-	//	parameter.name = haed_collision_name.c_str();
-	//	parameter.node_name = "BottomEyeCover";
-	//	parameter.position = head_position;
-	//	parameter.radius = 4.0f;
-	//	parameter.weight = 1.0f;
-	//	parameter.height = 0.0f;
-	//	parameter.collision_flg = false;
-	//	parameter.actor_type = CollisionActorType::Enemy;
-	//	parameter.update_type = CollisionUpdateType::Update_Node_Position;
-	//	sphere_parameter.emplace_back(parameter);
-
-	//	actor->AddComponent<EnemyCollision>(sphere_parameter, cylinder_parameter);
-	//}
 
 	// ビヘイビアツリー設定
 	behavior_data = new BehaviorData();
@@ -137,36 +88,11 @@ void EnemySlime::Start()
 //-----------------------------------------
 void EnemySlime::SetBehaviorNode()
 {
-	// 現在のシーン名取得
-	std::string name = SceneManager::Instance().GetCurrentScene()->GetName();
-
-	// シーンがワールドマップ時のノード設定
-	if (name, "SceneWorldMap")
-	{
-		ai_tree->AddNode("",	   "Root",	  0, BehaviorTree::SelectRule::Priority, NULL,					   NULL);
-		ai_tree->AddNode("Root",   "Battle",  4, BehaviorTree::SelectRule::Priority, new BattleJudgment(this), NULL);
-		ai_tree->AddNode("Root",   "Scount",  5, BehaviorTree::SelectRule::Priority, NULL,					   NULL);
-		ai_tree->AddNode("Battle", "Pursuit", 2, BehaviorTree::SelectRule::Non,		 NULL,					   new PursuitAction(this));
-		ai_tree->AddNode("Scount", "Wander",  1, BehaviorTree::SelectRule::Non,		 new WanderJudgment(this), new WanderAction(this));
-		ai_tree->AddNode("Scount", "Idle",	  2, BehaviorTree::SelectRule::Non,		 NULL,					   new IdleAction(this));
-	}
-	else
-	{
-		ai_tree->AddNode("",	   "Root",		 0, BehaviorTree::SelectRule::Priority, NULL,								NULL);
-		ai_tree->AddNode("Root",   "Death",		 1, BehaviorTree::SelectRule::Non,		new DeathJudgment(this),			new DeathAction(this));
-		ai_tree->AddNode("Root",   "Damage",	 2, BehaviorTree::SelectRule::Non,		new DamageJudgment(this),			new DamageAction(this));
-		ai_tree->AddNode("Root",   "Escape",	 3, BehaviorTree::SelectRule::Sequence, new EscapeJudgment(this),			NULL);
-		ai_tree->AddNode("Root",   "Battle",	 4, BehaviorTree::SelectRule::Priority, new BattleJudgment(this),			NULL);
-		ai_tree->AddNode("Root",   "Scount",	 5, BehaviorTree::SelectRule::Priority, NULL,								NULL);
-		ai_tree->AddNode("Escape", "Leave",		 0, BehaviorTree::SelectRule::Non,		NULL,								new LeaveAction(this));
-		ai_tree->AddNode("Escape", "Recover",    0, BehaviorTree::SelectRule::Non,		NULL,								new RecoverAction(this));
-		ai_tree->AddNode("Battle", "Attack",	 1, BehaviorTree::SelectRule::Priority, new AttackJudgment(this),			NULL);
-		ai_tree->AddNode("Battle", "Pursuit",	 2, BehaviorTree::SelectRule::Non,		NULL,								new PursuitAction(this));
-		ai_tree->AddNode("Attack", "JumpAttack", 1, BehaviorTree::SelectRule::Non,		new  HeavyBodyAttackJudgment(this), new HeavyBodyAttackAction(this));
-		ai_tree->AddNode("Attack", "BodyAttack", 2, BehaviorTree::SelectRule::Non,		NULL,								new BodyAttackAction(this));
-		ai_tree->AddNode("Scount", "Wander",     1, BehaviorTree::SelectRule::Non,		new WanderJudgment(this),			new WanderAction(this));
-		ai_tree->AddNode("Scount", "Idle",		 2, BehaviorTree::SelectRule::Non,		NULL,								new IdleAction(this));
-}
+	// ノード設定
+	ai_tree->AddNode("",	   "Root",	  0, BehaviorTree::SelectRule::Priority, NULL,					   NULL);
+	ai_tree->AddNode("Root",   "Scount",  5, BehaviorTree::SelectRule::Priority, NULL,					   NULL);
+	ai_tree->AddNode("Scount", "Wander",  1, BehaviorTree::SelectRule::Non,		 new WanderJudgment(this), new WanderAction(this));
+	ai_tree->AddNode("Scount", "Idle",	  2, BehaviorTree::SelectRule::Non,		 NULL,					   new IdleAction(this));
 }
 
 //-----------------------------------------
@@ -176,32 +102,6 @@ void EnemySlime::Update(float elapsed_time)
 {
 	// ビヘイビア更新処理
 	BehaviorUpdate(elapsed_time);
-
-	// 速力更新処理
-	GetMovement()->UpdateVelocity(elapsed_time);
-
-	// 無敵時間更新処理
-	GetCharactor()->UpdateInvincibleTimer(elapsed_time);
-}
-
-//-----------------------------------------
-// 当たり範囲デバッグプリミティブ描画
-//-----------------------------------------
-void EnemySlime::DrawDebugPrimitive()
-{
-	DebugRenderer* renderer = Graphics::Instance().GetDebugRenderer();
-	std::shared_ptr<Actor> actor = GetActor();
-	EnemyTerritoryTag teritory_tag = GetBelongingToTerritory();
-	DirectX::XMFLOAT3 position = actor->GetPosition();
-
-	// 索敵範囲をデバッグ円柱描画
-	renderer->DrawCylinder(position, search_range, 1.0f, DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f));
-
-	// 攻撃範囲をデバッグ円柱描画
-	renderer->DrawCylinder(position, GetAttackRange(), 1.0f, DirectX::XMFLOAT4(1.0f, 0.0f, 1.0f, 1.0f));
-
-	// ターゲット座標の球描画
-	renderer->DrawSphere(target_position, 5.f, DirectX::XMFLOAT4(1.0f, 0.0f, 1.0f, 1.0f));
 }
 
 //-----------------------------------------
@@ -211,26 +111,12 @@ void EnemySlime::Destroy()
 {
 	// アクターの取得
 	std::shared_ptr<Actor> actor = GetActor();
-	
-	// コリジョン削除
-	// 球コリジョン削除
-	//std::vector<std::shared_ptr<CollisionSphere>> list = CollisionManager::Instance().GetCollisionSphereFromID(GetCharactor()->GetID() + GetIdentity());
-	//for (std::shared_ptr<CollisionSphere> sphere : list)
-	//{
-	//	CollisionManager::Instance().UnregisterSphere(sphere);
-	//}
-	//
-	//// 円柱コリジョン削除
-	//CollisionManager::Instance().UnregisterCylinder(CollisionManager::Instance().GetCollisionCylinderFromName(actor->GetName()));
-	//
-	//// 立方体コリジョン削除
-	//CollisionManager::Instance().UnregisterBox(CollisionManager::Instance().GetCollisionBoxFromName("SlimeAABB"));
-	
+		
 	// 敵マネージャーから削除
-	EnemyManager::Instance().EnemyRemove(GetActor()->GetComponent<EnemySlime>());
+	EnemyManager::Instance().EnemyRemove(actor->GetComponent<EnemySlime>());
 	
 	// アクターマネージャーから削除
-	ActorManager::Instance().Remove(GetActor());
+	ActorManager::Instance().Remove(actor);
 }
 
 //-----------------------------------------
@@ -251,8 +137,8 @@ bool EnemySlime::OnMessages(const Telegram& message)
 		std::shared_ptr<Charactor> charactor = GetActor()->GetComponent<Charactor>();
 		// 攻撃ヒットフラグを立てる
 		charactor->SetHitAttackFlag(true);
+		break;
 	}
-	break;
 	case MessageType::Message_Hit_Boddy:
 		break;
 	}

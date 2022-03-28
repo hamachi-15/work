@@ -1,19 +1,28 @@
 #include <imgui.h>
+// シーン
 #include "SceneGame.h"
 #include "SceneBattle.h"
+
+// 算術関数
 #include "Mathf.h"
 
-// データ系
+// ゲームデータ
 #include "GameDataBase.h"
-#include "ResourceManager.h"
+#include "ActorType.h"
 
+// 描画
 #include "Graphics.h"
+#include "Light.h"
+
+// カメラ
 #include "Camera.h"
 #include "CameraController.h"
-#include "Template.h"
-#include "Light.h"
+
+// 入力
 #include "Input.h"
 
+// マネージャー
+#include "ResourceManager.h"
 #include "ActorManager.h"
 #include "EnemyManager.h"
 #include "CollisionManager.h"
@@ -23,27 +32,37 @@
 #include "EffectManager.h"
 #include "SceneManager.h"
 #include "AudioManager.h"
+#include "StageManager.h"
 
+// コンポーネント
 #include "Actor.h"
 #include "Player.h"
 #include "EnemySlime.h"
 #include "Stage.h"
 #include "Movement.h"
 
+// 当たり判定
 #include "PlayerCollision.h"
 #include "CullingCollision.h"
 
-
+// シェーダー
 #include "CascadeShadowMapShader.h"
 #include "LambertShader.h"
 #include "BloomShader.h"
 #include "PhongShader.h"
 #include "2DPrimitive.h"
 
+// メニュー
 #include "MenuSystem.h"
+
+// メッセージ
 #include "Messenger.h"
 #include "MessageData.h"
+
+// AI
 #include "MetaAI.h"
+
+// テクスチャ
 #include "Texture.h"
 #include "Sprite.h"
 
@@ -106,24 +125,17 @@ void SceneGame::Initialize()
 	// ステージ読み込み
 	{
 		std::shared_ptr<Actor> actor = ActorManager::Instance().Create();
-		actor->SetUpModel("Data/Model/Filde/Stage.mdl", nullptr);
+		actor->SetUpModel("Data/Model/Filde/Filde.mdl", nullptr);
 		actor->SetName("Filde");
 		actor->SetPosition(DirectX::XMFLOAT3(0, 0, 0));
 		actor->SetAngle(DirectX::XMFLOAT3( 0, Mathf::ConvartToRadian(-90), 0));
 		actor->SetScale(DirectX::XMFLOAT3(0.1f, 0.1f, 0.1f));
 		actor->SetShaderType(ShaderManager::ShaderType::CascadeShadowMap);
 	}
-	//// ステージオブジェクト読み込み
-	//{
-	//	std::shared_ptr<Actor> actor = ActorManager::Instance().Create();
-	//	actor->SetUpModel("Data/Model/Filde/StageObject/Conifer.mdl", nullptr);
-	//	actor->SetName("FildeObjects");
-	//	actor->SetPosition(DirectX::XMFLOAT3(-100, 0.3f, 100));
-	//	actor->SetAngle(DirectX::XMFLOAT3(0, Mathf::ConvartToRadian(-90), 0));
-	//	actor->SetScale(DirectX::XMFLOAT3(8.f, 8.f, 8.f));
-	//	actor->AddComponent<Stage>();
-	//	actor->SetShaderType(ShaderManager::ShaderType::Lambert);
-	//}
+
+	// ステージオブジェクトの配置
+	StageManager::Instance().WorldObjectRegister();
+
 	// プレイヤー読み込み
 	{
 		std::shared_ptr<Actor> actor = ActorManager::Instance().Create();
@@ -138,7 +150,7 @@ void SceneGame::Initialize()
 		actor->AddComponent<Player>();
 		actor->AddComponent<PlayerCollision>();
 		// プレイヤーのカリングコリジョンを追加
-		CollisionManager::Instance().RegisterCulling(std::make_shared<CullingCollision>(EnemyCategory::None, actor));
+		CollisionManager::Instance().RegisterCulling(std::make_shared<CullingCollision>(ActorType::None, actor));
 		actor->SetShaderType(ShaderManager::ShaderType::Phong);
 	}
 	// 敵の生成
@@ -172,6 +184,9 @@ void SceneGame::Finalize()
 
 	// メッセンジャーのクリア
 	Messenger::Instance().Clear();
+
+	// BGM再生停止
+	AudioManager::Instance().StopBGM(BGMType::WorldMap);
 }
 
 //-------------------------------------
@@ -211,8 +226,6 @@ void SceneGame::Update(float elapsed_time)
 		// タイマーが一定以上なら
 		if (primitive_context->timer >= Primitive_Max_Time)
 		{
-			// BGM再生停止
-			AudioManager::Instance().StopBGM(BGMType::WorldMap);
 			// バトルシーンへ遷移
 			SceneManager::Instance().ChangeScene(new SceneBattle());
 			return;
@@ -314,18 +327,6 @@ void SceneGame::ScreenRender(ID3D11DeviceContext* context, RenderContext* render
 		skybox_shader->End(context);
 	}
 
-	// デバッグプリミティブ描画
-	{
-		// 敵縄張りのデバッグプリミティブ描画
-		EnemyTerritoryManager::Instance().Render();
-		// 敵のデバッグプリミティブ描画
-		EnemyManager::Instance().DrawDebugPrimitive();
-		// 当たり判定ののデバッグプリミティブ描画
-		CollisionManager::Instance().Draw();
-
-		graphics.GetDebugRenderer()->Render(context, render_context->view, render_context->projection);
-	}
-
 	// アクター描画
 	{
 		// シャドウマップ作成
@@ -339,6 +340,18 @@ void SceneGame::ScreenRender(ID3D11DeviceContext* context, RenderContext* render
 
 		// 描画
 		ActorManager::Instance().Render(render_context);
+	}
+
+	// デバッグプリミティブ描画
+	{
+		// 敵縄張りのデバッグプリミティブ描画
+		EnemyTerritoryManager::Instance().Render();
+		// 敵のデバッグプリミティブ描画
+		EnemyManager::Instance().DrawDebugPrimitive();
+		// 当たり判定ののデバッグプリミティブ描画
+		CollisionManager::Instance().Draw();
+
+		graphics.GetDebugRenderer()->Render(context, render_context->view, render_context->projection);
 	}
 }
 
@@ -429,7 +442,7 @@ bool SceneGame::OnMessages(const Telegram& telegram)
 		primitive_context->number = 3;
 		primitive_context->timer = 0.0f;
 
-		// TODO エンカウントした敵のテリトリーに属ずる敵を探す
+		// エンカウントした敵のテリトリーに属する敵を探す
 		GameDataBase::Instance().EnemyFriendFromTerritory(telegram.message_box.territory_tag);
 		
 		// プレイヤーコンポーネント取得

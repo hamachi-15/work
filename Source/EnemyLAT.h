@@ -32,7 +32,4 @@ public:
 	
 	// 更新処理
 	void Update(float elapsed_time) override;
-
-	// 当たり範囲デバッグプリミティブ描画
-	void DrawDebugPrimitive() override;
 };

@@ -1,21 +1,25 @@
 #include "Model.h"
 #include "Graphics.h"
 
+// コンポーネント
 #include "Charactor.h"
 #include "EnemyLAT.h"
 
+// マネージャー
 #include "SceneManager.h"
 #include "ActorManager.h"
 #include "EnemyManager.h"
 #include "EnemyTerritoryManager.h"
 #include "CollisionManager.h"
 
+// AI
 #include "BehaviorTree.h"
 #include "BehaviorData.h"
 #include "NodeBase.h"
 #include "JudgmentOwner.h"
 #include "ActionOwner.h"
 
+// コリジョン
 #include "EnemyCollision.h"
 //********************************
 // 
@@ -104,65 +108,8 @@ void EnemyLAT::Start()
 	// マネージャーに登録
 	EnemyManager::Instance().EnemyRegister(actor->GetComponent<EnemyLAT>());
 
-	// 索敵範囲の設定
-	SetSearchRange(10.0f);
-
-	// 攻撃範囲の設定
-	SetAttackRange(5.0f);
-
 	// 最初はターゲット座標を自身の座標に設定
 	SetTargetPosition(actor->GetPosition());
-
-	// コリジョン設定
-	//{
-	//	CollisionParameter parameter;
-	//	// モデル取得
-	//	Model* model = actor->GetModel();
-	//	std::vector<CollisionParameter> sphere_parameter;
-	//	std::vector<CollisionParameter> cylinder_parameter;
-
-	//	// カリング用のコリジョン
-	//	parameter.name = "LATAABB";
-	//	parameter.actor_name = actor->GetName();
-	//	parameter.node_name = "";
-	//	parameter.position = {};
-	//	parameter.xmfloat_radius = DirectX::XMFLOAT3(1.5f, 1.5f, 1.5f);
-	//	parameter.collision_flg = true;
-	//	parameter.actor_id = charactor->GetID();
-	//	parameter.actor_type = CollisionActorType::Enemy;
-	//	parameter.update_type = CollisionUpdateType::Update_Actor;
-
-	//	// 体のコリジョン設定
-	//	parameter.name = actor->GetName();
-	//	parameter.actor_id = charactor->GetID() + GetIdentity();
-	//	parameter.position = { 0.0f, 0.0f, 0.0f };
-	//	parameter.radius = 3.0f;
-	//	parameter.weight = 1.0f;
-	//	parameter.height = 5.0f;
-	//	parameter.collision_flg = true;
-	//	parameter.actor_type = CollisionActorType::Enemy;
-	//	parameter.update_type = CollisionUpdateType::Update_Actor;
-	//	cylinder_parameter.emplace_back(parameter);
-
-	//	// 尻尾のコリジョン設定
-	//	DirectX::XMFLOAT3 tail_position;
-	//	Mathf::GetNodePosition("LAT:tai102_M_BK", tail_position, model);
-	//	std::string name = actor->GetName();
-	//	name += "Tail";
-	//	parameter.name = name.c_str();
-	//	parameter.node_name = "LAT:tai102_M_BK";
-	//	parameter.actor_id = charactor->GetID();
-	//	parameter.position = tail_position;
-	//	parameter.radius = 3.0f;
-	//	parameter.weight = 1.0f;
-	//	parameter.height = 0.0f;
-	//	parameter.collision_flg = false;
-	//	parameter.actor_type = CollisionActorType::Enemy;
-	//	parameter.update_type = CollisionUpdateType::Update_Node_Position;
-	//	sphere_parameter.emplace_back(parameter);
-
-	//	actor->AddComponent<EnemyCollision>(sphere_parameter, cylinder_parameter);
-	//}
 
 	// ビヘイビアツリーの設定
 	behavior_data = new BehaviorData();
@@ -177,35 +124,10 @@ void EnemyLAT::Start()
 //-----------------------------------------
 void EnemyLAT::SetBehaviorNode()
 {
-	// 現在のシーン名取得
-	std::string scene_name = SceneManager::Instance().GetCurrentScene()->GetName();
-
-	// シーンがワールドマップ時のノード設定
-	if(scene_name == "SceneWorldMap")
-	{
-		ai_tree->AddNode("", "Root", 0, BehaviorTree::SelectRule::Priority, NULL, NULL);
-		ai_tree->AddNode("Root", "Battle", 4, BehaviorTree::SelectRule::Priority, new BattleJudgment(this), NULL);
-		ai_tree->AddNode("Root", "Scount", 5, BehaviorTree::SelectRule::Priority, NULL, NULL);
-		ai_tree->AddNode("Battle", "Pursuit", 2, BehaviorTree::SelectRule::Non, NULL, new PursuitAction(this));
-		ai_tree->AddNode("Scount", "Wander", 1, BehaviorTree::SelectRule::Non, new WanderJudgment(this), new WanderAction(this));
-		ai_tree->AddNode("Scount", "Idle", 2, BehaviorTree::SelectRule::Non, NULL, new IdleAction(this));
-	}
-	else
-	{
-		ai_tree->AddNode("", "Root", 0, BehaviorTree::SelectRule::Priority, NULL, NULL);
-		ai_tree->AddNode("Root", "Death", 1, BehaviorTree::SelectRule::Non, new DeathJudgment(this), new DeathAction(this));
-		ai_tree->AddNode("Root", "Damage", 2, BehaviorTree::SelectRule::Non, new DamageJudgment(this), new DamageAction(this));
-		ai_tree->AddNode("Root", "Escape", 3, BehaviorTree::SelectRule::Sequence, new EscapeJudgment(this), NULL);
-		ai_tree->AddNode("Root", "Battle", 4, BehaviorTree::SelectRule::Priority, new BattleJudgment(this), NULL);
-		ai_tree->AddNode("Root", "Scount", 5, BehaviorTree::SelectRule::Priority, NULL, NULL);
-		ai_tree->AddNode("Escape", "Leave", 0, BehaviorTree::SelectRule::Non, NULL, new LeaveAction(this));
-		ai_tree->AddNode("Escape", "Recover", 0, BehaviorTree::SelectRule::Non, NULL, new RecoverAction(this));
-		ai_tree->AddNode("Battle", "Attack", 1, BehaviorTree::SelectRule::Random, new AttackJudgment(this), NULL);
-		ai_tree->AddNode("Battle", "Pursuit", 2, BehaviorTree::SelectRule::Non, NULL, new PursuitAction(this));
-		//ai_tree->AddNode("Attack", "TailAttack", 0, BehaviorTree::SelectRule::Non, new SkillShotJudgment(this), new SkillShotAction(this));
-		ai_tree->AddNode("Scount", "Wander", 1, BehaviorTree::SelectRule::Non, new WanderJudgment(this), new WanderAction(this));
-		ai_tree->AddNode("Scount", "Idle", 2, BehaviorTree::SelectRule::Non, NULL, new IdleAction(this));
-	}
+	ai_tree->AddNode("", "Root", 0, BehaviorTree::SelectRule::Priority, NULL, NULL);
+	ai_tree->AddNode("Root", "Scount", 5, BehaviorTree::SelectRule::Priority, NULL, NULL);
+	ai_tree->AddNode("Scount", "Wander", 1, BehaviorTree::SelectRule::Non, new WanderJudgment(this), new WanderAction(this));
+	ai_tree->AddNode("Scount", "Idle", 2, BehaviorTree::SelectRule::Non, NULL, new IdleAction(this));
 }
 
 //-----------------------------------------
@@ -215,31 +137,4 @@ void EnemyLAT::Update(float elapsed_time)
 {
 	// ビヘイビア更新処理
 	BehaviorUpdate(elapsed_time);
-}
-
-//-----------------------------------------
-// 当たり範囲デバッグプリミティブ描画
-//-----------------------------------------
-void EnemyLAT::DrawDebugPrimitive()
-{
-	DebugRenderer* renderer = Graphics::Instance().GetDebugRenderer();
-	std::shared_ptr<Actor> actor = GetActor();
-	EnemyTerritoryTag teritory_tag = GetBelongingToTerritory();
-	std::shared_ptr<EnemyTerritory> enemy_territory = EnemyTerritoryManager::Instance().GetTerritory(teritory_tag);
-	DirectX::XMFLOAT3 position = actor->GetPosition();
-	float territory_range = enemy_territory->GetTerritoryRange();
-	DirectX::XMFLOAT3 territory_origin = enemy_territory->GetTerritoryOrigin();
-	territory_origin.y = actor->GetPosition().y;
-
-	// 縄張り範囲をデバッグ円柱描画
-	renderer->DrawCylinder(territory_origin, territory_range, 1.0f, DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f));
-
-	// 索敵範囲をデバッグ円柱描画
-	renderer->DrawCylinder(position, search_range, 1.0f, DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f));
-
-	// 攻撃範囲をデバッグ円柱描画
-	renderer->DrawCylinder(position, GetAttackRange(), 1.0f, DirectX::XMFLOAT4(1.0f, 0.0f, 1.0f, 1.0f));
-
-	// ターゲット座標の球描画
-	renderer->DrawSphere(target_position, 0.5f, DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
 }

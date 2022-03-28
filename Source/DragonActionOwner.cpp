@@ -1,7 +1,12 @@
+// データベース
 #include "GameDatabase.h"
-#include "EnemyCategory.h"
+#include "AttackCategory.h"
+#include "ActorType.h"
 
+// AI
 #include "DragonActionOwner.h"
+
+// コンポーネント
 #include "Actor.h"
 #include "Enemy.h"
 #include "Charactor.h"
@@ -13,6 +18,7 @@
 #include "CollisionManager.h"
 #include "EnemyTerritoryManager.h"
 
+// 算術関数
 #include "Mathf.h"
 
 // 汎用関数
@@ -185,7 +191,7 @@ void BasicAttackAction::Start()
 	owner->PlayAnimation("NightmareDragonBasicAttack");
 
 	// 当たり判定を行う時間のデータを取得
-	collision_time_data = GameDataBase::Instance().GetAttackCollitionTimeData(AttackCategory::BitingAttack, EnemyCategory::NightmareDragon);
+	collision_time_data = GameDataBase::Instance().GetAttackCollitionTimeData(AttackCategory::BitingAttack, ActorType::NightmareDragon);
 }
 
 // -----------------------------
@@ -226,7 +232,7 @@ void ClawAttackAction::Start()
 	// アニメーション再生
 	owner->PlayAnimation("NightmareDragonClawAttack");
 	// 当たり判定を行う時間のデータを取得
-	collision_time_data = GameDataBase::Instance().GetAttackCollitionTimeData(AttackCategory::ClawAttack, EnemyCategory::NightmareDragon);
+	collision_time_data = GameDataBase::Instance().GetAttackCollitionTimeData(AttackCategory::ClawAttack, ActorType::NightmareDragon);
 }
 
 // -----------------------------
@@ -268,7 +274,7 @@ void HornAttackAction::Start()
 	owner->PlayAnimation("NightmareDragonHornAttack");
 
 	// 当たり判定を行う時間のデータを取得
-	collision_time_data = GameDataBase::Instance().GetAttackCollitionTimeData(AttackCategory::HornAttack, EnemyCategory::NightmareDragon);
+	collision_time_data = GameDataBase::Instance().GetAttackCollitionTimeData(AttackCategory::HornAttack, ActorType::NightmareDragon);
 }
 
 // -----------------------------
@@ -313,7 +319,7 @@ void BodyPressAttackAction::Start()
 	owner->PlayAnimation("NightmareDragonJump");
 
 	// 当たり判定を行う時間のデータを取得
-	collision_time_data = GameDataBase::Instance().GetAttackCollitionTimeData(AttackCategory::BodyPressAttack, EnemyCategory::NightmareDragon);
+	collision_time_data = GameDataBase::Instance().GetAttackCollitionTimeData(AttackCategory::BodyPressAttack, ActorType::NightmareDragon);
 }
 
 // -----------------------------
@@ -462,14 +468,6 @@ void FireBollAttackAction::Start()
 
 	// 攻撃の当たり判定処理
 	std::string collision_name = owner_actor->GetName();
-
-	// コリジョンマネージャー取得
-	//CollisionManager& collision_manager = CollisionManager::Instance();
-	//std::shared_ptr<CollisionCylinder> collision = collision_manager.GetCollisionCylinderFromName(collision_name);
-	//collision->SetAttackFlag(true);
-
-	//DirectX::XMFLOAT3 player_position = ActorManager::Instance().GetActor("Player")->GetPosition();
-	//direction = Mathf::ReturnNormalizeFloatSubtract(player_position, owner->GetActor()->GetPosition());
 }
 
 //-----------------------------
@@ -525,7 +523,7 @@ void TailAttackAction::Start()
 	owner->PlayAnimation("SoulEaterDragonTailAttack");
 
 	// 当たり判定を行う時間のデータを取得
-	collision_time_data = GameDataBase::Instance().GetAttackCollitionTimeData(AttackCategory::TailAttack, EnemyCategory::SoulEaterDragon);
+	collision_time_data = GameDataBase::Instance().GetAttackCollitionTimeData(AttackCategory::TailAttack, ActorType::SoulEaterDragon);
 }
 
 //-----------------------------

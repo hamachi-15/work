@@ -1,12 +1,18 @@
-#include "Graphics.h"
+// カメラ
 #include "Camera.h"
+// 描画
 #include "Light.h"
-
+#include "Graphics.h"
+// モデル
 #include "Model.h"
 
-#include "Actor.h"
+// マネージャー
 #include "ActorManager.h"
 
+// コンポーネント
+#include "Actor.h"
+
+// シェーダー
 #include "CreateShadowMapShader.h"
 #include "CascadeShadowMapShader.h"
 #include "GaussianBlurShader.h"
@@ -14,6 +20,7 @@
 #include "GaussianXBlur.h"
 #include "GaussianYBlur.h"
 
+// テクスチャ
 #include "Sprite.h"
 #include "Texture.h"
 
@@ -352,11 +359,9 @@ void ActorManager::Render(RenderContext* render_context)
 	// シェーダータイプの初期化
 	shader_type = static_cast<ShaderManager::ShaderType>(-1);
 
-	// IMGUIのリスター描画
 	DrawLister();
-
-	// IMGUIの詳細描画
 	DrawDetail();
+
 }
 
 //------------------------------
@@ -402,7 +407,6 @@ void ActorManager::BrightRender(RenderContext* render_context)
 		}
 	}
 	Lambert->End(context);
-
 }
 
 //------------------------------

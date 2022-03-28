@@ -1,7 +1,7 @@
 #pragma once
 #include "Collision.h"
 
-enum class EnemyCategory;
+enum class ActorType;
 class Effect;
 
 //************************************
@@ -13,13 +13,13 @@ class EnemyCollision : public Component
 {
 public:
 	// コンストラクタ
-	EnemyCollision(EnemyCategory enemy_category, int identity) : enemy_category(enemy_category), identity(identity){}
+	EnemyCollision(ActorType enemy_category, int identity) : enemy_category(enemy_category), identity(identity){}
 
 	// デストラクタ
 	~EnemyCollision();
 
 	// 名前取得
-	std::string GetName() const override { return this->name; }
+	std::string GetName() const override { return "EnemyCollision"; }
 
 	// GUI描画
 	void OnGUI() override;
@@ -43,8 +43,7 @@ private:
 	float											hit_effect_scale = 5.0f;
 	std::shared_ptr<CollisionCylinder>				collision_cylinder;
 	std::vector<std::shared_ptr<CollisionSphere>>	collision_spheres;
-	std::string										name = "";
 	bool											attack_falg = false;
-	EnemyCategory									enemy_category; // データベースのコリジョンデータ検索に使う
+	ActorType										enemy_category; // データベースのコリジョンデータ検索に使う
 	int												identity = 0;
 };

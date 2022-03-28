@@ -1,31 +1,7 @@
 #pragma once
 #include <DirectXMath.h>
 
-// コリジョンメッシュの種類
-//enum class CollisionMeshType
-//{
-//	Sphere,
-//	Cylinder,
-//	AABB
-//};
-
-// コリジョン座標の更新方法
-//enum class CollisionUpdateType
-//{
-//	Update_Actor,			// アクター座標に更新
-//	Update_Node_Position,	// モデルの特定ノード座標に更新
-//	Update_Local_Position,	// 特定ノードのローカル位置をワールド座標に変換して更新
-//	Update_Castam_poition, // 上記のどれでもない方法で更新
-//};
-
-// コリジョンを持っているアクターのタイプ
-//enum class CollisionActorType
-//{
-//	Enemy,
-//	Player,
-//	None		// その他
-//};
-enum class ActorType;
+enum class ActorCategory;
 enum class CollisionUpdateType;
 
 //-----------------------------------
@@ -61,6 +37,6 @@ struct CollisionParameter
 	float					height = 0.0f;
 	float					weight = 1.0f;
 	bool					collision_flg = false;
-	ActorType				actor_type;
+	ActorCategory			actor_type;
 	CollisionUpdateType		update_type;
 };

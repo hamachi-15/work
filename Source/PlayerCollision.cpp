@@ -1,24 +1,40 @@
 #include "PlayerCollision.h"
+// メッセージ
 #include "Telegram.h"
+
+// AI
 #include "MetaAI.h"
+
+// モデル
 #include "Model.h"
+
+// 汎用関数
 #include "Universal.h"
+
+// 描画
 #include "DebugRenderer.h"
 #include "Graphics.h"
 
+// マネージャー
 #include "EffectManager.h"
 #include "ActorManager.h"
 #include "CollisionManager.h"
 #include "SceneManager.h"
 #include "AudioManager.h"
 
+// コンポーネント
 #include "Charactor.h"
 #include "Enemy.h"
 
+// エフェクト
 #include "Effect.h"
 
+// ゲームデータ
 #include "GameDatabase.h"
-
+#include "ActorType.h"
+#include "ActorCategory.h"
+#include "CollisionParameterData.h"
+#include "EnemyTerritoryTag.h"
 //************************************
 // 
 // プレイヤーのコリジョン
@@ -75,7 +91,7 @@ void PlayerCollision::Start()
     hit_effect = std::make_shared<Effect>("Data/Effect/Hit.efk", effect_manager->GetEffekseerManager());
 
     // コリジョンのデータからプレイヤーのコリジョンデータを設定
-    std::vector<std::shared_ptr<CollisionParameterData>> collision_parameter = GameDataBase::Instance().GetAttackCollitionParamterDataList(EnemyCategory::None);
+    std::vector<std::shared_ptr<CollisionParameterData>> collision_parameter = GameDataBase::Instance().GetAttackCollitionParamterDataList(ActorType::None);
     for (std::shared_ptr<CollisionParameterData> data : collision_parameter)
     {
         CollisionParameter parameter;
@@ -197,6 +213,10 @@ void PlayerCollision::Update(float elapsed_time)
         if (CollisionManager::Instance().IntersectCylinderVsCylinder(collision_cylinder.get(), GetActor(), cylinderB.get(), cylinderB_actor, result))
         {
             CollisionManager::Instance().PushOutCollision(collision_cylinder.get(), GetActor(), cylinderB.get(), cylinderB_actor, result);
+
+            // アクターがステージオブジェクトなら以降の処理をしない
+            if (cylinderB->GetActorType() == ActorCategory::StageObject) continue;
+
             Message message;
             // 現在のシーンがワールドマップならシーンへ敵とエンカウントをしたメッセージを送る
             std::string scene_name = SceneManager::Instance().GetCurrentScene()->GetName();
@@ -205,7 +225,10 @@ void PlayerCollision::Update(float elapsed_time)
             message.hit_position = collision_cylinder->GetPosition();
             message.territory_tag = ActorManager::Instance().GetActor(cylinderB->GetActorName())->GetComponent<Enemy>()->GetBelongingToTerritory();
             if (scene_name == "SceneWorldMap")
-            {
+            {// エンカウントした敵のテリトリーがターゲット以外ならエンカウント処理はしない
+                if (message.territory_tag != EnemyTerritoryTag::Territory5 &&
+                    message.territory_tag != EnemyTerritoryTag::Territory4) continue;
+                // ワールドマップシーンにエンカウント処理をさせる
                 message.message = MessageType::Message_Hit_Boddy;
                 Reaction(static_cast<int>(MetaAI::Identity::WorldMap), message);
                 return;

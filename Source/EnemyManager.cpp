@@ -1,5 +1,7 @@
- #include "Graphics.h"
+// 描画
+#include "Graphics.h"
 
+// 算術関数
 #include "Mathf.h"
 
 // シェーダー系インクルード
@@ -8,7 +10,10 @@
 
 // データベース系インクルード
 #include "GameDatabase.h"
-#include "EnemyCategory.h"
+#include "ActorType.h"
+#include "EnemyTerritoryPosition.h"
+#include "WorldMapData.h"
+#include "EnemyData.h"
 
 // マネージャーインクルード
 #include "EnemyTerritoryManager.h"
@@ -16,7 +21,7 @@
 #include "UIManager.h"
 #include "CollisionManager.h"
 
-// アクター系インクルード
+// コンポーネントインクルード
 #include "Charactor.h"
 #include "Movement.h"
 #include "ActorManager.h"
@@ -34,6 +39,7 @@
 #include "EnemyCollision.h"
 #include "CullingCollision.h"
 
+// TODO 関数のリファクタリング
 //-----------------------------------------------
 // コンストラクタ
 //-----------------------------------------------
@@ -292,51 +298,51 @@ void EnemyManager::AddComponent(std::shared_ptr<Actor> actor, std::shared_ptr<En
 	// 敵の種類ごとのコンポーネントを追加
 	switch (enemy_data->category)
 	{
-	case EnemyCategory::Slime:
+	case ActorType::Slime:
 		enemy = actor->AddComponent<EnemySlime>();
-		actor->AddComponent<EnemyCollision>(EnemyCategory::Slime, identity);
+		actor->AddComponent<EnemyCollision>(ActorType::Slime, identity);
 
 		// カリング用コリジョンを追加
 		CollisionManager::Instance().RegisterCulling(
-			std::make_shared<CullingCollision>(EnemyCategory::Slime, actor));
+			std::make_shared<CullingCollision>(ActorType::Slime, actor));
 		break;
-	case EnemyCategory::LAT:
+	case ActorType::LAT:
 		enemy = actor->AddComponent<EnemyLAT>();
-		actor->AddComponent<EnemyCollision>(EnemyCategory::LAT, identity);
+		actor->AddComponent<EnemyCollision>(ActorType::LAT, identity);
 
 		// カリング用コリジョンを追加
 		CollisionManager::Instance().RegisterCulling(
-			std::make_shared<CullingCollision>(EnemyCategory::LAT, actor));
+			std::make_shared<CullingCollision>(ActorType::LAT, actor));
 		break;
-	case EnemyCategory::PLT:
+	case ActorType::PLT:
 		enemy = actor->AddComponent<EnemyPLT>();
-		actor->AddComponent<EnemyCollision>(EnemyCategory::PLT, identity);
+		actor->AddComponent<EnemyCollision>(ActorType::PLT, identity);
 
 		// カリング用コリジョンを追加
 		CollisionManager::Instance().RegisterCulling(
-			std::make_shared<CullingCollision>(EnemyCategory::PLT, actor));
+			std::make_shared<CullingCollision>(ActorType::PLT, actor));
 		break;
-	case EnemyCategory::SoulEaterDragon:
+	case ActorType::SoulEaterDragon:
 		if (IsBattleScene()) {
 			std::shared_ptr<BossHealthUI> ui = actor->AddComponent<BossHealthUI>();
 			UIManager::Instance().RegisterUI(ui);
 		}
 		enemy = actor->AddComponent<EnemyDragonSoulEater>();
-		actor->AddComponent<EnemyCollision>(EnemyCategory::SoulEaterDragon, identity);
+		actor->AddComponent<EnemyCollision>(ActorType::SoulEaterDragon, identity);
 		// カリング用コリジョンを追加
 		CollisionManager::Instance().RegisterCulling(
-			std::make_shared<CullingCollision>(EnemyCategory::SoulEaterDragon, actor));
+			std::make_shared<CullingCollision>(ActorType::SoulEaterDragon, actor));
 		break;
-	case EnemyCategory::NightmareDragon:
+	case ActorType::NightmareDragon:
 		if (IsBattleScene()) {
 			std::shared_ptr<BossHealthUI> ui = actor->AddComponent<BossHealthUI>();
 			UIManager::Instance().RegisterUI(ui);
 		}
 		enemy = actor->AddComponent<EnemyDragonNightmare>();
-		actor->AddComponent<EnemyCollision>(EnemyCategory::NightmareDragon, identity);
+		actor->AddComponent<EnemyCollision>(ActorType::NightmareDragon, identity);
 		// カリング用コリジョンを追加
 		CollisionManager::Instance().RegisterCulling(
-			std::make_shared<CullingCollision>(EnemyCategory::NightmareDragon, actor));
+			std::make_shared<CullingCollision>(ActorType::NightmareDragon, actor));
 		break;
 	}
 	// アイデンティティ設定

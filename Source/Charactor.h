@@ -97,7 +97,7 @@ public:
 	float GetTurnSpeed() const { return this->turn_speed; }
 
 	// ヒットストップタイマー設定
-	void SetHitStopFrame(float hitstop_frame = 12.0f) { this->hitstop_frame = hitstop_frame; }
+	void SetHitStopFrame(float hitstop_frame = 9.0f) { this->hitstop_frame = hitstop_frame; }
 
 	// ヒットストップタイマー取得
 	float GetHitStopFrame() const { return hitstop_frame; }

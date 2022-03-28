@@ -26,8 +26,11 @@ public:
 		return instance;
 	}
 
-	// ステージオブジェクト登録処理
-	void Register();
+	// ワールドステージオブジェクト登録処理
+	void WorldObjectRegister();
+
+	// バトルステージオブジェクト登録処理
+	void ButtleObjectRegister();
 
 	// ステージオブジェクト登録解除処理
 	void Unregister(std::shared_ptr<Actor> object);

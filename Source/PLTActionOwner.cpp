@@ -1,9 +1,18 @@
 #include "PLTActionOwner.h"
+
+// ゲームデータ
 #include "GameDatabase.h"
+#include "ActorType.h"
+#include "AttackCategory.h"
+
+// コンポーネント
 #include "Enemy.h"
 #include "Charactor.h"
+
+// モデル
 #include "Model.h"
 
+// 汎用関数
 #include "Universal.h"
 //---------------------------
 // パンチ攻撃アニメーション再生
@@ -14,7 +23,7 @@ void BlowAttackAction::Start()
 	owner->PlayAnimation("PLTAttack");
 
 	// 当たり判定を行う時間のデータを取得
-	collision_time_data = GameDataBase::Instance().GetAttackCollitionTimeData(AttackCategory::PunchAttack, EnemyCategory::PLT);
+	collision_time_data = GameDataBase::Instance().GetAttackCollitionTimeData(AttackCategory::PunchAttack, ActorType::PLT);
 }
 
 //---------------------------

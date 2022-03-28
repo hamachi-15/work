@@ -14,6 +14,7 @@ class Enemy : public Component
 public:
 	// コンストラクタ
 	Enemy();
+
 	// デストラクタ
 	~Enemy() override;
 
@@ -36,7 +37,7 @@ public:
 	void BehaviorUpdate(float elapsed_time);
 
 	// 当たり範囲デバッグプリミティブ描画
-	virtual void DrawDebugPrimitive(){}
+	void DrawDebugPrimitive();
 	
 	// 敵の破棄処理
 	virtual void Destroy() = 0;
@@ -143,6 +144,11 @@ private:
 	std::shared_ptr<Movement>	movement;
 	std::shared_ptr<Charactor>	charactor;
 	EnemyTerritoryTag			teritory_tag;
+
+	DirectX::XMFLOAT4 primitive_color_blue = DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
+	DirectX::XMFLOAT4 primitive_color_purple = DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
+	DirectX::XMFLOAT4 primitive_color_red = DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
+	DirectX::XMFLOAT4 primitive_color_green = DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
 protected:
 	DirectX::XMFLOAT3	target_position = { 0.0f,0.0f,0.0f };
 	DirectX::XMFLOAT3	hit_position = { 0.0f, 0.0f, 0.0f };	// プレイヤーの攻撃コリジョンの位置(自身と衝突したときに使う)

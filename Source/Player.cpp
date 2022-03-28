@@ -1,28 +1,41 @@
 #include "Player.h"
+
+// 描画
 #include "Graphics.h"
-#include "Camera.h"
+
+// モデル
 #include "Model.h"
 
+// カメラ
+#include "Camera.h"
+
+// 算術関数
 #include "Mathf.h"
 
-#include "CollisionManager.h"
-
+// 当たり判定
 #include "PlayerCollision.h"
 #include "CullingCollision.h"
 
 #include "DebugRenderer.h"
+
+// マネージャー
+#include "CollisionManager.h"
 #include "ActorManager.h"
 #include "EnemyManager.h"
 #include "UIManager.h"
 #include "AudioManager.h"
 
+// ゲームデータ
 #include "GameDatabase.h"
 #include "AttackCategory.h"
 #include "AttackCollitionTime.h"
+#include "AnimationData.h"
 
+// メッセージ
 #include "MessageData.h"
 #include "Messenger.h"
 
+// UI
 #include "PlayerUIHealth.h"
 
 //-----------------------------------------

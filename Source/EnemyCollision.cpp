@@ -1,22 +1,36 @@
 #include "EnemyCollision.h"
+// メッセージ
 #include "Telegram.h"
+
+// AI
 #include "MetaAI.h"
+
+// モデル
 #include "Model.h"
-#include "Universal.h"
+
+// 描画
 #include "DebugRenderer.h"
 #include "Graphics.h"
 
+// マネージャー
 #include "ActorManager.h"
 #include "CollisionManager.h"
-
 #include "SceneManager.h"
 
+// コンポーネント
 #include "Charactor.h"
 #include "Enemy.h"
 
+// エフェクト
 #include "Effect.h"
 #include "EffectManager.h"
 
+// 汎用関数
+#include "Universal.h"
+
+// ゲームデータ
+#include "GameDatabase.h"
+#include "CollisionParameterData.h"
 //************************************
 // 
 // プレイヤーのコリジョン

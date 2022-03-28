@@ -2,13 +2,13 @@
 	@file	CollisionParameterData.h
 	@brief	ツールにて自動生成しています。絶対に書き換えないでください。
 	@autor	DataBase.xlsm
-	@data	2022/03/18
+	@data	2022/03/27
 **/
 #pragma	once
 
-#include	"EnemyCategory.h"
-#include	"CollisionMeshType.h"
 #include	"ActorType.h"
+#include	"CollisionMeshType.h"
+#include	"ActorCategory.h"
 #include	"CollisionUpdateType.h"
 
 
@@ -19,7 +19,7 @@
 struct	CollisionParameterData
 {
 	int	id;	//!<	ID
-	EnemyCategory	enemy_category;	//!<	アクター
+	ActorType	enemy_category;	//!<	アクター
 	CollisionMeshType	collision_type;	//!<	コリジョンの種類
 	char*	collision_name;	//!<	コリジョンの名前
 	char*	node_name;	//!<	ノードの名前
@@ -31,6 +31,6 @@ struct	CollisionParameterData
 	float	local_y;	//!<	ローカルY座標
 	float	local_z;	//!<	ローカルZ座標
 	int	collision_flag;	//!<	コリジョンフラグ
-	ActorType	actor_type;	//!<	所持するアクターのタイプ
+	ActorCategory	actor_type;	//!<	所持するアクターのタイプ
 	CollisionUpdateType	collision_update_type;	//!<	更新方法の種類
 };

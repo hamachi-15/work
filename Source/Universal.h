@@ -1,11 +1,11 @@
 #pragma once
 #include <DirectXMath.h>
 #include <string>
-#include "GameDatabase.h"
 #include "Model.h"
 
 
 // ‘O•ûéŒ¾
+struct AttackCollitionTime;
 class Actor;
 class Enemy;
 class CollisionObject;

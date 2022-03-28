@@ -7,13 +7,10 @@
 #include "SceneLoading.h"
 enum	Command
 {
-	OperateDictionary,
 	TitleBackDictionary,
-
 };
 static	const	char* command_name[] =
 {
-	"操作",
 	"タイトルに戻る"
 };
 
@@ -42,7 +39,6 @@ void TopMenu::Update(float elapsed_time)
 	if (gamepad.GetButtonDown() & GamePad::BTN_B)
 	{
 		MessageData::MenuCloseData data;
-		// TODO
 		Messenger::Instance().SendData(MessageData::MENUCLOSEEVENT, &data);
 		return;
 	}
@@ -51,20 +47,8 @@ void TopMenu::Update(float elapsed_time)
 
 	if (gamepad.GetButtonDown() & GamePad::BTN_A)
 	{
-		if (button_list->GetSelectedButton() == command_name[Command::OperateDictionary])
-		{
-			MessageData::MenuOpenData data;
-			data.menu_id = MenuId::OperateDictionaryMenu;
-			// TODO
-			Messenger::Instance().SendData(MessageData::MENUOPENEVENT, &data);
-		}
 		if (button_list->GetSelectedButton() == command_name[Command::TitleBackDictionary])
 		{
-			//MessageData::MenuOpenData data;
-			//data.menu_id = MenuId::TitleBackDictionaryMenu;
-			// TODO MENUOPENEVENTの書式どうする
-			// TODO タイトルに戻る前に確認のポップアップを入れるか
-			//Messenger::Instance().SendData(MessageData::MENUOPENEVENT, &data);
 			// 直接タイトルへ戻る
 			MessageData::MenuCloseData data;
 			Messenger::Instance().SendData(MessageData::MENUCLOSEEVENT, &data);

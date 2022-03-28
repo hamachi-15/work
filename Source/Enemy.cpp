@@ -1,22 +1,40 @@
-#include "GameDatabase.h"
+// 描画
+#include "Graphics.h"
+#include "DebugRenderer.h"
 
+// ゲームデータ
+#include "GameDatabase.h"
+#include "AnimationData.h"
+
+// 算術関数
 #include "Mathf.h"
 
+// コンポーネント
 #include "Charactor.h"
-#include "ActorManager.h"
 #include "Enemy.h"
 
+// マネージャー
+#include "ActorManager.h"
 #include "EnemyTerritoryManager.h"
 
+// AI
 #include "BehaviorTree.h"
 #include "BehaviorData.h"
 #include "NodeBase.h"
 
+// ImGui
 #include "ImGuiRenderer.h"
 
+//-----------------------------------------
+// コンストラクタ
+//-----------------------------------------
 Enemy::Enemy()
 {
 }
+
+//-----------------------------------------
+// デストラクタ
+//-----------------------------------------
 Enemy::~Enemy()
 {
 	delete ai_tree;
@@ -42,6 +60,35 @@ void Enemy::BehaviorUpdate(float elapsed_time)
 	{
 		active_node = ai_tree->Run(this, active_node, behavior_data, elapsed_time);
 	}
+}
+
+//-----------------------------------------
+// 当たり範囲デバッグプリミティブ描画
+//-----------------------------------------
+void Enemy::DrawDebugPrimitive()
+{
+	// デバックレンダラ取得
+	DebugRenderer* renderer = Graphics::Instance().GetDebugRenderer();
+	// アクター取得
+	std::shared_ptr<Actor> actor = GetActor();
+	// 縄張りのタグ取得
+	EnemyTerritoryTag teritory_tag = GetBelongingToTerritory();
+	// 取得したタグからテリトリーデータ取得
+	std::shared_ptr<EnemyTerritory> enemy_territory = EnemyTerritoryManager::Instance().GetTerritory(teritory_tag);
+	// アクターの座標取得
+	DirectX::XMFLOAT3 position = actor->GetPosition();
+
+	// 縄張り範囲をデバッグ円柱描画
+	renderer->DrawCylinder(enemy_territory->GetTerritoryOrigin(), enemy_territory->GetTerritoryRange(), 1.0f, primitive_color_green);
+
+	// 索敵範囲をデバッグ円柱描画
+	renderer->DrawCylinder(position, search_range, 1.0f, primitive_color_blue);
+
+	// 攻撃範囲をデバッグ円柱描画
+	renderer->DrawCylinder(position, GetAttackRange(), 1.0f, primitive_color_purple);
+
+	// ターゲット座標の球描画
+	renderer->DrawSphere(target_position, 0.5f, primitive_color_red);
 }
 
 //-----------------------------------------

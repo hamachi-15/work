@@ -5,12 +5,12 @@
 #include "MetaAI.h"
 #include "Component.h"
 #include "CollisionDataHeader.h"
-#include "ActorType.h"
+
+enum class CollisionUpdateType;
+enum class ActorCategory;
 class Model;
 class Telegram;
 class DebugRenderer;
-enum class ActorType;
-enum class CollisionUpdateType;
 
 //-----------------------------------
 // レイキャスト
@@ -122,7 +122,7 @@ public:
 	int GetActorID() const { return actor_id; }
 	
 	// アクターの種類取得
-	const ActorType& GetActorType() { return actor_type; }
+	const ActorCategory& GetActorType() { return actor_type; }
 
 	// 更新方法取得
 	const CollisionUpdateType& GetUpdateType() const { return update_type; }
@@ -160,7 +160,7 @@ private:
 	bool					collision_flag = true; // あたり判定を行うかのフラグ
 	bool					attack_falg = false; // 攻撃の当たり判定を行うか
 	bool					hit_flag = false;
-	ActorType				actor_type;
+	ActorCategory				actor_type;
 	CollisionUpdateType		update_type;
 };
 

@@ -41,7 +41,7 @@ bool Script::LoadScript(const char* filename)
 	fread(text_buffer, text_buffer_size, 1, fp);
 
 	// ファイルを閉じる
-	//fclose(fp);
+	fclose(fp);
 
 	// テキスト位置を初期化する
 	text_ip = 0;

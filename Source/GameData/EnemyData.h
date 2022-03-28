@@ -2,11 +2,11 @@
 	@file	EnemyData.h
 	@brief	ツールにて自動生成しています。絶対に書き換えないでください。
 	@autor	DataBase.xlsm
-	@data	2022/03/18
+	@data	2022/03/27
 **/
 #pragma	once
 
-#include	"EnemyCategory.h"
+#include	"ActorType.h"
 
 
 /*!
@@ -17,7 +17,7 @@ struct	EnemyData
 {
 	int	id;	//!<	Id
 	char*	name;	//!<	名前
-	EnemyCategory	category;	//!<	敵の種類
+	ActorType	category;	//!<	敵の種類
 	char*	model_path;	//!<	モデルパス
 	char*	animation_node_name;	//!<	アニメーションの原点ノード名
 	float	scale_x;	//!<	大きさ(X)

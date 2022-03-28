@@ -6,6 +6,8 @@
 #include "Model.h"
 #include "Collision.h"
 
+// ゲームデータ
+#include "AttackCollitionTime.h"
 //**********************************
 // 
 // 汎用関数クラス

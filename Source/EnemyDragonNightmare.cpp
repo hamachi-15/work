@@ -139,16 +139,12 @@ void EnemyDragonNightmare::SetBehaviorNode()
 	{	// シーンがバトルシーンの時のノード設定
 		ai_tree->AddNode("",					"Root",						0, BehaviorTree::SelectRule::Priority,	NULL,								NULL);
 		ai_tree->AddNode("Root",				"Death",					1, BehaviorTree::SelectRule::Non,		new DeathJudgment(this),			new DeathAction(this));
-		//ai_tree->AddNode("Root",				"Damage",					2, BehaviorTree::SelectRule::Non,		new DamageJudgment(this),			new DamageAction(this));
 		ai_tree->AddNode("Root",				"Battle",					3, BehaviorTree::SelectRule::Priority,	NULL/*new BattleJudgment(this)*/,	NULL);
 		ai_tree->AddNode("Root",				"Scount",					4, BehaviorTree::SelectRule::Priority,	NULL,								NULL);
 		ai_tree->AddNode("Battle",				"Attack",					1, BehaviorTree::SelectRule::On_Off_Ramdom,	new AttackJudgment(this),			NULL);
 		ai_tree->AddNode("Battle",				"OutRange",					2, BehaviorTree::SelectRule::Priority,		NULL,								NULL);
 		ai_tree->AddNode("Scount",				"Idle",						1, BehaviorTree::SelectRule::Non,		NULL,								new IdleAction(this));
 		ai_tree->AddNode("OutRange",			"Pursuit",					0, BehaviorTree::SelectRule::Non,		NULL, new PursuitAction(this));
-		//ai_tree->AddNode("OutRange",			"LungesAttack",				1, BehaviorTree::SelectRule::Sequence,	NULL, NULL);
-		//ai_tree->AddNode("LungesAttack",		"TurnSequence",				0, BehaviorTree::SelectRule::Non,		NULL, new TurnToTargetAction(this));
-		//ai_tree->AddNode("LungesAttack",		"LungesAttackSequence",		1, BehaviorTree::SelectRule::Non,		NULL, new LungesAttackAction(this));
 		ai_tree->AddNode("Attack",				"BasicAttack",				0, BehaviorTree::SelectRule::Sequence,	new BasicAttackJudgment(this),		NULL);
 		ai_tree->AddNode("Attack",				"BodyPressAttack",			0, BehaviorTree::SelectRule::Random,	new BodyPressAttackJudgment(this), NULL);
 		ai_tree->AddNode("Attack",				"PlayerToTurn",				0, BehaviorTree::SelectRule::Non,		new TurnToTargetJudgment(this),	new TurnToTargetAction(this));
@@ -197,31 +193,3 @@ void EnemyDragonNightmare::Update(float elapsed_time)
 	// ビヘイビア更新処理
 	BehaviorUpdate(elapsed_time);
 }
-
-//--------------------------------------
-// 当たり範囲デバッグプリミティブ描画
-//--------------------------------------
-void EnemyDragonNightmare::DrawDebugPrimitive()
-{
-	DebugRenderer* renderer = Graphics::Instance().GetDebugRenderer();
-	std::shared_ptr<Actor> actor = GetActor();
-	DirectX::XMFLOAT3 position = actor->GetPosition();
-	EnemyTerritoryTag teritory_tag = GetBelongingToTerritory();
-	std::shared_ptr<EnemyTerritory> enemy_territory = EnemyTerritoryManager::Instance().GetTerritory(teritory_tag);
-	float territory_range = enemy_territory->GetTerritoryRange();
-	DirectX::XMFLOAT3 territory_origin = enemy_territory->GetTerritoryOrigin();
-	territory_origin.y = actor->GetPosition().y;
-	// 縄張り範囲をデバッグ円柱描画
-	renderer->DrawCylinder(territory_origin, territory_range, 1.0f, DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f));
-
-	// 索敵範囲をデバッグ円柱描画
-	renderer->DrawCylinder(position, search_range, 1.0f, DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f));
-
-	// 攻撃範囲をデバッグ円柱描画
-	renderer->DrawCylinder(position, GetAttackRange(), 1.0f, DirectX::XMFLOAT4(1.0f, 0.0f, 1.0f, 1.0f));
-
-	// ターゲット座標の球描画
-	renderer->DrawSphere(target_position, 0.5f, DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
-}
-
-

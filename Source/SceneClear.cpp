@@ -3,6 +3,8 @@
 #include "ResourceManager.h"
 #include "ShaderManager.h"
 #include "SceneManager.h"
+#include "AudioManager.h"
+
 #include "SceneTitle.h"
 #include "Graphics.h"
 #include "Sprite.h"
@@ -20,6 +22,9 @@ void SceneClear::Initialize()
 	anybutton_texture = ResourceManager::Instance().LoadTexture("Data/Sprite/PushAnyButton.png");
 	clear_texture = std::make_unique<Texture>();
 	clear_texture->Load("Data/Sprite/GameClear.png");
+	// BGM再生
+	AudioManager::Instance().PlayBGM(BGMType::Clear);
+	AudioManager::Instance().SetBGMVolume(BGMType::Clear, 0.4f);
 }
 
 //-------------------------------------
@@ -29,6 +34,9 @@ void SceneClear::Finalize()
 {
 	// 撃破フラグをクリア
 	EnemyManager::Instance().CrearDefeat();
+
+	// BGM再生停止
+	AudioManager::Instance().StopBGM(BGMType::Clear);
 }
 
 //-------------------------------------

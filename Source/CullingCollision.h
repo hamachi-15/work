@@ -2,7 +2,7 @@
 #include <string>
 #include <memory>
 
-enum class EnemyCategory;
+enum class ActorType;
 struct CollisionParameter;
 class CollisionBox;
 class Actor;
@@ -17,7 +17,7 @@ class CullingCollision
 {
 public:
 	// コンストラクタ
-	CullingCollision(EnemyCategory enemy_category, std::shared_ptr<Actor> actor);
+	CullingCollision(ActorType enemy_category, std::shared_ptr<Actor> actor);
 
 	// デストラクタ
 	~CullingCollision();
@@ -47,5 +47,5 @@ private:
 	std::shared_ptr<Actor> actor;
 	std::shared_ptr<CollisionBox> collision_culling;
 	std::string name = "";
-	EnemyCategory	enemy_category; // データベースのコリジョンデータ検索に使う
+	ActorType	enemy_category; // データベースのコリジョンデータ検索に使う
 };
