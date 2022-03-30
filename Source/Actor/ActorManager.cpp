@@ -359,9 +359,6 @@ void ActorManager::Render(RenderContext* render_context)
 	// シェーダータイプの初期化
 	shader_type = static_cast<ShaderManager::ShaderType>(-1);
 
-	DrawLister();
-	DrawDetail();
-
 }
 
 //------------------------------

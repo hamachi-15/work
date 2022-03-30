@@ -349,18 +349,6 @@ void SceneBattle::ScreenRender(ID3D11DeviceContext* context, RenderContext* rend
 		shader->End(context);
 	}
 
-	// デバッグプリミティブ描画
-	{
-		// 敵縄張りのデバッグプリミティブ描画
-		EnemyTerritoryManager::Instance().Render();
-		// 敵のデバッグプリミティブ描画
-		EnemyManager::Instance().DrawDebugPrimitive();
-		// 当たり判定ののデバッグプリミティブ描画
-		CollisionManager::Instance().Draw();
-
-		graphics.GetDebugRenderer()->Render(context, render_context->view, render_context->projection);
-	}
-
 	// アクター描画
 	{
 		// シャドウマップ作成
